@@ -1,0 +1,66 @@
+---
+name: "Lychee"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/lychee.yaml"]
+  schedule:
+    - cron: "0 0 * * *"
+
+env:
+  WORKFLOW_ISSUE_TITLE: "Link Checker Dashboard 🔗"
+
+jobs:
+  lychee:
+    name: Lychee
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Setup Workflow Tools
+        shell: bash
+        run: brew install lychee
+
+      - name: Scan For Broken Links
+        shell: bash
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          lychee --verbose --no-progress \
+              --format markdown \
+              --output results.md \
+              --exclude-all-private \
+              --exclude-mail \
+              ./**/*.md || true
+
+      - name: Print Output
+        run: cat results.md
+
+      - name: Find Link Checker Issue
+        id: find-issue
+        shell: bash
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          issue_number=$( \
+              gh issue list \
+                  --search "in:title ${{ env.WORKFLOW_ISSUE_TITLE }}" \
+                  --state open \
+                  --json number \
+                  | jq --raw-output '.[0].number' \
+          )
+          echo "issue-number=${issue_number}" >> $GITHUB_OUTPUT
+          echo "${issue_number}"
+
+      - name: Update Issue
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: "${{ env.WORKFLOW_ISSUE_TITLE }}"
+          issue-number: "${{ steps.find-issue.outputs.issue-number || '' }}"
+          content-filepath: results.md
