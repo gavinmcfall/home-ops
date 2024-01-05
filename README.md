@@ -1,3 +1,5 @@
+<div align="center">
+
 # Project Fleet
 <img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/Fleet.png" align="center" width="144px" height="144px"/>
 
@@ -10,6 +12,8 @@ _... managed with Flux, Renovate, Swearing and GitHub Actions_ 🤖
 
 [![Discord](https://img.shields.io/discord/673534664354430999?style=for-the-badge&label&logo=discord&logoColor=white&color=blue)](https://discord.gg/home-operations)&nbsp;&nbsp;
 [![Kubernetes](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fonedr0p%2Fhome-ops%2Fmain%2Fkubernetes%2Fmain%2Fapps%2Ftools%2Fsystem-upgrade-controller%2Fplans%2Fserver.yaml&query=%24.spec.version&style=for-the-badge&logo=kubernetes&logoColor=white&label=%20)](https://k3s.io/)&nbsp;&nbsp;
+
+</div>
 
 ## 📖 Overview
 
