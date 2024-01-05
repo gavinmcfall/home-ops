@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: int-ingress
   rules:
-    - host: &host nexus.${bootstrap_cloudflare_domain}
+    - host: &host nexus.${SECRET_DOMAIN}
       http:
         paths:
           - path: /

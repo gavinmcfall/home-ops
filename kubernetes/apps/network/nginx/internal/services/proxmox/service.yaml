@@ -6,7 +6,7 @@ metadata:
   namespace: networking
 spec:
   type: ExternalName
-  externalName: nexus.${bootstrap_cloudflare_domain}
+  externalName: nexus.${SECRET_DOMAIN}
   ports:
     - name: http
       port: &port 8006
