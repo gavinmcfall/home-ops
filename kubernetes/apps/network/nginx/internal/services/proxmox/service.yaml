@@ -10,7 +10,7 @@ spec:
       port: &port 8006
       protocol: TCP
       targetPort: *port
-    - name: spice-console
+    - name: http
       port: &port2 3128
       protocol: TCP
       targetPort: *port2
