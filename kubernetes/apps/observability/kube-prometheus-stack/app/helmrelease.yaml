@@ -27,8 +27,8 @@ spec:
   uninstall:
     keepHistory: false
   dependsOn:
-    - name: local-path-provisioner
-      namespace: storage
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   valuesFrom:
     - name: kube-prometheus-stack-values
       kind: ConfigMap
