@@ -8,5 +8,5 @@ subsets:
   - ip: 10.90.254.1
   ports:
   - name: http
-    port: 80
+    port: 443
     protocol: TCP
