@@ -10,3 +10,6 @@ subsets:
   - name: http
     port: 8006
     protocol: TCP
+  - name: spice-console
+    port: 3128
+    protocol: TCP
