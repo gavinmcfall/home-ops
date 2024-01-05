@@ -5,7 +5,7 @@ metadata:
   name: &app proxmox
   namespace: networking
 spec:
-  ingressClassName: int-ingress
+  ingressClassName: internal
   rules:
     - host: &host nexus.${SECRET_DOMAIN}
       http:

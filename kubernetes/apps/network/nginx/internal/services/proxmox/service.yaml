@@ -6,7 +6,7 @@ metadata:
   namespace: networking
 spec:
   type: ExternalName
-  externalName: nexus.${SECRET_DOMAIN}
+  externalName: 10.90.1.1
   ports:
     - name: http
       port: &port 8006
