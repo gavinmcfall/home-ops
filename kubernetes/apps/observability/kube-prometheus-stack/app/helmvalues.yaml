@@ -109,7 +109,7 @@ data:
         storageSpec:
           volumeClaimTemplate:
             spec:
-              storageClassName: ceph-block
+              storageClassName: local-hostpath
               resources:
                 requests:
                   storage: 10Gi
