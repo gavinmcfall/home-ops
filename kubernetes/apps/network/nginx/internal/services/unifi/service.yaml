@@ -7,6 +7,6 @@ metadata:
 spec:
   ports:
     - name: http
-      port: &port 80
+      port: &port 443
       protocol: TCP
       targetPort: *port
