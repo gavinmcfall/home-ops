@@ -1,4 +1,4 @@
-![Alt text](infrstructure/images/Nerdz_Infrastructure_v1.png)
+![Alt text](infrastructure/images/Nerdz_Infrastructure_v1.png)
 
 
 # Deploy a Kubernetes cluster backed by Flux
