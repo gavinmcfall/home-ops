@@ -7,8 +7,8 @@ metadata:
 spec:
   type: ExternalName
   externalName: 10.90.1.1
-  # ports:
-  #   - name: http
-  #     port: &port 8006
-  #     protocol: TCP
-  #     targetPort: *port
+  ports:
+    - name: http
+      port: &port 8006
+      protocol: TCP
+      targetPort: *port
