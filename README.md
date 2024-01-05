@@ -52,6 +52,24 @@ This Git repository contains the following directories under [Kubernetes](./kube
 This is a high level diagram of how my kubernetes infrastructure is setup
 <img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/Nerdz_Infrastructure_v1.png" align="center"/>
 
+### Hardware
+
+| Device                      | Count | OS Disk Size      | Ram   | Operating System | Purpose                     |
+|-----------------------------|-------|-------------------|-------|------------------|-----------------------------|
+| Dell Poweredge R730         | 1     | 2x 2TB Raid1 ZFS  | 128GB | Proxmox          | Virtualization Host         |
+| Unifi Dream Machine Pro     | 1     | -                 | -     |                  | Router / FW DHCP Main Lan   |
+| Unifi US 24 250w PoE        | 1     | -                 | -     |                  | PoE for APs etc (1Gbe)      |
+| Unifi US 48 G1              | 1     | -                 | -     |                  | Primary Switch (1Gbe)       |
+| Unifi U6 Lite               | 3     | -                 | -     |                  | Wirless Access Points (PoE) |
+
+### Virtual Machines
+
+| Device                      | Count | OS Disk Size    | Data Disk Size             | CPU | Ram  | Operating System    | Purpose                              |
+|-----------------------------|-------|-----------------|----------------------------|-----|------|---------------------|--------------------------------------|
+| Arccorp, Crusader, Hurston  | 3     | 250GB SSD: VT-d | 2TB SSD: VT-d (rook-ceph)  | 12c | 24GB | Debian              | Kubernetes Masters                   |
+| Stormwind                   | 1     | 40GB            | -                          | 02c | 02GB | Windows Server 2022 | DNS / DHCP                           |
+| rclone-proxmox              | 1     | 08GB            | -                          | 01c | 01GB | Ubuntu (lxc)        | Sync Proxmox backups to Backblaze B2 |
+
 ## 🤝 Gratitude and Thanks
 
 Thanks to all the people who donate their time in the [Home Operations](https://discord.gg/home-operations) and [TechnoTim](https://l.technotim.live/discord) Discord Communities for all of their support
