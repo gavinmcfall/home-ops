@@ -70,6 +70,7 @@ spec:
             any: true
       extraArgs:
         default-ssl-certificate: "network/${SECRET_DOMAIN/./-}-production-tls"
+        tcp-services-configmap: "ingress-nginx/tcp-services"
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
