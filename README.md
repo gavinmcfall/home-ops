@@ -50,7 +50,7 @@ This Git repository contains the following directories under [Kubernetes](./kube
 ### Infrastructure
 
 This is a high level diagram of how my kubernetes infrastructure is setup
-<img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/Nerdz_Infrastructure_v1.png" align="center" width="1751px" height="792px"/>
+<img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/Nerdz_Infrastructure_v1.png" align="center" width="1280px" height="579px"/>
 
 testing git push
 
