@@ -24,8 +24,8 @@ spec:
   uninstall:
     keepHistory: false
   dependsOn:
-    - name: local-path-provisioner
-      namespace: storage
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   values:
     deploymentStrategy:
       type: Recreate
@@ -51,6 +51,14 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/default
+          - name: ceph
+            orgId: 1
+            folder: Ceph
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/ceph
           - name: flux
             orgId: 1
             folder: Flux
@@ -168,6 +176,6 @@ spec:
             - *host
     persistence:
       enabled: true
-      storageClassName: local-hostpath
+      storageClassName: ceph-block
     testFramework:
       enabled: false
