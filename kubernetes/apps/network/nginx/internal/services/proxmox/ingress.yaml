@@ -1,0 +1,22 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: &app proxmox
+  namespace: networking
+spec:
+  ingressClassName: int-ingress
+  rules:
+    - host: &host nexus.${bootstrap_cloudflare_domain}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: *app
+                port:
+                  number: 8006
+  tls:
+    - hosts:
+        - *host
