@@ -6,15 +6,9 @@ kubernetes:
         arccorp:
           ansible_user: k3sadmin
           ansible_host: 10.90.3.101
-          ceph_drives:
-            - /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
         crusader:
           ansible_user: k3sadmin
           ansible_host: 10.90.3.102
-          ceph_drives:
-            - /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
         hurston:
           ansible_user: k3sadmin
           ansible_host: 10.90.3.103
-          ceph_drives:
-            - /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
