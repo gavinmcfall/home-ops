@@ -60,7 +60,7 @@ Thanks to all the people who donate their time in the [Home Operations](https://
 
 ## 📜 Changelog
 
-See my _awful_ [commit history](https://github.com/onedr0p/home-ops/commits/main)
+See my _awful_ [commit history](https://github.com/gavinmcfall/home-ops/commits/main)
 
 ---
 
