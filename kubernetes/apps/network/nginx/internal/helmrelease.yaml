@@ -26,6 +26,8 @@ spec:
     keepHistory: false
   values:
     fullnameOverride: nginx-internal
+    tcp:
+      "3128": "network/proxmox:3128"
     controller:
       replicaCount: 1
       service:
@@ -70,7 +72,6 @@ spec:
             any: true
       extraArgs:
         default-ssl-certificate: "network/${SECRET_DOMAIN/./-}-production-tls"
-        tcp-services-configmap: "ingress-nginx/tcp-services"
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
