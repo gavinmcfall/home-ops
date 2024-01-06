@@ -88,6 +88,7 @@ spec:
         apiVersion: 1
         deleteDatasources:
           - { name: Prometheus, orgId: 1 }
+          - { name: Loki, orgId: 1 }
         datasources:
           - name: Prometheus
             type: prometheus
@@ -97,6 +98,13 @@ spec:
             jsonData:
               prometheusType: Prometheus
             isDefault: true
+          - name: Loki
+            type: loki
+            uid: loki
+            access: proxy
+            url: http://loki-gateway.observability.svc.cluster.local
+            jsonData:
+              maxLines: 250
     dashboards:
       default:
         cloudflared:
