@@ -1,7 +1,7 @@
 <div align="center">
 
-# Project Fleet
-<img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/Fleet.png" align="center" width="144px" height="144px"/>
+# Kubernetes Nerdz
+<img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/kubernetes.png" align="center" width="144px" height="144px"/>
 
 ### My Home Operations Repository :octocat:
 _... managed with Flux, Renovate, Swearing and GitHub Actions_ 🤖
