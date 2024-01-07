@@ -44,8 +44,8 @@ spec:
       wal:
         compression: bzip2
         maxParallel: 8
-      destinationPath: s3://cloudnative-pg/
-      endpointURL: https://s3.turbo.ac
+      destinationPath: s3://nerdz-cloudnative-pg/
+      endpointURL: https://s3.us-east-005.backblazeb2.com
       serverName: &currentCluster postgres16-v2
       s3Credentials:
         accessKeyId:
@@ -61,8 +61,8 @@ spec:
         wal:
           compression: bzip2
           maxParallel: 8
-        destinationPath: s3://cloudnative-pg/
-        endpointURL: https://s3.turbo.ac
+        destinationPath: s3://nerdz-cloudnative-pg/
+        endpointURL: https://s3.us-east-005.backblazeb2.com
         s3Credentials:
           accessKeyId:
             name: cloudnative-pg-secret
