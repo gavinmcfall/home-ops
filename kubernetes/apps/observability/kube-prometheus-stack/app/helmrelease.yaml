@@ -29,26 +29,35 @@ spec:
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
+  valuesFrom:
+    - kind: ConfigMap
+      name: kube-state-metrics-configmap
+      valuesKey: kube-state-metrics.yaml
   values:
     crds:
       enabled: true
     cleanPrometheusOperatorObjectNames: true
     alertmanager:
-      enabled: false
-    kube-state-metrics:
-      metricLabelsAllowlist:
-        - "deployments=[*]"
-        - "persistentvolumeclaims=[*]"
-        - "pods=[*]"
-      prometheus:
-        monitor:
-          enabled: true
-          relabelings:
-            - action: replace
-              sourceLabels: ["__meta_kubernetes_pod_node_name"]
-              regex: ^(.*)$
-              replacement: $1
-              targetLabel: kubernetes_node
+      ingress:
+        enabled: true
+        pathType: Prefix
+        ingressClassName: internal
+        hosts:
+          - &host alertmanager.${SECRET_DOMAIN}
+        tls:
+          - hosts:
+              - *host
+      alertmanagerSpec:
+        replicas: 2
+        useExistingSecret: true
+        configSecret: alertmanager-secret
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: local-hostpath
+              resources:
+                requests:
+                  storage: 1Gi
     kubelet:
       enabled: true
       serviceMonitor:
