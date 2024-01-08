@@ -10,7 +10,7 @@ data:
     endpoints:
       - name: "${APP}"
         group: infrastructure
-        url: "tcp://${GATUS_SVC_NAME}.${GATUS_NAMESPACE}.cluster.local:${GATUS_SVC_PORT}"
+        url: "tcp://${GATUS_SVC_NAME}.${GATUS_NAMESPACE}.svc.cluster.local:${GATUS_SVC_PORT}"
         interval: 1m
         client:
           dns-resolver: tcp://1.1.1.1:53
