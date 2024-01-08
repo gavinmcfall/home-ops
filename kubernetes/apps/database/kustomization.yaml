@@ -8,3 +8,4 @@ resources:
   # Flux-Kustomizations
   - ./cloudnative-pg/ks.yaml
   - ./redis/ks.yaml
+  - ../../../../templates/gatus/infrastructure
