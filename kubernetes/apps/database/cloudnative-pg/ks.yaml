@@ -50,4 +50,4 @@ spec:
       APP: *app
       GATUS_SVC_NAME: postgres-lb
       GATUS_SVC_PORT: "5432"
-      GATUS_NAMESPACE: ${{ targetNamespace }}
+      GATUS_NAMESPACE: database
