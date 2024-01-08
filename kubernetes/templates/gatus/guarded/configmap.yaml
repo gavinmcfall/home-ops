@@ -16,9 +16,9 @@ data:
           hide-hostname: true
           hide-url: true
         dns:
-          query-name: "${APP}.${SECRET_DOMAIN}"
+          query-name: "${GATUS_SUBDOMAIN:-${APP}}.nerdz.cloud"
           query-type: A
         conditions:
           - "len([BODY]) == 0"
         alerts:
-          - type: discord
+          - type: pushover
