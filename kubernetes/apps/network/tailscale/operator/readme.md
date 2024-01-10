@@ -31,7 +31,7 @@ We are going to start on [tailscale.com](https://login.tailscale.com/)
         - Read: :white_check_mark:
         - Write: :white_check_mark:
     - Click **Add tags** and select `k8s-operator`
-    - <img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/tailscale_01.png"/>
+    - <img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/Tailscale_01.png"/>
 10. Click `Generate client`
 11. You will be presented with:
     - Client ID
