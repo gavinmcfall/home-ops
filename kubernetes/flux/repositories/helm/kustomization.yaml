@@ -22,5 +22,6 @@ resources:
   - ./metrics-server.yaml
   - ./piraeus.yaml
   - ./prometheus-community.yaml
+  - ./rook-ceph.yaml
   - ./stakater.yaml
   - ./weave-gitops.yaml
