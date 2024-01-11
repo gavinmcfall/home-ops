@@ -32,11 +32,11 @@ spec:
       provisioner:
         image: registry.k8s.io/sig-storage/csi-provisioner:v3.6.3
       cephFSKernelMountOptions: ms_mode=prefer-crc
-      enableLiveness: false
+      enableLiveness: true
       serviceMonitor:
-        enabled: false
+        enabled: true
     monitoring:
-      enabled: false
+      enabled: true
     resources:
       requests:
         memory: 128Mi # unchangable
