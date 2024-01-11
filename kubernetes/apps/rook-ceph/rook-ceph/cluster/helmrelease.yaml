@@ -31,8 +31,8 @@ spec:
       namespace: storage
   values:
     monitoring:
-      enabled: false
-      createPrometheusRules: false
+      enabled: true
+      createPrometheusRules: true
     ingress:
       dashboard:
         ingressClassName: internal
