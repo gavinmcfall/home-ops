@@ -1,0 +1,89 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app wikijs
+  namespace: media
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    replicacount: 1
+    image:
+      # https://hub.docker.com/r/requarks/wiki
+      repository: ghcr.io/requarks/wiki
+      tag: 2.5.299
+    env:
+      TZ: "${TIMEZONE}"
+      APP_URL: "https://docs.${SECRET_DOMAIN}"
+      DB_TYPE: postgres
+      DB_HOST:
+        valueFrom:
+          secretKeyRef:
+            name: &secret wikijs-secret
+            key: INIT_POSTGRES_HOST
+      DB_PORT:
+        valueFrom:
+          secretKeyRef:
+            name: wikijs-secret
+            key: POSTGRES_PORT
+      DB_USER:
+        valueFrom:
+          secretKeyRef:
+            name: wikijs-secret
+            key: INIT_POSTGRES_USER
+      DB_NAME:
+        valueFrom:
+          secretKeyRef:
+            name: wikijs-secret
+            key: INIT_POSTGRES_DBNAME
+      DB_PASS:
+        valueFrom:
+          secretKeyRef:
+            name: wikijs-secret
+            key: INIT_POSTGRES_PASS
+      HA_ACTIVE: true
+    service:
+      main:
+        ports:
+          http:
+            port: 3000
+    persistence:
+      data:
+        enabled: true
+        mountPath: /data
+        existingClaim: wikijs-pvc
+        subPath: wikijs
+    ingress:
+      main:
+        enabled: true
+        className: external
+        annotations:
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        hosts:
+          - host: &host "docs.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - *host
+    podAnnotations:
+      secret.reloader.stakater.com/reload: *secret
