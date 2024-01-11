@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./addons/ks.yaml
-  - ./notifications/discord.yaml
+  - ./notifications/ks.yaml
   - ./weave-gitops/ks.yaml
