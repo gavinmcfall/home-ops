@@ -122,13 +122,13 @@ spec:
             jsonData:
               implementation: prometheus
     dashboards:
-      # default:
-      #   cloudflared:
-      #     # renovate: depName="Cloudflare Tunnels (cloudflared)"
-      #     gnetId: 17457
-      #     revision: 6
-      #     datasource:
-      #       - { name: DS_PROMETHEUS, value: Prometheus }
+      default:
+        cloudflared:
+          # renovate: depName="Cloudflare Tunnels (cloudflared)"
+          gnetId: 17457
+          revision: 6
+          datasource:
+            - { name: DS_PROMETHEUS, value: Prometheus }
       #   external-dns:
       #     # renovate: depName="External-dns"
       #     gnetId: 15038
