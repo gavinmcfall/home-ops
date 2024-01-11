@@ -18,16 +18,30 @@ spec:
   install:
     createNamespace: true
     remediation:
-      retries: 5
+      retries: 3
   upgrade:
     remediation:
-      retries: 5
+      retries: 3
   values:
     replicacount: 1
-    image:
-      # https://hub.docker.com/r/requarks/wiki
-      repository: ghcr.io/requarks/wiki
-      tag: 2.5.299
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16
+            envFrom:
+              - secretRef:
+                  name: wikijs-secret
+        containers:
+          main:
+            image:
+              repository: ghcr.io/requarks/wiki
+              pullPolicy: IfNotPresent
+              tag: "2.5.300"
     env:
       TZ: "${TIMEZONE}"
       APP_URL: "https://docs.${SECRET_DOMAIN}"
@@ -57,7 +71,6 @@ spec:
           secretKeyRef:
             name: wikijs-secret
             key: INIT_POSTGRES_PASS
-      HA_ACTIVE: true
     service:
       main:
         ports:
