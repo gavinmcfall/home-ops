@@ -129,11 +129,11 @@ spec:
           revision: 6
           datasource:
             - { name: DS_PROMETHEUS, value: Prometheus }
-      #   external-dns:
-      #     # renovate: depName="External-dns"
-      #     gnetId: 15038
-      #     revision: 3
-      #     datasource: Prometheus
+        external-dns:
+          # renovate: depName="External-dns"
+          gnetId: 15038
+          revision: 3
+          datasource: Prometheus
       #   node-exporter-full:
       #     # renovate: depName="Node Exporter Full"
       #     gnetId: 1860
