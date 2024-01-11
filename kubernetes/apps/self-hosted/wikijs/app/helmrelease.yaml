@@ -76,12 +76,12 @@ spec:
         ports:
           http:
             port: 3000
-    persistence:
-      data:
-        enabled: true
-        mountPath: /data
-        existingClaim: wikijs-pvc
-        subPath: wikijs
+    # persistence:
+    #   data:
+    #     enabled: true
+    #     mountPath: /data
+    #     existingClaim: wikijs-pvc
+    #     subPath: wikijs
     ingress:
       main:
         enabled: true
