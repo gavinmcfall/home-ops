@@ -156,10 +156,6 @@ spec:
         cert-manager:
           url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
           datasource: Prometheus
-        node-exporter-full:
-          gnetId: 1860 # https://grafana.com/grafana/dashboards/1860?tab=revisions
-          revision: 31
-          datasource: Prometheus
       ceph:
       ceph-cluster:
         # renovate: depName="Ceph Cluster"
