@@ -147,9 +147,9 @@ spec:
         cert-manager:
           url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
           datasource: Prometheus
-      #   cloudnative-pg:
-      #     url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/samples/monitoring/grafana-dashboard.json
-      #     datasource: Prometheus
+        cloudnative-pg:
+          url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/samples/monitoring/grafana-dashboard.json
+          datasource: Prometheus
       #   external-secrets:
       #     url: https://raw.githubusercontent.com/external-secrets/external-secrets/main/docs/snippets/dashboard.json
       #     datasource: Prometheus
