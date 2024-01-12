@@ -6,9 +6,9 @@ configMapGenerator:
   - name: nut-exporter-dashboard
     files:
       - nut-exporter.json
-  - name: ups-aggregate-dashboard
-    files:
-      - ups-aggregate.json
+  # - name: ups-aggregate-dashboard
+  #   files:
+  #     - ups-aggregate.json
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
