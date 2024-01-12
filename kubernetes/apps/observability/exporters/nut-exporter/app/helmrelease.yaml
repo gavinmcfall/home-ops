@@ -44,6 +44,7 @@ spec:
               - secretRef:
                   name: nut-exporter-secret
             args:
+              # for some reason, this only work is the first and last values are duplicated
               - --nut.vars_enable="battery.charge,battery.charge,battery.runtime,input.voltage,output.voltage,output.voltage.nominal,ups.load,ups.status,ups.realpower,ups.realpower"
             resources:
               limits:
