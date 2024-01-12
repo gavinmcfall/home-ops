@@ -48,7 +48,7 @@ spec:
               - --nut.vars_enable="battery.charge,battery.charge,battery.runtime,input.voltage,output.voltage,output.voltage.nominal,ups.load,ups.status,ups.realpower,ups.realpower"
             resources:
               limits:
-                cpu: 100m
+                cpu: 200m
                 memory: 100Mi
     service:
       main:
