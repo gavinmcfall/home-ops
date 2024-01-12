@@ -24,12 +24,12 @@ metrics:
       - { color: red, min: 76, max: 9999 }
 
   - name: cluster_power_usage
-    query: sum(ipmi_dcmi_power_consumption_watts)
+    query: sum(network_ups_tools_ups_realpower)
     suffix: "w"
     colors:
-      - { color: "green", min: 0, max: 400 }
-      - { color: "orange", min: 401, max: 750 }
-      - { color: "red", min: 751, max: 9999 }
+      - { color: "green", min: 0, max: 200 }
+      - { color: "orange", min: 201, max: 300 }
+      - { color: "red", min: 301, max: 9999 }
 
   - name: cluster_age_days
     query: round((time() - max(kube_node_created) ) / 86400)
