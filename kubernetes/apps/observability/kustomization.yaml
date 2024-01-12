@@ -11,4 +11,4 @@ resources:
   - ./thanos/ks.yaml
   - ./vector/ks.yaml
   # Exporters
-  # - ./exporters
+  - ./exporters
