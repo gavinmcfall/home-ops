@@ -44,8 +44,7 @@ spec:
               - secretRef:
                   name: nut-exporter-secret
             args:
-              # the first time I set this, the first and last entries were ignored, so I have doubled them.
-              - --nut.vars_enable="battery.charge,battery.runtime,battery.voltage,battery.voltage.nominal,input.voltage,input.voltage.nominal,ups.load,ups.status,realpower"
+              - --nut.vars_enable="battery.charge,battery.runtime,input.voltage,input.voltage.nominal,output.voltage,output.voltage.nominal,ups.load,ups.status,ups.realpower"
             resources:
               limits:
                 cpu: 100m
