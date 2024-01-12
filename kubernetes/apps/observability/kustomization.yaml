@@ -10,3 +10,5 @@ resources:
   - ./loki/ks.yaml
   - ./thanos/ks.yaml
   - ./vector/ks.yaml
+  # Exporters
+  # - ./exporters
