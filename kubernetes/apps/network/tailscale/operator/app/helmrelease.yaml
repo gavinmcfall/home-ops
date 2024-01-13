@@ -3,18 +3,18 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: &app tailscale-operator
-  namespace: &ns network
+  name: tailscale-operator
 spec:
-  interval: 5m
+  interval: 30m
   chart:
     spec:
-      chart: app-template
-      version: 2.4.0
+      chart: tailscale-operator
+      version: 1.56.1
       sourceRef:
         kind: HelmRepository
-        name: bjw-s
+        name: tailscale
         namespace: flux-system
+  maxHistory: 2
   install:
     remediation:
       retries: 3
@@ -25,49 +25,16 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    controllers:
-      main:
-        replicas: 2
-        strategy: RollingUpdate
-        annotations:
-          reloader.stakater.com/auto: "true"
-        containers:
-          main:
-            image:
-              repository: tailscale/k8s-operator
-              tag: 1.56.1@sha256:bb02d69bcaa11d96d9a60bd5a068172e0a137dd8b5df994e00e6b27fd451bf28
-            service:
-              main:
-                enabled: false
-            probes:
-              liveness:
-                enabled: false
-              readiness:
-                enabled: false
-              startup:
-                enabled: false
-            serviceAccount:
-              create: false
-              name: *app
-            env:
-              OPERATOR_HOSTNAME: *app
-              OPERATOR_SECRET: *app
-              OPERATOR_NAMESPACE: *ns
-              CLIENT_ID_FILE: "/oauth/client_id"
-              CLIENT_SECRET_FILE: "/oauth/client_secret"
-              OPERATOR_LOGGING: "debug"
-              PROXY_IMAGE: "ghcr.io/tailscale/tailscale:v1.56.1"
-              PROXY_TAGS: "tag:k8s-operator"
-              AUTH_PROXY: "true"
-            resources:
-              requests:
-                cpu: 50m
-              limits:
-                memory: 128Mi
-    persistence:
-      oauth:
-        enabled: true
-        type: secret
-        name: tailscale-operator
-        mountPath: /oauth
-        readOnly: true
+    operatorConfig:
+      image:
+        repo: ghcr.io/tailscale/k8s-operator
+        tag: 1.56.1
+        digest: "sha256:bb02d69bcaa11d96d9a60bd5a068172e0a137dd8b5df994e00e6b27fd451bf28"
+      logging: "debug"
+    proxyConfig:
+      image:
+        repo: ghcr.io/tailscale/tailscale
+        tag: 1.56.1
+        digest: "sha256:ac0c192f6cba52877e4d9c2fe8943f16c0ab44927605a21416852590e3ccb71e"
+    apiServerProxyConfig:
+      mode: "true"
