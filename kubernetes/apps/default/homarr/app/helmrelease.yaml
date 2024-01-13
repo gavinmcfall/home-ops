@@ -35,7 +35,7 @@ spec:
               tag: 0.14.3@sha256:45f163b94e34354a643d3f71e77455d78e805e8bf32be199f74c2d131ea14bc1
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
+              readOnlyRootFilesystem: false
               capabilities: { drop: ["ALL"] }
             env:
               DEFAULT_COLOR_SCHEME: dark
