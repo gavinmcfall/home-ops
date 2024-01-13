@@ -94,3 +94,5 @@ spec:
           - path: /app/data/configs
           - path: /app/database
           - path: /app/public/icons
+      tmp:
+        type: emptyDir
