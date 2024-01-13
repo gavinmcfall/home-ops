@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,41 +10,60 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
-      interval: 15m
+      version: 2.4.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
-    image:
-      repository: tailscale/k8s-operator
-      tag: unstable-v1.49.197
-    updateStrategy:
-      type: Recreate
-    service:
+    controllers:
       main:
-        enabled: false
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: false
-      startup:
-        enabled: false
-    serviceAccount:
-      create: false
-      name: *app
-    env:
-      OPERATOR_HOSTNAME: *app
-      OPERATOR_SECRET: *app
-      OPERATOR_NAMESPACE: *ns
-      CLIENT_ID_FILE: "/oauth/client_id"
-      CLIENT_SECRET_FILE: "/oauth/client_secret"
-      OPERATOR_LOGGING: "debug"
-      PROXY_IMAGE: "ghcr.io/tailscale/tailscale:v1.56.1"
-      PROXY_TAGS: "tag:k8s-operator"
-      AUTH_PROXY: "true"
+        replicas: 2
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          main:
+            image:
+              repository: tailscale/k8s-operator
+              tag: 1.56.1@sha256:bb02d69bcaa11d96d9a60bd5a068172e0a137dd8b5df994e00e6b27fd451bf28
+            service:
+              main:
+                enabled: false
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            serviceAccount:
+              create: false
+              name: *app
+            env:
+              OPERATOR_HOSTNAME: *app
+              OPERATOR_SECRET: *app
+              OPERATOR_NAMESPACE: *ns
+              CLIENT_ID_FILE: "/oauth/client_id"
+              CLIENT_SECRET_FILE: "/oauth/client_secret"
+              OPERATOR_LOGGING: "debug"
+              PROXY_IMAGE: "ghcr.io/tailscale/tailscale:v1.56.1"
+              PROXY_TAGS: "tag:k8s-operator"
+              AUTH_PROXY: "true"
+            resources:
+              requests:
+                cpu: 50m
+              limits:
+                memory: 128Mi
     persistence:
       oauth:
         enabled: true
@@ -51,7 +71,3 @@ spec:
         name: tailscale-operator
         mountPath: /oauth
         readOnly: true
-    resources:
-      requests:
-        cpu: 50m
-        memory: 128Mi
