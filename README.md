@@ -42,7 +42,7 @@ This is a mono repository for my home infrastructure and Kubernetes cluster. I t
 
 ## ⛵ Kubernetes
 
-If you want to try and follow along with how I built my cluster and with some of the practices I use please check out he amazing template here:
+If you want to try and follow along with how I built my cluster and with some of the practices I use please check out the amazing template here:
 
 [![Flux Cluster Template](https://img.shields.io/badge/Flux%20Cluster%20Template-1f6feb?style=for-the-badge)](https://github.com/onedr0p/flux-cluster-template)
 [![Flux Cluster Template Stars](https://img.shields.io/github/stars/onedr0p/flux-cluster-template?style=for-the-badge&color=1f6feb)](https://github.com/onedr0p/flux-cluster-template)
