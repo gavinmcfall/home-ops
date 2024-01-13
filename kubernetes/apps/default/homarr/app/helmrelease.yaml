@@ -91,4 +91,6 @@ spec:
         enabled: true
         existingClaim: *app
         globalMounts:
-          - path: /app/
+          - path: /app/data/configs
+          - path: /app/database
+          - path: /app/public/icons
