@@ -94,7 +94,7 @@ spec:
         existingClaim: *app
         globalMounts:
           - path: /app/data/configs/
-          - path: /app/data/
+          - path: /data/
           - path: /app/public/icons/
       tmp:
         type: emptyDir
