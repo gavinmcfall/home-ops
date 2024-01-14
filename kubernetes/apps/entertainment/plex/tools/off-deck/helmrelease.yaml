@@ -1,0 +1,66 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: plex-off-deck
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 2.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  dependsOn:
+    - name: plex
+      namespace: entertainment
+  values:
+    controllers:
+      main:
+        type: cronjob
+        cronjob:
+          schedule: "@hourly"
+          timeZone: &timeZone ${TIMEZONE}
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/jbops
+              tag: 1.0.893@sha256:91e8b28db34a971a2bab2a006defd0d6aaaf9e2ee3057cc3640f0408227ddb26
+            env:
+              TZ: *timeZone
+              JBOPS__SCRIPT_PATH: utility/off_deck.py
+            args: [
+              "/entrypoint.sh",
+              "--markWatched",
+              "--playlists", "Toons", "SleepMix"
+            ]
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+    service:
+      main:
+        enabled: false
+    persistence:
+      secret-file:
+        type: secret
+        name: plex-off-deck-secret
+        globalMounts:
+          - path: /config/config.ini
+            subPath: config.ini
+            readOnly: true
