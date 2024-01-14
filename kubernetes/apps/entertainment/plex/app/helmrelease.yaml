@@ -42,7 +42,6 @@ spec:
               tag: 1.40.0.7775-456fbaf97@sha256:cd6bafd8cf9f75c2d5b6517de312a82a986049f89f089da74b6bdb23928b8b37
             env:
               TZ: ${TIMEZONE}
-              PLEX_CLAIM: claim-z8Hiq7rRJ5mpLaRyG4LC
             probes:
               liveness: &probes
                 enabled: true
@@ -124,10 +123,10 @@ spec:
         type: emptyDir
       transcode:
         type: emptyDir
-      # media:
-      #   type: nfs
-      #   server: 10.90.1.1
-      #   path: /mnt/media
-      #   globalMounts:
-      #     - path: /media
-      #       readOnly: true
+      media:
+        type: nfs
+        server: 10.90.1.1
+        path: /mnt/media
+        globalMounts:
+          - path: /media
+            readOnly: true
