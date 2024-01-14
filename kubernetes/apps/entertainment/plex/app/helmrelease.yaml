@@ -65,8 +65,8 @@ spec:
               requests:
                 cpu: 100m
               limits:
-                gpu.intel.com/i915: 1
-                memory: 8Gi
+                # gpu.intel.com/i915: 1
+                memory: 4Gi
         pod:
           # affinity:
           #   podAntiAffinity:
