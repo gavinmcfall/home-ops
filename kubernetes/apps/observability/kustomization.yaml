@@ -5,7 +5,7 @@ resources:
   - ./namespace.yaml
   - ./gatus/ks.yaml
   - ./grafana/ks.yaml
-  # - ./homarr/ks.yaml
+  - ./homarr/ks.yaml
   - ./kromgo/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
   - ./loki/ks.yaml
