@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   # - ./discord-template-notifier/ks.yaml
-  - ./homarr/ks.yaml
+  # - ./homarr/ks.yaml
