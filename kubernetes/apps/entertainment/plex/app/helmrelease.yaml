@@ -123,10 +123,10 @@ spec:
         type: emptyDir
       transcode:
         type: emptyDir
-      media:
-        type: nfs
-        server: 10.90.1.1
-        path: /mnt/media
-        globalMounts:
-          - path: /media
-            readOnly: true
+      # media:
+      #   type: nfs
+      #   server: 10.90.1.1
+      #   path: /mnt/media
+      #   globalMounts:
+      #     - path: /media
+      #       readOnly: true
