@@ -50,4 +50,4 @@ spec:
     # Subcharts
     nfd: {}
     gfd:
-      enabled: false
+      enabled: true
