@@ -66,8 +66,10 @@ spec:
             resources:
               requests:
                 cpu: 100m
+                nvidia.com/gpu: 1
               limits:
-                memory: 4Gi
+                memory: 16Gi
+                nvidia.com/gpu: 1
                 # gpu.intel.com/i915: 1
         pod:
           # affinity:
