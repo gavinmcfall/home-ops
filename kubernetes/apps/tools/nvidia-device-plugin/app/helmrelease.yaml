@@ -48,6 +48,7 @@ spec:
     nodeSelector:
       feature.node.kubernetes.io/custom-nvidia-gpu: "true"
     # Subcharts
-    nfd: {}
-    gfd:
+    nfd:
       enabled: false
+    gfd:
+      enabled: true
