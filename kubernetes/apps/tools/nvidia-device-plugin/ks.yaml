@@ -5,7 +5,7 @@ metadata:
   name: &app nvidia-device-plugin
   namespace: flux-system
 spec:
-  targetNamespace: kube-system
+  targetNamespace: tools
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
