@@ -46,7 +46,7 @@ spec:
       fallbackStrategies: ["named", "single"]
     runtimeClassName: nvidia
     nodeSelector:
-      feature.node.kubernetes.io/custom-nvidia-gpu: "true"
+      nvidia.feature.node.kubernetes.io/gpu: "true"
     # Subcharts
     nfd:
       enabled: false
