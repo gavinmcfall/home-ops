@@ -20,6 +20,7 @@ resources:
   - ./k8s-gateway.yaml
   - ./kubernetes-dashboard.yaml
   - ./metrics-server.yaml
+  - ./node-feature-discovery.yaml
   - ./nvidia-charts.yaml
   - ./piraeus.yaml
   - ./prometheus-community.yaml
