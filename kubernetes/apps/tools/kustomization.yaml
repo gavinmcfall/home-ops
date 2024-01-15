@@ -5,7 +5,7 @@ resources:
   - ./namespace.yaml
 # - ./discord-template-notifier/ks.yaml
   - ./descheduler/ks.yaml
-  - ./node-feature-discovery/ks.yaml
+  # - ./node-feature-discovery/ks.yaml
   - ./nvidia-device-plugin/ks.yaml
   - ./reloader/ks.yaml
   - ./system-upgrade-controller/ks.yaml
