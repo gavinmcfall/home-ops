@@ -42,9 +42,7 @@ spec:
               tag: 1.40.0.7775-456fbaf97@sha256:cd6bafd8cf9f75c2d5b6517de312a82a986049f89f089da74b6bdb23928b8b37
             env:
               TZ: ${TIMEZONE}
-            entrypoint:
-              - /bin/sleep
-              - 'infinity'
+            command: ["/bin/sleep", "infinity"]
             probes:
               liveness: &probes
                 enabled: false
