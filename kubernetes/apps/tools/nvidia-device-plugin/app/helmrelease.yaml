@@ -1,32 +1,53 @@
-# https://github.com/NVIDIA/k8s-device-plugin
-# Possibly switch to https://github.com/NVIDIA/gpu-operator
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: nvidia-device-plugin
-  namespace: tools
 spec:
-  interval: 15m
+  interval: 30m
   chart:
     spec:
-      # renovate: registryUrl=https://nvidia.github.io/k8s-device-plugin
       chart: nvidia-device-plugin
       version: 0.14.3
       sourceRef:
         kind: HelmRepository
         name: nvidia-charts
         namespace: flux-system
-      interval: 15m
-  # https://github.com/NVIDIA/k8s-device-plugin/blob/main/deployments/helm/nvidia-device-plugin/values.yaml
+  maxHistory: 2
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
-    image:
-      repository: nvcr.io/nvidia/k8s-device-plugin
-      tag: v0.14.3
+    config:
+      map:
+        default: |-
+          version: v1
+          flags:
+            migStrategy: none
+        mig-single: |-
+          version: v1
+          flags:
+            migStrategy: single
+        mig-mixed: |-
+          version: v1
+          flags:
+            migStrategy: mixed
+      # Default config name within the ConfigMap
+      default: "default"
+      # List of fallback strategies to attempt if no config is selected and no default is provided
+      fallbackStrategies: ["named", "single"]
     runtimeClassName: nvidia
     nodeSelector:
       feature.node.kubernetes.io/custom-nvidia-gpu: "true"
     # Subcharts
     nfd: {}
     gfd:
-      enabled: true
+      enabled: false
