@@ -43,7 +43,7 @@ spec:
               tag: 1.40.0.7775-456fbaf97@sha256:cd6bafd8cf9f75c2d5b6517de312a82a986049f89f089da74b6bdb23928b8b37
             env:
               TZ: ${TIMEZONE}
-            command: ["/bin/sleep", "infinity"]
+            # command: ["/bin/sleep", "infinity"]
             probes:
               liveness: &probes
                 enabled: false
@@ -82,10 +82,10 @@ spec:
           nodeSelector:
             nvidia.feature.node.kubernetes.io/gpu: "true"
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 568
+            runAsGroup: 568
             runAsNonRoot: true
-            fsGroup: 1000
+            fsGroup: 568
             fsGroupChangePolicy: OnRootMismatch
             supplementalGroups: [44, 105, 10000]
     service:
