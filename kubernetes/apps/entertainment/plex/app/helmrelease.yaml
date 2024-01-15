@@ -65,8 +65,8 @@ spec:
               requests:
                 cpu: 100m
               limits:
-                # gpu.intel.com/i915: 1
                 memory: 4Gi
+                # gpu.intel.com/i915: 1
         pod:
           # affinity:
           #   podAntiAffinity:
@@ -77,8 +77,8 @@ spec:
           #               operator: In
           #               values: ["frigate"]
           #         topologyKey: kubernetes.io/hostname
-          # nodeSelector:
-          #   intel.feature.node.kubernetes.io/gpu: "true"
+          nodeSelector:
+            nvidia.feature.node.kubernetes.io/gpu: "true"
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -125,8 +125,8 @@ spec:
         type: emptyDir
       media:
         type: nfs
-        server: 10.90.1.1
-        path: /mnt/media
+        server: 10.90.3.104
+        path: /mnt/data
         globalMounts:
           - path: /media
             readOnly: true
