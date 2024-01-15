@@ -43,7 +43,6 @@ spec:
               tag: 1.40.0.7775-456fbaf97@sha256:cd6bafd8cf9f75c2d5b6517de312a82a986049f89f089da74b6bdb23928b8b37
             env:
               TZ: ${TIMEZONE}
-            # command: ["/bin/sleep", "infinity"]
             probes:
               liveness: &probes
                 enabled: false
@@ -83,6 +82,7 @@ spec:
           #         topologyKey: kubernetes.io/hostname
           nodeSelector:
             nvidia.feature.node.kubernetes.io/gpu: "true"
+          runtimeClassName: nvidia
           securityContext:
             runAsUser: 568
             runAsGroup: 568
@@ -134,9 +134,3 @@ spec:
         globalMounts:
           - path: /media
             readOnly: true
----
-apiVersion: node.k8s.io/v1
-kind: RuntimeClass
-metadata:
-  name: nvidia
-handler: nvidia
