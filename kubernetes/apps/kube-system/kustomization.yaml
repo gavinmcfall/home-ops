@@ -6,4 +6,3 @@ resources:
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
   - ./metrics-server/ks.yaml
-  # - ./nvidia-device-plugin/ks.yaml
