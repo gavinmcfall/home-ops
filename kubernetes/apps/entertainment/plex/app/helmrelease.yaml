@@ -6,6 +6,7 @@ metadata:
   name: plex
 spec:
   interval: 30m
+  timeout: 5m
   chart:
     spec:
       chart: app-template
