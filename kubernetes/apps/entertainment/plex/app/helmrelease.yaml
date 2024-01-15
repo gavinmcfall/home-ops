@@ -78,7 +78,7 @@ spec:
           #               values: ["frigate"]
           #         topologyKey: kubernetes.io/hostname
           nodeSelector:
-            nvidia.feature.node.kubernetes.io/gpu: "true"
+            nvidia.feature.node.kubernetes.io/gpu: true
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
