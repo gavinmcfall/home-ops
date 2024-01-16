@@ -54,7 +54,7 @@ spec:
                   name: sabnzbd-secret
             probes:
               liveness: &probes
-                enabled: false
+                enabled: true
                 custom: true
                 spec:
                   httpGet:
@@ -68,8 +68,8 @@ spec:
               startup:
                 enabled: false
             securityContext:
-              allowPrivilegeEscalation: true
-              readOnlyRootFilesystem: false
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
