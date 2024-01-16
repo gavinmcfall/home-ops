@@ -39,7 +39,7 @@ spec:
               repository: ghcr.io/sct/overseerr
               tag: 1.33.2@sha256:714ea6db2bc007a2262d112bef7eec74972eb33d9c72bddb9cbd98b8742de950
             env:
-              TZ: America/New_York
+              TZ: ${TIMEZONE}
               LOG_LEVEL: "info"
               PORT: &port 80
             probes:
@@ -83,9 +83,9 @@ spec:
         enabled: true
         className: external
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.devbu.io
+          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
         hosts:
-          - host: &host requests.devbu.io
+          - host: &host requests.nerdz.cloud
             paths:
               - path: /
                 service:

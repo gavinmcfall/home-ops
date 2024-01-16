@@ -25,7 +25,7 @@ spec:
     keepHistory: false
   dependsOn:
     - name: qbittorrent
-      namespace: default
+      namespace: entertainment
   values:
     controllers:
       main:
@@ -34,7 +34,7 @@ spec:
         type: cronjob
         cronjob: &cronJobSpec
           schedule: "@hourly"
-          timeZone: &timeZone America/New_York
+          timeZone: &timeZone ${TIMEZONE}
           concurrencyPolicy: Forbid
           successfulJobsHistory: 1
           failedJobsHistory: 1
@@ -52,7 +52,7 @@ spec:
               "--last-activity",
               "--sites",
               "--unregistered",
-              "--server", "qbittorrent.default.svc.cluster.local",
+              "--server", "qbittorrent.entertainment.svc.cluster.local",
               "--port", "80",
               "--config", "/config/config.yaml"
             ]
@@ -72,7 +72,7 @@ spec:
               "--exclude-category", "music.import",
               "--include-tag", "unregistered",
               # "--dry-run",
-              "--server", "qbittorrent.default.svc.cluster.local",
+              "--server", "qbittorrent.entertainment.svc.cluster.local",
               "--port", "80"
             ]
             resources: *resources
@@ -88,7 +88,7 @@ spec:
               "--include-tag", "expired", # defined in config.yaml
               "--include-tag", "added:7d",
               # "--dry-run",
-              "--server", "qbittorrent.default.svc.cluster.local",
+              "--server", "qbittorrent.entertainment.svc.cluster.local",
               "--port", "80"
             ]
             resources: *resources
@@ -113,7 +113,7 @@ spec:
               "--exclude-pattern", "*/manual/*",
               "--exclude-pattern", "*/music.import/*",
               # "--dry-run",
-              "--server", "qbittorrent.default.svc.cluster.local",
+              "--server", "qbittorrent.entertainment.svc.cluster.local",
               "--port", "80"
             ]
             resources: *resources
@@ -128,7 +128,7 @@ spec:
             args: [
               "reannounce",
               "--process-seeding",
-              "--server", "qbittorrent.default.svc.cluster.local",
+              "--server", "qbittorrent.entertainment.svc.cluster.local",
               "--port", "80"
             ]
             resources: *resources
@@ -149,8 +149,8 @@ spec:
                 readOnly: true
       media:
         type: nfs
-        server: expanse.turbo.ac
-        path: /eros/Media
+        server: 10.90.3.104
+        path: /mnt/data
         advancedMounts:
           orphaned:
             main:

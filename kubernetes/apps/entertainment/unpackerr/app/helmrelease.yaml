@@ -34,11 +34,11 @@ spec:
               repository: docker.io/golift/unpackerr
               tag: 0.12.0@sha256:f2e35d22d85502d9e67da407cb6b1d9a71988dcadf8c7393043e15dd1d42857a
             env:
-              TZ: America/New_York
+              TZ: ${TIMEZONE}
               UN_WEBSERVER_METRICS: "true"
-              UN_SONARR_0_URL: http://sonarr.default.svc.cluster.local
+              UN_SONARR_0_URL: http://sonarr.entertainment.svc.cluster.local
               UN_SONARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr
-              UN_RADARR_0_URL: http://radarr.default.svc.cluster.local
+              UN_RADARR_0_URL: http://radarr.entertainment.svc.cluster.local
               UN_RADARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/radarr
             envFrom:
               - secretRef:
@@ -71,7 +71,7 @@ spec:
     persistence:
       media:
         type: nfs
-        server: expanse.turbo.ac
-        path: /eros/Media
+        server: 10.90.3.104
+        path: /mnt/data
         globalMounts:
           - path: /media

@@ -25,7 +25,7 @@ spec:
     keepHistory: false
   dependsOn:
     - name: qbittorrent
-      namespace: default
+      namespace: entertainment
   values:
     controllers:
       main:
@@ -37,7 +37,7 @@ spec:
               repository: ghcr.io/cross-seed/cross-seed
               tag: 5.9.2@sha256:6abdca45f0ecfd8d23a3035beefa716a14b66f23c14854631fe369d1ad346f1e
             env:
-              TZ: America/New_York
+              TZ: ${TIMEZONE}
               CROSSSEED_PORT: &port 80
             envFrom:
               - secretRef:
@@ -80,7 +80,7 @@ spec:
             readOnly: true
       media:
         type: nfs
-        server: expanse.turbo.ac
-        path: /eros/Media
+        server: 10.90.3.104
+        path: /mnt/data
         globalMounts:
           - path: /media

@@ -39,7 +39,7 @@ spec:
               repository: ghcr.io/onedr0p/tautulli
               tag: 2.13.4@sha256:7682cdcf98dbdd236a21d1a7b7b380928dbd67283dce9a76398a7c1461b0f802
             env:
-              TZ: America/New_York
+              TZ: ${TIMEZONE}
             probes:
               liveness: &probes
                 enabled: true
@@ -95,7 +95,7 @@ spec:
         enabled: true
         className: internal
         hosts:
-          - host: &host "{{ .Release.Name }}.devbu.io"
+          - host: &host "{{ .Release.Name }}.nerdz.cloud"
             paths:
               - path: /
                 service:
