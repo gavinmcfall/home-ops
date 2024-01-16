@@ -54,7 +54,7 @@ spec:
                   name: sabnzbd-secret
             probes:
               liveness: &probes
-                enabled: true
+                enabled: false
                 custom: true
                 spec:
                   httpGet:
