@@ -39,7 +39,7 @@ spec:
               repository: ghcr.io/onedr0p/qbittorrent
               tag: 4.6.2@sha256:fedb62126c82ae0c7192e9052633411294a27e9c233613c03b0a8d168d160040
             env:
-              TZ: America/New_York
+              TZ: ${TIMEZONE}
               QBITTORRENT__PORT: &port 80
               QBITTORRENT__BT_PORT: &bittorrentPort 50413
               QBT_Preferences__WebUI__AlternativeUIEnabled: false
@@ -93,7 +93,7 @@ spec:
         controller: main
         type: LoadBalancer
         annotations:
-          io.cilium/lb-ipam-ips: 192.168.42.202
+          io.cilium/lb-ipam-ips: 10.90.3.205
         ports:
           bittorrent:
             enabled: true
@@ -104,7 +104,7 @@ spec:
         enabled: true
         className: internal
         hosts:
-          - host: &host qb.devbu.io
+          - host: &host qb.nerdz.cloud
             paths:
               - path: /
                 service:
@@ -127,7 +127,7 @@ spec:
             readOnly: true
       media:
         type: nfs
-        server: expanse.turbo.ac
-        path: /eros/Media
+        server: 10.90.3.104
+        path: /mnt/data
         globalMounts:
           - path: /media

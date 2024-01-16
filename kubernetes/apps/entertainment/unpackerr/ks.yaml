@@ -6,13 +6,13 @@ metadata:
   name: &app unpackerr
   namespace: flux-system
 spec:
-  targetNamespace: default
+  targetNamespace: entertainment
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets-stores
-  path: ./kubernetes/main/apps/default/unpackerr/app
+  path: ./kubernetes/main/apps/entertainment/unpackerr/app
   prune: true
   sourceRef:
     kind: GitRepository
