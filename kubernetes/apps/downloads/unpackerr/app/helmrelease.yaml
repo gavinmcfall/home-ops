@@ -36,9 +36,9 @@ spec:
             env:
               TZ: ${TIMEZONE}
               UN_WEBSERVER_METRICS: "true"
-              UN_SONARR_0_URL: http://sonarr.entertainment.svc.cluster.local
+              UN_SONARR_0_URL: http://sonarr.downloads.svc.cluster.local
               UN_SONARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr
-              UN_RADARR_0_URL: http://radarr.entertainment.svc.cluster.local
+              UN_RADARR_0_URL: http://radarr.downloads.svc.cluster.local
               UN_RADARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/radarr
             envFrom:
               - secretRef:

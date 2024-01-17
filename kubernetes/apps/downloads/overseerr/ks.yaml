@@ -3,16 +3,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app cross-seed
+  name: &app overseerr
   namespace: flux-system
 spec:
-  targetNamespace: entertainment
+  targetNamespace: downloads
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  dependsOn:
-    - name: external-secrets-stores
-  path: ./kubernetes/apps/entertainment/cross-seed/app
+  path: ./kubernetes/apps/downloads/overseerr/app
   prune: true
   sourceRef:
     kind: GitRepository
@@ -24,3 +22,6 @@ spec:
   postBuild:
     substitute:
       APP: *app
+      GATUS_SUBDOMAIN: requests
+      GATUS_PATH: /api/v1/status
+      VOLSYNC_CAPACITY: 5Gi

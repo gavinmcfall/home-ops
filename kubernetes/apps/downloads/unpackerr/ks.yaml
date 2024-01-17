@@ -3,14 +3,16 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app overseerr
+  name: &app unpackerr
   namespace: flux-system
 spec:
-  targetNamespace: entertainment
+  targetNamespace: downloads
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/entertainment/overseerr/app
+  dependsOn:
+    - name: external-secrets-stores
+  path: ./kubernetes/apps/downloads/unpackerr/app
   prune: true
   sourceRef:
     kind: GitRepository
@@ -19,9 +21,3 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
-  postBuild:
-    substitute:
-      APP: *app
-      GATUS_SUBDOMAIN: requests
-      GATUS_PATH: /api/v1/status
-      VOLSYNC_CAPACITY: 5Gi
