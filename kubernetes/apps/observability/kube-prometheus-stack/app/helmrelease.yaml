@@ -39,14 +39,23 @@ spec:
     cleanPrometheusOperatorObjectNames: true
     alertmanager:
       ingress:
-        enabled: true
-        pathType: Prefix
-        ingressClassName: internal
-        hosts:
-          - &host alertmanager.${SECRET_DOMAIN}
-        tls:
-          - hosts:
-              - *host
+        main:
+          enabled: true
+          pathType: Prefix
+          ingressClassName: internal
+          hosts:
+            - &host alertmanager.${SECRET_DOMAIN}
+          tls:
+            - hosts:
+                - *host
+        tailscale:
+          enabled: true
+          className: tailscale
+          hosts:
+            - host: &tsapp1 alertmanager
+          tls:
+            - hosts:
+                - *tsapp1
       alertmanagerSpec:
         replicas: 2
         useExistingSecret: true
