@@ -77,7 +77,7 @@ spec:
         enabled: true
         className: tailscale
         hosts:
-          - host: *app
+          - host: &app irc
             paths: *paths
         tls:
           - hosts:
