@@ -6,13 +6,13 @@ metadata:
   name: &app sabnzbd
   namespace: flux-system
 spec:
-  targetNamespace: entertainment
+  targetNamespace: downloads
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets-stores
-  path: ./kubernetes/apps/entertainment/sabnzbd/app
+  path: ./kubernetes/apps/downloads/sabnzbd/app
   prune: false
   sourceRef:
     kind: GitRepository
