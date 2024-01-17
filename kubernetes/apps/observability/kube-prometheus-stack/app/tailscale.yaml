@@ -6,11 +6,17 @@ metadata:
   namespace: observability
 spec:
   ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: kube-prometheus-stack-alertmanager
-      port:
-        number: 80
+  rules:
+  - host: alertmanager
+    http:
+      paths:
+      - backend:
+          service:
+            name: kube-prometheus-stack-alertmanager
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
   tls:
-    - hosts:
-        - alertmanager
+  - hosts:
+    - alertmanager
