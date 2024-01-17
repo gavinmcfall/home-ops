@@ -6,6 +6,7 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./scrapeconfigs
+  - ./tailscale.yaml
 configMapGenerator:
   - name: alertmanager-config-tpl
     files:
