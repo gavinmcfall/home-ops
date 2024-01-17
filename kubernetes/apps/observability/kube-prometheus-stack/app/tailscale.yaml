@@ -1,0 +1,16 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: &app alertmanager
+  namespace: observability
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: *app
+      port:
+        number: http
+  tls:
+    - hosts:
+        - *app
