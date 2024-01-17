@@ -48,6 +48,15 @@ spec:
           tls:
             - hosts:
                 - *host
+        tailscale:
+          enabled: true
+          className: tailscale
+          hosts:
+            - host: alertmanager
+              # paths: *paths
+          tls:
+            - hosts:
+                - alertmanager
       alertmanagerSpec:
         replicas: 2
         useExistingSecret: true
