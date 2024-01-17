@@ -45,6 +45,11 @@ spec:
           ingressClassName: internal
           hosts:
             - &host alertmanager.${SECRET_DOMAIN}
+              paths: &paths
+                - path: /
+                  service:
+                    name: main
+                    port: http
           tls:
             - hosts:
                 - *host
@@ -52,7 +57,7 @@ spec:
           enabled: true
           className: tailscale
           hosts:
-            - host: *app
+            - host: &app alertmanager
               paths: *paths
           tls:
             - hosts:
