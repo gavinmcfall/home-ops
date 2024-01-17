@@ -122,4 +122,6 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: *app
+        type: emptyDir
+      tmp:
+        type: emptyDir
