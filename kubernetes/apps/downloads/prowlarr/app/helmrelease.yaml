@@ -102,7 +102,7 @@ spec:
           gethomepage.dev/widget.key: "{{HOMEPAGE_VAR_PROWLARR_TOKEN}}"
         hosts:
           - host: &host "{{ .Release.Name }}.nerdz.cloud"
-            paths:
+            paths: &paths
               - path: /
                 service:
                   name: main
