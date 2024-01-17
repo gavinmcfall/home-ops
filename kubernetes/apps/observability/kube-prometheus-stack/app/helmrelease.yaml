@@ -53,6 +53,11 @@ spec:
           className: tailscale
           hosts:
             - host: &app alertmanager
+              paths: &paths
+                - path: /
+                  service:
+                    name: main
+                    port: http
           tls:
             - hosts:
                 - *app
