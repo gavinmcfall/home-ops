@@ -43,8 +43,8 @@ spec:
           enabled: true
           pathType: Prefix
           ingressClassName: internal
-          hosts:
-            - &host alertmanager.${SECRET_DOMAIN}
+          host:
+            - &host "alertmanager.${SECRET_DOMAIN}"
             paths: &paths
               - path: /
                 service:
