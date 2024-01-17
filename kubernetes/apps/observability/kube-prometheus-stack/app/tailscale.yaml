@@ -10,7 +10,7 @@ spec:
     service:
       name: *app
       port:
-        number: http
+        number: 80
   tls:
     - hosts:
         - *app
