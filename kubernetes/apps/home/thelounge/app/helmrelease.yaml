@@ -77,11 +77,11 @@ spec:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app irc
+          - host: &tsapp irc
             paths: *paths
         tls:
           - hosts:
-              - *app
+              - *tsapp
     persistence:
       config:
         enabled: true
