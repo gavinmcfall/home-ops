@@ -95,7 +95,7 @@ spec:
         className: internal
         hosts:
           - host: &host sab.nerdz.cloud
-            paths:
+            paths: &paths
               - path: /
                 service:
                   name: main
@@ -103,6 +103,15 @@ spec:
         tls:
           - hosts:
               - *host
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app sab
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
     persistence:
       config:
         enabled: true
