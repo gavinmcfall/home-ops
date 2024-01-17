@@ -2,7 +2,7 @@
 # shellcheck disable=SC2154
 
 PUSHOVER_DEBUG="${PUSHOVER_DEBUG:-"true"}"
-# kubectl port-forward service/sonarr -n entertainment 8989:80
+# kubectl port-forward service/sonarr -n downloads 8989:80
 # export PUSHOVER_TOKEN="";
 # export PUSHOVER_USER_KEY="";
 # export sonarr_eventtype=Download;

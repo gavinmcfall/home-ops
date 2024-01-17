@@ -6,14 +6,14 @@ metadata:
   name: &app sonarr
   namespace: flux-system
 spec:
-  targetNamespace: entertainment
+  targetNamespace: downloads
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cloudnative-pg-cluster
     - name: external-secrets-stores
-  path: ./kubernetes/apps/entertainment/sonarr/app
+  path: ./kubernetes/apps/downloads/sonarr/app
   prune: false
   sourceRef:
     kind: GitRepository

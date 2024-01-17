@@ -2,7 +2,7 @@
 # shellcheck disable=SC2154
 
 PUSHOVER_DEBUG="${PUSHOVER_DEBUG:-"true"}"
-# kubectl port-forward service/radarr -n entertainment 7878:80
+# kubectl port-forward service/radarr -n downloads 7878:80
 # export PUSHOVER_TOKEN="";
 # export PUSHOVER_USER_KEY="";
 # export radarr_eventtype=Download;
