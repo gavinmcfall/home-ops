@@ -45,6 +45,11 @@ spec:
           ingressClassName: internal
           hosts:
             - &host alertmanager.${SECRET_DOMAIN}
+            paths: &paths
+              - path: /
+                service:
+                  name: main
+                  port: http
           tls:
             - hosts:
                 - *host
