@@ -5,5 +5,5 @@ resources:
   - ./namespace.yaml
 
 # Applications
-  # - ./homepage/ks.yaml
+  - ./homepage/ks.yaml
   - ./thelounge/ks.yaml
