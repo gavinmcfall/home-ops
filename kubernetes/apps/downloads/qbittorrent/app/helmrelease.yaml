@@ -105,7 +105,7 @@ spec:
         className: internal
         hosts:
           - host: &host qb.nerdz.cloud
-            paths:
+            paths: &paths
               - path: /
                 service:
                   name: main
