@@ -6,7 +6,7 @@ resources:
 
 # Applications
 
-  # - ./autobrr/ks.yaml
+  - ./autobrr/ks.yaml
   # - ./cross-seed/ks.yaml
   - ./flaresolverr/ks.yaml
   # - ./overseerr/ks.yaml
