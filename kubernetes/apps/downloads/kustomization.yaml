@@ -8,8 +8,7 @@ resources:
 
   # - ./autobrr/ks.yaml
   # - ./cross-seed/ks.yaml
-  # - ./kustomization.yaml/ks.yaml
-  # - ./namespace.yaml/ks.yaml
+  - ./flaresolverr/ks.yaml
   # - ./overseerr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
