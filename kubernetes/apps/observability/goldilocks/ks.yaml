@@ -10,8 +10,6 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  dependsOn:
-    - name: vpa
   path: ./kubernetes/apps/observability/goldilocks/app
   prune: true
   sourceRef:
