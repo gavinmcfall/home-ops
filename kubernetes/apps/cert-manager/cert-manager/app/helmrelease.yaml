@@ -26,10 +26,10 @@ spec:
   values:
     resources:
       requests:
-        cpu: 6m
+        cpu: 60m
         memory: 50Mi
       limits:
-        cpu: 10m
+        cpu: 100m
         memory: 60Mi
     installCRDs: true
     extraArgs:
