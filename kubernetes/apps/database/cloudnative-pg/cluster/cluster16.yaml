@@ -26,9 +26,9 @@ spec:
       shared_buffers: 512MB
   resources:
     requests:
-      cpu: 500m
+      cpu: 100m
     limits:
-      memory: 4Gi
+      memory: 1Gi
   monitoring:
     enablePodMonitor: true
     podMonitorMetricRelabelings:
