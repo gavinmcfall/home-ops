@@ -27,6 +27,13 @@ spec:
     - name: local-path-provisioner
       namespace: storage
   values:
+    resources:
+      requests:
+        cpu: 40m
+        memory: 80Mi
+      limits:
+        cpu: 60m
+        memory: 150Mi
     crds:
       create: true
     config:
