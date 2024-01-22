@@ -12,7 +12,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: vpa
-  path: ./kubernetes/main/apps/observability/goldilocks/app
+  path: ./kubernetes/apps/observability/goldilocks/app
   prune: true
   sourceRef:
     kind: GitRepository
