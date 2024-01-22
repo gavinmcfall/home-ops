@@ -24,6 +24,13 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    resources:
+      requests:
+        cpu: 6m
+        memory: 50Mi
+      limits:
+        cpu: 10m
+        memory: 60Mi
     installCRDs: true
     extraArgs:
       - --dns01-recursive-nameservers=1.1.1.1:53,9.9.9.9:53
