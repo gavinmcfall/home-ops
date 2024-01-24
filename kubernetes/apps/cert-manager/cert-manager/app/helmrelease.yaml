@@ -26,11 +26,11 @@ spec:
   values:
     resources:
       requests:
-        cpu: 60m
-        memory: 50Mi
+        cpu: 15m
+        memory: 64M
       limits:
-        cpu: 100m
-        memory: 60Mi
+        cpu: 24m
+        memory: 145M
     installCRDs: true
     extraArgs:
       - --dns01-recursive-nameservers=1.1.1.1:53,9.9.9.9:53
