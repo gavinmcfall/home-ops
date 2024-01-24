@@ -29,8 +29,8 @@ spec:
         cpu: 15m
         memory: 64M
       limits:
-        cpu: 15m
-        memory: 64M
+        cpu: 24m
+        memory: 140M
     installCRDs: true
     extraArgs:
       - --dns01-recursive-nameservers=1.1.1.1:53,9.9.9.9:53
@@ -50,10 +50,10 @@ spec:
       resources:
         requests:
           cpu: 15m
-          memory: 145M
+          memory: 127M
         limits:
-          cpu: 15m
-          memory: 145M
+          cpu: 24m
+          memory: 319M
 
     webhook:
       resources:
@@ -62,5 +62,5 @@ spec:
           memory: 64M
         limits:
           cpu: 24m
-          memory: 64M
+          memory: 80M
 
