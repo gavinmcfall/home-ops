@@ -12,7 +12,7 @@ spec:
       paths:
       - backend:
           service:
-            name: goldilocks-dashboard.observability.svc.cluster.local
+            name: goldilocks-dashboard
             port:
               number: 9093
         path: /
