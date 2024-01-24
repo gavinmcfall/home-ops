@@ -14,7 +14,7 @@ spec:
           service:
             name: goldilocks-dashboard
             port:
-              number: 9093
+              number: 80
         path: /
         pathType: Prefix
   tls:
