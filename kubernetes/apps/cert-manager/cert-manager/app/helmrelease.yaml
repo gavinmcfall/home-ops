@@ -50,10 +50,10 @@ spec:
       resources:
         requests:
           cpu: 15m
-          memory: 127M
+          memory: 110M
         limits:
           cpu: 24m
-          memory: 319M
+          memory: 318M
 
     webhook:
       resources:
