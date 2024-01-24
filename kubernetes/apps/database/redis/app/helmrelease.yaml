@@ -76,3 +76,10 @@ spec:
         limits:
           cpu: 11m
           memory: 50M
+    resources:
+      requests:
+        cpu: 62m
+        memory: 24M
+      limits:
+        cpu: 204m
+        memory: 80M
