@@ -31,6 +31,13 @@ spec:
     master:
       persistence:
         enabled: false
+      resources:
+        requests:
+          cpu: 62m
+          memory: 24M
+        limits:
+          cpu: 204m
+          memory: 80M
     redis:
       resources:
         requests:
