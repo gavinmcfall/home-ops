@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./gatus/ks.yaml
-  - ./goldilocks/ks.yaml
+  # - ./goldilocks/ks.yaml
   - ./grafana/ks.yaml
   - ./homarr/ks.yaml
   - ./kromgo/ks.yaml
