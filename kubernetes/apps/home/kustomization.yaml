@@ -6,4 +6,5 @@ resources:
 
 # Applications
   - ./homepage/ks.yaml
+  - ./media-browser/ks.yaml
   - ./thelounge/ks.yaml
