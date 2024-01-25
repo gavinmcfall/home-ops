@@ -6,13 +6,5 @@ resources:
 
 # Applications
 
-  # - ./autobrr/ks.yaml
-  # - ./cross-seed/ks.yaml
-  # - ./kustomization.yaml/ks.yaml
-  # - ./namespace.yaml/ks.yaml
-  # - ./overseerr/ks.yaml
   - ./plex/ks.yaml
-  # - ./prowlarr/ks.yaml
-  # - ./qbittorrent/ks.yaml
-  # - ./tautulli/ks.yaml
-  # - ./unpackerr/ks.yaml
+  - ./tautulli/ks.yaml
