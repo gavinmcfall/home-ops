@@ -32,10 +32,3 @@ spec:
     config:
       data:
         INHERITED_ANNOTATIONS: kyverno.io/ignore
-    resources:
-      requests:
-        cpu: 15m
-        memory: 94M
-      limits:
-        cpu: 24m
-        memory: 208M
