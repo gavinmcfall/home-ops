@@ -13,7 +13,7 @@ spec:
   dependsOn:
     - name: cloudnative-pg-cluster
     - name: external-secrets-stores
-  path: ./kubernetes/teyvat/apps/downloads/readarr/app
+  path: ./kubernetes/apps/downloads/readarr/app
   prune: true
   sourceRef:
     kind: GitRepository
