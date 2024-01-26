@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: &app thelounge
+  name: &app readarr
 spec:
   interval: 30m
   chart:
@@ -32,36 +32,55 @@ spec:
   values:
     controllers:
       main:
+        labels:
+          nfsMount: "true"
         annotations:
           reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16
+              pullPolicy: IfNotPresent
+            envFrom: &envFrom
+              - secretRef:
+                  name: readarr-secret
         containers:
           main:
             image:
-              repository: ghcr.io/thelounge/thelounge
-              tag: 4.4.1
+              repository: ghcr.io/lildrunkensmurf/readarr-develop
+              tag: 0.3.15.2376@sha256:753b08309fdb5843829f97ba45939deca9e06184234af6625c4845e6178b2975
             env:
-              THELOUNGE_HOME: /config
+              TZ: ${TIMEZONE}
+              READARR__INSTANCE_NAME: Readarr
+              READARR__PORT: &port 80
+              READARR__LOG_LEVEL: info
+            envFrom: *envFrom
             resources:
               requests:
-                cpu: 10m
-                memory: 250Mi
+                cpu: 15m
+                memory: 160M
               limits:
-                memory: 500Mi
+                memory: 330M
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
     service:
       main:
         ports:
           http:
-            port: 9000
+            port: *port
     ingress:
       main:
         enabled: true
-        className: external
-        annotations:
+        className: internal
         hosts:
-          - host: &host "irc.${SECRET_DOMAIN}"
+          - host: &host "{{ .Release.Name }}.nerdz.cloud"
             paths: &paths
               - path: /
-                pathType: Prefix
                 service:
                   name: main
                   port: http
@@ -72,12 +91,18 @@ spec:
         enabled: true
         className: tailscale
         hosts:
-          - host: &tsapp irc
+          - host: *app
             paths: *paths
         tls:
           - hosts:
-              - *tsapp
+              - *app
     persistence:
       config:
         enabled: true
         existingClaim: *app
+      media:
+        type: nfs
+        server: 10.90.3.104
+        path: /mnt/data
+        globalMounts:
+          - path: /media
