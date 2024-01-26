@@ -53,7 +53,7 @@ spec:
             env:
               TZ: ${TIMEZONE}
               COMPlus_EnableDiagnostics: "0"
-              PUSHOVER_DEBUG: "false"
+              # PUSHOVER_DEBUG: "false"
               READARR__AUTHENTICATION_METHOD: External
               READARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
               READARR__INSTANCE_NAME: Readarr
@@ -104,14 +104,14 @@ spec:
       config:
         enabled: true
         existingClaim: *app
-      pushover-notify:
-        type: configMap
-        name: readarr-configmap
-        defaultMode: 0775
-        globalMounts:
-          - path: /scripts/pushover-notify.sh
-            subPath: pushover-notify.sh
-            readOnly: true
+      # pushover-notify:
+      #   type: configMap
+      #   name: readarr-configmap
+      #   defaultMode: 0775
+      #   globalMounts:
+      #     - path: /scripts/pushover-notify.sh
+      #       subPath: pushover-notify.sh
+      #       readOnly: true
       media:
         type: nfs
         server: 10.90.3.104
