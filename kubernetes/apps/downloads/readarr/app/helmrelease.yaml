@@ -48,14 +48,10 @@ spec:
         containers:
           main:
             image:
-              repository: ghcr.io/onedr0p/readarr-develop
-              tag: 0.3.15.2376@sha256:ac03108c56438d100b258e4dcf4e7d3a3a998390b70f21a09c062f6139806235
+              repository: ghcr.io/lildrunkensmurf/readarr-develop
+              tag: 0.3.15.2376@sha256:753b08309fdb5843829f97ba45939deca9e06184234af6625c4845e6178b2975
             env:
               TZ: ${TIMEZONE}
-              # COMPlus_EnableDiagnostics: "0"
-              # PUSHOVER_DEBUG: "false"
-              # READARR__AUTHENTICATION_METHOD: External
-              # READARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
               READARR__INSTANCE_NAME: Readarr
               READARR__PORT: &port 80
               READARR__LOG_LEVEL: info
