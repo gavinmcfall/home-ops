@@ -52,10 +52,10 @@ spec:
               tag: 0.3.15.2376@sha256:ac03108c56438d100b258e4dcf4e7d3a3a998390b70f21a09c062f6139806235
             env:
               TZ: ${TIMEZONE}
-              COMPlus_EnableDiagnostics: "0"
+              # COMPlus_EnableDiagnostics: "0"
               # PUSHOVER_DEBUG: "false"
-              READARR__AUTHENTICATION_METHOD: External
-              READARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
+              # READARR__AUTHENTICATION_METHOD: External
+              # READARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
               READARR__INSTANCE_NAME: Readarr
               READARR__PORT: &port 80
               READARR__LOG_LEVEL: info
