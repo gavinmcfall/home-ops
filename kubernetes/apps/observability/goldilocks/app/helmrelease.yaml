@@ -38,11 +38,6 @@ spec:
       ingress:
         enabled: true
         ingressClassName: internal
-        annotations:
-          gethomepage.dev/enabled: "true"
-          gethomepage.dev/icon: etcd.png
-          gethomepage.dev/name: Goldilocks
-          gethomepage.dev/group: Observability
         hosts:
           - host: &host goldilocks.${SECRET_DOMAIN}
             paths:

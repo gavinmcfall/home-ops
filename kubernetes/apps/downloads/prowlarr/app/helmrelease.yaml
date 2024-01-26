@@ -92,14 +92,6 @@ spec:
       main:
         enabled: true
         className: internal
-        annotations:
-          gethomepage.dev/enabled: "true"
-          gethomepage.dev/group: Downloads
-          gethomepage.dev/name: Prowlarr
-          gethomepage.dev/icon: prowlarr.png
-          gethomepage.dev/widget.type: prowlarr
-          gethomepage.dev/widget.url: http://prowlarr.downloads
-          gethomepage.dev/widget.key: "{{HOMEPAGE_VAR_PROWLARR_TOKEN}}"
         hosts:
           - host: &host "{{ .Release.Name }}.nerdz.cloud"
             paths: &paths
