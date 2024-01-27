@@ -1,0 +1,100 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: calibre-web
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 2.5.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          enableServiceLinks: false
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            runAsNonRoot: true
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups: [10000]
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/bjw-s/calibre-web
+              tag: 0.6.21@sha256:1a738c3e89df1e855643fcc341f166152df7b191a833367c6537130973676913
+            env:
+              CACHE_DIR: /cache
+            resources:
+              requests:
+                cpu: 5m
+                memory: 470M
+              limits:
+                memory: 470M
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8083
+
+    ingress:
+      main:
+        enabled: true
+        className: external
+        annotations:
+        hosts:
+          - host: &host "reading.nerdz.cloud"
+            paths: &paths
+              - path: /
+                pathType: Prefix
+                service:
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - *host
+
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &tsapp reading
+            paths: *paths
+        tls:
+          - hosts:
+              - *tsapp
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: calibre-web
+        advancedMounts:
+          main:
+            main:
+              - path: /config
+
+      media:
+        type: nfs
+        server: 10.90.3.104
+        path: /mnt/data
+        globalMounts:
+          - path: /media
+
+      cache:
+        type: emptyDir
+        globalMounts:
+          - path: /cache
