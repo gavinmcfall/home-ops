@@ -5,7 +5,7 @@ resources:
   - ./namespace.yaml
 
 # Applications
-  - ./calibre-web/ks.yaml
+  # - ./calibre-web/ks.yaml
   - ./kavita/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
