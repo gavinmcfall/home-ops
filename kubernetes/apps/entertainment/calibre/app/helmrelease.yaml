@@ -49,6 +49,8 @@ spec:
         ports:
           http:
             port: 8080
+          content-server:
+            port: 8081
     ingress:
       main:
         enabled: true
@@ -63,6 +65,20 @@ spec:
         tls:
           - hosts:
               - *host
+
+      content-server:
+        enabled: true
+        className: internal
+        hosts:
+          - host: &host2 "calibre-server.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  name: main
+                  port: content-server
+        tls:
+          - hosts:
+              - *host2
 
       tailscale:
         enabled: true
