@@ -52,9 +52,7 @@ spec:
     ingress:
       main:
         enabled: true
-        className: external
-        annotations:
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+        className: internal
         hosts:
           - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
             paths: &paths
