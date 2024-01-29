@@ -60,6 +60,7 @@ spec:
         enabled: true
         className: external
         annotations:
+          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
         hosts:
           - host: &host "books.nerdz.cloud"
             paths: &paths
