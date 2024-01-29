@@ -6,6 +6,6 @@ resources:
 
 # Applications
   # - ./calibre-web/ks.yaml
-  - ./kavita/ks.yaml
+  # - ./kavita/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
