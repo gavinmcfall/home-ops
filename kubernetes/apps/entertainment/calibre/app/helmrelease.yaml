@@ -84,4 +84,4 @@ spec:
         server: 10.90.3.104
         path: /mnt/data
         globalMounts:
-          - path: /media/Database/Calibre
+          - path: /media
