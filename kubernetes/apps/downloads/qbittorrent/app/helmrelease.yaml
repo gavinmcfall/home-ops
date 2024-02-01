@@ -95,7 +95,7 @@ spec:
               VPN_SERVICE_PROVIDER: custom
               VPN_TYPE: wireguard
               VPN_INTERFACE: wg0
-              VPN_ENDPOINT_PORT: 32685
+              VPN_ENDPOINT_PORT: ${WIREGUARD_PORT}
               VPN_PORT_FORWARDING: on
               VPN_PORT_FORWARDING_PROVIDER: protonvpn
               FIREWALL_INPUT_PORTS: 8080
