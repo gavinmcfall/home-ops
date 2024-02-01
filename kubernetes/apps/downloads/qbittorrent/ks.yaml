@@ -48,3 +48,8 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
+  postBuild:
+    substitute:
+      APP: *app
+      APP_UID: "568"
+      APP_GID: "568"
