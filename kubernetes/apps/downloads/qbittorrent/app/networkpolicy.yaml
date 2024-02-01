@@ -23,6 +23,14 @@ spec:
       ports:
         - port: &port 8080
           protocol: TCP
+    # prowlarr
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prowlarr
+      ports:
+        - port: *port
+          protocol: TCP
     # sonarr
     - from:
         - podSelector:
