@@ -97,7 +97,7 @@ spec:
               VPN_INTERFACE: wg0
               VPN_ENDPOINT_PORT: 1337
               VPN_PORT_FORWARDING: on
-              VPN_PORT_FORWARDING_PROVIDER: protonvpn
+              VPN_PORT_FORWARDING_PROVIDER: private internet access
               FIREWALL_INPUT_PORTS: 8080
               FIREWALL_OUTBOUND_SUBNETS: 10.42.0.0/16,10.43.0.0/16 # Allow access to k8s subnets
             envFrom:
