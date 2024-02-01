@@ -87,50 +87,49 @@ spec:
               limits:
                 memory: 16Gi
 
-          # gluetun:
-          #   image:
-          #     repository: ghcr.io/qdm12/gluetun
-          #     tag: v3.37.0
-          #   env:
-          #     VPN_SERVICE_PROVIDER: custom
-          #     VPN_TYPE: wireguard
-          #     VPN_INTERFACE: wg0
-          #     VPN_ENDPOINT_PORT: 51820
-          #     VPN_PORT_FORWARDING: on
-          #     VPN_PORT_FORWARDING_PROVIDER: private internet access
-          #     FIREWALL_INPUT_PORTS: 8080
-          #     FIREWALL_OUTBOUND_SUBNETS: 10.42.0.0/16,10.43.0.0/16 # Allow access to k8s subnets
-          #   envFrom:
-          #     - secretRef:
-          #         name: qbittorrent-secret
-          #   securityContext:
-          #     privileged: true
-          #     capabilities:
-          #       add:
-          #         - NET_ADMIN
-          #     allowPrivilegeEscalation: false
+          gluetun:
+            image:
+              repository: ghcr.io/qdm12/gluetun
+              tag: v3.37.0
+            env:
+              VPN_SERVICE_PROVIDER: custom
+              VPN_TYPE: wireguard
+              VPN_INTERFACE: wg0
+              VPN_ENDPOINT_PORT: 51820
+              VPN_PORT_FORWARDING: on
+              VPN_PORT_FORWARDING_PROVIDER: protonvpn
+              FIREWALL_INPUT_PORTS: 8080
+              FIREWALL_OUTBOUND_SUBNETS: 10.42.0.0/16,10.43.0.0/16 # Allow access to k8s subnets
+            envFrom:
+              - secretRef:
+                  name: qbittorrent-secret
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+              allowPrivilegeEscalation: false
 
-          # port-forward:
-          #   image:
-          #     repository: ghcr.io/bjw-s/gluetun-qb-port-sync
-          #     tag: v0.0.1
-          #   env:
-          #     GLUETUN_CONTROL_SERVER_HOST: localhost
-          #     GLUETUN_CONTROL_SERVER_PORT: 8000
-          #     QBITTORRENT_HOST: localhost
-          #     QBITTORRENT_WEBUI_PORT: *port
-          #     CRON_ENABLED: true
-          #     CRON_SCHEDULE: "*/5 * * * *"
-          #     LOG_TIMESTAMP: false
-          #   securityContext:
-          #     runAsUser: ${APP_UID}
-          #     runAsGroup: ${APP_UID}
-          #     runAsNonRoot: true
-          #     allowPrivilegeEscalation: false
-          #     readOnlyRootFilesystem: false
-          #     capabilities:
-          #       drop:
-          #         - ALL
+          port-forward:
+            image:
+              repository: ghcr.io/bjw-s/gluetun-qb-port-sync
+              tag: v0.0.1
+            env:
+              GLUETUN_CONTROL_SERVER_HOST: localhost
+              GLUETUN_CONTROL_SERVER_PORT: 8000
+              QBITTORRENT_HOST: localhost
+              QBITTORRENT_WEBUI_PORT: *port
+              CRON_ENABLED: true
+              CRON_SCHEDULE: "*/5 * * * *"
+              LOG_TIMESTAMP: false
+            securityContext:
+              runAsUser: ${APP_UID}
+              runAsGroup: ${APP_UID}
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
 
     service:
       main:
