@@ -95,7 +95,7 @@ spec:
               VPN_SERVICE_PROVIDER: custom
               VPN_TYPE: wireguard
               VPN_INTERFACE: wg0
-              VPN_ENDPOINT_PORT: 48700
+              VPN_ENDPOINT_PORT: 51820
               VPN_PORT_FORWARDING: on
               VPN_PORT_FORWARDING_PROVIDER: private internet access
               FIREWALL_INPUT_PORTS: 8080
@@ -107,7 +107,7 @@ spec:
               capabilities:
                 add:
                   - NET_ADMIN
-              allowPrivilegeEscalation: true
+              allowPrivilegeEscalation: false
 
           port-forward:
             image:
