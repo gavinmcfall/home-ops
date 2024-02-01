@@ -53,7 +53,7 @@ spec:
               "--sites",
               "--unregistered",
               "--server", "qbittorrent.downloads.svc.cluster.local",
-              "--port", "80",
+              "--port", "8080",
               "--config", "/config/config.yaml"
             ]
             resources: &resources
@@ -73,7 +73,7 @@ spec:
               "--include-tag", "unregistered",
               # "--dry-run",
               "--server", "qbittorrent.downloads.svc.cluster.local",
-              "--port", "80"
+              "--port", "8080"
             ]
             resources: *resources
           expired:
@@ -89,7 +89,7 @@ spec:
               "--include-tag", "added:7d",
               # "--dry-run",
               "--server", "qbittorrent.downloads.svc.cluster.local",
-              "--port", "80"
+              "--port", "8080"
             ]
             resources: *resources
         pod:
@@ -129,7 +129,7 @@ spec:
               "reannounce",
               "--process-seeding",
               "--server", "qbittorrent.downloads.svc.cluster.local",
-              "--port", "80"
+              "--port", "8080"
             ]
             resources: *resources
         pod:
