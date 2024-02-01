@@ -48,7 +48,7 @@ spec:
             env:
               TZ: ${TIMEZONE}
               QBITTORRENT__PORT: &port 8080
-              QBITTORRENT__BT_PORT: &bittorrentPort 50413
+              # QBITTORRENT__BT_PORT: &bittorrentPort 50413
               QBT_Preferences__WebUI__AlternativeUIEnabled: false
               QBT_Preferences__WebUI__AuthSubnetWhitelistEnabled: true
               QBT_Preferences__WebUI__AuthSubnetWhitelist: |-
@@ -137,16 +137,16 @@ spec:
         ports:
           http:
             port: *port
-      bittorrent:
-        controller: main
-        type: LoadBalancer
-        annotations:
-          io.cilium/lb-ipam-ips: 10.90.3.205
-        ports:
-          bittorrent:
-            enabled: true
-            port: *bittorrentPort
-            protocol: TCP
+      # bittorrent:
+      #   controller: main
+      #   type: LoadBalancer
+      #   annotations:
+      #     io.cilium/lb-ipam-ips: 10.90.3.205
+      #   ports:
+      #     bittorrent:
+      #       enabled: true
+      #       port: *bittorrentPort
+      #       protocol: TCP
 
     ingress:
       main:
