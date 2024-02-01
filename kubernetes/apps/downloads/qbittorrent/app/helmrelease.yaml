@@ -90,7 +90,7 @@ spec:
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
-              tag: v3.34.3
+              tag: v3.37.0
             env:
               VPN_SERVICE_PROVIDER: custom
               VPN_TYPE: wireguard
@@ -104,11 +104,10 @@ spec:
               - secretRef:
                   name: qbittorrent-secret
             securityContext:
-              privileged: true
               capabilities:
                 add:
                   - NET_ADMIN
-              allowPrivilegeEscalation: true
+              allowPrivilegeEscalation: false
 
           port-forward:
             image:
@@ -123,8 +122,8 @@ spec:
               CRON_SCHEDULE: "*/5 * * * *"
               LOG_TIMESTAMP: false
             securityContext:
-              runAsUser: ${APP_UID}
-              runAsGroup: ${APP_UID}
+              runAsUser: 568
+              runAsGroup: 568
               runAsNonRoot: true
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
