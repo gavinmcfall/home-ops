@@ -48,7 +48,7 @@ spec:
             env:
               TZ: ${TIMEZONE}
               QBITTORRENT__PORT: &port 8080
-              QBITTORRENT__BT_PORT: &bittorrentPort 50413
+              QBITTORRENT__BT_PORT: &bittorrentPort 51820
               QBT_Preferences__WebUI__AlternativeUIEnabled: false
               QBT_Preferences__WebUI__AuthSubnetWhitelistEnabled: true
               QBT_Preferences__WebUI__AuthSubnetWhitelist: |-
