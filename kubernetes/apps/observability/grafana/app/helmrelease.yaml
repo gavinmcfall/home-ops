@@ -185,6 +185,11 @@ spec:
           gnetId: 15761
           revision: 15
           datasource: Prometheus
+        kubernetes-state-metrics:
+          # renovate: depName="Kubernetes / Views / Cluster"
+          gnetId: 16520
+          revision: 9
+          datasource: Prometheus
         kubernetes-coredns:
           # renovate: depName="Kubernetes / System / CoreDNS"
           gnetId: 15762
