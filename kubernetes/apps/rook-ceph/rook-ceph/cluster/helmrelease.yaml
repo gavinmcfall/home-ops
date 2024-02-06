@@ -54,7 +54,7 @@ spec:
         provider: host
         addressRanges:
           public:
-            - ${LAN_CIDR}
+            - ${LAN_SERVER_CIDR}
           cluster:
             - ${CEPH_CIDR}
         connections:
