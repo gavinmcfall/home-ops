@@ -76,7 +76,7 @@ spec:
               TZ: "${TIMEZONE}"
               PUID: *user
               PGID: *group
-              MEDIA_FOLDER: /media/youtube
+              MEDIA_FOLDER: /media/Library/Youtube
 
             resources:
               requests:

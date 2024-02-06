@@ -122,9 +122,54 @@ data:
             - "original_url!*=/shorts/"
             - "!is_live"
 
+      yt_playlist_foreigntv:
+        preset:
+          - yt_video
+          - season_by_year__episode_by_download_index
+
+        download:
+          download_strategy: "url"
+          playlist_thumbnails:
+            - name: "poster.jpg"
+              uid: "avatar_uncropped"
+            - name: "banner.jpg"
+              uid: "banner_uncropped"
+
+        output_options:
+          output_directory: "/media/Library/Television - Foreign/{tv_show_name_sanitized}"
+          file_name: "{episode_path}.{ext}"
+          thumbnail_name: "{episode_path}-thumb.{thumbnail_ext}"
+
+        overrides:
+          date: "{upload_date}"
+          season: "{upload_year}"
+          episode: "{download_index}"
+          episode_padded: "{upload_month_padded}{upload_day_padded}"
+          episode_file_name: "S{season}E{episode_padded} - {title_sanitized}"
+          episode_path: "{episode_file_name}"
+
+        video_tags:
+          episode: "{episode}"
+          season: "{season_number}"
+
+      yt_playlist_one_season:
+        preset: yt_playlist
+        overrides:
+          season: "0"
+          tv_show_name: "{subscription_name}"
+
+      yt_channel:
+        preset: yt_playlist
+        overrides:
+          tv_show_name: "{subscription_name}"
+        match_filters:
+          filters:
+            - "original_url!*=/shorts/"
+            - "!is_live"
+
   subscriptions.yaml: |-
     new_life_begins:
-      preset: "yt_playlist_one_season"
+      preset: "yt_playlist_foreigntv"
       download:
         url: "https://www.youtube.com/playlist?list=PLooD8l3FSd6l3mqZPuN0mB44fmalKdoGK"
       overrides:
