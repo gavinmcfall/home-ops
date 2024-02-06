@@ -51,12 +51,12 @@ spec:
       osd_class_update_on_start = false
     cephClusterSpec:
       network:
-        # provider: host
-        # addressRanges:
-        #   public:
-        #     - ${LAN_SERVER_CIDR}
-        #   cluster:
-        #     - ${CEPH_CIDR}
+        provider: host
+        addressRanges:
+          public:
+            - ${CEPH_PUBLIC_CIDR}
+          cluster:
+            - ${CEPH_CLUSTER_CIDR}
         connections:
           requireMsgr2: true
       crashCollector:
