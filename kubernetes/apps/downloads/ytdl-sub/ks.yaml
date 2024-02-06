@@ -10,7 +10,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: media-ytdl-sub-config
+    - name: ytdl-sub-config
   path: ./kubernetes/apps/downloads/ytdl-sub/app
   prune: true
   sourceRef:
@@ -24,7 +24,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: media-ytdl-sub-config
+  name: ytdl-sub-config
   namespace: flux-system
 spec:
   targetNamespace: downloads
