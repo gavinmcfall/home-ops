@@ -54,7 +54,7 @@ spec:
               QBT_Preferences__WebUI__AuthSubnetWhitelist: |-
                 10.42.0.0/16, 10.90.0.0/16
               QBT_Preferences__WebUI__LocalHostAuth: false
-              QBT_BitTorrent__Session__Interface: eth0
+              QBT_BitTorrent__Session__Interface: wg0
               QBT_BitTorrent__Session__InterfaceAddress:
                 valueFrom:
                   fieldRef:
