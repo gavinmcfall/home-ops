@@ -59,7 +59,7 @@ spec:
                 valueFrom:
                   fieldRef:
                     fieldPath: status.podIP
-              QBT_BitTorrent__Session__InterfaceName: eth0
+              QBT_BitTorrent__Session__InterfaceName: wg0
             probes:
               liveness: &probes
                 enabled: false
