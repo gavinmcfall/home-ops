@@ -176,4 +176,11 @@ data:
         season: "1"
         tv_show_name: New Life Begins
 
+    gen_z:
+      preset: "yt_playlist_foreigntv"
+      download:
+        url: "https://www.youtube.com/playlist?list=PLDuzvnRIfxZrxlCXTD0xu5PBunhzT7_ai"
+      overrides:
+        season: "1"
+        tv_show_name: Gen Z
 
