@@ -49,7 +49,7 @@ spec:
           main:
             image:
               repository: ghcr.io/lildrunkensmurf/readarr-develop
-              tag: 0.3.15.2376@sha256:753b08309fdb5843829f97ba45939deca9e06184234af6625c4845e6178b2975
+              tag: 0.3.18.2411@sha256:e8bd6e3fd07340dc7946655fbe19dd69de2f3b9dec9fab5793bc89b78bb8b4ad
             env:
               TZ: ${TIMEZONE}
               READARR__INSTANCE_NAME: Readarr
