@@ -5,6 +5,6 @@ resources:
   - ./namespace.yaml
 
 # Applications
-  # - ./kavita/ks.yaml
+  - ./kavita/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
