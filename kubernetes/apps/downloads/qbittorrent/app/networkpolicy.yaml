@@ -39,6 +39,15 @@ spec:
       ports:
         - port: *port
           protocol: TCP
+
+    # readarr
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: readarr
+      ports:
+        - port: *port
+          protocol: TCP
     # radarr
     - from:
         - podSelector:
