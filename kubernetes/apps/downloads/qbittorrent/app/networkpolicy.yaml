@@ -39,7 +39,14 @@ spec:
       ports:
         - port: *port
           protocol: TCP
-
+    # sonarr-uhd
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: sonarr-uhd
+      ports:
+        - port: *port
+          protocol: TCP
     # readarr
     - from:
         - podSelector:
