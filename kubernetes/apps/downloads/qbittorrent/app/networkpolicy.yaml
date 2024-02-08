@@ -23,6 +23,22 @@ spec:
       ports:
         - port: &port 8080
           protocol: TCP
+    # autobrr
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: autobrr
+      ports:
+        - port: *port
+          protocol: TCP
+    # cross-seed
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: cross-seed
+      ports:
+        - port: *port
+          protocol: TCP
     # prowlarr
     - from:
         - podSelector:
@@ -31,19 +47,11 @@ spec:
       ports:
         - port: *port
           protocol: TCP
-    # sonarr
+    # qbtools
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: sonarr
-      ports:
-        - port: *port
-          protocol: TCP
-    # sonarr-uhd
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: sonarr-uhd
+              app.kubernetes.io/name: qbtools
       ports:
         - port: *port
           protocol: TCP
@@ -63,30 +71,26 @@ spec:
       ports:
         - port: *port
           protocol: TCP
-    # qbtools
+    # sonarr
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: qbtools
+              app.kubernetes.io/name: sonarr
       ports:
         - port: *port
           protocol: TCP
-    # autobrr
+    # sonarr-uhd
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: autobrr
+              app.kubernetes.io/name: sonarr-uhd
       ports:
         - port: *port
           protocol: TCP
-    # cross-seed
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: cross-seed
-      ports:
-        - port: *port
-          protocol: TCP
+
+#######################################
+#            EGRESS                   #
+#######################################
   egress:
     # kube-dns
     - to:
