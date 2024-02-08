@@ -99,7 +99,7 @@ spec:
         enabled: true
         className: internal
         hosts:
-          - host: &host "{{ .Release.Name }}-uhd.nerdz.cloud"
+          - host: &host "{{ .Release.Name }}.nerdz.cloud"
             paths: &paths
               - path: /
                 service:
