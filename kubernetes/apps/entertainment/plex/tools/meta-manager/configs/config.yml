@@ -82,7 +82,7 @@ settings:
 
 plex:
   url: http://plex.entertainment.svc.cluster.local:32400
-  token: <<PMM_PLEX_API_KEY>>
+  token: <<PLEX_API_KEY>>
   timeout: 60
   clean_bundles: false
   empty_trash: false
@@ -90,25 +90,25 @@ plex:
 
 tautulli:
   url: http://tautulli.entertainment.svc.cluster.local:8181
-  apikey: <<PMM_TAUTULLI_API_KEY>>
+  apikey: <<TAUTULLI_API_KEY>>
 
 tmdb:
-  apikey: <<PMM_TMDB_API_KEY>>
+  apikey: <<TMDB_API_KEY>>
   language: en
   cache_expiration: 60
   region:
 
 omdb:
-  apikey: <<PMM_OMDB_API_KEY>>
+  apikey: <<OMDB_API_KEY>>
   cache_expiration: 60
 
 mdblist:
-  apikey: <<PMM_MDBLIST_API_KEY>>
+  apikey: <<MDBLIST_API_KEY>>
   cache_expiration: 60
 
 radarr:
   url: http://radarr.downloads.svc.cluster.local:80
-  token: <<PMM_RADARR_API_KEY>>
+  token: <<RADARR_API_KEY>>
   add_missing: false
   add_existing: false
   root_folder_path: /media/movies
@@ -123,7 +123,7 @@ radarr:
 
 sonarr:
   url: http://sonarr.downloads.svc.cluster.local:80
-  token: <<PMM_SONARR_API_KEY>>
+  token: <<SONARR_API_KEY>>
   add_missing: false
   add_existing: false
   root_folder_path: /media/shows
@@ -141,7 +141,7 @@ sonarr:
 
 sonarr-uhd:
   url: http://sonarr-uhd.downloads.svc.cluster.local:80
-  token: <<PMM_SONARR_UHD_API_KEY>>
+  token: <<SONARR_UHD_API_KEY>>
   add_missing: false
   add_existing: false
   root_folder_path: /media/shows
@@ -158,13 +158,13 @@ sonarr-uhd:
   upgrade_existing: false
 
 trakt:
-  client_id: <<PMM_TRAKT_CLIENT_ID}}
-  client_secret: <<PMM_TRAKT_CLIENT_SECRET>>
+  client_id: <<TRAKT_CLIENT_ID}}
+  client_secret: <<TRAKT_CLIENT_SECRET>>
   authorization:
-    access_token: <<PMM_TRAKT_ACCESS_TOKEN>>
+    access_token: <<TRAKT_ACCESS_TOKEN>>
     token_type: Bearer
-    expires_in: <<PMM_TRAKT_EXPIRES_IN>>
-    refresh_token: <<PMM_TRAKT_REFRESH_TOKEN>>
+    expires_in: <<TRAKT_EXPIRES_IN>>
+    refresh_token: <<TRAKT_REFRESH_TOKEN>>
     scope: public
-    created_at: <<PMM_TRAKT_CREATED_AT>>
+    created_at: <<TRAKT_CREATED_AT>>
   pin:
