@@ -5,10 +5,10 @@ vars:
   TIMENOW:
     sh: date +%Y%m%d-%H%M%S
 
-includes:
-  k8s:
-    internal: true
-    taskfile: ../k8s
+# includes:
+#   k8s:
+#     internal: true
+#     taskfile: ../k8s
 
 tasks:
   unlock:
