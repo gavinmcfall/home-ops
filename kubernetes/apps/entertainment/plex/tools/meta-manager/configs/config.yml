@@ -81,34 +81,34 @@ settings:
   playlist_exclude_users:
 
 plex:
-  url: http://plex.media.svc.cluster.local:32400
-  token: <<PLEX_API_KEY>>
+  url: http://plex.entertainment.svc.cluster.local:32400
+  token: {{ PMM_PLEX_API_KEY }}
   timeout: 60
   clean_bundles: false
   empty_trash: false
   optimize: false
 
 tautulli:
-  url: http://tautulli.media.svc.cluster.local:8181
-  apikey: <<TAUTULLI_API_KEY>>
+  url: http://tautulli.entertainment.svc.cluster.local:8181
+  apikey: {{ PMM_TAUTULLI_API_KEY }}
 
 tmdb:
-  apikey: <<TMDB_API_KEY>>
+  apikey: {{ PMM_TMDB_API_KEY }}
   language: en
   cache_expiration: 60
   region:
 
 omdb:
-  apikey: <<OMDB_API_KEY>>
+  apikey: {{ PMM_OMDB_API_KEY }}
   cache_expiration: 60
 
 mdblist:
-  apikey: <<MDBLIST_API_KEY>>
+  apikey: {{ PMM_MDBLIST_API_KEY }}
   cache_expiration: 60
 
 radarr:
-  url: http://radarr.media.svc.cluster.local:7878
-  token: <<RADARR_API_KEY>>
+  url: http://radarr.downloads.svc.cluster.local:80
+  token: {{ PMM_RADARR_API_KEY }}
   add_missing: false
   add_existing: false
   root_folder_path: /media/movies
@@ -122,8 +122,8 @@ radarr:
   upgrade_existing: false
 
 sonarr:
-  url: http://sonarr.media.svc.cluster.local:8989
-  token: <<SONARR_API_KEY>>
+  url: http://sonarr.downloads.svc.cluster.local:80
+  token: {{ PMM_SONARR_API_KEY }}
   add_missing: false
   add_existing: false
   root_folder_path: /media/shows
@@ -139,14 +139,32 @@ sonarr:
   plex_path:
   upgrade_existing: false
 
+sonarr-uhd:
+  url: http://sonarr-uhd.downloads.svc.cluster.local:80
+  token: {{ PMM_SONARR_UHD_API_KEY }}
+  add_missing: false
+  add_existing: false
+  root_folder_path: /media/shows
+  monitor: all
+  quality_profile: Ultra-HD
+  language_profile: English
+  series_type: standard
+  season_folder: true
+  tag:
+  search: false
+  cutoff_search: false
+  sonarr_path:
+  plex_path:
+  upgrade_existing: false
+
 trakt:
-  client_id: <<TRAKT_CLIENT_ID>>
-  client_secret: <<TRAKT_CLIENT_SECRET>>
+  client_id: {{ PMM_TRAKT_CLIENT_ID}}
+  client_secret: {{ PMM_TRAKT_CLIENT_SECRET }}
   authorization:
-    access_token: <<TRAKT_ACCESS_TOKEN>>
+    access_token: {{ PMM_TRAKT_ACCESS_TOKEN }}
     token_type: Bearer
-    expires_in: <<TRAKT_EXPIRES_IN>>
-    refresh_token: <<TRAKT_REFRESH_TOKEN>>
+    expires_in: {{ PMM_TRAKT_EXPIRES_IN }}
+    refresh_token: {{ PMM_TRAKT_REFRESH_TOKEN }}
     scope: public
-    created_at: <<TRAKT_CREATED_AT>>
+    created_at: {{ PMM_TRAKT_CREATED_AT }}
   pin:
