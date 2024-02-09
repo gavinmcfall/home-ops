@@ -158,7 +158,7 @@ sonarr-uhd:
   upgrade_existing: false
 
 trakt:
-  client_id: <<TRAKT_CLIENT_ID}}
+  client_id: <<TRAKT_CLIENT_ID>>
   client_secret: <<TRAKT_CLIENT_SECRET>>
   authorization:
     access_token: <<TRAKT_ACCESS_TOKEN>>
