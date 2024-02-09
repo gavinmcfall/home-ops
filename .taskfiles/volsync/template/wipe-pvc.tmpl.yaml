@@ -2,8 +2,8 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "wipe-${app}-${ts}"
-  namespace: "${ns}"
+  name: "wipe-${PVC}-${TIMENOW}"
+  namespace: "${NS}"
 spec:
   ttlSecondsAfterFinished: 3600
   template:
@@ -12,14 +12,15 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: wipe
-          image: docker.io/library/busybox:latest
+          image: public.ecr.aws/docker/library/busybox:latest
           command: ["/bin/sh", "-c", "cd /config; find . -delete"]
           volumeMounts:
             - name: config
               mountPath: /config
           securityContext:
-            privileged: true
+            runAsUser: 0
+            runAsGroup: 0
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: "${claim}"
+            claimName: "${PVC}"
