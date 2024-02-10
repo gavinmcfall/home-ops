@@ -1,6 +1,7 @@
 ---
 libraries:
   Anime:
+    remove_overlays: true
     overlay_files:
       - file: config/overlays/Anime/
     operations:
@@ -14,6 +15,7 @@ libraries:
       mass_episode_user_rating_update: imdb
 
   Movies:
+    remove_overlays: true
     overlay_files:
       - file: config/overlays/Movies/
     operations:
@@ -27,6 +29,7 @@ libraries:
       mass_episode_user_rating_update: imdb
 
   Movies - UHD:
+    remove_overlays: true
     overlay_files:
       - file: config/overlays/Movies/
     operations:
@@ -40,6 +43,7 @@ libraries:
       mass_episode_user_rating_update: imdb
 
   Television:
+    remove_overlays: true
     overlay_files:
       - file: config/overlays/Television/
     operations:
@@ -53,6 +57,7 @@ libraries:
       mass_episode_user_rating_update: imdb
 
   Television - UHD:
+    remove_overlays: true
     overlay_files:
       - file: config/overlays/Television/
     operations:
@@ -66,6 +71,7 @@ libraries:
       mass_episode_user_rating_update: imdb
 
   Television - Foreign:
+    remove_overlays: true
     overlay_files:
       - file: config/overlays/Television/
     operations:
