@@ -3,6 +3,13 @@ libraries:
   Anime:
     remove_overlays: true
     overlay_files:
+      - pmm: commonsense
+      - pmm: commonsense
+        template_variables:
+          builder_level: season
+      - pmm: commonsense
+        template_variables:
+          builder_level: episode
       - file: config/overlays/Anime/anime-overlay.yaml
     operations:
       mass_genre_update: tmdb
