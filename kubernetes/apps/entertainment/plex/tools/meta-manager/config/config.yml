@@ -138,28 +138,28 @@ settings:
 #############################################
 
 anidb:
+  cache_expiration: 60
   client: <<ANIDB_CLIENT>>
-  version: 1
   language: en
-  cache_expiration: 60
-  username: <<ANIDB_USERNAME>>
   password: <<ANIDB_PASSWORD>>
-  cache_expiration: 60
+  username: <<ANIDB_USERNAME>>
+  version: 1
 
 mdblist:
   apikey: <<MDBLIST_API_KEY>>
   cache_expiration: 60
 
 mal:
-  client_id: <<MYANIMELIST_CLIENT_ID>>
-  client_secret: <<MYANIMELIST_CLIENT_SECRET>>
-  localhost_url: <<MYANIMELIST_LOCALHOST_URL>>
   authorization:
     access_token: <<MYANIMELIST_ACCESS_TOKEN>>
     token_type: Bearer
     expires_in: <<MYANIMELIST_EXPIRES_IN>>
     refresh_token: <<MYANIMELIST_REFRESH_TOKEN>>
   cache_expiration: 60
+  client_id: <<MYANIMELIST_CLIENT_ID>>
+  client_secret: <<MYANIMELIST_CLIENT_SECRET>>
+  localhost_url: <<MYANIMELIST_LOCALHOST_URL>>
+
 
 omdb:
   apikey: <<OMDB_API_KEY>>
@@ -167,13 +167,11 @@ omdb:
 
 tmdb:
   apikey: <<TMDB_API_KEY>>
-  language: en
   cache_expiration: 60
+  language: en
   region: NZ
 
 trakt:
-  client_id: <<TRAKT_CLIENT_ID>>
-  client_secret: <<TRAKT_CLIENT_SECRET>>
   authorization:
     access_token: <<TRAKT_ACCESS_TOKEN>>
     token_type: Bearer
@@ -181,6 +179,8 @@ trakt:
     refresh_token: <<TRAKT_REFRESH_TOKEN>>
     scope: public
     created_at: <<TRAKT_CREATED_AT>>
+  client_id: <<TRAKT_CLIENT_ID>>
+  client_secret: <<TRAKT_CLIENT_SECRET>>
   pin: <<TRAKT_PIN>>
 
 #############################################
