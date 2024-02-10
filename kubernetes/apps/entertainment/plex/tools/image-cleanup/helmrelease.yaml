@@ -31,7 +31,7 @@ spec:
       main:
         type: cronjob
         cronjob:
-          schedule: "30 8 * * 6"
+          schedule: "0 4 * * 6" # At 04:00 on Saturday | https://crontab.guru/
           timeZone: &timeZone ${TIMEZONE}
         containers:
           main:
