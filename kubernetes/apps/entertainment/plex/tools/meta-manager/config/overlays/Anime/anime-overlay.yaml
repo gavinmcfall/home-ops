@@ -1,10 +1,7 @@
+overlays:
 ############################
 #         RATINGS          #
 ############################
-- pmm: commonsense
-- pmm: commonsense
-  template_variables:
-    builder_level: season
-- pmm: commonsense
-  template_variables:
-    builder_level: episode
+  content-rating:
+    overlay:
+      pmm: commonsense
