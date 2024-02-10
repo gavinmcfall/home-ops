@@ -10,7 +10,7 @@ configMapGenerator:
     files:
       - ./config/config.yml
       - ./scripts/run.sh
-  - name: pmm-anime-overlay
+  - name: pmm-overlays
     files:
       - ./config/overlays/Anime/anime-overlay.yaml
 

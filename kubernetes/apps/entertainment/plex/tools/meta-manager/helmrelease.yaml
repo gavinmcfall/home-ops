@@ -73,6 +73,13 @@ spec:
           - path: /config/config.yml
             subPath: config.yml
             readOnly: true
+      overlay-files:
+        type: configMap
+        name: pmm-overlays
+        globalMounts:
+          - path: /config/overlays/Anime/anime-overlay.yaml
+            subPath: anime-overlay.yaml
+            readOnly: true
       logs:
         type: emptyDir
         globalMounts:
