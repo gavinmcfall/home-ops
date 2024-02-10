@@ -12,3 +12,5 @@ kubeconfig
 .venv*
 # Taskfile
 .tasks
+# PMM Logs
+pmm.log
