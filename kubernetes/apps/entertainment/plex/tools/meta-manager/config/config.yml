@@ -1,77 +1,87 @@
 ---
 libraries:
-  # Movies:
-  #   collection_files:
-  #     - file: config/collections/Movies.yml
-  #     - file: config/collections/Movies - Trakt (Unplayed) by Magic815.yml
-  #     - file: config/collections/Movies - Holidays by Drazzizzi.yml
-  #     # - file: config/overlays/Movies - Locations.yml
-  #   overlay_files:
-  #     # - file: config/overlays/Movies - Overlays - Audio.yml
-  #     - file: config/overlays/Movies - Overlays - Charts.yml
-  #     - file: config/overlays/Movies - Overlays - Oscars.yml
-  #     - file: config/overlays/Movies - Overlays - Ratings.yml
-  #     - file: config/overlays/Movies - Overlays - Stand-up.yml
-  #     - file: config/overlays/Movies - Overlays - Streaming Services.yml
-  #     - file: config/overlays/Movies - Overlays - Studios.yml
-  #   operations:
-  #     mass_genre_update: imdb
-  #     mass_content_rating_update: omdb
-  #     mass_audience_rating_update: mdb_tomatoesaudience
-  #     mass_critic_rating_update: mdb_metacritic
-  #     mass_user_rating_update: imdb
-
-  # TV Shows:
-  #   collection_files:
-  #     - file: config/collections/TV Shows.yml
-  #   overlay_files:
-  #     - file: config/overlays/TV Shows - Overlays - Charts.yml
-  #     - file: config/overlays/TV Shows - Overlays - Network.yml
-  #     - file: config/overlays/TV Shows - Overlays - Ratings.yml
-  #     - file: config/overlays/TV Shows - Overlays - Statuses.yml
-  #     - file: config/overlays/TV Shows - Overlays - Streaming Services.yml
-  #     - file: config/overlays/TV Shows - Overlays - Studios.yml
-  #   operations:
-  #     mass_genre_update: tmdb
-  #     mass_content_rating_update: omdb
-  #     mass_audience_rating_update: mdb_tomatoesaudience
-  #     mass_critic_rating_update: mdb_metacritic
-  #     mass_user_rating_update: imdb
-  #     mass_episode_audience_rating_update: mdb_tomatoesaudience
-  #     mass_episode_critic_rating_update: mdb_metacritic
-  #     mass_episode_user_rating_update: imdb
-
-  Movies:                        # These are names of libraries in your Plex
-    collection_files:
-      - pmm: basic               # This is a file within PMM's defaults folder
-      - pmm: imdb                # This is a file within PMM's defaults folder
-      # see the wiki for how to use local files, folders, URLs, or files from git
-    overlay_path:
-      - remove_overlays: false   # Set this to true to remove all overlays
-      - pmm: ribbon              # This is a file within PMM's defaults folder
-      # see the wiki for how to use local files, folders, URLs, or files from git
-  TV Shows:
-    collection_files:
-      - pmm: basic               # This is a file within PMM's defaults folder
-      - pmm: imdb                # This is a file within PMM's defaults folder
-      # see the wiki for how to use local files, folders, URLs, or files from git
-    overlay_path:
-      - remove_overlays: false   # Set this to true to remove all overlays
-      - pmm: ribbon              # This is a file within PMM's defaults folder
-      # see the wiki for how to use local files, folders, URLs, or files from git
   Anime:
-    collection_files:
-      - pmm: basic               # This is a file within PMM's defaults folder
-      - pmm: anilist             # This is a file within PMM's defaults folder
-      # see the wiki for how to use local files, folders, URLs, or files from git
-  Music:
-    collection_files:
-      - file: config/Music.yml   # This is a local file THAT YOU MIGHT CREATE
-playlist_files:
-  - pmm: playlist                # This is a file within PMM's defaults folder
-    template_variables:
-      libraries: Movies, TV Shows   # list of libraries that you want the PMM Defaults playlists to look at
-  # see the wiki for how to use local files, folders, URLs, or files from git
+    overlay_files:
+      - file: config/overlays/Anime/
+    operations:
+      mass_genre_update: tmdb
+      mass_content_rating_update: omdb
+      mass_audience_rating_update: mdb_tomatoesaudience
+      mass_critic_rating_update: mdb_metacritic
+      mass_user_rating_update: imdb
+      mass_episode_audience_rating_update: mdb_tomatoesaudience
+      mass_episode_critic_rating_update: mdb_metacritic
+      mass_episode_user_rating_update: imdb
+
+  Movies:
+    overlay_files:
+      - file: config/overlays/Movies/
+    operations:
+      mass_genre_update: tmdb
+      mass_content_rating_update: omdb
+      mass_audience_rating_update: mdb_tomatoesaudience
+      mass_critic_rating_update: mdb_metacritic
+      mass_user_rating_update: imdb
+      mass_episode_audience_rating_update: mdb_tomatoesaudience
+      mass_episode_critic_rating_update: mdb_metacritic
+      mass_episode_user_rating_update: imdb
+
+  Movies - UHD:
+    overlay_files:
+      - file: config/overlays/Movies/
+    operations:
+      mass_genre_update: tmdb
+      mass_content_rating_update: omdb
+      mass_audience_rating_update: mdb_tomatoesaudience
+      mass_critic_rating_update: mdb_metacritic
+      mass_user_rating_update: imdb
+      mass_episode_audience_rating_update: mdb_tomatoesaudience
+      mass_episode_critic_rating_update: mdb_metacritic
+      mass_episode_user_rating_update: imdb
+
+  Television:
+    overlay_files:
+      - file: config/overlays/Television/
+    operations:
+      mass_genre_update: tmdb
+      mass_content_rating_update: omdb
+      mass_audience_rating_update: mdb_tomatoesaudience
+      mass_critic_rating_update: mdb_metacritic
+      mass_user_rating_update: imdb
+      mass_episode_audience_rating_update: mdb_tomatoesaudience
+      mass_episode_critic_rating_update: mdb_metacritic
+      mass_episode_user_rating_update: imdb
+
+  Television - UHD:
+    overlay_files:
+      - file: config/overlays/Television/
+    operations:
+      mass_genre_update: tmdb
+      mass_content_rating_update: omdb
+      mass_audience_rating_update: mdb_tomatoesaudience
+      mass_critic_rating_update: mdb_metacritic
+      mass_user_rating_update: imdb
+      mass_episode_audience_rating_update: mdb_tomatoesaudience
+      mass_episode_critic_rating_update: mdb_metacritic
+      mass_episode_user_rating_update: imdb
+
+  Television - Foreign:
+    overlay_files:
+      - file: config/overlays/Television/
+    operations:
+      mass_genre_update: tmdb
+      mass_content_rating_update: omdb
+      mass_audience_rating_update: mdb_tomatoesaudience
+      mass_critic_rating_update: mdb_metacritic
+      mass_user_rating_update: imdb
+      mass_episode_audience_rating_update: mdb_tomatoesaudience
+      mass_episode_critic_rating_update: mdb_metacritic
+      mass_episode_user_rating_update: imdb
+
+
+#############################################
+#                SETTINGS                   #
+#############################################
 
 settings:
   run_order:
@@ -117,82 +127,41 @@ settings:
   custom_repo:
   check_nightly: false
 
-plex:
-  url: http://plex.entertainment.svc.cluster.local:32400
-  token: <<PLEX_API_KEY>>
-  timeout: 60
-  clean_bundles: false
-  empty_trash: false
-  optimize: false
+#############################################
+#               DATABASES                   #
+#############################################
 
-tautulli:
-  url: http://tautulli.entertainment.svc.cluster.local:8181
-  apikey: <<TAUTULLI_API_KEY>>
-
-tmdb:
-  apikey: <<TMDB_API_KEY>>
+anidb:
+  client: <<ANIDB_CLIENT>>
+  version: 1
   language: en
   cache_expiration: 60
-  region:
-
-omdb:
-  apikey: <<OMDB_API_KEY>>
-  cache_expiration: 60
+  username: <<ANIDB_USERNAME>>
+  password: <<ANIDB_PASSWORD>>
 
 mdblist:
   apikey: <<MDBLIST_API_KEY>>
   cache_expiration: 60
 
-radarr:
-  url: http://radarr.downloads.svc.cluster.local:80
-  token: <<RADARR_API_KEY>>
-  add_missing: false
-  add_existing: false
-  root_folder_path: /media/Library/Movies
-  monitor: true
-  availability: announced
-  quality_profile: Remux-1080p
-  tag:
-  search: false
-  radarr_path:
-  plex_path:
-  upgrade_existing: false
+mal:
+  client_id: <<MYANIMELIST_CLIENT_ID>>
+  client_secret: <<MYANIMELIST_CLIENT_SECRET>>
+  localhost_url: <<MYANIMELIST_LOCALHOST_URL>>
+  authorization:
+    access_token: <<MYANIMELIST_ACCESS_TOKEN>>
+    token_type: Bearer
+    expires_in: <<MYANIMELIST_EXPIRES_IN>>
+    refresh_token: <<MYANIMELIST_REFRESH_TOKEN>>
 
-sonarr:
-  url: http://sonarr.downloads.svc.cluster.local:80
-  token: <<SONARR_API_KEY>>
-  add_missing: false
-  add_existing: false
-  root_folder_path: /media/Library/Television
-  monitor: all
-  quality_profile: Web-1080p
-  language_profile: English
-  series_type: standard
-  season_folder: true
-  tag:
-  search: false
-  cutoff_search: false
-  sonarr_path:
-  plex_path:
-  upgrade_existing: false
+omdb:
+  apikey: <<OMDB_API_KEY>>
+  cache_expiration: 60
 
-sonarr-uhd:
-  url: http://sonarr-uhd.downloads.svc.cluster.local:80
-  token: <<SONARR_UHD_API_KEY>>
-  add_missing: false
-  add_existing: false
-  root_folder_path: "/media/Library/Television - UHD"
-  monitor: all
-  quality_profile: Ultra-HD
-  language_profile: English
-  series_type: standard
-  season_folder: true
-  tag:
-  search: false
-  cutoff_search: false
-  sonarr_path:
-  plex_path:
-  upgrade_existing: false
+tmdb:
+  apikey: <<TMDB_API_KEY>>
+  language: en
+  cache_expiration: 60
+  region: NZ
 
 trakt:
   client_id: <<TRAKT_CLIENT_ID>>
@@ -204,4 +173,75 @@ trakt:
     refresh_token: <<TRAKT_REFRESH_TOKEN>>
     scope: public
     created_at: <<TRAKT_CREATED_AT>>
-  pin:
+  pin: <<TRAKT_PIN>>
+
+#############################################
+#                  TOOLS                    #
+#############################################
+
+plex:
+  url: http://plex.entertainment.svc.cluster.local:32400
+  token: <<PLEX_API_KEY>>
+  timeout: 60
+  clean_bundles: false
+  empty_trash: false
+  optimize: false
+
+#############################################
+#           UNUSED CONFIGURATION            #
+#############################################
+
+# radarr:
+#   url: http://radarr.downloads.svc.cluster.local:80
+#   token: <<RADARR_API_KEY>>
+#   add_missing: false
+#   add_existing: false
+#   root_folder_path: /media/Library/Movies
+#   monitor: true
+#   availability: announced
+#   quality_profile: Remux-1080p
+#   tag:
+#   search: false
+#   radarr_path:
+#   plex_path:
+#   upgrade_existing: false
+
+# sonarr:
+#   url: http://sonarr.downloads.svc.cluster.local:80
+#   token: <<SONARR_API_KEY>>
+#   add_missing: false
+#   add_existing: false
+#   root_folder_path: /media/Library/Television
+#   monitor: all
+#   quality_profile: Web-1080p
+#   language_profile: English
+#   series_type: standard
+#   season_folder: true
+#   tag:
+#   search: false
+#   cutoff_search: false
+#   sonarr_path:
+#   plex_path:
+#   upgrade_existing: false
+
+# sonarr-uhd:
+#   url: http://sonarr-uhd.downloads.svc.cluster.local:80
+#   token: <<SONARR_UHD_API_KEY>>
+#   add_missing: false
+#   add_existing: false
+#   root_folder_path: "/media/Library/Television - UHD"
+#   monitor: all
+#   quality_profile: Ultra-HD
+#   language_profile: English
+#   series_type: standard
+#   season_folder: true
+#   tag:
+#   search: false
+#   cutoff_search: false
+#   sonarr_path:
+#   plex_path:
+#   upgrade_existing: false
+
+# tautulli:
+#   url: http://tautulli.entertainment.svc.cluster.local:8181
+#   apikey: <<TAUTULLI_API_KEY>>
