@@ -8,7 +8,7 @@ resources:
 configMapGenerator:
   - name: plex-meta-manager-configmap
     files:
-      - ./configs/config.yml
+      - ./config/config.yml
       - ./scripts/run.sh
 generatorOptions:
   disableNameSuffixHash: true
