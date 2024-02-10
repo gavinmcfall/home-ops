@@ -13,5 +13,6 @@ configMapGenerator:
   - name: pmm-anime-overlay
     files:
       - ./config/overlays/Anime/anime-overlay.yaml
+
 generatorOptions:
   disableNameSuffixHash: true
