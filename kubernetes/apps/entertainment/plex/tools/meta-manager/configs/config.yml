@@ -112,7 +112,7 @@ radarr:
   token: <<RADARR_API_KEY>>
   add_missing: false
   add_existing: false
-  root_folder_path: /media/movies
+  root_folder_path: /media/Library/Movies
   monitor: true
   availability: announced
   quality_profile: Remux-1080p
@@ -127,7 +127,7 @@ sonarr:
   token: <<SONARR_API_KEY>>
   add_missing: false
   add_existing: false
-  root_folder_path: /media/shows
+  root_folder_path: /media/Library/Television
   monitor: all
   quality_profile: Web-1080p
   language_profile: English
@@ -145,7 +145,7 @@ sonarr-uhd:
   token: <<SONARR_UHD_API_KEY>>
   add_missing: false
   add_existing: false
-  root_folder_path: /media/shows
+  root_folder_path: "/media/Library/Television - UHD"
   monitor: all
   quality_profile: Ultra-HD
   language_profile: English
