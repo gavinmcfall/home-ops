@@ -1,7 +1,7 @@
 ---
 libraries:
   Anime:
-    remove_overlays: true
+    remove_overlays: false
     overlay_files:
       - pmm: commonsense
       - pmm: commonsense
@@ -10,7 +10,7 @@ libraries:
       - pmm: commonsense
         template_variables:
           builder_level: episode
-      - file: config/overlays/Anime/anime-overlay.yaml
+      # - file: config/overlays/Anime/anime-overlay.yaml
     operations:
       mass_genre_update: tmdb
       mass_content_rating_update: omdb
