@@ -2,18 +2,18 @@
 libraries:
   Movies:
     collection_files:
-      - file: config/Movies.yml
-      - file: config/Movies - Trakt (Unplayed).yml
-      - file: config/Movies - Holidays.yml
-      - file: config/Movies - Locations.yml
+      - file: config/collections/Movies.yml
+      - file: config/collections/Movies - Trakt (Unplayed) by Magic815.yml
+      - file: config/collections/Movies - Holidays by Drazzizzi.yml
+      # - file: config/overlays/Movies - Locations.yml
     overlay_files:
-      - file: config/Movies - Overlays - Charts.yml
-      - file: config/Movies - Overlays - Streaming Services.yml
-      - file: config/Movies - Overlays - Studios.yml
-      - file: config/Movies - Overlays - Oscars.yml
-      - file: config/Movies - Overlays - Audio.yml
-      - file: config/Movies - Overlays - Ratings.yml
-      - file: config/Movies - Overlays - Stand-up.yml
+      # - file: config/overlays/Movies - Overlays - Audio.yml
+      - file: config/overlays/Movies - Overlays - Charts.yml
+      - file: config/overlays/Movies - Overlays - Oscars.yml
+      - file: config/overlays/Movies - Overlays - Ratings.yml
+      - file: config/overlays/Movies - Overlays - Stand-up.yml
+      - file: config/overlays/Movies - Overlays - Streaming Services.yml
+      - file: config/overlays/Movies - Overlays - Studios.yml
     operations:
       mass_genre_update: imdb
       mass_content_rating_update: omdb
@@ -23,13 +23,14 @@ libraries:
 
   TV Shows:
     collection_files:
-      - file: config/TV Shows.yml
+      - file: config/collections/TV Shows.yml
     overlay_files:
-      - file: config/TV Shows - Overlays - Charts.yml
-      - file: config/TV Shows - Overlays - Streaming Services + Networks.yml
-      - file: config/TV Shows - Overlays - Studios.yml
-      - file: config/TV Shows - Overlays - Ratings.yml
-      - file: config/TV Shows - Overlays - Statuses.yml
+      - file: config/overlays/TV Shows - Overlays - Charts.yml
+      - file: config/overlays/TV Shows - Overlays - Network.yml
+      - file: config/overlays/TV Shows - Overlays - Ratings.yml
+      - file: config/overlays/TV Shows - Overlays - Statuses.yml
+      - file: config/overlays/TV Shows - Overlays - Streaming Services.yml
+      - file: config/overlays/TV Shows - Overlays - Studios.yml
     operations:
       mass_genre_update: tmdb
       mass_content_rating_update: omdb
@@ -43,7 +44,7 @@ libraries:
 settings:
   cache: true
   cache_expiration: 60
-  asset_directory: config/assets
+  asset_directory: config/overlays/assets
   asset_folders: false
   asset_depth: 0
   create_asset_folders: false

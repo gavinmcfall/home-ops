@@ -9,5 +9,9 @@ pmm () {
         --run-libraries "$1"
 }
 
+pmm "Anime"
 pmm "Movies"
-pmm "TV Shows"
+pmm "Movies - UHD"
+pmm "Television"
+pmm "Television - Foreign"
+pmm "Television - UHD"
