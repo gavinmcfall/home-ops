@@ -3,7 +3,7 @@ libraries:
   Anime:
     remove_overlays: true
     overlay_files:
-      - file: config/overlays/Anime/
+      - file: config/overlays/Anime/anime-overlay.yaml
     operations:
       mass_genre_update: tmdb
       mass_content_rating_update: omdb
