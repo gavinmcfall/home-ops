@@ -10,5 +10,7 @@ configMapGenerator:
     files:
       - ./config/config.yml
       - ./scripts/run.sh
+      # Overlay Config files
+      - ./config/overlays/Anime/anime-overlay.yaml
 generatorOptions:
   disableNameSuffixHash: true
