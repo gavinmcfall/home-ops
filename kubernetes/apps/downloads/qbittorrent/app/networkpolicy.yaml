@@ -39,6 +39,14 @@ spec:
       ports:
         - port: *port
           protocol: TCP
+    # kapowarr
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: kapowarr
+      ports:
+        - port: *port
+          protocol: TCP
     # prowlarr
     - from:
         - podSelector:
