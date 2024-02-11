@@ -10,6 +10,7 @@ resources:
   # - ./cross-seed/ks.yaml
   - ./flaresolverr/ks.yaml
   - ./kapowarr/ks.yaml
+  - ./mylar/ks.yaml
   - ./overseerr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
