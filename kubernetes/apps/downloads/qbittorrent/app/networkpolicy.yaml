@@ -47,6 +47,14 @@ spec:
       ports:
         - port: *port
           protocol: TCP
+    # mylar
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: mylar
+      ports:
+        - port: *port
+          protocol: TCP
     # prowlarr
     - from:
         - podSelector:
