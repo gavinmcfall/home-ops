@@ -7,5 +7,6 @@ resources:
 # Applications
   - ./calibre/ks.yaml
   - ./kavita/ks.yaml
+  - ./komga/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
