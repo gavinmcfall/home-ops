@@ -14,11 +14,6 @@ spec:
   superuserSecret:
     name: cloudnative-pg-secret
   enableSuperuserAccess: true
-  # Note: Bootstrap is needed when recovering from an existing cnpg cluster
-  # bootstrap:
-  #   recovery:
-  #     source: &previousCluster postgres16-v1
-  # Remove bootstrap after the cluster is recovered
   postgresql:
     parameters:
       max_connections: "600"
@@ -39,7 +34,7 @@ spec:
         action: labeldrop
   backup:
     retentionPolicy: 30d
-    barmanObjectStore:
+    barmanObjectStore: &barmanObjectStore
       data:
         compression: bzip2
       wal:
@@ -47,7 +42,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://nerdz-cloudnative-pg/
       endpointURL: https://s3.us-east-005.backblazeb2.com
-      serverName: &currentCluster postgres16-v1
+      serverName: &currentCluster postgres16-v2
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -56,18 +51,12 @@ spec:
           name: cloudnative-pg-secret
           key: aws-secret-access-key
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
+  bootstrap:
+    recovery:
+      source: &previousCluster postgres16-v1
+  # Note: externalClusters is needed when recovering from an existing cnpg cluster
   externalClusters:
     - name: *previousCluster
       barmanObjectStore:
-        wal:
-          compression: bzip2
-          maxParallel: 8
-        destinationPath: s3://nerdz-cloudnative-pg/
-        endpointURL: https://s3.us-east-005.backblazeb2.com
-        s3Credentials:
-          accessKeyId:
-            name: cloudnative-pg-secret
-            key: aws-access-key-id
-          secretAccessKey:
-            name: cloudnative-pg-secret
-            key: aws-secret-access-key
+        <<: *barmanObjectStore
+        serverName: *previousCluster
