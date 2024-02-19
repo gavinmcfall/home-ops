@@ -16,8 +16,9 @@ spec:
   enableSuperuserAccess: true
   postgresql:
     parameters:
-      max_connections: "200"
-      shared_buffers: 256MB
+      max_connections: "600"
+      max_slot_wal_keep_size: 10GB
+      shared_buffers: 512MB
   resources:
     requests:
       cpu: 100m
