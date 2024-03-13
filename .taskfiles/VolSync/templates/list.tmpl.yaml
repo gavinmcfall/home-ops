@@ -12,8 +12,8 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: list
-          image: docker.io/restic/restic:0.16.3
+          image: docker.io/restic/restic:0.16.4
           args: ["snapshots"]
           envFrom:
             - secretRef:
-                name: "${app}-volsync-minio-secret"
+                name: "${app}-volsync"

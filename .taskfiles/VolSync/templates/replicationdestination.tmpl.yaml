@@ -8,10 +8,10 @@ spec:
   trigger:
     manual: restore-once
   restic:
-    repository: "${app}-volsync-secret"
+    repository: "${app}-volsync"
     destinationPVC: "${claim}"
     copyMethod: Direct
-    storageClassName: longhorn
+    storageClassName: ceph-block
     # storageClassName: ceph-filesystem
     # accessModes: ["ReadWriteMany"]
     # IMPORTANT NOTE:
