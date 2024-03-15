@@ -32,7 +32,7 @@ spec:
           main:
             image:
               repository: ghcr.io/ajnart/homarr
-              tag: 0.14.3@sha256:45f163b94e34354a643d3f71e77455d78e805e8bf32be199f74c2d131ea14bc1
+              tag: 0.15.2@sha256:caf77d79272d16e8081a90e0f2b2928d385ca0b3c0dd36e50cb46ff3aa940ab9
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
