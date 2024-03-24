@@ -16,4 +16,4 @@ spec:
           args: ["snapshots"]
           envFrom:
             - secretRef:
-                name: "${app}-volsync"
+                name: "${app}-volsync-minio-secret"
