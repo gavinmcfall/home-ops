@@ -36,7 +36,7 @@ spec:
           main:
             image:
               repository: docker.io/meisnate12/plex-meta-manager
-              tag: v1.20.0@sha256:ab18727278a4c8f5327353d351dff75b6403e35296fc7f7083099a1fffac891d
+              tag: v1.21.0@sha256:024b6efe5f3461ed24267c728816c550b6d88c37371dd410b31d06a7af3803e6
             command:
               - /scripts/run.sh
             env:
