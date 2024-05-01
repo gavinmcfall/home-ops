@@ -4,10 +4,10 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
 
-# Applications
+  # Applications
   - ./calibre/ks.yaml
   - ./kavita/ks.yaml
   - ./komga/ks.yaml
-  - ./plex/ks.yaml
+  # - ./plex/ks.yaml
   - ./tautulli/ks.yaml
   - ./wizarr/ks.yaml
