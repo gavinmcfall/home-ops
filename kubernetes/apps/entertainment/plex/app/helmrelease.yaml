@@ -93,7 +93,7 @@ spec:
       #             values: ["frigate"]
       #       topologyKey: kubernetes.io/hostname
       nodeSelector:
-        intel.feature.node.kubernetes.io/gpu: "true"
+        nvidia.feature.node.kubernetes.io/gpu: "true"
     service:
       app:
         controller: plex
