@@ -46,6 +46,7 @@ spec:
               NVIDIA_VISIBLE_DEVICES: all
               # https://github.com/NVIDIA/nvidia-container-runtime#nvidia_driver_capabilities
               NVIDIA_DRIVER_CAPABILITIES: all
+              PLEX_CLAIM: claim-jxa16-s61_ogH3y-L3Xp
             probes:
               liveness: &probes
                 enabled: true
