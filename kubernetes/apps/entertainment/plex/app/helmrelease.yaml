@@ -72,7 +72,7 @@ spec:
               requests:
                 cpu: 100m
               limits:
-                gpu.intel.com/i915: 1
+                nvidia.com/gpu: 1
                 memory: 16Gi
     defaultPodOptions:
       securityContext:
@@ -83,15 +83,15 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [44, 10000]
         seccompProfile: { type: RuntimeDefault }
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values: ["frigate"]
-              topologyKey: kubernetes.io/hostname
+      # affinity:
+      # podAntiAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     - labelSelector:
+      #         matchExpressions:
+      #           - key: app.kubernetes.io/name
+      #             operator: In
+      #             values: ["frigate"]
+      #       topologyKey: kubernetes.io/hostname
       nodeSelector:
         intel.feature.node.kubernetes.io/gpu: "true"
     service:
@@ -104,8 +104,7 @@ spec:
           http:
             port: 32400
     ingress:
-      main:
-        enabled: true
+      app:
         className: external
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
@@ -114,20 +113,20 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *host
     persistence:
       config:
-        enabled: true
         existingClaim: plex
       # Separate PVC for cache to avoid backing up cache files
-      plex-cache:
+      cache:
         existingClaim: plex-cache
         globalMounts:
           - path: /config/Library/Application Support/Plex Media Server/Cache
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /config/Library/Application Support/Plex Media Server/Logs
       tmp:
         type: emptyDir
       transcode:
@@ -139,3 +138,9 @@ spec:
         globalMounts:
           - path: /media
             readOnly: true
+---
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: nvidia
+handler: nvidia
