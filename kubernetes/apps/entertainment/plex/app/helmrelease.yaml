@@ -80,7 +80,7 @@ spec:
         runAsGroup: 568
         runAsNonRoot: true
         fsGroup: 568
-        fsGroupChangePolicy: OnRootMismatch
+        fsGroupChangePolicy: Always
         supplementalGroups: [44, 105, 10000]
       # affinity:
       # podAntiAffinity:
@@ -108,7 +108,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hosts:
-          - host: &host "{{ .Release.Name }}.nerdz.cloud"
+          - host: "{{ .Release.Name }}.nerdz.cloud"
             paths:
               - path: /
                 service:
