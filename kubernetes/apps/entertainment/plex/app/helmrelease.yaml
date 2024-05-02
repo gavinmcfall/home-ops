@@ -1,12 +1,11 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: plex
 spec:
   interval: 30m
-  timeout: 5m
   chart:
     spec:
       chart: app-template
@@ -21,9 +20,8 @@ spec:
   upgrade:
     cleanupOnFail: true
     remediation:
+      strategy: rollback
       retries: 3
-  uninstall:
-    keepHistory: false
   dependsOn:
     - name: nvidia-device-plugin
       namespace: tools
@@ -33,11 +31,11 @@ spec:
       namespace: storage
   values:
     controllers:
-      main:
+      plex:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/plex
               tag: 1.40.2.8395-c67dce28e@sha256:a2a3149c1326e7777bfe9def135c687d884652f78d34e92264b0dab765908215
@@ -50,7 +48,7 @@ spec:
               NVIDIA_DRIVER_CAPABILITIES: all
             probes:
               liveness: &probes
-                enabled: false
+                enabled: true
                 custom: true
                 spec:
                   httpGet:
@@ -62,7 +60,10 @@ spec:
                   failureThreshold: 3
               readiness: *probes
               startup:
-                enabled: false
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -70,33 +71,32 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                nvidia.com/gpu: 1
               limits:
+                gpu.intel.com/i915: 1
                 memory: 16Gi
-                nvidia.com/gpu: 1
-                # gpu.intel.com/i915: 1
-        pod:
-          # affinity:
-          #   podAntiAffinity:
-          #     requiredDuringSchedulingIgnoredDuringExecution:
-          #       - labelSelector:
-          #           matchExpressions:
-          #             - key: app.kubernetes.io/name
-          #               operator: In
-          #               values: ["frigate"]
-          #         topologyKey: kubernetes.io/hostname
-          nodeSelector:
-            nvidia.feature.node.kubernetes.io/gpu: "true"
-          runtimeClassName: nvidia
-          securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            runAsNonRoot: true
-            fsGroup: 568
-            fsGroupChangePolicy: OnRootMismatch
-            supplementalGroups: [44, 105, 10000]
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [44, 10000]
+        seccompProfile: { type: RuntimeDefault }
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values: ["frigate"]
+              topologyKey: kubernetes.io/hostname
+      nodeSelector:
+        intel.feature.node.kubernetes.io/gpu: "true"
     service:
-      main:
+      app:
+        controller: plex
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: 10.90.3.204
