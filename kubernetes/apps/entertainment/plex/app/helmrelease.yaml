@@ -81,7 +81,7 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [44, 10000]
+        supplementalGroups: [44, 105, 10000]
         seccompProfile: { type: RuntimeDefault }
       # affinity:
       # podAntiAffinity:
