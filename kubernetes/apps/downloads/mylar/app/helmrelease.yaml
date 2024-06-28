@@ -40,7 +40,7 @@ spec:
           main:
             image:
               repository: ghcr.io/linuxserver/mylar3
-              tag: nightly@sha256:a6826b306993a45d83a69bee1ba76cdadefd747c4ccbeb1438a425ce5d5c1d22
+              tag: nightly@sha256:a77c0247b2c65a3ee46c69294afe084d1442934a500be16af1a3faef03ebffab
             env:
               TZ: ${TIMEZONE}
               UID: 1000
