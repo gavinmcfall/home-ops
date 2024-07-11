@@ -5,9 +5,9 @@ resources:
   - ./namespace.yaml
 
   # Applications
-  - ./calibre/ks.yaml
-  - ./kavita/ks.yaml
-  - ./komga/ks.yaml
-  - ./plex/ks.yaml
-  - ./tautulli/ks.yaml
-  - ./wizarr/ks.yaml
+  # - ./calibre/ks.yaml
+  # - ./kavita/ks.yaml
+  # - ./komga/ks.yaml
+  # - ./plex/ks.yaml
+  # - ./tautulli/ks.yaml
+  # - ./wizarr/ks.yaml

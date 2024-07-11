@@ -71,15 +71,15 @@ spec:
         config:
           osdsPerDevice: "1"
         nodes:
-          - name: arccorp
+          - name: stanton-01
             devices:
-              - name: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
-          - name: crusader
+              - name: /dev/disk/by-id/nvme-SAMSUNG_MZQL21T9HCJR-00A07_S64GNN0X204442
+          - name: stanton-02
             devices:
-              - name: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
-          - name: hurston
+              - name: /dev/disk/by-id/nvme-SAMSUNG_MZQL21T9HCJR-00A07_S64GNN0X204442
+          - name: stanton-03
             devices:
-              - name: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
+              - name: /dev/disk/by-id/nvme-SAMSUNG_MZQL21T9HCJR-00A07_S64GNN0X204434
       resources:
         mgr:
           requests:
