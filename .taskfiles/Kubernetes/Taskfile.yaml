@@ -2,51 +2,35 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
+vars:
+  KUBECONFORM_SCRIPT: "{{.SCRIPTS_DIR}}/kubeconform.sh"
+
 tasks:
 
-  mount:
-    desc: Mount a PersistentVolumeClaim to a temporary pod for a cluster
-    summary: |
-      Args:
-        cluster: Cluster to run command against (required)
-        ns: Namespace the PVC is in (default: default)
-        claim: PVC to mount (required)
-    interactive: true
-    cmd: |
-      kubectl --context {{.cluster}} run -n {{.ns}} debug-{{.claim}} -i --tty --rm --image=null --privileged --overrides='
-        {
-          "apiVersion": "v1",
-          "spec": {
-            "containers": [
-              {
-                "name": "debug",
-                "image": "ghcr.io/onedr0p/alpine:rolling",
-                "command": ["/bin/bash"],
-                "stdin": true,
-                "stdinOnce": true,
-                "tty": true,
-                "volumeMounts": [
-                  {
-                    "name": "config",
-                    "mountPath": "/config"
-                  }
-                ]
-              }
-            ],
-            "volumes": [
-              {
-                "name": "config",
-                "persistentVolumeClaim": {
-                  "claimName": "{{.claim}}"
-                }
-              }
-            ],
-            "restartPolicy": "Never"
-          }
-        }'
-    requires:
-      vars: ["cluster", "claim"]
+  resources:
+    desc: Gather common resources in your cluster, useful when asking for support
+    cmds:
+      - for: { var: resource }
+        cmd: kubectl get {{.ITEM}} {{.CLI_ARGS | default "-A"}}
     vars:
-      ns: '{{.ns | default "default"}}'
+      resource: >-
+        nodes
+        gitrepositories
+        kustomizations
+        helmrepositories
+        helmreleases
+        certificates
+        certificaterequests
+        ingresses
+        pods
+
+  kubeconform:
+    desc: Validate Kubernetes manifests with kubeconform
+    cmd: bash {{.KUBECONFORM_SCRIPT}} {{.KUBERNETES_DIR}}
     preconditions:
-      - { msg: "PVC not found", sh: "kubectl --context {{.cluster}} -n {{.ns}} get persistentvolumeclaim {{.claim}}" }
+      - msg: Missing kubeconform script
+        sh: test -f {{.KUBECONFORM_SCRIPT}}
+
+  .reset:
+    internal: true
+    cmd: rm -rf {{.KUBERNETES_DIR}}
