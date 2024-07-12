@@ -25,7 +25,7 @@ nodes:
     ipAddress: "10.90.3.101"
     installDiskSelector:
       serial: "S73VNU0X303066H"
-    talosImageURL: factory.talos.dev/installer/4c96eadff580c39a59bf92b6dcb9fa4ba5396e8210429396d50783a494503746
+    talosImageURL: factory.talos.dev/installer/9815c9b5e00515fccee82e1a367d6b47a4e906ab8fa3256e7721c6a33f274060
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -43,7 +43,7 @@ nodes:
     ipAddress: "10.90.3.102"
     installDiskSelector:
       serial: "S73VNU0X303413H"
-    talosImageURL: factory.talos.dev/installer/4c96eadff580c39a59bf92b6dcb9fa4ba5396e8210429396d50783a494503746
+    talosImageURL: factory.talos.dev/installer/9815c9b5e00515fccee82e1a367d6b47a4e906ab8fa3256e7721c6a33f274060
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -61,7 +61,7 @@ nodes:
     ipAddress: "10.90.3.103"
     installDiskSelector:
       serial: "S73VNU0X303400H"
-    talosImageURL: factory.talos.dev/installer/4c96eadff580c39a59bf92b6dcb9fa4ba5396e8210429396d50783a494503746
+    talosImageURL: factory.talos.dev/installer/9815c9b5e00515fccee82e1a367d6b47a4e906ab8fa3256e7721c6a33f274060
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -85,7 +85,6 @@ patches:
   - "@./patches/global/kubelet.yaml"
   - "@./patches/global/openebs-local.yaml"
   - "@./patches/global/sysctl.yaml"
-  - "@./patches/global/udev.yaml"
 
 # Controller patches
 controlPlane:
@@ -94,3 +93,4 @@ controlPlane:
     - "@./patches/controller/cluster.yaml"
     - "@./patches/controller/disable-admission-controller.yaml"
     - "@./patches/controller/etcd.yaml"
+
