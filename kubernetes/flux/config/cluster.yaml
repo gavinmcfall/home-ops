@@ -7,8 +7,6 @@ metadata:
 spec:
   interval: 30m
   url: "https://github.com/gavinmcfall/home-ops.git"
-  secretRef:
-    name: github-deploy-key
   ref:
     branch: "main"
   ignore: |

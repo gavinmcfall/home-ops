@@ -23,7 +23,8 @@ cniConfig:
 nodes:
   - hostname: "stanton-01"
     ipAddress: "10.90.3.101"
-    installDisk: "/pci0000:00/0000:00:1c.4/0000:58:00.0/nvme/nvme1/nvme1n1"
+    installDiskSelector:
+      serial: "S73VNU0X303066H"
     talosImageURL: factory.talos.dev/installer/4c96eadff580c39a59bf92b6dcb9fa4ba5396e8210429396d50783a494503746
     controlPlane: true
     networkInterfaces:
@@ -40,7 +41,8 @@ nodes:
           ip: "10.90.3.100"
   - hostname: "stanton-02"
     ipAddress: "10.90.3.102"
-    installDisk: "/pci0000:00/0000:00:1c.4/0000:58:00.0/nvme/nvme1/nvme1n1"
+    installDiskSelector:
+      serial: "S73VNU0X303413H"
     talosImageURL: factory.talos.dev/installer/4c96eadff580c39a59bf92b6dcb9fa4ba5396e8210429396d50783a494503746
     controlPlane: true
     networkInterfaces:
@@ -57,7 +59,8 @@ nodes:
           ip: "10.90.3.100"
   - hostname: "stanton-03"
     ipAddress: "10.90.3.103"
-    installDisk: "/pci0000:00/0000:00:1c.4/0000:58:00.0/nvme/nvme1/nvme1n1"
+    installDiskSelector:
+      serial: "S73VNU0X303400H"
     talosImageURL: factory.talos.dev/installer/4c96eadff580c39a59bf92b6dcb9fa4ba5396e8210429396d50783a494503746
     controlPlane: true
     networkInterfaces:
