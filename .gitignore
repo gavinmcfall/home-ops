@@ -3,14 +3,24 @@
 Thumbs.db
 # k8s
 kubeconfig
+talosconfig
 .decrypted~*.yaml
 .config.env
 *.agekey
 *.pub
 *.key
+# Private
+.private
+.bin
 # Ansible
 .venv*
 # Taskfile
-.tasks
-# PMM Logs
-pmm.log
+.task
+# Brew
+Brewfile.lock.json
+# intellij
+.idea
+# wiki
+wiki
+# Bootstrap
+/config.yaml

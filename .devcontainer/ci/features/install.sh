@@ -3,45 +3,46 @@ set -e
 set -o noglob
 
 apk add --no-cache \
-    bash bind-tools ca-certificates curl python3 \
-        py3-pip moreutils jq git iputils \
-            openssh-client starship fzf
+    age bash bind-tools ca-certificates curl direnv gettext python3 \
+    py3-pip moreutils jq git iputils openssh-client \
+    starship fzf fish yq helm
 
 apk add --no-cache \
     --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community \
-        age direnv fish helm kubectl kustomize sops
+        kubectl sops
 
-sudo apk add --no-cache \
+apk add --no-cache \
     --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
         lsd
 
-for installer_path in \
-    "budimanjojo/talhelper!" \
-    "cilium/cilium-cli!!?as=cilium" \
-    "cli/cli!!?as=gh" \
-    "cloudflare/cloudflared!" \
-    "derailed/k9s!" \
-    "fluxcd/flux2!!?as=flux" \
-    "go-task/task!" \
-    "k0sproject/k0sctl!" \
-    "kubecolor/kubecolor!" \
-    "stern/stern!" \
-    "siderolabs/talos!!?as=talosctl" \
-    "yannh/kubeconform!" \
-    "mikefarah/yq!"
+for app in \
+    "budimanjojo/talhelper!!?as=talhelper&type=script" \
+    "cilium/cilium-cli!!?as=cilium&type=script" \
+    "cli/cli!!?as=gh&type=script" \
+    "cloudflare/cloudflared!!?as=cloudflared&type=script" \
+    "derailed/k9s!!?as=k9s&type=script" \
+    "fluxcd/flux2!!?as=flux&type=script" \
+    "go-task/task!!?as=task&type=script" \
+    "helmfile/helmfile!!?as=helmfile&type=script" \
+    "kubecolor/kubecolor!!?as=kubecolor&type=script" \
+    "kubernetes-sigs/krew!!?as=krew&type=script" \
+    "kubernetes-sigs/kustomize!!?as=kustomize&type=script" \
+    "stern/stern!!?as=stern&type=script" \
+    "siderolabs/talos!!?as=talosctl&type=script" \
+    "yannh/kubeconform!!?as=kubeconform&type=script"
 do
-    curl -fsSL "https://i.jpillora.com/${installer_path}" | bash
+    echo "=== Installing ${app} ==="
+    curl -fsSL "https://i.jpillora.com/${app}" | bash
 done
 
 # Create the fish configuration directory
 mkdir -p /home/vscode/.config/fish/{completions,conf.d}
 
 # Setup autocompletions for fish
-for tool in cilium flux helm k9s kubectl kustomize talhelper talosctl; do
+for tool in cilium flux helm helmfile k9s kubectl kustomize talhelper talosctl; do
     $tool completion fish > /home/vscode/.config/fish/completions/$tool.fish
 done
 gh completion --shell fish > /home/vscode/.config/fish/completions/gh.fish
-k0sctl completion --shell fish > /home/vscode/.config/fish/completions/k0sctl.fish
 stern --completion fish > /home/vscode/.config/fish/completions/stern.fish
 yq shell-completion fish > /home/vscode/.config/fish/completions/yq.fish
 
