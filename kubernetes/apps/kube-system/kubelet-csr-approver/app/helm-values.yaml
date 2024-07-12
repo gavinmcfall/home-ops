@@ -1,0 +1,3 @@
+---
+providerRegex: ^(stanton-01|stanton-02|stanton-03)$
+bypassDnsResolution: true
