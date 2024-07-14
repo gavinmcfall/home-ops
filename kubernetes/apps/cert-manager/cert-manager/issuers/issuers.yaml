@@ -34,6 +34,6 @@ spec:
             apiTokenSecretRef:
               name: cert-manager-secret
               key: api-token
-        # selector:
-        #   dnsZones:
-        #     - "${SECRET_DOMAIN}"
+        selector:
+          dnsZones:
+            - "${SECRET_DOMAIN}"
