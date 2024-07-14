@@ -12,7 +12,7 @@ spec:
   dependsOn:
     - name: cert-manager-issuers
   path: ./kubernetes/apps/network/ingress-nginx/certificates
-  prune: true
+  prune: false
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
