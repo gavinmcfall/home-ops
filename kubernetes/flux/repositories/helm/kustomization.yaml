@@ -8,9 +8,11 @@ resources:
   - ./external-dns.yaml
   - ./external-secrets.yaml
   - ./ingress-nginx.yaml
+  - ./intel-charts.yaml
   - ./jetstack.yaml
   - ./k8s-gateway.yaml
   - ./metrics-server.yaml
+  - ./node-feature-discovery.yaml
   - ./openebs.yaml
   - ./postfinance.yaml
   - ./prometheus-community.yaml
