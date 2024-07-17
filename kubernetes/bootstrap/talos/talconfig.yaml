@@ -39,6 +39,24 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.90.3.100"
+      - deviceSelector:
+          busPath: 0-1.0 # stanton-02
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.101/32
+        routes:
+          - network: 169.254.255.102/32
+            metric: 2048
+      - deviceSelector:
+          busPath: 1-1.0 # stanton-03
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.101/32
+        routes:
+          - network: 169.254.255.103/32
+            metric: 2048
   - hostname: "stanton-02"
     ipAddress: "10.90.3.102"
     installDiskSelector:
@@ -57,6 +75,24 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.90.3.100"
+      - deviceSelector:
+          busPath: 0-1.0 # stanton-01
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.102/32
+        routes:
+          - network: 169.254.255.101/32
+            metric: 2048
+      - deviceSelector:
+          busPath: 1-1.0 # stanton-03
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.102/32
+        routes:
+          - network: 169.254.255.103/32
+            metric: 2048
   - hostname: "stanton-03"
     ipAddress: "10.90.3.103"
     installDiskSelector:
@@ -75,6 +111,24 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.90.3.100"
+      - deviceSelector:
+          busPath: 0-1.0 # stanton-01
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.103/32
+        routes:
+          - network: 169.254.255.101/32
+            metric: 2048
+      - deviceSelector:
+          busPath: 1-1.0 # stanton-02
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.103/32
+        routes:
+          - network: 169.254.255.102/32
+            metric: 2048
 
 # Global patches
 patches:
@@ -85,6 +139,8 @@ patches:
   - "@./patches/global/kubelet.yaml"
   - "@./patches/global/openebs-local.yaml"
   - "@./patches/global/sysctl.yaml"
+  - "@./patches/global/thunderbolt.yaml"
+  - "@./patches/global/kernel.yaml"
 
 # Controller patches
 controlPlane:
@@ -93,4 +149,3 @@ controlPlane:
     - "@./patches/controller/cluster.yaml"
     - "@./patches/controller/disable-admission-controller.yaml"
     - "@./patches/controller/etcd.yaml"
-
