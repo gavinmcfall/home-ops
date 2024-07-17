@@ -1,0 +1,4 @@
+machine:
+  kernel:
+    modules:
+      - name: thunderbolt_net

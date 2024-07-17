@@ -1,0 +1,8 @@
+machine:
+  install:
+    extraKernelArgs:
+      - intel_iommu=on
+      - iommu=pt
+      - mitigations=off
+      - net.ifnames=0
+      # - pcie_ports=native
