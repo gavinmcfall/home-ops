@@ -12,7 +12,7 @@ spec:
       version: v1.14.8
       sourceRef:
         kind: HelmRepository
-        name: rook-ceph
+        name: rook-ceph-charts
         namespace: flux-system
   install:
     remediation:
