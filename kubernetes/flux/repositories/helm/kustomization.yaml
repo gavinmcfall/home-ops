@@ -16,6 +16,6 @@ resources:
   - ./openebs.yaml
   - ./postfinance.yaml
   - ./prometheus-community.yaml
-  - ./rook-ceph.yaml
+  - ./rook-ceph-charts.yaml
   - ./spegel.yaml
   - ./stakater.yaml
