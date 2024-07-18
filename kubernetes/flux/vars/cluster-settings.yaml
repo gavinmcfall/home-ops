@@ -14,8 +14,10 @@ data:
   CLUSTER_SNAPSHOT_FILESYSTEM: csi-ceph-filesystem
   CLUSTER_STORAGE_BUCKET: ceph-bucket
   CLUSTER_STORAGE_HOSTPATH: democratic-csi-local-hostpath
-  CLUSTER_SNAPSHOT_HOSTPATH:
-    csi-democratic-csi-local-hostpath
+  CLUSTER_SNAPSHOT_HOSTPATH: csi-democratic-csi-local-hostpath
+  CEPH_PUBLIC_CIDR: 10.90.3.0/16
+  CEPH_CLUSTER_CIDR:
+    169.254.255.0/24
 
     # K8s
   CLUSTER_POD_CIDR: 10.69.0.0/16
