@@ -19,6 +19,10 @@ data:
   CEPH_CLUSTER_CIDR:
     169.254.255.0/24
 
-    # K8s
+  # K8s
   CLUSTER_POD_CIDR: 10.69.0.0/16
   CLUSTER_SERVICE_CIDR: 10.96.0.0/16
+
+  #Netowrking
+  LOCAL_CIDR: 10.90.0.0/16
+
