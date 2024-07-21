@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
 # Applications
-# - ./qbittorrent/ks.yaml
+- ./qbittorrent/ks.yaml
 
 # - ./autobrr/ks.yaml
 # - ./cross-seed/ks.yaml
