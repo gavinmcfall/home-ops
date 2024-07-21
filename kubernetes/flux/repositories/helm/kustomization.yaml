@@ -5,6 +5,7 @@ resources:
   - ./backube-charts.yaml
   - ./bjw-s.yaml
   - ./cilium.yaml
+  - ./cloudnative-pg.yaml
   - ./coredns.yaml
   - ./descheduler.yaml
   - ./external-dns.yaml
