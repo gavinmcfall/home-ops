@@ -3,8 +3,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./namespace.yaml
+  - ./qbittorrent/ks.yaml
 # Applications
-- ./qbittorrent/ks.yaml
 
 # - ./autobrr/ks.yaml
 # - ./cross-seed/ks.yaml
