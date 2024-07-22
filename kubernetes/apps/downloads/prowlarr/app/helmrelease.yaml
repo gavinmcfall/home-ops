@@ -24,7 +24,7 @@ spec:
       retries: 3
   values:
     controllers:
-      app:
+      prowlarr:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -41,9 +41,9 @@ spec:
               repository: ghcr.io/onedr0p/prowlarr-develop
               tag: 1.21.1.4631@sha256:8c66ee4dac0bae54ff008c747c70e968be4681a56d75116e5161cd1dc9888437
             env:
-              PROWLARR__INSTANCE_NAME: Prowlarr
+              PROWLARR__APP_INSTANCENAME: Prowlarr
               PROWLARR__APP__THEME: dark
-              PROWLARR__AUTHENTICATION_METHOD: External
+              PROWLARR__AUTH_METHOD: External
               PROWLARR__AUTH__REQUIRED: DisabledForLocalAddresses
               PROWLARR__LOG__DBENABLED: "False"
               PROWLARR__LOG_LEVEL: info
@@ -70,7 +70,7 @@ spec:
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
-                cpu: 10m
+                cpu: 100m
               limits:
                 memory: 1Gi
     defaultPodOptions:
@@ -99,7 +99,6 @@ spec:
                   port: http
     persistence:
       config:
-        enabled: true
         type: emptyDir
       tmp:
         type: emptyDir
