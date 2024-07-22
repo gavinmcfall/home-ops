@@ -114,7 +114,7 @@ spec:
       media:
         type: nfs
         server: 10.90.1.69
-        path: /mnt/storage0/media
+        path: /mnt/storage0/
         globalMounts:
           - path: /media/Downloads/qbittorrent
             subPath: Downloads/qbittorrent
