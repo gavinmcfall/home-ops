@@ -52,24 +52,24 @@ spec:
                   fieldRef:
                     fieldPath: status.podIP
               QBT_BitTorrent__Session__InterfaceName: wg0
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /api/v2/app/version
-                    port: *port
-                  initialDelaySeconds: 30
-                  periodSeconds: 30
-                  timeoutSeconds: 10
-                  failureThreshold: 6
-              readiness: *probes
-              startup:
-                enabled: true
-                spec:
-                  failureThreshold: 30
-                  periodSeconds: 60
+            # probes:
+            #   liveness: &probes
+            #     enabled: true
+            #     custom: true
+            #     spec:
+            #       httpGet:
+            #         path: /api/v2/app/version
+            #         port: *port
+            #       initialDelaySeconds: 30
+            #       periodSeconds: 30
+            #       timeoutSeconds: 10
+            #       failureThreshold: 6
+            #   readiness: *probes
+            #   startup:
+            #     enabled: true
+            #     spec:
+            #       failureThreshold: 30
+            #       periodSeconds: 60
             securityContext:
               runAsNonRoot: true
               runAsUser: 568
