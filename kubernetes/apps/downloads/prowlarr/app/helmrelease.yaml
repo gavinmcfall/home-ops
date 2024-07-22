@@ -89,14 +89,13 @@ spec:
             port: *port
     ingress:
       app:
-        enabled: true
         className: internal
         hosts:
           - host: &host "{{ .Release.Name }}.nerdz.cloud"
             paths: &paths
               - path: /
                 service:
-                  name: main
+                  name: app
                   port: http
         # tls:
         #   - hosts:
