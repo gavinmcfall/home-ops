@@ -33,6 +33,60 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
+          app:
+            image:
+              repository: ghcr.io/onedr0p/qbittorrent
+              tag: 4.6.5@sha256:c019af23966ebafcaf1713d4553bc043246858b711a7d57d8bee358a89990a3e
+            env:
+              TZ: ${TIMEZONE}
+              QBITTORRENT__PORT: &port 80
+              QBITTORRENT__BT_PORT: &bittorrentPort 51820
+              QBT_Preferences__WebUI__AlternativeUIEnabled: false
+              QBT_Preferences__WebUI__AuthSubnetWhitelistEnabled: true
+              QBT_Preferences__WebUI__AuthSubnetWhitelist: |-
+                10.69.0.0/16, 10.90.0.0/16
+              QBT_Preferences__WebUI__LocalHostAuth: false
+              QBT_BitTorrent__Session__Interface: wg0
+              QBT_BitTorrent__Session__InterfaceAddress:
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.podIP
+              QBT_BitTorrent__Session__InterfaceName: wg0
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v2/app/version
+                    port: *port
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
+              readiness: *probes
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 568
+              runAsGroup: 568
+              fsGroup: 568
+              fsGroupChangePolicy: OnRootMismatch
+              supplementalGroups: [10000]
+              seccompProfile: { type: RuntimeDefault }
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 18Gi
+
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
@@ -77,63 +131,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
-          app:
-            image:
-              repository: ghcr.io/onedr0p/qbittorrent
-              tag: 4.6.5@sha256:c019af23966ebafcaf1713d4553bc043246858b711a7d57d8bee358a89990a3e
-            env:
-              TZ: ${TIMEZONE}
-              QBITTORRENT__PORT: &port 80
-              QBITTORRENT__BT_PORT: &bittorrentPort 51820
-              QBT_Preferences__WebUI__AlternativeUIEnabled: false
-              QBT_Preferences__WebUI__AuthSubnetWhitelistEnabled: true
-              QBT_Preferences__WebUI__AuthSubnetWhitelist: |-
-                10.69.0.0/16, 10.90.0.0/16
-              QBT_Preferences__WebUI__LocalHostAuth: false
-              QBT_BitTorrent__Session__Interface: wg0
-              QBT_BitTorrent__Session__InterfaceAddress:
-                valueFrom:
-                  fieldRef:
-                    fieldPath: status.podIP
-              QBT_BitTorrent__Session__InterfaceName: wg0
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /api/v2/app/version
-                    port: *port
-                  initialDelaySeconds: 30
-                  periodSeconds: 30
-                  timeoutSeconds: 10
-                  failureThreshold: 6
-              readiness: *probes
-              startup:
-                enabled: true
-                spec:
-                  failureThreshold: 30
-                  periodSeconds: 10
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 18Gi
-
-    # defaultPodOptions:
-    #   securityContext:
-    #     runAsNonRoot: true
-    #     runAsUser: 568
-    #     runAsGroup: 568
-    #     fsGroup: 568
-    #     fsGroupChangePolicy: OnRootMismatch
-    #     supplementalGroups: [10000]
-    #     seccompProfile: { type: RuntimeDefault }
     service:
       app:
         controller: qbittorrent
