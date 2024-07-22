@@ -52,24 +52,21 @@ spec:
                   fieldRef:
                     fieldPath: status.podIP
               QBT_BitTorrent__Session__InterfaceName: wg0
-            # probes:
-            #   liveness: &probes
-            #     enabled: true
-            #     custom: true
-            #     spec:
-            #       httpGet:
-            #         path: /api/v2/app/version
-            #         port: *port
-            #       initialDelaySeconds: 30
-            #       periodSeconds: 30
-            #       timeoutSeconds: 10
-            #       failureThreshold: 6
-            #   readiness: *probes
-            #   startup:
-            #     enabled: true
-            #     spec:
-            #       failureThreshold: 30
-            #       periodSeconds: 60
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 8192Mi
             securityContext:
               runAsNonRoot: true
               runAsUser: 568
@@ -81,11 +78,6 @@ spec:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 18Gi
 
           gluetun:
             image:
@@ -149,7 +141,7 @@ spec:
       app:
         className: internal
         hosts:
-          - host: &host qb.nerdz.cloud
+          - host: qb.nerdz.cloud
             paths:
               - path: /
                 service:
@@ -160,6 +152,13 @@ spec:
       config:
         enabled: true
         existingClaim: qbittorrent
+
+      empty-config:
+        type: emptyDir
+        advancedMounts:
+          qbittorrent:
+            port-forward:
+              - path: /config
 
       completed-script:
         type: configMap
