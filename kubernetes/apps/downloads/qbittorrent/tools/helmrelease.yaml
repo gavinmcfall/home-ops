@@ -115,10 +115,9 @@ spec:
         type: nfs
         server: 10.90.1.69
         path: /mnt/storage0/media
-        advancedMounts:
-          orphaned:
-            main:
-              - path: /media
+        globalMounts:
+          - path: /media/Downloads/qbittorrent
+            subPath: Downloads/qbittorrent
 
     service:
       main:
