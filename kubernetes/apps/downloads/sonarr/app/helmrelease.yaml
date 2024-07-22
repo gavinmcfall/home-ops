@@ -1,15 +1,15 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app sonarr
+  name: sonarr
 spec:
   interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 2.4.0
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -20,15 +20,14 @@ spec:
   upgrade:
     cleanupOnFail: true
     remediation:
+      strategy: rollback
       retries: 3
-  uninstall:
-    keepHistory: false
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
     controllers:
-      main:
+      sonarr:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -40,21 +39,19 @@ spec:
               - secretRef:
                   name: sonarr-secret
         containers:
-          main:
+          app:
             image:
-              repository: ghcr.io/onedr0p/sonarr
-              tag: 4.0.1.929@sha256:4d107b1f0bfa652195d1f4054bdceac271553cfcc397a7b8ceedbfa625cba0b8
+              repository: ghcr.io/onedr0p/sonarr-develop
+              tag: 4.0.8.1902@sha256:717e5ad40303f4f8eba15d9476a86a7c7c9fe3003ec6d6b4c5fab37d19f6fff0
             env:
-              # Ref: https://github.com/Radarr/Radarr/issues/7030#issuecomment-1039689518
-              # Ref: https://github.com/dotnet/runtime/issues/9336
-              COMPlus_EnableDiagnostics: "0"
-              PUSHOVER_DEBUG: "false"
-              SONARR__AUTHENTICATION_METHOD: External
-              SONARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
-              SONARR__INSTANCE_NAME: Sonarr
-              SONARR__PORT: &port 80
-              SONARR__LOG_LEVEL: info
-              SONARR__THEME: dark
+              SONARR__APP__INSTANCENAME: Sonarr
+              SONARR__APP__THEME: dark
+              SONARR__AUTH__METHOD: External
+              SONARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              SONARR__LOG__DBENABLED: "False"
+              SONARR__LOG__LEVEL: info
+              SONARR__SERVER__PORT: &port 80
+              SONARR__UPDATE__BRANCH: develop
               TZ: ${TIMEZONE}
             envFrom: *envFrom
             probes:
@@ -70,56 +67,42 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               readiness: *probes
-              startup:
-                enabled: false
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
-                cpu: 10m
+                cpu: 100m
               limits:
-                memory: 1Gi
-        pod:
-          securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            runAsNonRoot: true
-            fsGroup: 568
-            fsGroupChangePolicy: OnRootMismatch
-            supplementalGroups: [10000]
+                memory: 2Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: { type: RuntimeDefault }
     service:
-      main:
+      app:
+        controller: sonarr
         ports:
           http:
             port: *port
     ingress:
-      main:
-        enabled: true
+      app:
         className: internal
         hosts:
-          - host: &host "{{ .Release.Name }}.nerdz.cloud"
-            paths: &paths
+          - host: "{{ .Release.Name }}.nerdz.cloud"
+            paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *host
-      tailscale:
-        enabled: true
-        className: tailscale
-        hosts:
-          - host: *app
-            paths: *paths
-        tls:
-          - hosts:
-              - *app
     persistence:
       config:
-        enabled: true
         existingClaim: sonarr
       pushover-notify:
         type: configMap
@@ -133,7 +116,7 @@ spec:
         type: emptyDir
       media:
         type: nfs
-        server: 10.90.3.104
-        path: /mnt/data
+        server: 10.90.1.69
+        path: /mnt/storage0/
         globalMounts:
           - path: /media
