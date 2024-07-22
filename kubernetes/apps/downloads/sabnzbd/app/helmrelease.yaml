@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: sabnzbd
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.4.0
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -20,24 +20,23 @@ spec:
   upgrade:
     cleanupOnFail: true
     remediation:
+      strategy: rollback
       retries: 3
-  uninstall:
-    keepHistory: false
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
     - name: volsync
-      namespace: storage
+      namespace: volsync-system
   values:
     controllers:
-      main:
+      sabnzbd:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/sabnzbd
-              tag: 4.2.1@sha256:c9f2577a9483ed1a53295ed6315f4ebfcf9e99507c1095f49b5bc2f0cf080179
+              tag: 4.3.2@sha256:8e70a877c77805dfe93ce30a8da3362fbddf221ef806951d4e4634bb80dc87b5
             env:
               TZ: ${TIMEZONE}
               SABNZBD__PORT: &port 80
@@ -66,8 +65,6 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               readiness: *probes
-              startup:
-                enabled: false
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -77,51 +74,43 @@ spec:
                 cpu: 100m
               limits:
                 memory: 8Gi
-        pod:
-          securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            runAsNonRoot: true
-            fsGroup: 568
-            fsGroupChangePolicy: OnRootMismatch
-            supplementalGroups: [10000]
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: { type: RuntimeDefault }
     service:
-      main:
+      app:
+        controller: sabnzbd
         ports:
           http:
             port: *port
     ingress:
-      main:
-        enabled: true
+      app:
         className: internal
         hosts:
-          - host: &host sab.nerdz.cloud
-            paths: &paths
+          - host: sab.nerdz.cloud
+            paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *host
-      tailscale:
-        enabled: true
-        className: tailscale
-        hosts:
-          - host: &app sab
-            paths: *paths
-        tls:
-          - hosts:
-              - *app
     persistence:
       config:
-        enabled: true
         existingClaim: sabnzbd
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /config/logs
       tmp:
         type: emptyDir
       media:
         type: nfs
-        server: 10.90.3.104
-        path: /mnt/data
+        server: 10.90.1.69
+        path: /mnt/storage0/
         globalMounts:
           - path: /media
