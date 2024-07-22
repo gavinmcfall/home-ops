@@ -24,7 +24,7 @@ spec:
       retries: 3
   values:
     controllers:
-      main:
+      app:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -36,7 +36,7 @@ spec:
               - secretRef:
                   name: prowlarr-secret
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/onedr0p/prowlarr-develop
               tag: 1.21.1.4631@sha256:8c66ee4dac0bae54ff008c747c70e968be4681a56d75116e5161cd1dc9888437
