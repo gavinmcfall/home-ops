@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: qbtools
@@ -9,116 +9,169 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.5.0
-      interval: 30m
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: qbittorrent
+      namespace: default
   values:
     controllers:
-      main:
-        enabled: false
-
       tagging:
         type: cronjob
-
-        cronjob:
+        cronjob: &cronJobSpec
           schedule: "@hourly"
+          timeZone: &timeZone ${TIMEZONE}
           concurrencyPolicy: Forbid
           successfulJobsHistory: 1
           failedJobsHistory: 1
-
-        pod:
-          restartPolicy: OnFailure
-          securityContext: &podSecurityContext
-            runAsUser: ${APP_UID}
-            runAsGroup: ${APP_GID}
-            runAsNonRoot: true
-
         initContainers:
-          main:
+          tagging:
             image: &image
               repository: ghcr.io/buroa/qbtools
-              tag: v0.13.0
+              tag: v0.15.3@sha256:68c211301e88ae942629cf05793f860675467aac5cdc7b7500b394f294f62eac
+            env: &env
+              TZ: *timeZone
+              POD_NAMESPACE:
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
             args:
-              - tagging
-              - --added-on
-              - --expired
-              - --last-activity
-              - --not-working
-              - --sites
-              - --unregistered
-              - --server
-              - qbittorrent.downloads.svc.cluster.local
-              - --port
-              - "8080"
-              - --config
-              - /config/config.yaml
+              [
+                "tagging",
+                "--added-on",
+                "--expired",
+                "--last-activity",
+                "--sites",
+                "--unregistered",
+                "--server",
+                "qbittorrent.$(POD_NAMESPACE).svc.cluster.local",
+                "--port",
+                "80",
+                "--config",
+                "/config/config.yaml",
+              ]
             resources: &resources
               requests:
-                memory: 128Mi
                 cpu: 25m
               limits:
-                memory: 256Mi
-            securityContext: &containerSecurityContext
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-
+                memory: 256M
         containers:
           unregistered:
             image: *image
-            args:
-              - prune
-              - --exclude-category
-              - manual
-              - --include-tag
-              - unregistered
-              # - --dry-run
-              - --server
-              - qbittorrent.downloads.svc.cluster.local
-              - --port
-              - "8080"
+            env: *env
+            args: [
+                "prune",
+                "--exclude-category",
+                "manual",
+                "--exclude-category",
+                "music",
+                "--exclude-category",
+                "music.import",
+                "--include-tag",
+                "unregistered",
+                # "--dry-run",
+                "--server",
+                "qbittorrent.$(POD_NAMESPACE).svc.cluster.local",
+                "--port",
+                "80",
+              ]
             resources: *resources
-            securityContext: *containerSecurityContext
-
-      reannounce:
-        pod:
-          securityContext: *podSecurityContext
-        containers:
-          main:
+          expired:
             image: *image
-            args:
-              - reannounce
-              - --process-seeding
-              - --server
-              - qbittorrent.downloads.svc.cluster.local
-              - --port
-              - "8080"
+            env: *env
+            args: [
+                "prune",
+                "--exclude-category",
+                "manual",
+                "--exclude-category",
+                "music",
+                "--exclude-category",
+                "music.import",
+                "--include-tag",
+                "expired", # defined in config.yaml
+                "--include-tag",
+                "added:7d",
+                # "--dry-run",
+                "--server",
+                "qbittorrent.$(POD_NAMESPACE).svc.cluster.local",
+                "--port",
+                "80",
+              ]
             resources: *resources
-            securityContext: *containerSecurityContext
-
+        pod:
+          restartPolicy: OnFailure
+      orphaned:
+        type: cronjob
+        cronjob:
+          <<: *cronJobSpec
+          schedule: "@daily"
+        containers:
+          app:
+            image: *image
+            env: *env
+            args: [
+                "orphaned",
+                "--exclude-pattern",
+                "*_unpackerred*",
+                "--exclude-pattern",
+                "*/manual/*",
+                "--exclude-pattern",
+                "*/music.import/*",
+                # "--dry-run",
+                "--server",
+                "qbittorrent.$(POD_NAMESPACE).svc.cluster.local",
+                "--port",
+                "80",
+              ]
+            resources: *resources
+        pod:
+          restartPolicy: OnFailure
+      reannounce:
+        containers:
+          app:
+            image: *image
+            env: *env
+            args:
+              [
+                "reannounce",
+                "--process-seeding",
+                "--server",
+                "qbittorrent.$(POD_NAMESPACE).svc.cluster.local",
+                "--port",
+                "80",
+              ]
+            resources: *resources
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        seccompProfile: { type: RuntimeDefault }
     persistence:
-      config-file:
-        type: configMap
-        name: qbtools-configmap
+      secret-file:
+        type: secret
+        name: qbtools-secret
         globalMounts:
           - path: /config/config.yaml
             subPath: config.yaml
             readOnly: true
-
       media:
         type: nfs
         server: 10.90.1.69
-        path: /mnt/storage0/
-        globalMounts:
-          - path: /media/Downloads/qbittorrent
-            subPath: Downloads/qbittorrent
-
-    service:
-      main:
-        enabled: false
+        path: /mnt/storage0/media
+        advancedMounts:
+          orphaned:
+            app:
+              - path: /media/Downloads/qbittorrent
+                subPath: Downloads/qbittorrent
