@@ -170,5 +170,7 @@ spec:
         type: nfs
         server: 10.90.1.69
         path: /mnt/storage0/media
-        globalMounts:
-          - path: /media/
+        advancedMounts:
+          orphaned:
+            app:
+              - path: /media/
