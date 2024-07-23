@@ -85,7 +85,7 @@ spec:
               requests:
                 cpu: 100m
               limits:
-                memory: 18Gi
+                memory: 8192Mi
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
@@ -98,7 +98,7 @@ spec:
               VPN_PORT_FORWARDING: on
               VPN_PORT_FORWARDING_PROVIDER: protonvpn
               DOT: off
-              FIREWALL_INPUT_PORTS: *port
+              FIREWALL_INPUT_PORTS: 80
               FIREWALL_OUTBOUND_SUBNETS: 10.69.0.0/16,10.96.0.0/16 # Allow access to k8s subnets
             envFrom:
               - secretRef:
@@ -138,10 +138,10 @@ spec:
         ports:
           http:
             port: *port
-          bittorrent:
-            enabled: true
-            port: *bittorrentPort
-            protocol: TCP
+          # bittorrent:
+          #   enabled: true
+          #   port: *bittorrentPort
+          #   protocol: TCP
     ingress:
       app:
         className: internal
