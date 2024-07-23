@@ -53,36 +53,36 @@ spec:
                     fieldPath: status.podIP
               QBT_BitTorrent__Session__InterfaceName: wg0
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
-              readiness:
-                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v2/app/version
+                    port: *port
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
+              readiness: *probes
               startup:
                 enabled: true
                 spec:
                   failureThreshold: 30
-                  periodSeconds: 5
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
               limits:
-                memory: 8192Mi
-            securityContext:
-              runAsNonRoot: true
-              runAsUser: 568
-              runAsGroup: 568
-              fsGroup: 568
-              fsGroupChangePolicy: OnRootMismatch
-              supplementalGroups: [10000]
-              seccompProfile: { type: RuntimeDefault }
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
-
+                memory: 18Gi
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
-              tag: v3.37.0
+              tag: v3.38.0
             env:
               VPN_SERVICE_PROVIDER: custom
               VPN_TYPE: wireguard
@@ -101,11 +101,10 @@ spec:
                 add:
                   - NET_ADMIN
               allowPrivilegeEscalation: false
-
           port-forward:
             image:
               repository: ghcr.io/bjw-s/gluetun-qb-port-sync
-              tag: v0.0.1
+              tag: v0.0.2@sha256:fdf0e8256a9acaeb613522e8bef4bf195e042d7de6d1b355d582ab2d395ec66a
             env:
               GLUETUN_CONTROL_SERVER_HOST: localhost
               GLUETUN_CONTROL_SERVER_PORT: 8000
@@ -123,6 +122,15 @@ spec:
               capabilities:
                 drop:
                   - ALL
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: { type: RuntimeDefault }
     service:
       app:
         controller: qbittorrent
@@ -136,7 +144,6 @@ spec:
             enabled: true
             port: *bittorrentPort
             protocol: TCP
-
     ingress:
       app:
         className: internal
@@ -147,28 +154,9 @@ spec:
                 service:
                   identifier: app
                   port: http
-
     persistence:
       config:
-        enabled: true
         existingClaim: qbittorrent
-
-      empty-config:
-        type: emptyDir
-        advancedMounts:
-          qbittorrent:
-            port-forward:
-              - path: /config
-
-      completed-script:
-        type: configMap
-        name: qbittorrent-scripts
-        defaultMode: 0775
-        globalMounts:
-          - path: /scripts/completed.sh
-            subPath: completed.sh
-            readOnly: true
-
       media:
         type: nfs
         server: 10.90.1.69
