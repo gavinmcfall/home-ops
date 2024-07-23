@@ -34,9 +34,9 @@ includes:
   user:
     taskfile: .taskfiles/User
     optional: true
+  volsync: .taskfiles/VolSync/Taskfile.yaml
 
 tasks:
-
   default: task --list
 
   init:
