@@ -155,7 +155,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: qbittorrent-config
+        existingClaim: qbittorrent
         advancedMounts:
           qbittorrent:
             app:
