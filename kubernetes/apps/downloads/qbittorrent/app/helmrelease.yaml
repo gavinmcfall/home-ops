@@ -154,7 +154,18 @@ spec:
                   port: http
     persistence:
       config:
-        existingClaim: qbittorrent
+        enabled: true
+        existingClaim: qbittorrent-config
+        advancedMounts:
+          qbittorrent:
+            app:
+              - path: /config
+      empty-config:
+        type: emptyDir
+        advancedMounts:
+          qbittorrent:
+            port-forward:
+              - path: /config
       media:
         type: nfs
         server: 10.90.1.69
