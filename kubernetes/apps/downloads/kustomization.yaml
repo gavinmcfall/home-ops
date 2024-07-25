@@ -18,6 +18,6 @@ resources:
   # - ./recyclarr/ks.yaml
   - ./sabnzbd/ks.yaml
   - ./sonarr/ks.yaml
-  # - ./sonarr-uhd/ks.yaml
+  - ./sonarr-uhd/ks.yaml
   # - ./unpackerr/ks.yaml
   # - ./ytdl-sub/ks.yaml

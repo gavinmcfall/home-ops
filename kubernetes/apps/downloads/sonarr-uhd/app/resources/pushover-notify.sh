@@ -2,10 +2,10 @@
 # shellcheck disable=SC2154
 
 PUSHOVER_DEBUG="${PUSHOVER_DEBUG:-"true"}"
-# kubectl port-forward service/sonarr-uhd -n downloads 8989:80
+# kubectl port-forward service/sonarr -n downloads 8989:80
 # export PUSHOVER_TOKEN="";
 # export PUSHOVER_USER_KEY="";
-# export sonarr-uhd_eventtype=Download;
+# export sonarr_eventtype=Download;
 # ./pushover-notify.sh
 
 CONFIG_FILE="/config/config.xml" && [[ "${PUSHOVER_DEBUG}" == "true" ]] && CONFIG_FILE="config.xml"
@@ -42,39 +42,39 @@ fi
 #
 # Send Notification on Test
 #
-if [[ "${sonarr-uhd_eventtype:-}" == "Test" ]]; then
+if [[ "${sonarr_eventtype:-}" == "Test" ]]; then
     PUSHOVER_TITLE="Test Notification"
-    PUSHOVER_MESSAGE="Howdy this is a test notification from ${sonarr-uhd_instancename:-Sonarr-uhd}"
+    PUSHOVER_MESSAGE="Howdy this is a test notification from ${sonarr_instancename:-Sonarr}"
 fi
 
 #
 # Send notification on Download or Upgrade
 #
-if [[ "${sonarr-uhd_eventtype:-}" == "Download" ]]; then
-    if [[ "${sonarr-uhd_isupgrade}" == "True" ]]; then pushover_title="Upgraded"; else pushover_title="Downloaded"; fi
+if [[ "${sonarr_eventtype:-}" == "Download" ]]; then
+    if [[ "${sonarr_isupgrade}" == "True" ]]; then pushover_title="Upgraded"; else pushover_title="Downloaded"; fi
     printf -v PUSHOVER_TITLE "Episode %s" "${pushover_title}"
     printf -v PUSHOVER_MESSAGE "<b>%s (S%02dE%02d)</b><small>\n%s</small><small>\n\n<b>Client:</b> %s</small><small>\n<b>Quality:</b> %s</small>" \
-        "${sonarr-uhd_series_title}" \
-        "${sonarr-uhd_episodefile_seasonnumber}" \
-        "${sonarr-uhd_episodefile_episodenumbers}" \
-        "${sonarr-uhd_episodefile_episodetitles}" \
-        "${sonarr-uhd_download_client}" \
-        "${sonarr-uhd_episodefile_quality}"
-    printf -v PUSHOVER_URL "%s/series/%s" "${sonarr-uhd_applicationurl:-localhost}" "${sonarr-uhd_series_titleslug}"
-    printf -v PUSHOVER_URL_TITLE "View series in %s" "${sonarr-uhd_instancename:-Sonarr-uhd}"
+        "${sonarr_series_title}" \
+        "${sonarr_episodefile_seasonnumber}" \
+        "${sonarr_episodefile_episodenumbers}" \
+        "${sonarr_episodefile_episodetitles}" \
+        "${sonarr_download_client}" \
+        "${sonarr_episodefile_quality}"
+    printf -v PUSHOVER_URL "%s/series/%s" "${sonarr_applicationurl:-localhost}" "${sonarr_series_titleslug}"
+    printf -v PUSHOVER_URL_TITLE "View series in %s" "${sonarr_instancename:-Sonarr}"
 fi
 
 #
 # Send notification on Manual Interaction Required
 #
-if [[ "${sonarr-uhd_eventtype:-}" == "ManualInteractionRequired" ]]; then
+if [[ "${sonarr_eventtype:-}" == "ManualInteractionRequired" ]]; then
     PUSHOVER_PRIORITY="1"
     printf -v PUSHOVER_TITLE "Episode requires manual interaction"
     printf -v PUSHOVER_MESSAGE "<b>%s</b><small>\n<b>Client:</b> %s</small>" \
-        "${sonarr-uhd_series_title}" \
-        "${sonarr-uhd_download_client}"
-    printf -v PUSHOVER_URL "%s/activity/queue" "${sonarr-uhd_applicationurl:-localhost}"
-    printf -v PUSHOVER_URL_TITLE "View queue in %s" "${sonarr-uhd_instancename:-Sonarr-uhd}"
+        "${sonarr_series_title}" \
+        "${sonarr_download_client}"
+    printf -v PUSHOVER_URL "%s/activity/queue" "${sonarr_applicationurl:-localhost}"
+    printf -v PUSHOVER_URL_TITLE "View queue in %s" "${sonarr_instancename:-Sonarr}"
 fi
 
 notification=$(jq -n \
