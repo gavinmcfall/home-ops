@@ -13,7 +13,7 @@ spec:
   dependsOn:
     - name: cloudnative-pg-cluster
     - name: external-secrets-stores
-  path: ./kubernetes/apps/downloads/radarr/app
+  path: ./kubernetes/apps/downloads/radarr-uhd/app
   prune: true
   sourceRef:
     kind: GitRepository
