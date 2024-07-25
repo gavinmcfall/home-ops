@@ -27,7 +27,7 @@ spec:
       namespace: rook-ceph
   values:
     controllers:
-      radarr:
+      radarr-uhd:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
