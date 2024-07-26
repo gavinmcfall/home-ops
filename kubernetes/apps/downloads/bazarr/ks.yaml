@@ -13,7 +13,7 @@ spec:
   dependsOn:
     - name: cloudnative-pg-cluster
     - name: external-secrets-stores
-  path: ./kubernetes/main/apps/downloads/bazarr/app
+  path: ./kubernetes/apps/downloads/bazarr/app
   prune: true
   sourceRef:
     kind: GitRepository
