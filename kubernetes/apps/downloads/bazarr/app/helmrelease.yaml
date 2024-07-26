@@ -22,10 +22,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-  - name: rook-ceph-cluster
-    namespace: rook-ceph
-  - name: volsync
-    namespace: storage
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync-system
+      namespace: storage
   values:
     controllers:
       bazarr:
@@ -41,8 +41,8 @@ spec:
             env:
               TZ: ${TIMEZONE}
             envFrom:
-            - secretRef:
-                name: bazarr-secret
+              - secretRef:
+                  name: bazarr-secret
             resources:
               requests:
                 cpu: 10m
@@ -54,10 +54,10 @@ spec:
               repository: registry.k8s.io/git-sync/git-sync
               tag: v4.2.4
             args:
-            - --repo=https://github.com/KBlixt/subcleaner
-            - --branch=master
-            - --wait=86400 # 1 day
-            - --root=/add-ons
+              - --repo=https://github.com/KBlixt/subcleaner
+              - --branch=master
+              - --wait=86400 # 1 day
+              - --root=/add-ons
             resources:
               requests:
                 cpu: 10m
@@ -83,12 +83,12 @@ spec:
       app:
         className: internal
         hosts:
-        - host: "{{ .Release.Name }}.nerdz.cloud"
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
+          - host: "{{ .Release.Name }}.nerdz.cloud"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
     persistence:
       config:
         existingClaim: *app
