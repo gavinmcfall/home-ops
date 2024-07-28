@@ -113,7 +113,7 @@ spec:
               - name: /dev/disk/by-id/nvme-SAMSUNG_MZQL21T9HCJR-00A07_S64GNN0X204442
           - name: stanton-02
             devices:
-              - name: /dev/disk/by-id/nvme-SAMSUNG_MZQL21T9HCJR-00A07_S64GNN0X204442
+              - name: /dev/disk/by-id/nvme-SAMSUNG_MZQL21T9HCJR-00A07_S64GNN0WB06544
           - name: stanton-03
             devices:
               - name: /dev/disk/by-id/nvme-SAMSUNG_MZQL21T9HCJR-00A07_S64GNN0X204434
