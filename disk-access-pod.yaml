@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disk-access-pod
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: stanton-03
+  containers:
+  - name: main-container
+    image: alpine:latest
+    command: ["/bin/sh", "-c", "sleep 3600"]
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: host-dev
+      mountPath: /dev
+  volumes:
+  - name: host-dev
+    hostPath:
+      path: /dev
+      type: Directory
