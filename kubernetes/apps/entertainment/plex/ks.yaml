@@ -26,26 +26,3 @@ spec:
       APP: *app
       GATUS_PATH: /web/index.html
       VOLSYNC_CAPACITY: 30Gi
----
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: &app plex-tools
-  namespace: flux-system
-spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *app
-  targetNamespace: entertainment
-  dependsOn:
-    - name: external-secrets-stores
-  path: ./kubernetes/apps/entertainment/plex/tools
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: home-kubernetes
-  wait: false
-  interval: 30m
-  retryInterval: 1m
-  timeout: 5m
