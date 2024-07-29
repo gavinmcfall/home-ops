@@ -40,7 +40,7 @@ spec:
               repository: ghcr.io/alexta69/metube
               tag: "2024-01-26"
             env:
-              DOWNLOAD_DIR: "/downloads"
+              DOWNLOAD_DIR: "/downloads/metube"
               STATE_DIR: "/config"
               YTDL_OPTIONS: '{"http_headers":{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"}}'
     defaultPodOptions:
@@ -74,6 +74,6 @@ spec:
       downloads:
         type: nfs
         server: 10.90.1.69
-        path: /mnt/storage0/media/downloads
+        path: /mnt/storage0/media
         globalMounts:
-          - path: /media/
+          - path: /media
