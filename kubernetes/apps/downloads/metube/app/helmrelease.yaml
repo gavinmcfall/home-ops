@@ -77,4 +77,4 @@ spec:
         path: /mnt/storage0/media
         globalMounts:
           - path: /media/downloads/metube
-            subPath: /download/metube
+            subPath: /downloads/metube
