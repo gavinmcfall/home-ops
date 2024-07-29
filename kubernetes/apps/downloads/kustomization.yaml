@@ -6,7 +6,7 @@ resources:
   - ./qbittorrent/ks.yaml
   # Applications
   # - ./autobrr/ks.yaml
-  # - ./bazarr/ks.yaml
+  - ./bazarr/ks.yaml
   # - ./cross-seed/ks.yaml
   - ./flaresolverr/ks.yaml
   # - ./kapowarr/ks.yaml
