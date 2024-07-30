@@ -14,6 +14,6 @@ configMapGenerator:
       - ./config/radarr.yaml
       - ./config/sonarr-anime.yaml
       - ./config/sonarr-uhd.yaml
-      - ./config/radarr.yaml
+      - ./config/sonarr.yaml
 generatorOptions:
   disableNameSuffixHash: true
