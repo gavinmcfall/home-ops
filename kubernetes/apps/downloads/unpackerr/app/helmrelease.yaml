@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: unpackerr
@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.4.0
+      version: 3.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -20,22 +20,23 @@ spec:
   upgrade:
     cleanupOnFail: true
     remediation:
+      strategy: rollback
       retries: 3
-  uninstall:
-    keepHistory: false
   values:
     controllers:
-      main:
+      unpackerr:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          main:
+          app:
             image:
-              repository: docker.io/golift/unpackerr
-              tag: 0.12.0@sha256:f2e35d22d85502d9e67da407cb6b1d9a71988dcadf8c7393043e15dd1d42857a
+              repository: ghcr.io/unpackerr/unpackerr
+              tag: 0.14.0@sha256:92e76f59dffc11379c1cb900bc4a4dd10bcb1ad15a8a34797fdf07e4d28f22f8
             env:
               TZ: ${TIMEZONE}
-              UN_WEBSERVER_METRICS: "true"
+              UN_WEBSERVER_METRICS: true
+              UN_WEBSERVER_LOG_FILE: /logs/webserver.log
+              UN_ACTIVITY: true
               UN_SONARR_0_URL: http://sonarr.downloads.svc.cluster.local
               UN_SONARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr
               UN_RADARR_0_URL: http://radarr.downloads.svc.cluster.local
@@ -43,6 +44,11 @@ spec:
             envFrom:
               - secretRef:
                   name: unpackerr-secret
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -52,26 +58,37 @@ spec:
                 cpu: 10m
               limits:
                 memory: 4Gi
-        pod:
-          securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            runAsNonRoot: true
-            fsGroup: 568
-            fsGroupChangePolicy: OnRootMismatch
-            supplementalGroups: [10000]
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: { type: RuntimeDefault }
     service:
-      main:
+      app:
+        controller: unpackerr
         ports:
           http:
             port: 5656
     serviceMonitor:
-      main:
-        enabled: true
+      app:
+        serviceName: unpackerr
+        endpoints:
+          - port: http
+            scheme: http
+            path: /metrics
+            interval: 1m
+            scrapeTimeout: 10s
     persistence:
+      logs:
+        type: emptyDir
       media:
         type: nfs
         server: 10.90.3.104
-        path: /mnt/data
+        path: /mnt/storage0/media
         globalMounts:
-          - path: /media
+          - path: /media/Downloads/qbittorrent
+            subPath: Downloads/qbittorrent
