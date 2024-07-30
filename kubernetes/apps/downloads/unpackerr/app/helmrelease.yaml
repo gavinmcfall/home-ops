@@ -87,7 +87,7 @@ spec:
         type: emptyDir
       media:
         type: nfs
-        server: 10.90.3.104
+        server: 10.90.1.69
         path: /mnt/storage0/media
         globalMounts:
           - path: /downloads/
