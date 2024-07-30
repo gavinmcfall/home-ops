@@ -74,7 +74,7 @@ spec:
       downloads:
         type: nfs
         server: 10.90.1.69
-        path: /mnt/storage0/media/downloads
+        path: /mnt/storage0/media/
         globalMounts:
           - path: /downloads
-            subPath: metube
+            subPath: downloads/metube
