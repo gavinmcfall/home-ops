@@ -9,10 +9,10 @@ resources:
 configMapGenerator:
   - name: recyclarr-configmap
     files:
-      - ./config/radarr-anime.yaml
+      # - ./config/radarr-anime.yaml
       - ./config/radarr-uhd.yaml
       - ./config/radarr.yaml
-      - ./config/sonarr-anime.yaml
+      # - ./config/sonarr-anime.yaml
       - ./config/sonarr-uhd.yaml
       - ./config/sonarr.yaml
 generatorOptions:
