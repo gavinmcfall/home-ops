@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: ghcr.io/alexta69/metube
-              tag: "2024-01-26"
+              tag: "2024-07-26@sha256:5b690482ebf6c674101f6e111d6035e3d30fc102af01a0b62482aca684111942"
             env:
               DOWNLOAD_DIR: "/downloads"
               STATE_DIR: "/config"
