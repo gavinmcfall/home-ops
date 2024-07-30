@@ -90,5 +90,5 @@ spec:
         server: 10.90.3.104
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media/Downloads/qbittorrent
-            subPath: Downloads/qbittorrent
+          - path: /downloads/
+            subPath: downloads/qbittorrent
