@@ -1,0 +1,42 @@
+###################################################################################################
+# Recyclarr Configuration Template: Anime Radarr                                                  #
+# Updated: 2023-10-07                                                                             #
+# Documentation: https://recyclarr.dev                                                            #
+# Note: If you are using multiple profiles in a single instance, please read the following        #
+# documentation about file merging:                                                               #
+# https://recyclarr.dev/wiki/yaml/config-examples/#merge-single-instance                          #
+###################################################################################################
+
+# Instance Definition: https://recyclarr.dev/wiki/yaml/config-reference/basic/
+radarr:
+  anime-radarr:
+    base_url: http://radarr.downloads.svc.cluster.local:80
+    api_key: !env_var RADARR_API_KEY
+    delete_old_custom_formats: true
+    replace_existing_custom_formats: true
+
+    include:
+      # Comment out any of the following includes to disable them
+      - template: radarr-quality-definition-movie
+      - template: radarr-quality-profile-anime
+      - template: radarr-custom-formats-anime
+
+    # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
+    custom_formats:
+      - trash_ids:
+          - 064af5f084a0a24458cc8ecd3220f93f # Uncensored
+        quality_profiles:
+          - name: Remux-1080p - Anime
+            score: 0 # Adjust scoring as desired
+
+      - trash_ids:
+          - a5d148168c4506b55cf53984107c396e # 10bit
+        quality_profiles:
+          - name: Remux-1080p - Anime
+            score: 0 # Adjust scoring as desired
+
+      - trash_ids:
+          - 4a3b087eea2ce012fcc1ce319259a3be # Anime Dual Audio
+        quality_profiles:
+          - name: Remux-1080p - Anime
+            score: 0 # Adjust scoring as desired
