@@ -17,14 +17,18 @@ sonarr:
     replace_existing_custom_formats: true
 
     include:
-      # Comment out any of the following includes to disable them
+      # TV Templates
       - template: sonarr-quality-definition-series
       - template: sonarr-v4-quality-profile-web-1080p
       - template: sonarr-v4-custom-formats-web-1080p
+      # Anime Templates
+      - template: sonarr-quality-definition-anime
+      - template: sonarr-v4-quality-profile-anime
+      - template: sonarr-v4-custom-formats-anime
 
     # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
     custom_formats:
-      # Optional
+      # TV Custom Formats
       - trash_ids:
           # - 32b367365729d530ca1c124a0b180c64 # Bad Dual Groups
           # - 82d40da2bc6923f41e14394075dd4b03 # No-RlsGroup
@@ -44,3 +48,22 @@ sonarr:
           - 9b64dff695c2115facf1b6ea59c9bd07 # x265 (no HDR/DV)
         quality_profiles:
           - name: WEB-1080p
+
+      #Anime Custom Formats
+      - trash_ids:
+          - 026d5aadd1a6b4e550b134cb6c72b3ca # Uncensored
+        quality_profiles:
+          - name: Remux-1080p - Anime
+            score: 0 # Adjust scoring as desired
+
+      - trash_ids:
+          - b2550eb333d27b75833e25b8c2557b38 # 10bit
+        quality_profiles:
+          - name: Remux-1080p - Anime
+            score: 0 # Adjust scoring as desired
+
+      - trash_ids:
+          - 418f50b10f1907201b6cfdf881f467b7 # Anime Dual Audio
+        quality_profiles:
+          - name: Remux-1080p - Anime
+            score: 0 # Adjust scoring as desired
