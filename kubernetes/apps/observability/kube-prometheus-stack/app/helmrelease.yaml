@@ -38,9 +38,9 @@ spec:
       ingress:
         enabled: true
         annotations:
-          external-dns.alpha.kubernetes.io/target: internal.devbu.io
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         ingressClassName: internal
-        hosts: ["alertmanager.devbu.io"]
+        hosts: ["alertmanager.${SECRET_DOMAIN}"]
         pathType: Prefix
       alertmanagerSpec:
         useExistingSecret: true
@@ -78,9 +78,9 @@ spec:
     kubeControllerManager:
       enabled: true
       endpoints: &cp
-        - 192.168.42.10
-        - 192.168.42.11
-        - 192.168.42.12
+        - 10.90.3.101
+        - 10.90.3.102
+        - 10.90.3.103
     kubeEtcd:
       enabled: true
       endpoints: *cp
@@ -93,9 +93,9 @@ spec:
       ingress:
         enabled: true
         annotations:
-          external-dns.alpha.kubernetes.io/target: internal.devbu.io
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         ingressClassName: internal
-        hosts: ["prometheus.devbu.io"]
+        hosts: ["prometheus.${SECRET_DOMAIN}"]
         pathType: Prefix
       prometheusSpec:
         scrapeInterval: 1m # Must match interval in Grafana Helm chart

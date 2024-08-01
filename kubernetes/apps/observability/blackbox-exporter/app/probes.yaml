@@ -11,15 +11,7 @@ spec:
   targets:
     staticConfig:
       static:
-        - expanse.internal
-        - garage-door.internal
-        - hdhomerun.internal
-        - idrac.internal
-        - kiosk.internal
-        - kvm.internal
+        - citadel.internal #NAS
         - pikvm.internal
-        - receiver.internal
-        - ups.internal
-        - vacuum.internal
-        - zigbee-controller.internal
-        - zwave-controller.internal
+        - voron.internal #3D printer
+        - ups.internal #NUT server Pi
