@@ -101,5 +101,5 @@ spec:
         server: 10.90.1.69
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media  # This is the path inside the container
-            readOnly: true                                                                                                                                  
+          - path: /media # This is the path inside the container
+            readOnly: false
