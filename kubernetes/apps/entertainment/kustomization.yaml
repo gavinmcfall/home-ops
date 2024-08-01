@@ -5,7 +5,7 @@ resources:
   - ./namespace.yaml
 
   # Applications
-  # - ./audiobookshelf/ks.yaml
+  - ./audiobookshelf/ks.yaml
   # - ./calibre/ks.yaml
   # - ./kavita/ks.yaml
   # - ./komga/ks.yaml
