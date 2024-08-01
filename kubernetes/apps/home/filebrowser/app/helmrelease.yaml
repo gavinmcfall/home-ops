@@ -78,7 +78,7 @@ spec:
     ingress:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         className: internal
         hosts:
           - host: "{{ .Release.Name }}.nerdz.cloud"
