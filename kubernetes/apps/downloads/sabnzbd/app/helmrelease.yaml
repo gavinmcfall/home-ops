@@ -46,8 +46,8 @@ spec:
                 sabnzbd.downloads.svc,
                 sabnzbd.downloads.svc.cluster,
                 sabnzbd.downloads.svc.cluster.local,
-                sab.nerdz.cloud,
-                sabnzbd.nerdz.cloud,
+                sab.${SECRET_DOMAIN},
+                sabnzbd.${SECRET_DOMAIN},
                 sab.tail21dd8.ts.net
             envFrom:
               - secretRef:
@@ -95,7 +95,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         className: internal
         hosts:
-          - host: sab.nerdz.cloud
+          - host: sab.${SECRET_DOMAIN}
             paths:
               - path: /
                 service:
