@@ -28,10 +28,10 @@ spec:
     ingress:
       enabled: true
       annotations:
-        external-dns.alpha.kubernetes.io/target: internal.devbu.io
+        external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
       className: internal
       hosts:
-        - host: blackbox-exporter.devbu.io
+        - host: blackbox-exporter.${SECRET_DOMAIN}
           paths:
             - path: /
               pathType: Prefix

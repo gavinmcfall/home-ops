@@ -29,8 +29,8 @@ spec:
     fullnameOverride: *app
     config:
       devices:
-        - /dev/sda
-        - /dev/nvme0n1
+        - /dev/nvme0n1 # Ceph Disk
+        - /dev/nvme1n1 # Primary Disk
     serviceMonitor:
       enabled: true
     prometheusRules:
