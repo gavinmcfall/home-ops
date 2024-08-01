@@ -120,6 +120,8 @@ spec:
             fsGroupChangePolicy: OnRootMismatch
     ingress:
       main:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         enabled: true
         className: internal
         hosts:
