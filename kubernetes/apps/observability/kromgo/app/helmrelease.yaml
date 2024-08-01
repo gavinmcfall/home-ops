@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: filebrowser
+  name: &app kromgo
 spec:
   interval: 30m
   chart:
@@ -24,28 +24,26 @@ spec:
       retries: 3
   values:
     controllers:
-      filebrowser:
+      kromgo:
+        strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
-              repository: docker.io/filebrowser/filebrowser
-              tag: v2.30.0@sha256:1252d3e3d7c27598765a4cd08d68a8b4dda57753649870dcfd2fdcc2e3622709
+              repository: ghcr.io/kashalls/kromgo
+              tag: 0.3.1@sha256:5ba40b2fda00ab7adb039c0be955161b84febfe9e9e7816d5f1f87d9ab41f173
             env:
-              TZ: ${TIMEZONE}
-              FB_DATABASE: /config/filebrowser.db
-              FB_ROOT: /media
-              FB_LOG: stdout
-              FB_NOAUTH: true
+              PROMETHEUS_URL: http://prometheus-operated.observability.svc.cluster.local:9090
+              PORT: &port 80
             probes:
               liveness: &probes
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /health
-                    port: &port 80
+                    path: /-/ready
+                    port: *port
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
@@ -57,42 +55,38 @@ spec:
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
-                cpu: 100m
+                cpu: 10m
               limits:
-                memory: 2Gi
+                memory: 64Mi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
-        fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [10000]
+        runAsUser: 65534
+        runAsGroup: 65534
         seccompProfile: { type: RuntimeDefault }
     service:
       app:
-        controller: filebrowser
+        controller: kromgo
         ports:
           http:
             port: *port
     ingress:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
+          external-dns.alpha.kubernetes.io/target: external.devbu.io
+        className: external
         hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - host: "{{ .Release.Name }}.devbu.io"
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
     persistence:
-      config:
-        existingClaim: filebrowser
-      media:
-        type: nfs
-        server: 10.90.1.69
-        path: /mnt/storage0/media
+      config-file:
+        type: configMap
+        name: kromgo-configmap
         globalMounts:
-          - path: /media
+          - path: /kromgo/config.yaml
+            subPath: config.yaml
+            readOnly: true
