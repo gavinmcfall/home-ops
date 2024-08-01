@@ -68,9 +68,8 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                memory: 150Mi
               limits:
-                memory: 300Mi
+                memory: 1Gi
     service:
       app:
         controller: audiobookshelf
