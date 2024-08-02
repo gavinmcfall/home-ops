@@ -2,7 +2,7 @@
 
 # Kubernetes Nerdz
 
-<img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/docs/src/assets/logo.png" align="center" width="144px" height="144px"/>
+<img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/b5f6123f113a99aa744002eeef3856e95c797732/docs/src/assets/logo.png" align="center" width="144px" height="144px"/>
 
 ### My Home Operations Repository :octocat:
 
