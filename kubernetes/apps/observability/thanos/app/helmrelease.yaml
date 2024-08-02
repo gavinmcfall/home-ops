@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://lds-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -25,7 +25,7 @@ spec:
       retries: 3
   dependsOn:
     - name: openebs
-      namespace: storage
+      namespace: openebs-system
     - name: rook-ceph-cluster
       namespace: rook-ceph
   valuesFrom:
@@ -56,7 +56,7 @@ spec:
         config:
           insecure: true
     additionalEndpoints:
-      - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.observability.svc.cluster.local
+      - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.monitoring.svc.cluster.local
     additionalReplicaLabels: ["__replica__"]
     serviceMonitor:
       enabled: true
@@ -70,12 +70,12 @@ spec:
         - --retention.resolution-1h=60d
       persistence: &persistence
         enabled: true
-        storageClass: ceph-block
-        size: 20Gi
+        storageClass: ${CLUSTER_STORAGE_HOSTPATH}
+        size: 10Gi
     query:
       replicas: 2
       extraArgs: ["--alert.query-url=https://thanos.${SECRET_DOMAIN}"]
-      additionalStores: ["thanos-svc.${SECRET_DOMAIN}:10901"]
+      additionalStores: ["thanos.286k.co:10901"]
     queryFrontend:
       enabled: true
       replicas: 2
@@ -89,10 +89,10 @@ spec:
       ingress:
         enabled: true
         ingressClassName: internal
-        annotations:
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hosts:
-          - thanos.${SECRET_DOMAIN}
+          - &host thanos.${SECRET_DOMAIN}
+        tls:
+          - hosts: [*host]
       podAnnotations: &podAnnotations
         configmap.reloader.stakater.com/reload: *configMap
     rule:
