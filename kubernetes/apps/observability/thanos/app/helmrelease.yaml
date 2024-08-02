@@ -56,7 +56,7 @@ spec:
         config:
           insecure: true
     additionalEndpoints:
-      - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.monitoring.svc.cluster.local
+      - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.observability.svc.cluster.local
     additionalReplicaLabels: ["__replica__"]
     serviceMonitor:
       enabled: true
