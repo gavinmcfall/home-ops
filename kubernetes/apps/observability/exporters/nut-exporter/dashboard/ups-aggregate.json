@@ -67,7 +67,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 68,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -122,16 +122,17 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "/^mfr$/",
           "values": false
         },
-        "textMode": "value"
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -149,7 +150,6 @@
           "refId": "A"
         }
       ],
-      "transformations": [],
       "type": "stat"
     },
     {
@@ -188,16 +188,17 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "/^model$/",
           "values": false
         },
-        "textMode": "value"
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -215,7 +216,6 @@
           "refId": "A"
         }
       ],
-      "transformations": [],
       "type": "stat"
     },
     {
@@ -230,19 +230,22 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "max": 240,
+          "min": 220,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "dark-red",
                 "value": null
               },
               {
-                "color": "red",
-                "value": 80
+                "color": "green",
+                "value": 220
               }
             ]
-          }
+          },
+          "unit": "volt"
         },
         "overrides": []
       },
@@ -254,33 +257,41 @@
       },
       "id": 12,
       "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "sizing": "auto",
+        "text": {
+          "titleSize": 1
+        }
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "network_ups_tools_battery_voltage{instance=~\"$instance\"}",
+          "expr": "network_ups_tools_output_voltage{instance=~\"$instance\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "interval": "",
           "legendFormat": "__auto",
           "range": true,
-          "refId": "A"
+          "refId": "A",
+          "useBackend": false
         }
       ],
-      "title": "Battery Voltage",
+      "title": "Output Voltage",
       "type": "gauge"
     },
     {
@@ -295,12 +306,22 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "max": 240,
+          "min": 220,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "dark-red",
                 "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 220
+              },
+              {
+                "color": "green",
+                "value": 230
               }
             ]
           },
@@ -316,18 +337,19 @@
       },
       "id": 14,
       "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "sizing": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -387,18 +409,19 @@
       },
       "id": 16,
       "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "sizing": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -457,18 +480,19 @@
       },
       "id": 18,
       "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "sizing": "auto"
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -539,16 +563,17 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -610,16 +635,17 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.4.7",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -643,7 +669,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 7
       },
       "id": 29,
       "panels": [],
@@ -662,6 +688,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -675,6 +702,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -709,7 +737,7 @@
         "h": 4,
         "w": 12,
         "x": 0,
-        "y": 22
+        "y": 8
       },
       "id": 21,
       "options": {
@@ -752,6 +780,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -765,6 +794,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -791,7 +821,7 @@
               }
             ]
           },
-          "unit": "volt"
+          "unit": "watt"
         },
         "overrides": []
       },
@@ -799,7 +829,7 @@
         "h": 4,
         "w": 12,
         "x": 12,
-        "y": 22
+        "y": 8
       },
       "id": 20,
       "options": {
@@ -820,14 +850,18 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "network_ups_tools_battery_voltage{instance=~\"$instance\"}",
+          "expr": "network_ups_tools_ups_realpower{instance=~\"$instance\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "legendFormat": "{{instance}}",
           "range": true,
-          "refId": "A"
+          "refId": "A",
+          "useBackend": false
         }
       ],
-      "title": "Battery Voltage",
+      "title": "Power Consumed",
       "type": "timeseries"
     },
     {
@@ -842,6 +876,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -855,6 +890,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -889,7 +925,7 @@
         "h": 5,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 12
       },
       "id": 23,
       "options": {
@@ -932,6 +968,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -945,6 +982,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -979,7 +1017,7 @@
         "h": 5,
         "w": 12,
         "x": 12,
-        "y": 26
+        "y": 12
       },
       "id": 22,
       "options": {
@@ -1022,6 +1060,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1035,6 +1074,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1069,7 +1109,7 @@
         "h": 5,
         "w": 12,
         "x": 0,
-        "y": 31
+        "y": 17
       },
       "id": 24,
       "options": {
@@ -1103,13 +1143,16 @@
   ],
   "refresh": "",
   "revision": 1,
-  "schemaVersion": 38,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
       {
-        "current": {},
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
@@ -1136,7 +1179,7 @@
         "current": {
           "selected": false,
           "text": "Prometheus",
-          "value": "Prometheus"
+          "value": "prometheus"
         },
         "hide": 2,
         "includeAll": false,
@@ -1160,6 +1203,6 @@
   "timezone": "",
   "title": "UPS Aggregate",
   "uid": "UDm8LmP4z",
-  "version": 3,
+  "version": 1,
   "weekStart": ""
 }
