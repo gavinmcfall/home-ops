@@ -36,12 +36,12 @@ metrics:
       - { color: red, min: 76, max: 9999 }
 
   - name: cluster_power_usage
-    query: round(upsHighPrecOutputLoad, 0.1)
+    query: sum(network_ups_tools_ups_realpower)
     suffix: "w"
     colors:
-      - { color: "green", min: 0, max: 400 }
-      - { color: "orange", min: 401, max: 750 }
-      - { color: "red", min: 751, max: 9999 }
+      - { color: "green", min: 0, max: 300 }
+      - { color: "orange", min: 301, max: 480 }
+      - { color: "red", min: 481, max: 9999 }
 
   - name: cluster_age_days
     query: round((time() - min(kube_node_created) ) / 86400)
