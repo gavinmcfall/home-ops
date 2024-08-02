@@ -17,3 +17,6 @@ resources:
   - ./smartctl-exporter/ks.yaml
   # - ./snmp-exporter/ks.yaml
   # - ./unpoller/ks.yaml
+
+  # Exporters
+  - ./exporters
