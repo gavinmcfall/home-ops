@@ -22,5 +22,6 @@ resources:
   - ./postfinance.yaml
   - ./prometheus-community.yaml
   - ./rook-ceph-charts.yaml
+  - ./stevehipwell.yaml
   - ./spegel.yaml
   - ./stakater.yaml
