@@ -861,7 +861,7 @@
           "useBackend": false
         }
       ],
-      "title": "Power Consumed",
+      "title": "Power Draw",
       "type": "timeseries"
     },
     {
