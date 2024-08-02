@@ -44,7 +44,7 @@ spec:
           annotations:
             configmap.reloader.stakater.com/reload: &config network-ups-tools-config
           nodeSelector:
-            ups.feature.node.kubernetes.io/tripplite: "true"
+            ups.feature.node.kubernetes.io/eaton: "true"
     service:
       app:
         controller: *app
