@@ -117,7 +117,7 @@ This is a high level diagram of how my kubernetes infrastructure is setup
 
 ## 🤝 Gratitude and Thanks
 
-Thanks to all the people who donate their time in the [Home Operations](https://discord.gg/home-operations) and [TechnoTim](https://l.technotim.live/discord) Discord Communities for all of their support
+Thanks to all the people who donate their time in the [Home Operations](https://discord.gg/home-operations) and [TechnoTim](https://l.technotim.live/discord) Discord Communities for all of their support. Special Shout out to my friend and colleague [Kevin Durbin](https://github.com/kevindurb)
 
 ---
 
