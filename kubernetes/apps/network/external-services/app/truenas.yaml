@@ -46,7 +46,6 @@ spec:
   tls:
     - hosts:
         - citadel.${SECRET_DOMAIN}
-        - citadel.internal
       secretName: truenas-tls # Assumes you have a TLS secret for your domain
   rules:
     - host: citadel.${SECRET_DOMAIN}
