@@ -12,7 +12,7 @@ kubeconform_args=(
     "-strict"
     "-ignore-missing-schemas"
     "-skip"
-    "Secret,ReplicationDestination.volsync.backube,ReplicationSource.volsync.backube"
+    "Secret,ReplicationSource,ReplicationDestination"
     "-schema-location"
     "default"
     "-schema-location"
