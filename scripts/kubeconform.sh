@@ -23,6 +23,7 @@ kubeconform_args=(
 echo "=== Validating standalone manifests in ${KUBERNETES_DIR}/flux ==="
 find "${KUBERNETES_DIR}/flux" -maxdepth 1 -type f -name '*.yaml' -print0 | while IFS= read -r -d $'\0' file;
   do
+    echo "Running kubeconform on ${file} with arguments: ${kubeconform_args[@]}"
     kubeconform "${kubeconform_args[@]}" "${file}"
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
       exit 1
