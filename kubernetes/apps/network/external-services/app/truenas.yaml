@@ -7,8 +7,10 @@ metadata:
 spec:
   ports:
     - protocol: TCP
-      port: 80
+      port: 443
       targetPort: 443
+  selector:
+    app: truenas
 ---
 apiVersion: discovery.k8s.io/v1
 kind: EndpointSlice
@@ -19,8 +21,8 @@ metadata:
     kubernetes.io/service-name: truenas
 addressType: IPv4
 ports:
-  - name: http
-    appProtocol: http
+  - name: https
+    appProtocol: https
     protocol: TCP
     port: 443
 endpoints:
@@ -37,8 +39,13 @@ metadata:
     app.kubernetes.io/instance: *app
   annotations:
     external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" # Redirects HTTP to HTTPS
 spec:
   ingressClassName: internal
+  tls:
+    - hosts:
+        - citadel.${SECRET_DOMAIN}
+      secretName: truenas-tls # Assumes you have a TLS secret for your domain
   rules:
     - host: citadel.${SECRET_DOMAIN}
       http:
@@ -49,4 +56,4 @@ spec:
               service:
                 name: *app
                 port:
-                  number: 80
+                  number: 443
