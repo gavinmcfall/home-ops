@@ -7,7 +7,7 @@ metadata:
 spec:
   ports:
     - protocol: TCP
-      port: 443
+      port: 80
       targetPort: 443
 ---
 apiVersion: discovery.k8s.io/v1
@@ -40,7 +40,7 @@ metadata:
 spec:
   ingressClassName: internal
   rules:
-    - host: truenas.${SECRET_DOMAIN}
+    - host: citadel.${SECRET_DOMAIN}
       http:
         paths:
           - path: /
@@ -49,4 +49,4 @@ spec:
               service:
                 name: *app
                 port:
-                  number: 443
+                  number: 80
