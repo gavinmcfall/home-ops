@@ -7,5 +7,6 @@ resources:
   - ./echo-server/ks.yaml
   - ./external-dns/ks.yaml
   - ./external-dns-unifi/ks.yaml
+  - ./external-services/ks.yaml
   - ./ingress-nginx/ks.yaml
   - ./k8s-gateway/ks.yaml
