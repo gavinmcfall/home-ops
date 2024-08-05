@@ -8,7 +8,7 @@ resources:
   # - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
   # - ./cross-seed/ks.yaml
-  - ./flaresolverr/ks.yaml
+  # - ./flaresolverr/ks.yaml
   # - ./kapowarr/ks.yaml
   - ./metube/ks.yaml
   # - ./mylar/ks.yaml
