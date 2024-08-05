@@ -115,7 +115,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile: { type: RuntimeDefault }
     service:
-      app:
+      main:
         controller: onepassword-connect
         ports:
           http:
