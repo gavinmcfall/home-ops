@@ -7,8 +7,8 @@ metadata:
 spec:
   targetNamespace: downloads
   dependsOn:
-    - name: cluster-apps-cloudnative-pg-cluster
-    - name: cluster-apps-external-secrets-stores
+    - name: cloudnative-pg-cluster
+    - name: external-secrets-stores
   path: ./kubernetes/apps/downloads/autobrr/app
   prune: true
   sourceRef:
