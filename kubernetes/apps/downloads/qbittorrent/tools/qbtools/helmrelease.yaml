@@ -65,8 +65,8 @@ spec:
               - prune
               - --exclude-tag=expired
               - --include-tag=unregistered
-              - --server=qbittorrent.media.svc.cluster.local
-              - --port=8080
+              - --server=qbittorrent.downloads.svc.cluster.local
+              - --port=80
           expired:
             <<: *container
             args:
@@ -74,8 +74,8 @@ spec:
               - --exclude-category=manual
               - --exclude-tag=activity:24h
               - --include-tag=expired
-              - --server=qbittorrent.media.svc.cluster.local
-              - --port=8080
+              - --server=qbittorrent.downloads.svc.cluster.local
+              - --port=80
         pod:
           restartPolicy: OnFailure
           securityContext: &podSecurityContext
@@ -94,8 +94,8 @@ spec:
               - orphaned
               - --exclude-pattern="*_unpackerred"
               - --exclude-pattern="*/manual/*"
-              - --server=qbittorrent.media.svc.cluster.local
-              - --port=8080
+              - --server=qbittorrent.downloads.svc.cluster.local
+              - --port=80
         pod:
           restartPolicy: OnFailure
           securityContext:
@@ -111,8 +111,8 @@ spec:
             args:
               - reannounce
               - --process-seeding
-              - --server=qbittorrent.media.svc.cluster.local
-              - --port=8080
+              - --server=qbittorrent.downloads.svc.cluster.local
+              - --port=80
         pod:
           securityContext: *podSecurityContext
     persistence:
@@ -127,10 +127,8 @@ spec:
                 readOnly: true
       media:
         type: nfs
-        server: nas.${INTERNAL_DOMAIN}
-        path: /volume1/media
-        advancedMounts:
-          orphaned:
-            app:
-              - path: /media/downloads/torrents
-                subPath: downloads/torrents
+        server: citadel.internal
+        path: /mnt/storage0/
+        globalMounts:
+          - path: /media/Downloads/qbittorrent
+            subPath: Downloads/qbittorrent
