@@ -5,9 +5,8 @@ resources:
   - ./namespace.yaml
   - ./qbittorrent/ks.yaml
   # Applications
-  # - ./autobrr/ks.yaml
+  - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
-  # - ./cross-seed/ks.yaml
   - ./flaresolverr/ks.yaml
   # - ./kapowarr/ks.yaml
   - ./metube/ks.yaml
