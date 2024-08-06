@@ -5,4 +5,5 @@ kind: Kustomization
 resources:
   - ./truenas.yaml
   - ./proxmox.yaml
+  - ./unifi.yaml
   - ./voron.yaml
