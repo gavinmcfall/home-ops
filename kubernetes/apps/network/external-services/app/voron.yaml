@@ -7,7 +7,7 @@ metadata:
 spec:
   ports:
     - protocol: TCP
-      port: 443
+      port: 80
       targetPort: 80
   selector:
     app: voron
@@ -56,4 +56,4 @@ spec:
               service:
                 name: *app
                 port:
-                  number: 443
+                  number: 80
