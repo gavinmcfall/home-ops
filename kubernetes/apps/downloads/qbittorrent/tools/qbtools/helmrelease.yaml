@@ -43,7 +43,7 @@ spec:
               - --last-activity
               - --sites
               - --unregistered
-              - --server=qbittorrent.dowloads.svc.cluster.local
+              - --server=qbittorrent.downloads.svc.cluster.local
               - --port=8080
             env:
               TZ: *timeZone
