@@ -61,8 +61,8 @@ data:
               fields: ["status"]
         - Healthchecks:
             href: https://dashboard.uptimerobot.com/monitors#mainDashboard
-            icon: healthchecks.png
-            description: Healthchecks Internet Uptime
+            icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/uptimerobot.png
+            description: Uptime Robot Dashboard
             widget:
               type: uptimerobot
               url: https://api.uptimerobot.com
@@ -97,7 +97,7 @@ data:
             widget:
               type: truenas
               url: https://citadel.${SECRET_DOMAIN}
-              key: yourtruenasapikey # not required if using username / password
+              key: {{HOMEPAGE_VAR_TRUENAS_TOKEN}}
               enablePools: true
               nasType: scale
     # - Home:
