@@ -4,6 +4,6 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   # Applications
-  # - ./homepage/ks.yaml
+  - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
 # - ./thelounge/ks.yaml
