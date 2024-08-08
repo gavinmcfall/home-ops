@@ -162,12 +162,10 @@ data:
     - logo:
         icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/Nerdz_200x200_transparent.png
     - search:
-        provider: [google]
-        focus: false
+        provider: custom
+        icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/google.png
+        url: https://www.google.co.nz/search?q=
         target: _blank
-    - greeting:
-        text_size: xl
-        text: "Gidday"
     - kubernetes:
         cluster:
           cpu: true
