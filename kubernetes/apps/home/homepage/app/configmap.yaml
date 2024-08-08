@@ -97,6 +97,7 @@ data:
             widget:
               type: truenas
               url: https://citadel.${SECRET_DOMAIN}
+              icon: truenas-scale.png
               key: {{HOMEPAGE_VAR_TRUENAS_TOKEN}}
               enablePools: true
               nasType: scale
