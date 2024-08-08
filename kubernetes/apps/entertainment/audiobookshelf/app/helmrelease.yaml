@@ -85,7 +85,7 @@ spec:
           gethomepage.dev/icon: audiobookshelf.png
           gethomepage.dev/description: Audiobook Library
           gethomepage.dev/widget.type: audiobookshelf
-          gethomepage.dev/widget.url: http://audiobookshelf:80
+          gethomepage.dev/widget.url: http://audiobookshelf.entertainment:80
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_AUDIOBOOKSHELF_TOKEN}}`}}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         className: external
