@@ -258,6 +258,15 @@ spec:
     ingress:
       enabled: true
       annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/icon: grafana.png
+        gethomepage.dev/name: Grafana
+        gethomepage.dev/group: Observability
+        gethomepage.dev/description: Monitoring Dashboards
+        gethomepage.dev/widget.type: grafana
+        gethomepage.dev/widget.url: http://grafana.observability
+        gethomepage.dev/widget.username: "{{`{{HOMEPAGE_VAR_GRAFANA_USERNAME}}`}}"
+        gethomepage.dev/widget.password: "{{`{{HOMEPAGE_VAR_GRAFANA_PASSWORD}}`}}"
         external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
       ingressClassName: internal
       hosts: ["grafana.${SECRET_DOMAIN}"]

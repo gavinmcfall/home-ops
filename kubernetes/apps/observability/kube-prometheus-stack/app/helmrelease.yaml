@@ -38,6 +38,14 @@ spec:
       ingress:
         enabled: true
         annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/icon: prometheus.png
+          gethomepage.dev/name: Prometheus
+          gethomepage.dev/group: Observability
+          gethomepage.dev/app: prometheus
+          gethomepage.dev/description: Monitoring Scrape Service
+          gethomepage.dev/widget.type: prometheus
+          gethomepage.dev/widget.url: http://kube-prometheus-stack-prometheus.observability:9090
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         ingressClassName: internal
         hosts: ["alertmanager.${SECRET_DOMAIN}"]

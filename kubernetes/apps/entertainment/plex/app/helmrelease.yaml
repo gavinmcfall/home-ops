@@ -93,6 +93,14 @@ spec:
     ingress:
       app:
         annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Video
+          gethomepage.dev/name: Plex
+          gethomepage.dev/icon: plex.png
+          gethomepage.dev/description: Media Player
+          gethomepage.dev/widget.type: plex
+          gethomepage.dev/widget.url: http://plex.entertainment:32400
+          gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_PLEX_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         className: external
         hosts:
