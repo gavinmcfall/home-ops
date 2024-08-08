@@ -10,7 +10,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/main/apps/downloads/mylar/app
+  path: ./kubernetes/apps/downloads/mylar/app
   prune: true
   sourceRef:
     kind: GitRepository
