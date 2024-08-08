@@ -116,6 +116,7 @@ data:
     title: Dashboard
     favicon: https://github.com/walkxcode/dashboard-icons/blob/main/png/heimdall.png
     useEqualHeights: true
+    statusStyle: dot
     theme: dark
     background:
       image: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/backgrounds/homepage/homepage-background-dbs.jpg
