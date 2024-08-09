@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: tailscale-operator
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: tailscale-operator
+      version: 1.70.0
+      sourceRef:
+        kind: HelmRepository
+        name: tailscale
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    operatorConfig:
+      image:
+        repo: ghcr.io/tailscale/k8s-operator
+        tag: 1.70.0
+        digest: "sha256:8edd06cf5bacc17b55d8dbde5303e7dc1478cd6a58c8ec92904cde07d0bed908"
+      logging: "debug"
+    proxyConfig:
+      image:
+        repo: ghcr.io/tailscale/tailscale
+        tag: 1.70.0
+        digest: "sha256:19c66f261912cd19fa5362d36cf6f4770ad6f273b410f940a0eba39b376fe326"
+    apiServerProxyConfig:
+      mode: "true"
