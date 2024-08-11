@@ -6,11 +6,11 @@ metadata:
   name: &app tautulli
   namespace: flux-system
 spec:
-  targetNamespace: media
+  targetNamespace: entertainment
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/main/apps/media/tautulli/app
+  path: ./kubernetes/apps/entertainment/tautulli/app
   prune: true
   sourceRef:
     kind: GitRepository

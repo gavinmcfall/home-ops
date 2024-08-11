@@ -26,7 +26,7 @@ spec:
     - name: rook-ceph-cluster
       namespace: rook-ceph
     - name: volsync
-      namespace: storage
+      namespace: volsync-system
   values:
     controllers:
       tautulli:
@@ -40,11 +40,15 @@ spec:
             env:
               TZ: ${TIMEZONE}
             command: ["/usr/local/bin/python", "Tautulli.py"]
-            args: [
-              "--config", "/config/config.ini",
-              "--datadir", "/config",
-              "--port", "80"
-            ]
+            args:
+              [
+                "--config",
+                "/config/config.ini",
+                "--datadir",
+                "/config",
+                "--port",
+                "80",
+              ]
             probes:
               liveness: &probes
                 enabled: true
@@ -85,14 +89,14 @@ spec:
       app:
         className: external
         annotations:
-          gethomepage.dev/enabled: "true"
-          gethomepage.dev/group: Video
-          gethomepage.dev/name: Tautulli
-          gethomepage.dev/icon: tautulli.png
-          gethomepage.dev/description: Plex Stream Monitoring
-          gethomepage.dev/widget.type: tautulli
-          gethomepage.dev/widget.url: http://tautulli.media
-          gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_TAUTULLI_TOKEN}}` }}"
+          # gethomepage.dev/enabled: "true"
+          # gethomepage.dev/group: Video
+          # gethomepage.dev/name: Tautulli
+          # gethomepage.dev/icon: tautulli.png
+          # gethomepage.dev/description: Plex Stream Monitoring
+          # gethomepage.dev/widget.type: tautulli
+          # gethomepage.dev/widget.url: http://tautulli.entertainment
+          # gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_TAUTULLI_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hosts:
           - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
