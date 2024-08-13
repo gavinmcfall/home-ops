@@ -158,11 +158,20 @@ spec:
         className: internal
         hosts:
           - host: qb.${SECRET_DOMAIN}
-            paths:
+            paths: &paths
               - path: /
                 service:
                   identifier: app
                   port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app qb
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
     persistence:
       config:
         enabled: true
