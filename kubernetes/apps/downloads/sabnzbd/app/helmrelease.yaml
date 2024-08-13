@@ -104,11 +104,20 @@ spec:
         className: internal
         hosts:
           - host: sab.${SECRET_DOMAIN}
-            paths:
+            paths: &paths
               - path: /
                 service:
                   identifier: app
                   port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app sab
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
     persistence:
       config:
         existingClaim: sabnzbd
