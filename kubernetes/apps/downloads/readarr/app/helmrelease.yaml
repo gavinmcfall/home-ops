@@ -97,12 +97,12 @@ spec:
               - path: /
                 service:
                   identifier: app
-                  port: http
+                  port: http                                                                                                                                                                                          
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "{{ .Release.Name }}"
+          - host: "{{ .Release.Name }}"
             paths: *paths
         tls:
           - hosts:
