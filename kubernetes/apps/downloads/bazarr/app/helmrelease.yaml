@@ -115,11 +115,20 @@ spec:
         className: internal
         hosts:
           - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths:
+            paths: &paths
               - path: /
                 service:
                   identifier: app
                   port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
     persistence:
       add-ons:
         type: emptyDir
