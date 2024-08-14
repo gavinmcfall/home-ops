@@ -91,7 +91,7 @@ spec:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "{{ .Release.Name }}"
+          - host: "{{ .Release.Name }}"
             paths: *paths
         tls:
           - hosts:
