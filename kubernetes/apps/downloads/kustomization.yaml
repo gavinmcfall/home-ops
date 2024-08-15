@@ -20,4 +20,4 @@ resources:
   - ./sonarr/ks.yaml
   - ./sonarr-uhd/ks.yaml
   - ./unpackerr/ks.yaml
-  - ./whisparr/ks.yaml
+  # - ./whisparr/ks.yaml
