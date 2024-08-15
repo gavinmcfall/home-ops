@@ -117,7 +117,7 @@ spec:
         type: emptyDir
       media:
         type: nfs
-        server: 10.90.1.69
+        server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
           - path: /media
