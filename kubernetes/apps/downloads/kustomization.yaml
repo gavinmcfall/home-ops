@@ -10,7 +10,6 @@ resources:
   - ./kapowarr/ks.yaml
   - ./metube/ks.yaml
   - ./mylar/ks.yaml
-  # - ./overseerr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
   - ./radarr/ks.yaml
@@ -21,3 +20,4 @@ resources:
   - ./sonarr/ks.yaml
   - ./sonarr-uhd/ks.yaml
   - ./unpackerr/ks.yaml
+  - ./whisparr/ks.yaml
