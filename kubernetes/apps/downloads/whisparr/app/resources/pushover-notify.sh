@@ -2,11 +2,11 @@
 # shellcheck disable=SC2154
 
 PUSHOVER_DEBUG="${PUSHOVER_DEBUG:-"true"}"
-# kubectl port-forward service/radarr-uhd -n downloads 7878:80
+# kubectl port-forward service/whisparr -n downloads 8989:80
 # export PUSHOVER_TOKEN="";
 # export PUSHOVER_USER_KEY="";
-# export radarr-uhd_eventtype=Download;
-# ./notify.sh
+# export whisparr_eventtype=Download;
+# ./pushover-notify.sh
 
 CONFIG_FILE="/config/config.xml" && [[ "${PUSHOVER_DEBUG}" == "true" ]] && CONFIG_FILE="config.xml"
 ERRORS=()
@@ -42,40 +42,39 @@ fi
 #
 # Send Notification on Test
 #
-if [[ "${radarr-uhd_eventtype:-}" == "Test" ]]; then
+if [[ "${whisparr_eventtype:-}" == "Test" ]]; then
     PUSHOVER_TITLE="Test Notification"
-    PUSHOVER_MESSAGE="Howdy this is a test notification from ${radarr-uhd_instancename:-radarr-uhd}"
+    PUSHOVER_MESSAGE="Howdy this is a test notification from ${whisparr_instancename:-whisparr}"
 fi
 
 #
 # Send notification on Download or Upgrade
 #
-if [[ "${radarr-uhd_eventtype:-}" == "Download" ]]; then
-    if [[ "${radarr-uhd_isupgrade}" == "True" ]]; then pushover_title="Upgraded"; else pushover_title="Downloaded"; fi
-    printf -v PUSHOVER_TITLE "Movie %s" "${pushover_title}"
-    printf -v PUSHOVER_MESSAGE "<b>%s (%s)</b><small>\n%s</small><small>\n\n<b>Client:</b> %s</small><small>\n<b>Quality:</b> %s</small><small>\n<b>Size:</b> %s</small>" \
-        "${radarr-uhd_movie_title}" \
-        "${radarr-uhd_movie_year}" \
-        "${radarr-uhd_movie_overview}" \
-        "${radarr-uhd_download_client}" \
-        "${radarr-uhd_moviefile_quality}" \
-        "$(numfmt --to iec --format "%8.2f" "${radarr-uhd_release_size}")"
-    printf -v PUSHOVER_URL "%s/movie/%s" "${radarr-uhd_applicationurl:-localhost}" "${radarr-uhd_movie_tmdbid}"
-    printf -v PUSHOVER_URL_TITLE "View movie in %s" "${radarr-uhd_instancename:-radarr-uhd}"
+if [[ "${whisparr_eventtype:-}" == "Download" ]]; then
+    if [[ "${whisparr_isupgrade}" == "True" ]]; then pushover_title="Upgraded"; else pushover_title="Downloaded"; fi
+    printf -v PUSHOVER_TITLE "Episode %s" "${pushover_title}"
+    printf -v PUSHOVER_MESSAGE "<b>%s (S%02dE%02d)</b><small>\n%s</small><small>\n\n<b>Client:</b> %s</small><small>\n<b>Quality:</b> %s</small>" \
+        "${whisparr_series_title}" \
+        "${whisparr_episodefile_seasonnumber}" \
+        "${whisparr_episodefile_episodenumbers}" \
+        "${whisparr_episodefile_episodetitles}" \
+        "${whisparr_download_client}" \
+        "${whisparr_episodefile_quality}"
+    printf -v PUSHOVER_URL "%s/series/%s" "${whisparr_applicationurl:-localhost}" "${whisparr_series_titleslug}"
+    printf -v PUSHOVER_URL_TITLE "View series in %s" "${whisparr_instancename:-whisparr}"
 fi
 
 #
 # Send notification on Manual Interaction Required
 #
-if [[ "${radarr-uhd_eventtype:-}" == "ManualInteractionRequired" ]]; then
+if [[ "${whisparr_eventtype:-}" == "ManualInteractionRequired" ]]; then
     PUSHOVER_PRIORITY="1"
-    printf -v PUSHOVER_TITLE "Movie requires manual interaction"
-    printf -v PUSHOVER_MESSAGE "<b>%s (%s)</b><small>\n<b>Client:</b> %s</small>" \
-        "${radarr-uhd_movie_title}" \
-        "${radarr-uhd_movie_year}" \
-        "${radarr-uhd_download_client}"
-    printf -v PUSHOVER_URL "%s/activity/queue" "${radarr-uhd_applicationurl:-localhost}"
-    printf -v PUSHOVER_URL_TITLE "View queue in %s" "${radarr-uhd_instancename:-radarr-uhd}"
+    printf -v PUSHOVER_TITLE "Episode requires manual interaction"
+    printf -v PUSHOVER_MESSAGE "<b>%s</b><small>\n<b>Client:</b> %s</small>" \
+        "${whisparr_series_title}" \
+        "${whisparr_download_client}"
+    printf -v PUSHOVER_URL "%s/activity/queue" "${whisparr_applicationurl:-localhost}"
+    printf -v PUSHOVER_URL_TITLE "View queue in %s" "${whisparr_instancename:-whisparr}"
 fi
 
 notification=$(jq -n \
