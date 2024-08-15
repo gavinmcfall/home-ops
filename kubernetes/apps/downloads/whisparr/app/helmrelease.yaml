@@ -1,0 +1,123 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: whisparr
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.2
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  driftDetection:
+    mode: enabled
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      whisparr:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16
+            envFrom: &envFrom
+              - secretRef:
+                  name: whisparr-secret
+        containers:
+          app:
+            image:
+              repository: docker.io/hotio/whisparr
+              tag: v3@sha256:53819a95363b59e240cb3692437af8aa98c7d9205ba3d4929ecb71c8053015aa
+            env:
+              WHISPARR__ANALYTICS_ENABLED: "False"
+              WHISPARR__AUTHENTICATION_METHOD: External
+              WHISPARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
+              WHISPARR__BRANCH: develop
+              WHISPARR__INSTANCE_NAME: Whisparr
+              WHISPARR__LOG_LEVEL: info
+              WHISPARR__PORT: &port 80
+              TZ: ${TIMEZONE}
+            envFrom: *envFrom
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [4000]
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: whisparr
+        ports:
+          http:
+            port: *port
+    ingress:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        className: internal
+        hosts:
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths: &paths
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
+    persistence:
+      config:
+        existingClaim: whisparr
+      tmp:
+        type: emptyDir
+      media:
+        type: nfs
+        server: 10.90.1.69
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /media
