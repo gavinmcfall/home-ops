@@ -115,6 +115,14 @@ spec:
         existingClaim: whisparr
       tmp:
         type: emptyDir
+      pushover-notify:
+        type: configMap
+        name: whisparr-configmap
+        defaultMode: 0775
+        globalMounts:
+          - path: /scripts/pushover-notify.sh
+            subPath: pushover-notify.sh
+            readOnly: true
       media:
         type: nfs
         server: citadel.internal
