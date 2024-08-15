@@ -40,8 +40,8 @@ spec:
         containers:
           app:
             image:
-              repository: docker.io/hotio/whisparr
-              tag: v3@sha256:53819a95363b59e240cb3692437af8aa98c7d9205ba3d4929ecb71c8053015aa
+              repository: ghcr.io/jfroy/whisparr-nightly
+              tag: 2.0.0.548@sha256:1c47253ada468c925efc13cc2ac8172a5b87f49d1d5f0bbbb838055c4d795ac8
             env:
               WHISPARR__ANALYTICS_ENABLED: "False"
               WHISPARR__AUTHENTICATION_METHOD: External
@@ -81,7 +81,7 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [4000]
+        supplementalGroups: [10000]
         seccompProfile: { type: RuntimeDefault }
     service:
       app:
