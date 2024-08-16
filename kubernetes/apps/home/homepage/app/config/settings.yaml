@@ -21,6 +21,7 @@ layout:
     icon: mdi-network
   Events:
     style: row
+    columns: 2
     # icon: mdi-calendar
   Infrastructure:
     style: row
