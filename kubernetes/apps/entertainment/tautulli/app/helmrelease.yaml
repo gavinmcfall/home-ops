@@ -90,7 +90,7 @@ spec:
         className: external
         annotations:
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/group: Entertainment
+          gethomepage.dev/group: Streaming
           gethomepage.dev/name: Tautulli
           gethomepage.dev/app: *app
           gethomepage.dev/icon: tautulli.png
