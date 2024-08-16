@@ -3,7 +3,10 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: bazarr
+  name: &app bazarr
+commonMetadata:
+  labels:
+    app.kubernetes.io/name: *app
 spec:
   interval: 30m
   chart:
