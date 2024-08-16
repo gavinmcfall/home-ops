@@ -106,6 +106,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: Bazarr
+          gethomepage.dev/app: bazarr-app
           gethomepage.dev/icon: bazarr.png
           gethomepage.dev/description: Subtitle Downloads
           gethomepage.dev/widget.type: bazarr
