@@ -1,0 +1,35 @@
+---
+- logo:
+    icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/Nerdz_200x200_transparent.png
+- search:
+    provider: custom
+    icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/google.png
+    url: https://www.google.co.nz/search?q=
+    target: _blank
+- kubernetes:
+    cluster:
+      cpu: true
+      memory: true
+      show: true
+      showLabel: true
+    nodes:
+      cpu: true
+      memory: true
+      show: false
+      showLabel: true
+- openmeteo:
+    label: Home
+    latitude: ${LATITUDE}
+    longitude: ${LONGITUDE}
+    units: metric
+    cache: 5
+- datetime:
+    text_size: l
+    format:
+      timeStyle: short
+      dateStyle: short
+      hourCycle: h23
+- unifi_console:
+    url: https://unifi.${SECRET_DOMAIN}
+    username: { { HOMEPAGE_VAR_UNIFI_USERNAME } }
+    password: { { HOMEPAGE_VAR_UNIFI_PASSWORD } }
