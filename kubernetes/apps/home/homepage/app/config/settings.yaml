@@ -22,21 +22,18 @@ layout:
   Calendar:
     style: column
     icon: mdi-calendar
-  Video:
-    style: column
-    icon: mdi-play-circle
-  Books:
-    style: row
-    columns: 2
-    icon: mdi-book
   Infrastructure:
     style: row
-    columns: 5
+    columns: 2
     icon: mdi-server
   Observability:
     style: row
-    columns: 5
+    columns: 3
     icon: mdi-chart-line
+  Entertainment:
+    style: row
+    columns: 5
+    icon: mdi-movie
   Home:
     style: row
     columns: 5
