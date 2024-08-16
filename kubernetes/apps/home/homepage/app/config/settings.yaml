@@ -1,0 +1,47 @@
+---
+title: Dashboard
+favicon: https://github.com/walkxcode/dashboard-icons/blob/main/png/heimdall.png
+useEqualHeights: true
+statusStyle: dot
+theme: dark
+background:
+  image: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/backgrounds/homepage/homepage-background-dbs.jpg
+  opacity: 20
+color: slate
+headerStyle: clean
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: true
+  showSearchSuggestions: true
+  hideVisitURL: true
+layout:
+  Network:
+    style: row
+    columns: 3
+    icon: mdi-network
+  Calendar:
+    style: column
+    icon: mdi-calendar
+  Video:
+    style: column
+    icon: mdi-play-circle
+  Books:
+    style: row
+    columns: 2
+    icon: mdi-book
+  Infrastructure:
+    style: row
+    columns: 5
+    icon: mdi-server
+  Observability:
+    style: row
+    columns: 5
+    icon: mdi-chart-line
+  Home:
+    style: row
+    columns: 5
+    icon: mdi-home-analytics
+  Downloads:
+    style: row
+    columns: 3
+    icon: mdi-download-circle
