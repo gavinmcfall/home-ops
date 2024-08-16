@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: radarr
+  name: &app radarr
 spec:
   interval: 30m
   chart:
@@ -97,6 +97,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: Radarr
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: radarr.png
           gethomepage.dev/description: Movie Downloads
           gethomepage.dev/widget.type: radarr

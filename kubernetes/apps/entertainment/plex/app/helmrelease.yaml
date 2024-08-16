@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: plex
+  name: &app plex
 spec:
   interval: 30m
   chart:
@@ -96,6 +96,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Video
           gethomepage.dev/name: Plex
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: plex.png
           gethomepage.dev/description: Media Player
           gethomepage.dev/widget.type: plex

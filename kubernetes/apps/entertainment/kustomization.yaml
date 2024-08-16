@@ -7,7 +7,6 @@ resources:
   # Applications
   - ./audiobookshelf/ks.yaml
   - ./kavita/ks.yaml
-  # - ./komga/ks.yaml
   - ./overseerr/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml

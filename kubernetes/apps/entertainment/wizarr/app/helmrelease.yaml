@@ -35,7 +35,7 @@ spec:
         containers:
           app:
             image:
-              repository:  ghcr.io/wizarrrr/wizarr
+              repository: ghcr.io/wizarrrr/wizarr
               tag: 4.1.1
             env:
               TZ: ${TIMEZONE}
@@ -66,6 +66,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Video
           gethomepage.dev/name: Wizarr
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: wizarr.png
           gethomepage.dev/description: Plex Invite Management
           # gethomepage.dev/widget.type: wizarr
