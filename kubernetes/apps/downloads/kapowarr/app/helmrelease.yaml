@@ -60,6 +60,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: Kapowarr
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: calibre-web.png
           gethomepage.dev/description: Comic Downloads
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}

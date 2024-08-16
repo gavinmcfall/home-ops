@@ -85,6 +85,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: Readarr
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: readarr.png
           gethomepage.dev/description: eBook Downloads
           gethomepage.dev/widget.type: readarr
@@ -97,7 +98,7 @@ spec:
               - path: /
                 service:
                   identifier: app
-                  port: http                                                                                                                                                                                          
+                  port: http
       tailscale:
         enabled: true
         className: tailscale

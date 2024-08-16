@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: sabnzbd
+  name: &app sabnzbd
 spec:
   interval: 30m
   chart:
@@ -95,6 +95,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: SABnzbd
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: sabnzbd.png
           gethomepage.dev/description: NZB Download Client
           gethomepage.dev/widget.type: sabnzbd

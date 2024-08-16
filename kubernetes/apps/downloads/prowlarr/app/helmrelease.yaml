@@ -93,6 +93,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: Prowlarr
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: prowlarr.png
           gethomepage.dev/description: Torrent/NZB Indexer Management
           gethomepage.dev/widget.type: prowlarr

@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: sonarr
+  name: &app sonarr
 spec:
   interval: 30m
   chart:
@@ -97,6 +97,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: Sonarr
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: sonarr.png
           gethomepage.dev/description: TV Downloads
           gethomepage.dev/widget.type: sonarr

@@ -66,6 +66,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Video
           gethomepage.dev/name: Overseerr
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: overseerr.png
           gethomepage.dev/description: Media Request Management
           gethomepage.dev/widget.type: overseerr

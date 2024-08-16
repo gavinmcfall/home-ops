@@ -58,8 +58,9 @@ spec:
         className: external
         annotations:
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/group: Books
+          gethomepage.dev/group: Entertainment
           gethomepage.dev/name: Kavita
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: kavita.png
           gethomepage.dev/description: Comic/Ebook Web Reader
           gethomepage.dev/widget.type: kavita
