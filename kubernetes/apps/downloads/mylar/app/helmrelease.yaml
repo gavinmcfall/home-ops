@@ -71,6 +71,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: Mylar
+          gethomepage.dev/app: *app
           gethomepage.dev/icon: mylar.png
           gethomepage.dev/description: Comic Downloads
           gethomepage.dev/widget.type: mylar
