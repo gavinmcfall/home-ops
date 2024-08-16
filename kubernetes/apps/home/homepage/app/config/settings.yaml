@@ -15,18 +15,14 @@ quicklaunch:
   showSearchSuggestions: true
   hideVisitURL: true
 layout:
-  Network:
+  Infrastructure:
     style: row
-    columns: 3
-    icon: mdi-network
+    columns: 4
+    icon: mdi-server
   Events:
     style: row
     columns: 2
-    # icon: mdi-calendar
-  Infrastructure:
-    style: row
-    columns: 2
-    icon: mdi-server
+    header: false
   Observability:
     style: row
     columns: 3
