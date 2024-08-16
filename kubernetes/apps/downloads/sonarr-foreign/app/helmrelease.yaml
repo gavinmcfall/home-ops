@@ -44,7 +44,7 @@ spec:
               repository: ghcr.io/onedr0p/sonarr-develop
               tag: 4.0.8.2008@sha256:737662938d4373ec8b5d80ac37bb96c24637cb1871bc55c74c54ad66af43fafd
             env:
-              SONARR__APP__INSTANCENAME: Sonarr
+              SONARR__APP__INSTANCENAME: Sonarr-Foreign
               SONARR__APP__THEME: dark
               SONARR__AUTH__METHOD: External
               SONARR__AUTH__REQUIRED: DisabledForLocalAddresses
@@ -96,9 +96,9 @@ spec:
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
-          gethomepage.dev/name: Sonarr
+          gethomepage.dev/name: Sonarr-Foreign
           gethomepage.dev/icon: sonarr.png
-          gethomepage.dev/description: TV Downloads
+          gethomepage.dev/description: Foreign TV Downloads
           gethomepage.dev/widget.type: sonarr
           gethomepage.dev/widget.url: http://sonarr-foreign.downloads
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_SONARR_FOREIGN_TOKEN}}` }}"
