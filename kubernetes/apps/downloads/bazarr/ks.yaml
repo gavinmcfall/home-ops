@@ -9,8 +9,7 @@ spec:
   targetNamespace: downloads
   commonMetadata:
     labels:
-      # app.kubernetes.io/name: *app
-      app.kubernetes.io/name: bazarr-app
+      app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets-stores
   path: ./kubernetes/apps/downloads/bazarr/app
