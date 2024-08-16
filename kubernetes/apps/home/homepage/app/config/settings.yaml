@@ -29,13 +29,9 @@ layout:
     icon: mdi-chart-line
   Entertainment:
     style: row
-    columns: 5
+    columns: 4
     icon: mdi-movie
-  Home:
-    style: row
-    columns: 5
-    icon: mdi-home-analytics
   Downloads:
     style: row
-    columns: 3
+    columns: 4
     icon: mdi-download-circle
