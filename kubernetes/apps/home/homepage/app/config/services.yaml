@@ -1,5 +1,5 @@
 ---
-- Network:
+- Infrastructure:
     - Cloudflared:
         href: https://dash.cloudflare.com/
         icon: cloudflare-zero-trust.png
@@ -27,6 +27,16 @@
           url: https://unifi.${SECRET_DOMAIN}
           username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
           password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
+    - Truenas:
+        href: https://citadel.${SECRET_DOMAIN}
+        icon: truenas.png
+        description: TrueNAS Dashboard
+        widget:
+          type: truenas
+          url: https://citadel.${SECRET_DOMAIN}
+          key: {{HOMEPAGE_VAR_TRUENAS_TOKEN}}
+          enablePools: true
+          nasType: scale
 - Events:
     - Agenda:
         widget:
@@ -43,17 +53,6 @@
             - type: readarr # active widget type that is currently enabled on homepage - possible values: radarr, sonar>
               service_group: Downloads # group name where widget exists
               service_name: Readarr # service name for that widget
-- Infrastructure:
-    - Truenas:
-        href: https://citadel.${SECRET_DOMAIN}
-        icon: truenas.png
-        description: TrueNAS Dashboard
-        widget:
-          type: truenas
-          url: https://citadel.${SECRET_DOMAIN}
-          key: {{HOMEPAGE_VAR_TRUENAS_TOKEN}}
-          enablePools: true
-          nasType: scale
 # - Home:
 #     - Home-Assistant:
 #         href: https://hass.${SECRET_DOMAIN}

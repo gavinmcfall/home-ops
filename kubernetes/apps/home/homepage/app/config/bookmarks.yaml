@@ -36,3 +36,6 @@
     - home-ops:
         - icon: github.png
           href: "https://github.com/gavinmcfall/home-ops"
+    - Weave-Gitops:
+        - icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/weave-gitops.png
+          href: "https://gitops.nerdz.cloud/"

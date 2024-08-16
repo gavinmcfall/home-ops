@@ -31,11 +31,6 @@ spec:
       enabled: true
       className: internal
       annotations:
-        gethomepage.dev/enabled: "true"
-        gethomepage.dev/group: Infrastructure
-        gethomepage.dev/name: Weave-gitops
-        gethomepage.dev/icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/weave.png
-        gethomepage.dev/description: Flux Dashboard
         external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
       hosts:
         - host: "gitops.${SECRET_DOMAIN}"
