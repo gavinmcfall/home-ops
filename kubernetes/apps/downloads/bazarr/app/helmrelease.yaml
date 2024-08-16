@@ -6,7 +6,7 @@ metadata:
   name: &app bazarr
 commonMetadata:
   labels:
-    app.kubernetes.io/name: *app
+    app.kubernetes.io/name: bazarr-app
 spec:
   interval: 30m
   chart:
