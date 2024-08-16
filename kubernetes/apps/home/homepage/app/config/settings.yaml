@@ -19,11 +19,8 @@ layout:
     style: row
     columns: 3
     icon: mdi-network
-  Calendar:
-    style: column
-    # icon: mdi-calendar
-  Streaming:
-    style: column
+  Events:
+    style: row
     # icon: mdi-calendar
   Infrastructure:
     style: row
