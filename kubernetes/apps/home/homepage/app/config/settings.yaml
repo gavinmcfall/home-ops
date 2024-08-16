@@ -21,7 +21,10 @@ layout:
     icon: mdi-network
   Calendar:
     style: column
-    icon: mdi-calendar
+    # icon: mdi-calendar
+  Streaming:
+    style: column
+    # icon: mdi-calendar
   Infrastructure:
     style: row
     columns: 2
