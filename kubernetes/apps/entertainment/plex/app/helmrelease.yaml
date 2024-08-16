@@ -94,7 +94,7 @@ spec:
       app:
         annotations:
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/group: Video
+          gethomepage.dev/group: Entertainment
           gethomepage.dev/name: Plex
           gethomepage.dev/app: *app
           gethomepage.dev/icon: plex.png
