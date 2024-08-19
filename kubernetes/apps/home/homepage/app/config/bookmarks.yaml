@@ -39,3 +39,19 @@
     - Weave-Gitops:
         - icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/weave-gitops.png
           href: "https://gitops.nerdz.cloud/"
+- TCG:
+    - Moxfield:
+        - icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/moxfield.png
+          href: "https://moxfield.com/"
+    - EDHREC:
+        - icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/edhrec.png
+          href: "https://edhrec.com/"
+    - Scryfall:
+        - icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/scryfall.png
+          href: "https://scryfall.com/"
+    - Gatherer:
+        - icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/mtg.png
+          href: "https://gatherer.wizards.com/"
+    - Card Kingdom:
+        - icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/card-kingdom.png
+          href: "https://www.cardkingdom.com/"
