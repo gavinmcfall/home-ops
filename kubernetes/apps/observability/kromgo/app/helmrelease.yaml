@@ -39,7 +39,7 @@ spec:
               SERVER_PORT: &port 80
               HEALTH_HOST: 0.0.0.0
               HEALTH_PORT: &healthport 8888
-             probes:
+            probes:
               liveness: &probes
                 enabled: true
                 custom: true
