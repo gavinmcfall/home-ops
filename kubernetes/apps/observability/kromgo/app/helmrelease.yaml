@@ -37,13 +37,13 @@ spec:
               PROMETHEUS_URL: http://prometheus-operated.observability.svc.cluster.local:9090
               PORT: &port 80
             probes:
-              liveness: &probes
+              liveness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
                     path: /-/healh
-                    port: *8888
+                    port: 8888
                   initialDelaySeconds: 20
                   periodSeconds: 10
                   timeoutSeconds: 1
@@ -54,7 +54,7 @@ spec:
                 spec:
                   httpGet:
                     path: /-/ready
-                    port: *8888
+                    port: 8888
                   initialDelaySeconds: 20
                   periodSeconds: 10
                   timeoutSeconds: 1
