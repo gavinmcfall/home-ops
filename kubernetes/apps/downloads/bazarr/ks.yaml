@@ -26,4 +26,4 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 5Gi
       GATUS_PATH: /api/system/status
-      GATUS_STATUS: "401"
+      GATUS_STATUS: "200"
