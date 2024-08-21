@@ -20,5 +20,7 @@ data:
           query-type: A
         conditions:
           - "len([BODY]) == 0"
+        headers:
+          - X-Api-Key: ${GATUS_API_KEY}
         alerts:
           - type: pushover

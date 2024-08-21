@@ -27,3 +27,8 @@ spec:
       VOLSYNC_CAPACITY: 5Gi
       GATUS_PATH: /api/system/status
       GATUS_STATUS: "200"
+      GATUS_API_KEY: $BAZARR__API_KEY
+    substituteFrom:
+      - kind: Secret
+        name: bazarr-secret
+        optional: false
