@@ -79,6 +79,7 @@ spec:
               GITSYNC_REF: master
               GITSYNC_PERIOD: 24h
               GITSYNC_ROOT: /add-ons
+              GATUS_API_KEY: $BAZARR__API_KEY
             resources:
               requests:
                 cpu: 10m
