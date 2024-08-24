@@ -118,5 +118,4 @@ spec:
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media/Library/Books
-            subPath: Library/Books
+          - path: /media
