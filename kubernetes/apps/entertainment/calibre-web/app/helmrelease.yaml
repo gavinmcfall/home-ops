@@ -85,7 +85,7 @@ spec:
         globalMounts:
           - path: /cache
       config:
-        existingClaim: calibre-web-config
+        existingClaim: calibre-web
       media:
         type: nfs
         server: citadel.internal
