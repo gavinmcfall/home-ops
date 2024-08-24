@@ -6,6 +6,7 @@ resources:
 
   # Applications
   - ./audiobookshelf/ks.yaml
+  - ./calibre-web/ks.yaml
   - ./kavita/ks.yaml
   - ./overseerr/ks.yaml
   - ./plex/ks.yaml
