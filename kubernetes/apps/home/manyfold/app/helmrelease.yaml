@@ -99,6 +99,9 @@ spec:
           gethomepage.dev/icon: manyfold
           gethomepage.dev/description: STL Library
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          nginx.ingress.kubernetes.io/proxy-body-size: '0'
+          nginx.ingress.kubernetes.io/proxy-read-timeout: '600'
+          nginx.ingress.kubernetes.io/proxy-send-timeout: '600'
         className: external
         hosts:
           - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
