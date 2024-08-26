@@ -23,7 +23,7 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: postgres16
+    - name: cloudnative-pg
       namespace: database
     - name: dragongfly
       namespace: database
