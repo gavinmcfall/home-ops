@@ -6,5 +6,5 @@ resources:
   # Applications
   - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
-  - ./manfold/ks.yaml
+  - ./manyfold/ks.yaml
   # - ./thelounge/ks.yaml
