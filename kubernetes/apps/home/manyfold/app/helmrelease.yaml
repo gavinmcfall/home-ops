@@ -48,6 +48,8 @@ spec:
             env:
               DATABASE_ADAPTER: postgresql
               PORTS: &port 3214
+              PUID: 1000
+              PGID: 1000
               TZ: ${TIMEZONE}
             envFrom: *envFrom
             probes:
@@ -72,15 +74,15 @@ spec:
                 cpu: 100m
               limits:
                 memory: 2Gi
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: false
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [10000]
-        seccompProfile: { type: RuntimeDefault }
+    # defaultPodOptions:
+    #   securityContext:
+    #     runAsNonRoot: false
+    #     runAsUser: 1000
+    #     runAsGroup: 1000
+    #     fsGroup: 1000
+    #     fsGroupChangePolicy: OnRootMismatch
+    #     supplementalGroups: [10000]
+    #     seccompProfile: { type: RuntimeDefault }
     service:
       app:
         controller: manyfold
