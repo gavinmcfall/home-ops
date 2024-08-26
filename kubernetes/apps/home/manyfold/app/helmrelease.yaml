@@ -29,7 +29,7 @@ spec:
       namespace: database
   values:
     controllers:
-      sonarr:
+      manyfold:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
