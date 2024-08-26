@@ -64,7 +64,7 @@ spec:
                   failureThreshold: 3
               readiness: *probes
             securityContext:
-              allowPrivilegeEscalation: false
+              allowPrivilegeEscalation: true
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
             resources:
