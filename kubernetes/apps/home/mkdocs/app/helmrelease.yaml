@@ -1,0 +1,106 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app mkdocs
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.3.2
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      mkdocs:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          git-clone:
+            image:
+              repository: alpine/git
+              tag: latest
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                git config --global credential.helper store && \
+                echo "https://${username}:${password}@github.com" > /root/.git-credentials && \
+                git clone --single-branch --branch=<YOUR_BRANCH> https://github.com/your-org/your-repo.git /docs
+            envFrom:
+              - secretRef:
+                  name: mkdocs-secret
+        containers:
+          app:
+            image:
+              repository: squidfunk/mkdocs-material
+              tag: 9@sha256:7132ca3957c1fc325443579356fcc68696cd1aa54c715ce61228ea5e0b2d427a
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: &port 8000
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 2Gi
+    service:
+      app:
+        controller: mkdocs
+        ports:
+          http:
+            port: *port
+    ingress:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Home
+          gethomepage.dev/name: MKDocs
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: mkdocs
+          gethomepage.dev/description: Internal Documentation
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        className: internal
+        hosts:
+          - host: "docs.${SECRET_DOMAIN}"
+            paths: &paths
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
+persistence:
+  mkdocs-volume:
+    type: emptyDir
