@@ -48,9 +48,9 @@ spec:
               tag: 0.76.1@sha256:1d223361bf75fbdec3209e9468009a3f5904ef483837315ad236417940aea190
             env:
               DATABASE_ADAPTER: postgresql
-              PORTS: &port 3214
-              PUID: 1000
-              PGID: 1000
+              # PORTS: &port 3214
+              # PUID: 1000
+              # PGID: 1000
               MULTIUSER: enabled
               TZ: ${TIMEZONE}
             envFrom: *envFrom
@@ -88,7 +88,7 @@ spec:
         controller: manyfold
         ports:
           http:
-            port: *port
+            port: 3214
     ingress:
       app:
         annotations:
