@@ -126,6 +126,7 @@ spec:
       tmpfs:
         enabled: true
         type: emptyDir
+        medium: Memory
         advancedMounts:
           manyfold:
             main:
