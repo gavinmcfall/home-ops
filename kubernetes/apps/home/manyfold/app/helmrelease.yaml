@@ -124,3 +124,10 @@ spec:
         path: /mnt/storage0/media
         globalMounts:
           - path: /media
+      tmpfs:
+        enabled: true
+        type: emptyDir
+        advancedMounts:
+          manyfold:
+            main:
+              - path: /app/tmp
