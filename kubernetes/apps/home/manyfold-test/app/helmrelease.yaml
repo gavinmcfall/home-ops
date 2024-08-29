@@ -37,10 +37,9 @@ spec:
               DATABASE_USER: &dbUser manyfold
               DATABASE_PASSWORD: &dbPassword password
               DATABASE_NAME: manyfold
-              MULTIUSER: false
+              MULTIUSER: true
               PORT: &port 3214
               REDIS_URL: redis://manyfold-test-redis.home.svc.cluster.local:6379
-              REGISTRATION: false
               SECRET_KEY_BASE: placeholder
             probes:
               liveness: &probes
