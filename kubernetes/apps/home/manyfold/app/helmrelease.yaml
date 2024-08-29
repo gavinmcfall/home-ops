@@ -51,8 +51,6 @@ spec:
               PORTS: &port 3214
               MULTIUSER: enabled
               TZ: ${TIMEZONE}
-              PUID: 1000
-              PGID: 1000
             envFrom: *envFrom
             probes:
               liveness: &probes
@@ -69,19 +67,19 @@ spec:
               readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
-              # readOnlyRootFilesystem: true
+              readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
               limits:
                 memory: 2Gi
-    # defaultPodOptions:
-    #   securityContext:
-    #     runAsUser: 568
-    #     runAsGroup: 568
-    #     fsGroup: 568
-    #     fsGroupChangePolicy: OnRootMismatch
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
     service:
       app:
         controller: manyfold
@@ -131,4 +129,7 @@ spec:
         advancedMounts:
           manyfold:
             main:
-              - path: /app/tmp
+              - path: /tmp
+              - path: /usr/src/app/tmp
+              - path: /usr/src/app/log
+              - path: /run
