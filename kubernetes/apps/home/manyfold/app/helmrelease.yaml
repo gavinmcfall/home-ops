@@ -50,6 +50,9 @@ spec:
               DATABASE_ADAPTER: postgresql
               PORTS: &port 3214
               MULTIUSER: enabled
+              TZ: ${TIMEZONE}
+              PUID: 1000
+              PGID: 1000
             envFrom: *envFrom
             probes:
               liveness: &probes
@@ -73,12 +76,12 @@ spec:
                 cpu: 100m
               limits:
                 memory: 2Gi
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
-        fsGroupChangePolicy: OnRootMismatch
+    # defaultPodOptions:
+    #   securityContext:
+    #     runAsUser: 568
+    #     runAsGroup: 568
+    #     fsGroup: 568
+    #     fsGroupChangePolicy: OnRootMismatch
     service:
       app:
         controller: manyfold
