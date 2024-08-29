@@ -132,10 +132,7 @@ spec:
               - path: /tmp
                 readOnly: false
             second:
-              - path: /usr/src/app/tmp
-                readOnly: false
-            third:
-              - path: /usr/src/app/log
+              - path: /app/tmp
                 readOnly: false
             fourth:
               - path: /run
