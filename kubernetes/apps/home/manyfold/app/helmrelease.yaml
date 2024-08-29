@@ -140,12 +140,9 @@ spec:
         type: emptyDir
         advancedMounts:
           manyfold:
-            temp:
+            main: &tmpdirs
               - path: /tmp
-                readOnly: false
-            app-temp:
+                subPath: host-tmp
               - path: /app/tmp
-                readOnly: false
-            run:
-              - path: /run
-                readOnly: false
+                subPath: app-tmp
+            chown-tmpdirs: *tmpdirs
