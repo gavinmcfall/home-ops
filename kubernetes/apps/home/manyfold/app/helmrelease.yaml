@@ -129,7 +129,4 @@ spec:
         advancedMounts:
           manyfold:
             main:
-              - path: /tmp
-              - path: /usr/src/app/tmp
-              - path: /usr/src/app/log
-              - path: /run
+              - path: /app/tmp
