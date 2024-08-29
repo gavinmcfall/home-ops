@@ -130,3 +130,4 @@ spec:
           manyfold:
             main:
               - path: /app/tmp
+                readOnly: false
