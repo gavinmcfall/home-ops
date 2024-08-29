@@ -33,13 +33,13 @@ spec:
               tag: 0.76.1@sha256:f67e049e3584f94c06a51e28075aa1f7622fdaaad4edc4f9f97df60368620e1f
             env:
               DATABASE_ADAPTER: postgresql
-              DATABASE_HOST: manyfold-test-postgres.default.svc.cluster.local
+              DATABASE_HOST: manyfold-test-postgres.home.svc.cluster.local
               DATABASE_USER: &dbUser manyfold
               DATABASE_PASSWORD: &dbPassword password
               DATABASE_NAME: manyfold
               MULTIUSER: false
               PORT: &port 3214
-              REDIS_URL: redis://manyfold-test-redis.default.svc.cluster.local:6379
+              REDIS_URL: redis://manyfold-test-redis.home.svc.cluster.local:6379
               REGISTRATION: false
               SECRET_KEY_BASE: placeholder
             probes:
