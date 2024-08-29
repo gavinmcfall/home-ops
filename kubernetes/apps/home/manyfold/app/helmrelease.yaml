@@ -45,12 +45,11 @@ spec:
           app:
             image:
               repository: ghcr.io/bjw-s/manyfold
-              tag: 0.76.1@sha256:f67e049e3584f94c06a51e28075aa1f7622fdaaad4edc4f9f97df60368620e1f
+              tag: 0.76.1@sha256:721c5d8a0432ac9f47cac3c14f5246642c4a8539f24ee158c6c548ed683c9789
             env:
               DATABASE_ADAPTER: postgresql
               PORTS: &port 3214
               MULTIUSER: enabled
-              TZ: ${TIMEZONE}
             envFrom: *envFrom
             probes:
               liveness: &probes
