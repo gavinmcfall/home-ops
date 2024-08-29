@@ -1,0 +1,131 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: manyfold-test
+  namespace: default
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.4.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      manyfold-test:
+        pod:
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+        containers:
+          main:
+            image:
+              repository: ghcr.io/bjw-s/manyfold
+              tag: 0.76.1@sha256:f67e049e3584f94c06a51e28075aa1f7622fdaaad4edc4f9f97df60368620e1f
+            env:
+              DATABASE_ADAPTER: postgresql
+              DATABASE_HOST: manyfold-test-postgres.default.svc.cluster.local
+              DATABASE_USER: &dbUser manyfold
+              DATABASE_PASSWORD: &dbPassword password
+              DATABASE_NAME: manyfold
+              MULTIUSER: false
+              PORT: &port 3214
+              REDIS_URL: redis://manyfold-test-redis.default.svc.cluster.local:6379
+              REGISTRATION: false
+              SECRET_KEY_BASE: placeholder
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 2Gi
+
+      postgres:
+        containers:
+          postgres:
+            image:
+              repository: docker.io/postgres
+              tag: 15
+            env:
+              POSTGRES_USER: *dbUser
+              POSTGRES_PASSWORD: *dbPassword
+
+      redis:
+        containers:
+          redis:
+            image:
+              repository: docker.io/valkey/valkey
+              tag: 7.2.6
+            resources:
+              requests:
+                cpu: 5m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+
+    service:
+      app:
+        controller: manyfold-test
+        ports:
+          http:
+            port: *port
+      redis:
+        controller: redis
+        ports:
+          redis:
+            port: 6379
+      postgres:
+        controller: postgres
+        ports:
+          postgres:
+            port: 5432
+
+    persistence:
+      data:
+        type: emptyDir
+        advancedMounts:
+          manyfold-test:
+            main:
+              - path: /data/database
+                subPath: database
+              - path: /data/libraries/main
+                subPath: libraries/main
+      tmpfs:
+        enabled: true
+        type: emptyDir
+        advancedMounts:
+          manyfold-test:
+            main:
+              - path: /app/tmp
+      postgres:
+        enabled: true
+        type: emptyDir
+        advancedMounts:
+          postgres:
+            postgres:
+              - path: /var/lib/postgresql/data
