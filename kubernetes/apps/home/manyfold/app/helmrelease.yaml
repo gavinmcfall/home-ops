@@ -143,6 +143,8 @@ spec:
             main: &tmpdirs
               - path: /tmp
                 subPath: host-tmp
+                readOnly: false
               - path: /app/tmp
                 subPath: app-tmp
+                readOnly: false
             chown-tmpdirs: *tmpdirs
