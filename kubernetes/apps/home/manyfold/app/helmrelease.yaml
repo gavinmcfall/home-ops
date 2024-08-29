@@ -128,4 +128,4 @@ spec:
         advancedMounts:
           manyfold:
             main:
-              - path: /app/tmp/cache
+              - path: /app/tmp
