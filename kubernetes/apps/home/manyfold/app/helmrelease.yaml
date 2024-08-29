@@ -41,6 +41,18 @@ spec:
             envFrom: &envFrom
               - secretRef:
                   name: manyfold-secret
+          chown-tmpdirs:
+            image:
+              repository: docker.io/library/alpine
+              tag: 3.19
+            command:
+              - /bin/sh
+              - -c
+            args:
+              - |
+                chmod o-rwx /app/tmp /tmp
+            securityContext:
+              runAsUser: 0
         containers:
           app:
             image:
@@ -128,12 +140,12 @@ spec:
         type: emptyDir
         advancedMounts:
           manyfold:
-            main:
+            temp:
               - path: /tmp
                 readOnly: false
-            second:
+            app-temp:
               - path: /app/tmp
                 readOnly: false
-            fourth:
+            run:
               - path: /run
                 readOnly: false
