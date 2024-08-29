@@ -45,28 +45,26 @@ spec:
           app:
             image:
               repository: ghcr.io/bjw-s/manyfold
-              tag: 0.76.1@sha256:1d223361bf75fbdec3209e9468009a3f5904ef483837315ad236417940aea190
+              tag: 0.76.1@sha256:f67e049e3584f94c06a51e28075aa1f7622fdaaad4edc4f9f97df60368620e1f
             env:
               DATABASE_ADAPTER: postgresql
-              # PORTS: &port 3214
-              # PUID: 1000
-              # PGID: 1000
+              PORTS: &port 3214
               MULTIUSER: enabled
               TZ: ${TIMEZONE}
             envFrom: *envFrom
-            # probes:
-            #   liveness: &probes
-            #     enabled: true
-            #     custom: true
-            #     spec:
-            #       httpGet:
-            #         path: /health
-            #         port: *port
-            #       initialDelaySeconds: 0
-            #       periodSeconds: 10
-            #       timeoutSeconds: 1
-            #       failureThreshold: 3
-            #   readiness: *probes
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -88,7 +86,7 @@ spec:
         controller: manyfold
         ports:
           http:
-            port: 3214
+            port: *port
     ingress:
       app:
         annotations:
