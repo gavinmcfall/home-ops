@@ -30,7 +30,7 @@ spec:
           main:
             image:
               repository: ghcr.io/bjw-s/manyfold
-              tag: 0.76.1@sha256:f67e049e3584f94c06a51e28075aa1f7622fdaaad4edc4f9f97df60368620e1f
+              tag: 0.76.1@sha256:b61e63ca1e56090c8f17c3d973c98cf8fcbc6ea34c5c584e38eebde609aab35f
             env:
               DATABASE_ADAPTER: postgresql
               DATABASE_HOST: manyfold-test-postgres.home.svc.cluster.local
