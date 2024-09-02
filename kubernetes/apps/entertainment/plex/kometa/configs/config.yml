@@ -289,7 +289,7 @@ omdb:
   cache_expiration: 60
 
 plex:
-  url: http://plex.media:32400
+  url: http://plex.entertainment:32400
   token: <<PLEX_API_KEY>>
   timeout: 60
   clean_bundles: false
