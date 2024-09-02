@@ -58,28 +58,28 @@ spec:
             image:
               repository: ghcr.io/bjw-s/manyfold
               tag: 0.76.1@sha256:b61e63ca1e56090c8f17c3d973c98cf8fcbc6ea34c5c584e38eebde609aab35f
-            command:
-              - sleep
-              - infinity
+            # command:
+            #   - sleep
+            #   - infinity
             env:
               DATABASE_ADAPTER: postgresql
               PORTS: &port 3214
               MULTIUSER: enabled
               TZ: ${TIMEZONE}
             envFrom: *envFrom
-            # probes:
-            #   liveness: &probes
-            #     enabled: true
-            #     custom: true
-            #     spec:
-            #       httpGet:
-            #         path: /health
-            #         port: *port
-            #       initialDelaySeconds: 0
-            #       periodSeconds: 10
-            #       timeoutSeconds: 1
-            #       failureThreshold: 3
-            #   readiness: *probes
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -143,7 +143,7 @@ spec:
         type: emptyDir
         advancedMounts:
           manyfold:
-            main: &tmpdirs
+            app: &tmpdirs
               - path: /tmp
                 subPath: host-tmp
                 readOnly: false
