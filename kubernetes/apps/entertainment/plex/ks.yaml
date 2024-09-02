@@ -85,7 +85,7 @@ metadata:
   name: &app kometa
   namespace: flux-system
 spec:
-  targetNamespace: media
+  targetNamespace: entertainment
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
