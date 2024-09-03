@@ -1,0 +1,112 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app redash
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      redash:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/buroa/postgres-init
+              tag: 16
+            envFrom: &envFrom
+              - secretRef:
+                  name: redash-secret
+        containers:
+          app:
+            image:
+              repository: redash/redash
+              tag: 10.1.0.b50633@sha256:f3e8d95656255d9684051604a586dfd50035fa1e297e68379dc1b557f1885c0f
+            env:
+              PYTHONUNBUFFERED: 0
+              REDASH_PRODUCTION: "true"
+              TZ: ${TIMEZONE}
+            envFrom: *envFrom
+            redash:
+              secretKey: "{{ .REDASH_SECRET_KEY }}"
+              cookieSecret: "{{ .REDASH_COOKIE_SECRET }}"
+            postgressql:
+              enabled: false
+            externalPostgreSQLSecret:
+              name: redash-secret
+              key:
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 90
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 10
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 100m
+                memory: 500Mi
+              limits:
+                cpu: 500Mi
+                memory: 3Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+    ingress:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        className: internal
+        hosts:
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths: &paths
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
