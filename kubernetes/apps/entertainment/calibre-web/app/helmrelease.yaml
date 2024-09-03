@@ -69,8 +69,8 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/group: Media
-          gethomepage.dev/name: Calibre
+          gethomepage.dev/group: Entertainment
+          gethomepage.dev/name: Calibre Web
           gethomepage.dev/icon: calibre.png
           gethomepage.dev/description: eBook Library
         hosts:
