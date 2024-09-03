@@ -7,5 +7,4 @@ resources:
   - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
   - ./manyfold/ks.yaml
-  # - ./manyfold-test/ks.yaml
-  # - ./thelounge/ks.yaml
+  - ./thelounge/ks.yaml
