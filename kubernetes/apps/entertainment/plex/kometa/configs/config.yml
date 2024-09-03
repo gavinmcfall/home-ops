@@ -26,7 +26,7 @@ libraries:
       mass_critic_rating_update: mdb_metacritic
       mass_user_rating_update: imdb
     sonarr:
-      root_folder_path: "/mnt/storage0/media/Library/Anime"
+      root_folder_path: "/media/Library/Anime"
       quality_profile: HD - Anime
       series_type: anime
 
@@ -90,7 +90,7 @@ libraries:
       token: <<RADARR_UHD_API_KEY>>
       add_missing: false
       add_existing: false
-      root_folder_path: "/mnt/storage0/media/Library/Movies - UHD"
+      root_folder_path: "/media/Library/Movies - UHD"
       monitor: true
       availability: announced
       quality_profile: UHD
@@ -168,7 +168,7 @@ libraries:
       token: <<SONARR_UHD_API_KEY>>
       add_missing: false
       add_existing: false
-      root_folder_path: "/mnt/storage0/media/Library/Television - UHD"
+      root_folder_path: "/media/Library/Television - UHD"
       monitor: all
       quality_profile: HD
       language_profile: English
@@ -217,7 +217,7 @@ libraries:
       token: <<SONARR_FOREIGN_API_KEY>>
       add_missing: false
       add_existing: false
-      root_folder_path: "/mnt/storage0/media/Library/Television - Foreign"
+      root_folder_path: "/media/Library/Television - Foreign"
       monitor: all
       quality_profile: HD
       language_profile: Mandarin
@@ -301,7 +301,7 @@ radarr:
   token: <<RADARR_API_KEY>>
   add_missing: false
   add_existing: false
-  root_folder_path: "/mnt/storage0/media/Library/Movies"
+  root_folder_path: "/media/Library/Movies"
   monitor: true
   availability: announced
   quality_profile: HD
@@ -316,7 +316,7 @@ sonarr:
   token: <<SONARR_API_KEY>>
   add_missing: false
   add_existing: false
-  root_folder_path: "/mnt/storage0/media/Library/Television"
+  root_folder_path: "/media/Library/Television"
   monitor: all
   quality_profile: HD
   language_profile: English
