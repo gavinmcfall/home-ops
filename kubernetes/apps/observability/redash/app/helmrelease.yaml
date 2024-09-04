@@ -31,8 +31,7 @@ spec:
     # initContainers -- Redash global init containers
     initContainers:
       - name: init-db
-        image:
-          repository: "ghcr.io/buroa/postgres-init:16"
+        image: "ghcr.io/buroa/postgres-init:16"
         envFrom:
           - secretRef:
               name: redash-secret
