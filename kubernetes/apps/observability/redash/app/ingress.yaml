@@ -1,0 +1,41 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  annotations:
+    gethomepage.dev/href: "https://redash.${SECRET_DOMAIN}"
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/app: redash
+    gethomepage.dev/group: Other
+    gethomepage.dev/icon: mdi-database-search
+    gethomepage.dev/name: Redash
+    external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+
+spec:
+  ingressClassName: internal
+  rules:
+    - host: redash.${SECRET_DOMAIN}
+      http:
+        paths: &paths
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: &app redash
+                port:
+                  name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tailscale-ingress
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: *app
+      http:
+        paths: *paths
+  tls:
+    - hosts:
+        - *app
