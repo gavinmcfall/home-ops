@@ -32,7 +32,7 @@ spec:
     initContainers:
       - name: init-db
         image:
-          repository: ghcr.io/buroa/postgres-init:16
+          repository: "ghcr.io/buroa/postgres-init:16"
         envFrom:
           - secretRef:
               name: redash-secret
