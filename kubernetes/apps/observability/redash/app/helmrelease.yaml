@@ -1,112 +1,61 @@
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: &app redash
-spec:
-  interval: 30m
-  chart:
-    spec:
-      chart: app-template
-      version: 3.4.0
-      sourceRef:
-        kind: HelmRepository
-        name: bjw-s
-        namespace: flux-system
-  install:
-    remediation:
-      retries: 3
-  upgrade:
-    cleanupOnFail: true
-    remediation:
-      strategy: rollback
-      retries: 3
-  values:
-    controllers:
-      redash:
-        annotations:
-          reloader.stakater.com/auto: "true"
-        initContainers:
-          init-db:
-            image:
-              repository: ghcr.io/buroa/postgres-init
-              tag: 16
-            envFrom: &envFrom
-              - secretRef:
-                  name: redash-secret
-        containers:
-          app:
-            image:
-              repository: redash/redash
-              tag: 10.1.0.b50633@sha256:f3e8d95656255d9684051604a586dfd50035fa1e297e68379dc1b557f1885c0f
-            env:
-              PYTHONUNBUFFERED: 0
-              REDASH_PRODUCTION: "true"
-              TZ: ${TIMEZONE}
-            envFrom: *envFrom
-            redash:
-              secretKey: "{{ .REDASH_SECRET_KEY }}"
-              cookieSecret: "{{ .REDASH_COOKIE_SECRET }}"
-            postgressql:
-              enabled: false
-            externalPostgreSQLSecret:
-              name: redash-secret
-              key:
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /ping
-                    port: &port 80
-                  initialDelaySeconds: 90
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 10
-              readiness: *probes
-            resources:
-              requests:
-                cpu: 100m
-                memory: 500Mi
-              limits:
-                cpu: 500Mi
-                memory: 3Gi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
-    ingress:
-      app:
-        annotations:
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-      tailscale:
-        enabled: true
-        className: tailscale
-        hosts:
-          - host: "{{ .Release.Name }}"
-            paths: *paths
-        tls:
-          - hosts:
-              - *app
+image:
+  registry: docker.io
+  repo: redash/redash
+  # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
+  tag: 10.1.0.b50633@sha256:f3e8d95656255d9684051604a586dfd50035fa1e297e68379dc1b557f1885c0f
+  pullPolicy: IfNotPresent
+
+env:
+  PYTHONUNBUFFERED: 0
+  REDASH_PRODUCTION: "true"
+envFrom:
+  - secretRef:
+      name: redash-secret
+
+# initContainers -- Redash global init containers
+initContainers:
+  init-db:
+  image:
+    repository: ghcr.io/buroa/postgres-init
+    tag: 16
+  envFrom:
+    - secretRef:
+        name: redash-secret
+
+## Redash application configuration
+redash:
+  # -- REQUIRED `REDASH_SECRET_KEY` value. Secret key used for data encryption. Stored as a Secret value.
+  secretKey: "{{ .Values.env.REDASH_SECRET_KEY }}"
+  # -- REQUIRED `REDASH_COOKIE_SECRET` value. Required. used for various cryptographic features of the web server. read more about how redash uses secret keys [here]({% link _kb/open-source/admin-guide/secrets.md %}). Stored as a Secret value.
+  cookieSecret: "{{ .Values.env.REDASH_COOKIE_SECRET }}"
+
+# externalPostgreSQLSecret -- Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
+externalPostgreSQLSecret:
+  name: redash-secret
+  key: "{{ .Values.env.REDASH_POSTGRES_CONNECTION_STRING }}"
+
+## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/README.md)
+postgresql:
+  # postgresql.enabled -- Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.
+  enabled: true
+  primary:
     service:
-      app:
-        controller: *app
-        ports:
-          http:
-            port: *port
+      ports:
+        postgresql: 5432
+
+# externalRedisSecret -- Read external Redis configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
+externalRedisSecret:
+  name: redash-secret
+  key: "{{ .Values.env.REDASH_REDIS_CONNECTION_STRING }}"
+
+## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/redis/README.md)
+redis:
+  # redis.enabled -- Whether to deploy a Redis server to satisfy the applications database requirements. To use an external Redis set this to false and configure the externalRedis parameter.
+  enabled: true
+  database: 0
+  master:
+    service:
+      ports:
+        redis: 6379
+  replica:
+    replicaCount: 0
