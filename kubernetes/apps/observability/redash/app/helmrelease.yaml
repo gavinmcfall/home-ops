@@ -18,7 +18,7 @@ spec:
       registry: docker.io
       repo: redash/redash
       # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
-      tag: 10.1.0.b50633@sha256:f3e8d95656255d9684051604a586dfd50035fa1e297e68379dc1b557f1885c0f
+      tag: 10.1.0.b50633
       pullPolicy: IfNotPresent
 
     env:
@@ -32,8 +32,7 @@ spec:
     initContainers:
       - name: init-db
         image:
-          repository: ghcr.io/buroa/postgres-init
-          tag: 16
+          repository: ghcr.io/buroa/postgres-init:16
         envFrom:
           - secretRef:
               name: redash-secret
