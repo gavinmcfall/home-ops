@@ -1,0 +1,119 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: wikijs
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16.3@sha256:8ba3204f6b293dd168766009aae2ce4fa986a29b931c2d30ac1b30238ac750b8
+            envFrom:
+              - secretRef:
+                  name: wikijs-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/requarks/wiki
+              pullPolicy: IfNotPresent
+              tag: "2.5.303@sha256:1aae39563cf15d8cfc6371b6d33805653d9348a1af944a8be4501db36f120b84"
+            env:
+              TZ: ${TIMEZONE}
+              APP_URL: "https://wiki.${SECRET_DOMAIN}"
+            envFrom:
+              - secretRef:
+                  name: wikijs-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  initialDelaySeconds: 15
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  successThreshold: 1
+                  failureThreshold: 60
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 2Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: wikijs
+        ports:
+          http:
+            port: 3000
+    ingress:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Home
+          gethomepage.dev/name: Wiki
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: wikijs-text
+          gethomepage.dev/description: Internal wiki
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        className: external
+        hosts:
+          - host: "wiki.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+    persistence:
+      sshkey:
+        enabled: true
+        type: secret
+        name: wikijs-secret
+        items:
+          - key: id_rsa
+            path: id_rsa
+        globalMounts:
+          - path: /home/node/.ssh
