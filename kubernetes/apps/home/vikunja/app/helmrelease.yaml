@@ -48,7 +48,7 @@ spec:
               tag: 0.22.1@sha256:c9415431e6235229302bb8f9ee6660b74c24859d1e8adbc4a3e25bd418604b57
             envFrom: *envFrom
             env:
-              VIKUNJA_MAILER_HOST: smtp-relay.home.svc.cluster.local.
+              VIKUNJA_MAILER_HOST: smtp-relay.home.svc.cluster.local
               VIKUNJA_MAILER_PORT: "2525"
               VIKUNJA_MAILER_FROMEMAIL: Vikunja <vikunja@${SECRET_DOMAIN}>
             resources:
@@ -88,6 +88,9 @@ spec:
                 service:
                   identifier: app
                   port: http
+        tls:
+          - hosts:
+              - *host
     persistence:
       config:
         enabled: true
