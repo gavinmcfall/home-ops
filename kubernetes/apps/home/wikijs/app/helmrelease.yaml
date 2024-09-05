@@ -28,7 +28,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      app:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -107,13 +107,3 @@ spec:
                 service:
                   identifier: app
                   port: http
-    persistence:
-      sshkey:
-        enabled: true
-        type: secret
-        name: wikijs-secret
-        items:
-          - key: id_rsa
-            path: id_rsa
-        globalMounts:
-          - path: /home/node/.ssh
