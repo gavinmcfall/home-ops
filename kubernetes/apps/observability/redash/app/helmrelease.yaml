@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: redash # Matches the HelmRepository name in your file
         namespace: flux-system
-      version: 3.1.0-alpha6
+      version: 3.1.0-alpha9
   interval: 5m
   values:
     image:
