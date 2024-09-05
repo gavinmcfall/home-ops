@@ -28,7 +28,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      app:
+      wikijs:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -40,7 +40,7 @@ spec:
               - secretRef:
                   name: wikijs-secret
         containers:
-          wikijs:
+          app:
             image:
               repository: ghcr.io/requarks/wiki
               pullPolicy: IfNotPresent
