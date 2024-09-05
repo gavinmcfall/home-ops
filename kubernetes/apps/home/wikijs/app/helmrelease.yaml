@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: wikijs
+  name: &app wikijs
 spec:
   interval: 15m
   chart:
@@ -58,7 +58,7 @@ spec:
                 spec:
                   httpGet:
                     path: /healthz
-                    port: *port
+                    port: 80
                   initialDelaySeconds: 15
                   periodSeconds: 5
                   timeoutSeconds: 5
