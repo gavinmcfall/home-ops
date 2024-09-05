@@ -48,7 +48,7 @@ spec:
               tag: 0.22.1@sha256:c9415431e6235229302bb8f9ee6660b74c24859d1e8adbc4a3e25bd418604b57
             envFrom: *envFrom
             env:
-              VIKUNJA_MAILER_HOST: smtp-relay.default.svc.cluster.local.
+              VIKUNJA_MAILER_HOST: smtp-relay.home.svc.cluster.local.
               VIKUNJA_MAILER_PORT: "2525"
               VIKUNJA_MAILER_FROMEMAIL: Vikunja <vikunja@${SECRET_DOMAIN}>
             resources:
@@ -73,21 +73,14 @@ spec:
             port: 8080
     ingress:
       app:
-        enabled: true
-        className: nginx
         annotations:
-          external-dns.alpha.kubernetes.io/enabled: "true"
-          external-dns.alpha.kubernetes.io/target: services.${SECRET_DOMAIN}.
-          hajimari.io/icon: mdi:format-list-checks
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Vikunja
           gethomepage.dev/description: Tasks and project management platform.
-          gethomepage.dev/group: Applications
+          gethomepage.dev/group: ApplicationsHome
           gethomepage.dev/icon: vikunja.png
-          gethomepage.dev/pod-selector: >-
-            app in (
-              vikunja
-            )
+        className: external
         hosts:
           - host: &host "{{ .Release.Name }}.${SECRET_EXTERNAL_DOMAIN}"
             paths:
@@ -95,9 +88,6 @@ spec:
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *host
     persistence:
       config:
         enabled: true
