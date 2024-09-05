@@ -18,9 +18,7 @@ spec:
   dependsOn:
     - name: external-secrets-stores
     - name: rook-ceph-cluster
-      namespace: rook-ceph
     - name: volsync
-      namespace: volsync-system
   wait: false
   interval: 30m
   retryInterval: 1m
