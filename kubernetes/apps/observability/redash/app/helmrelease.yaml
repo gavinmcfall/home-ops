@@ -39,14 +39,13 @@ spec:
     ## Redash application configuration
     redash:
       # -- REQUIRED `REDASH_SECRET_KEY` value. Secret key used for data encryption. Stored as a Secret value.
-      secretKey: "{{ .Values.env.REDASH_SECRET_KEY }}"
+      secretKey: { { .Values.env.REDASH_SECRET_KEY } }
       # -- REQUIRED `REDASH_COOKIE_SECRET` value. Required. used for various cryptographic features of the web server. read more about how redash uses secret keys [here]({% link _kb/open-source/admin-guide/secrets.md %}). Stored as a Secret value.
-      cookieSecret: "{{ .Values.env.REDASH_COOKIE_SECRET }}"
+      cookieSecret: { { .Values.env.REDASH_COOKIE_SECRET } }
 
     # externalPostgreSQLSecret -- Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
-    externalPostgreSQLSecret:
-      name: redash-secret
-      key: "{{ .Values.env.REDASH_POSTGRES_CONNECTION_STRING }}"
+    externalPostgreSQL:
+      { { .Values.REDASH_POSTGRES_CONNECTION_STRING | quote } }
 
     ## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/README.md)
     postgresql:
@@ -54,9 +53,7 @@ spec:
       enabled: false
 
     # externalRedisSecret -- Read external Redis configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
-    externalRedisSecret:
-      name: redash-secret
-      key: "{{ .Values.env.REDASH_REDIS_CONNECTION_STRING }}"
+    externalRedisSecret: { { .Values.REDASH_REDIS_CONNECTION_STRING | quote } }
 
     ## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/redis/README.md)
     redis:
