@@ -69,7 +69,7 @@ spec:
           gethomepage.dev/group: Home
           gethomepage.dev/name: Wiki
           gethomepage.dev/app: *app
-          gethomepage.dev/icon: wikijs-text
+          gethomepage.dev/icon: si-XX-#1976D2
           gethomepage.dev/description: Internal wiki
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         className: external
@@ -80,10 +80,3 @@ spec:
                 service:
                   identifier: app
                   port: http
-    # persistence:
-    #   cache:
-    #     type: persistentVolumeClaim
-    #     accessMode: ReadWriteOnce
-    #     size: 1Gi
-    #     globalMounts:
-    #       - path: /wiki/data
