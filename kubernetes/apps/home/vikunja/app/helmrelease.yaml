@@ -1,0 +1,118 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app vikunja
+  namespace: default
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      vikunja:
+        annotations:
+          reloader.stakater.com/auto: "true"
+          configmap.reloader.stakater.com/reload: lidarr-pushover
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16
+            envFrom: &envFrom
+              - secretRef:
+                  name: vikunja-secret
+        containers:
+          app:
+            image:
+              repository: vikunja/api
+              tag: 0.22.1@sha256:c9415431e6235229302bb8f9ee6660b74c24859d1e8adbc4a3e25bd418604b57
+            envFrom: *envFrom
+            env:
+              VIKUNJA_MAILER_HOST: smtp-relay.default.svc.cluster.local.
+              VIKUNJA_MAILER_PORT: "2525"
+              VIKUNJA_MAILER_FROMEMAIL: Vikunja <vikunja@${SECRET_DOMAIN}>
+            resources:
+              requests:
+                cpu: 5m
+                memory: 10Mi
+              limits:
+                memory: 100Mi
+          frontend:
+            image:
+              repository: vikunja/frontend
+              tag: 0.22.1@sha256:f0223d441997fe29c377d0b476dc4bb2fc091b44b9c24d76b1b88c213df520c5
+          proxy:
+            image:
+              repository: caddy
+              tag: 2.8.4-alpine@sha256:221bcf3be161b0d856bdb7bea76b42386d732d19348f79692404829532d83f4a
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 8080
+    ingress:
+      app:
+        enabled: true
+        className: nginx
+        annotations:
+          external-dns.alpha.kubernetes.io/enabled: "true"
+          external-dns.alpha.kubernetes.io/target: services.${SECRET_DOMAIN}.
+          hajimari.io/icon: mdi:format-list-checks
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Vikunja
+          gethomepage.dev/description: Tasks and project management platform.
+          gethomepage.dev/group: Applications
+          gethomepage.dev/icon: vikunja.png
+          gethomepage.dev/pod-selector: >-
+            app in (
+              vikunja
+            )
+        hosts:
+          - host: &host "{{ .Release.Name }}.${SECRET_EXTERNAL_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+    persistence:
+      config:
+        enabled: true
+        existingClaim: *app
+        globalMounts:
+          - path: /app/vikunja/files
+      caddy-config:
+        type: configMap
+        name: vikunja-configmap
+        globalMounts:
+          - path: /etc/caddy/Caddyfile
+            subPath: Caddyfile
+      vikunja-config:
+        type: configMap
+        name: vikunja-configmap
+        globalMounts:
+          - path: /etc/vikunja/config.yml
+            subPath: Vikunja.yaml
