@@ -17,8 +17,6 @@ spec:
     name: home-kubernetes
   dependsOn:
     - name: external-secrets-stores
-    - name: rook-ceph-cluster
-    - name: volsync
   wait: false
   interval: 30m
   retryInterval: 1m
