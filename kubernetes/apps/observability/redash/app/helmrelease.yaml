@@ -43,33 +43,22 @@ spec:
       # -- REQUIRED `REDASH_COOKIE_SECRET` value. Required. used for various cryptographic features of the web server. read more about how redash uses secret keys [here]({% link _kb/open-source/admin-guide/secrets.md %}). Stored as a Secret value.
       cookieSecret: "{{ .Values.env.REDASH_COOKIE_SECRET }}"
 
+    ## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/README.md)
+    postgresql:
+      # postgresql.enabled -- Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.
+      enabled: false
+
     # externalPostgreSQLSecret -- Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
     externalPostgreSQLSecret:
       name: redash-secret
       key: "{{ .Values.env.REDASH_POSTGRES_CONNECTION_STRING }}"
 
-    ## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/README.md)
-    postgresql:
-      # postgresql.enabled -- Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.
-      enabled: true
-      primary:
-        service:
-          ports:
-            postgresql: 5432
+    ## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/redis/README.md)
+    redis:
+      # redis.enabled -- Whether to deploy a Redis server to satisfy the applications database requirements. To use an external Redis set this to false and configure the externalRedis parameter.
+      enabled: false
 
     # externalRedisSecret -- Read external Redis configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
     externalRedisSecret:
       name: redash-secret
       key: "{{ .Values.env.REDASH_REDIS_CONNECTION_STRING }}"
-
-    ## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/redis/README.md)
-    redis:
-      # redis.enabled -- Whether to deploy a Redis server to satisfy the applications database requirements. To use an external Redis set this to false and configure the externalRedis parameter.
-      enabled: true
-      database: 0
-      master:
-        service:
-          ports:
-            redis: 6379
-      replica:
-        replicaCount: 0
