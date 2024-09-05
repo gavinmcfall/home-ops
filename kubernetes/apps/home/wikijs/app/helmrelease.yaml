@@ -69,7 +69,7 @@ spec:
           gethomepage.dev/group: Home
           gethomepage.dev/name: Wiki
           gethomepage.dev/app: *app
-          gethomepage.dev/icon: si-XX-#1976D2
+          gethomepage.dev/icon: si-wikidotjs
           gethomepage.dev/description: Internal wiki
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         className: external
