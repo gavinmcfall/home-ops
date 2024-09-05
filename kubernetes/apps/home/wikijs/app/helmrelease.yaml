@@ -51,20 +51,20 @@ spec:
             envFrom:
               - secretRef:
                   name: wikijs-secret
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /healthz
-                    port: 80
-                  initialDelaySeconds: 15
-                  periodSeconds: 5
-                  timeoutSeconds: 5
-                  successThreshold: 1
-                  failureThreshold: 60
-              readiness: *probes
+            # probes:
+            #   liveness: &probes
+            #     enabled: true
+            #     custom: true
+            #     spec:
+            #       httpGet:
+            #         path: /healthz
+            #         port: 80
+            #       initialDelaySeconds: 15
+            #       periodSeconds: 5
+            #       timeoutSeconds: 5
+            #       successThreshold: 1
+            #       failureThreshold: 60
+            #   readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
