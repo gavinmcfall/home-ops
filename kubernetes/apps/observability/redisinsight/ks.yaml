@@ -12,7 +12,9 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: dragonfly
+      namespace: database
     - name: volsync
+      namespace: volsync-system
   path: ./kubernetes/apps/observability/redisinsight/app
   prune: true
   sourceRef:
