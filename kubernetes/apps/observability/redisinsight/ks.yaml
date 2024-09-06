@@ -12,7 +12,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: dragonfly-operator
-    - name: volsync
+    - name: cluster-apps-volsync
   path: ./kubernetes/apps/observability/redisinsight/app
   prune: true
   sourceRef:
