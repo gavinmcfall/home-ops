@@ -10,6 +10,6 @@ configMapGenerator:
   - name: authentik-branding
     files:
       - ./branding/favicon.png
-      - ./branding/logo.svg
+      - ./branding/logo.png
     options:
       disableNameSuffixHash: true
