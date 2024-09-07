@@ -11,7 +11,7 @@ data:
       # This is the default auth mechanism and does not require any additional configuration.
       local:
         # Enable or disable local authentication
-        enabled: true
+        enabled: false
       # OpenID configuration will allow users to authenticate through a third-party OpenID Connect compatible provider.
       # The provider needs to support the `openid`, `profile` and `email` scopes.
       # **Note:** Some openid providers (like gitlab) only make the email of the user available through openid claims if they have set it to be publicly visible.
@@ -20,22 +20,28 @@ data:
       # to <frontend-url>/auth/openid/<auth key>. Please make sure to configure the redirect url with your third party
       # auth service accordingly if you're using the default Vikunja frontend.
       # Take a look at the [default config file](https://kolaente.dev/vikunja/api/src/branch/main/config.yml.sample) for more information about how to configure openid authentication.
-      # openid:
-      #   # Enable or disable OpenID Connect authentication
-      #   enabled: true
-      #   # The url to redirect clients to. Defaults to the configured frontend url. If you're using Vikunja with the official
-      #   # frontend, you don't need to change this value.
-      #   redirecturl: https://tasks.${CLUSTER_DOMAIN}/auth/openid/
-      #   # A list of enabled providers
-      #   providers:
-      #     # The name of the provider as it will appear in the frontend.
-      #     - name: authelia
-      #       # The auth url to send users to if they want to authenticate using OpenID Connect.
-      #       authurl: https://auth.${CLUSTER_DOMAIN}
-      #       # The client ID used to authenticate Vikunja at the OpenID Connect provider.
-      #       clientid: vikunja
-      #       # The client secret used to authenticate Vikunja at the OpenID Connect provider.
-      #       clientsecret: ${VIKUNJA_OAUTH_CLIENT_SECRET}
+      openid:
+        # Enable or disable OpenID Connect authentication
+        enabled: true
+        # The url to redirect clients to. Defaults to the configured frontend url. If you're using Vikunja with the official
+        # frontend, you don't need to change this value.
+        # redirecturl: {{ .VIKUNJA_OAUTH_REDIRECT_URL }}
+        # A list of enabled providers
+        providers:
+          # The name of the provider as it will appear in the frontend.
+          - name: OAuth
+            # The auth url to send users to if they want to authenticate using OpenID Connect.
+            authurl: {{ .VIKUNJA_OAUTH_AUTH_URL }}
+            # The logout url to send users to if they want to log out.
+            logouturl: {{ .VIKUNJA_OAUTH_LOGOUT_URL }}
+            # The client ID used to authenticate Vikunja at the OpenID Connect provider.
+            clientid: {{ .VIKUNJA_OAUTH_CLIENT_ID }}
+            # The client secret used to authenticate Vikunja at the OpenID Connect provider.
+            clientsecret: {{ .VIKUNJA_OAUTH_CLIENT_SECRET }}
+            # The scope necessary to use oidc.
+            # If you want to use the Feature to create and assign to vikunja teams via oidc, you have to add the custom "vikunja_scope" and check [openid.md](https://vikunja.io/docs/openid/).
+            # e.g. scope: openid email profile vikunja_scope
+            scope: openid email profile
   Caddyfile: |-
     {
       admin off
