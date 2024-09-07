@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   # apps
-  # - ./minio/ks.yaml
+  - ./minio/ks.yaml
