@@ -44,7 +44,7 @@ data:
             scope: openid email profile
   Caddyfile: |-
     {
-      admin on
+      admin off
       auto_https off
     }
     :8080 {
