@@ -59,15 +59,15 @@ spec:
 
     redis:
       local_setup: false
-      remote_redis_url: "{{ .PLANE_REDIS_CONNECTION_STRING }}"
+      remote_redis_url: "{{ .Values.secretRefs.plane-other-secrets.name.PLANE_REDIS_CONNECTION_STRING }}"
 
     postgres:
       local_setup: false
-      remote_pg_url: "{{ .PLANE_POSTGRES_CONNECTION_STRING }}"
+      remote_pg_url: "{{ .Values.secretRefs.plane-other-secrets.name.PLANE_POSTGRES_CONNECTION_STRING }}"
 
     minio:
       local_setup: false
-      remote_minio_url: "{{ .PLANE_MINIO_CONNECTION_STRING }}"
+      remote_minio_url: "{{ .Values.secretRefs.plane-other-secrets.name.PLANE_MINIO_CONNECTION_STRING }}"
 
     web:
       replicas: 1
@@ -121,23 +121,23 @@ spec:
 
     env:
       # POSTGRES DB VALUES
-      pgdb_username: "{{ .PLANE_POSTGRES_USER }}"
-      pgdb_password: "{{ .PLANE_POSTGRES_PASSWORD }}"
-      pgdb_name: "{{ .PLANE_POSTGRES_DB }}"
-      pgdb_remote_url: "{{ .PLANE_POSTGRES_CONNECTION_STRING }}"
+      pgdb_username: "{{ .Values.secretRefs.plane-other-secrets.PLANE_POSTGRES_USER }}"
+      pgdb_password: "{{ .Values.secretRefs.plane-other-secrets.PLANE_POSTGRES_PASSWORD }}"
+      pgdb_name: "{{ .Values.secretRefs.plane-other-secrets.PLANE_POSTGRES_DB }}"
+      pgdb_remote_url: "{{ .Values.secretRefs.plane-other-secrets.PLANE_POSTGRES_CONNECTION_STRING }}"
 
       # REDIS
-      remote_redis_url: "{{ .PLANE_REDIS_CONNECTION_STRING }}"
+      remote_redis_url: "{{ .Values.secretRefs.plane-other-secrets.PLANE_REDIS_CONNECTION_STRING }}"
 
       # DATA STORE
       docstore_bucket: "plane-uploads"
       doc_upload_size_limit: "52428800" # 50MB
 
       # REQUIRED IF MINIO LOCAL SETUP IS FALSE
-      aws_access_key: "{{ .PLANE_MINIO_ACCESS_KEY }}"
-      aws_secret_access_key: "{{ .PLANE_MINIO_SECRET_KEY }}"
+      aws_access_key: "{{ .Values.secretRefs.plane-other-secrets.PLANE_MINIO_ACCESS_KEY }}"
+      aws_secret_access_key: "{{ .Values.secretRefs.plane-other-secrets.PLANE_MINIO_SECRET_KEY }}"
+      aws_s3_endpoint_url: "{{ .Values.secretRefs.plane-other-secrets.PLANE_MINIO_CONNECTION_STRING }}"
       aws_region: nz-north-1
-      aws_s3_endpoint_url: "{{ .PLANE_MINIO_CONNECTION_STRING }}"
 
       sentry_dsn: ""
       sentry_environment: ""
