@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app plane
+  name: plane
 spec:
   interval: 30m
   chart:
@@ -24,50 +24,33 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    global:
-      deploymentAnnotations:
-        secret.reloader.stakater.com/reload: "plane-other-secret"
-      envFrom:
-        - secretRef:
-            name: plane-other-secret
-
     planeVersion: stable
-
-    dockerRegistry:
-      enabled: false
 
     ingress:
       enabled: true
-      appHost: "plane.${SECRET_DOMAIN}"
-      minioHost: ""
+      appHost: "plane.nerdz.cloud"
       ingressClass: "external"
       ingress_annotations:
-        {
-          "nginx.ingress.kubernetes.io/proxy-body-size": "5m",
-          "external-dns.alpha.kubernetes.io/target": "external.${SECRET_DOMAIN}",
-          "gethomepage.dev/enabled": "true",
-          "gethomepage.dev/group": "Productivity",
-          "gethomepage.dev/name": "Plane",
-          "gethomepage.dev/app": "plane-web",
-          "gethomepage.dev/icon": "https://plane-marketing.s3.ap-south-1.amazonaws.com/plane-readme/plane_logo_.webp",
-          "gethomepage.dev/description": "Project Management",
-        }
-
-    # SSL Configuration - Valid only if ingress.enabled is true
-    ssl:
-      createIssuer: false
+        nginx.ingress.kubernetes.io/proxy-body-size: "5m"
+        external-dns.alpha.kubernetes.io/target: "external.nerdz.cloud"
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/group: "Productivity"
+        gethomepage.dev/name: "Plane"
+        gethomepage.dev/app: "plane-web"
+        gethomepage.dev/icon: "https://plane-marketing.s3.ap-south-1.amazonaws.com/plane-readme/plane_logo_.webp"
+        gethomepage.dev/description: "Project Management"
 
     redis:
       local_setup: false
-      remote_redis_url: "{{ .Values.env.remote_redis_url }}"
+      remote_redis_url: "$(REDIS_URL)" # This refers to the environment variable set in the deployment
 
     postgres:
       local_setup: false
-      remote_pg_url: "{{ .Values.env.pgdb_remote_url }}"
+      remote_pg_url: "$(PLANE_POSTGRES_CONNECTION_STRING)" # This refers to the environment variable set in the deployment
 
     minio:
       local_setup: false
-      remote_minio_url: "{{ .Values.env.aws_s3_endpoint_url }}"
+      remote_minio_url: "$(PLANE_MINIO_CONNECTION_STRING)" # This refers to the environment variable set in the deployment
 
     web:
       replicas: 1
@@ -100,6 +83,32 @@ spec:
       image: makeplane/plane-backend
       pullPolicy: IfNotPresent
       assign_cluster_ip: false
+      env:
+        - name: PLANE_POSTGRES_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: plane-other-secrets
+              key: PLANE_POSTGRES_CONNECTION_STRING
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: plane-other-secrets
+              key: PLANE_REDIS_CONNECTION_STRING
+        - name: PLANE_MINIO_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: plane-other-secrets
+              key: PLANE_MINIO_CONNECTION_STRING
+        - name: PLANE_POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: plane-other-secrets
+              key: PLANE_POSTGRES_USER
+        - name: PLANE_POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: plane-other-secrets
+              key: PLANE_POSTGRES_PASSWORD
 
     worker:
       replicas: 1
@@ -107,6 +116,12 @@ spec:
       cpuLimit: 500m
       image: makeplane/plane-backend
       pullPolicy: IfNotPresent
+      env:
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: plane-other-secrets
+              key: PLANE_REDIS_CONNECTION_STRING
 
     beatworker:
       replicas: 1
@@ -114,33 +129,30 @@ spec:
       cpuLimit: 500m
       image: makeplane/plane-backend
       pullPolicy: IfNotPresent
+      env:
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: plane-other-secrets
+              key: PLANE_REDIS_CONNECTION_STRING
 
     secretRefs:
       planeAppSecrets:
-        name: plane-secret
+        name: plane-other-secrets
 
     env:
-      # POSTGRES DB VALUES
-      pgdb_username: "{{ .Values.secretRefs.plane-other-secrets.PLANE_POSTGRES_USER }}"
-      pgdb_password: "{{ .Values.secretRefs.plane-other-secrets.PLANE_POSTGRES_PASSWORD }}"
-      pgdb_name: "{{ .Values.secretRefs.plane-other-secrets.PLANE_POSTGRES_DB }}"
-      pgdb_remote_url: "{{ .Values.secretRefs.plane-other-secrets.PLANE_POSTGRES_CONNECTION_STRING }}"
+      pgdb_username: "$(PLANE_POSTGRES_USER)"
+      pgdb_password: "$(PLANE_POSTGRES_PASSWORD)"
+      pgdb_name: "$(PLANE_POSTGRES_DB)"
+      pgdb_remote_url: "$(PLANE_POSTGRES_CONNECTION_STRING)"
+      remote_redis_url: "$(PLANE_REDIS_CONNECTION_STRING)"
+      aws_access_key: "$(PLANE_MINIO_ACCESS_KEY)"
+      aws_secret_access_key: "$(PLANE_MINIO_SECRET_KEY)"
+      aws_s3_endpoint_url: "$(PLANE_MINIO_CONNECTION_STRING)"
 
-      # REDIS
-      remote_redis_url: "{{ .Values.secretRefs.plane-other-secrets.PLANE_REDIS_CONNECTION_STRING }}"
-
-      # DATA STORE
-      docstore_bucket: "plane-uploads"
-      doc_upload_size_limit: "52428800" # 50MB
-
-      # REQUIRED IF MINIO LOCAL SETUP IS FALSE
-      aws_access_key: "{{ .Values.secretRefs.plane-other-secrets.PLANE_MINIO_ACCESS_KEY }}"
-      aws_secret_access_key: "{{ .Values.secretRefs.plane-other-secrets.PLANE_MINIO_SECRET_KEY }}"
-      aws_s3_endpoint_url: "{{ .Values.secretRefs.plane-other-secrets.PLANE_MINIO_CONNECTION_STRING }}"
-      aws_region: nz-north-1
-
-      sentry_dsn: ""
-      sentry_environment: ""
-
-      cors_allowed_origins: ""
-      default_cluster_domain: cluster.local
+    Global:
+      deploymentAnnotations:
+        secret.reloader.stakater.com/reload: "plane-other-secrets"
+      envFrom:
+        secretRef:
+          name: plane-other-secrets
