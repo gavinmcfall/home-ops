@@ -59,15 +59,15 @@ spec:
 
     redis:
       local_setup: false
-      remote_redis_url: "{{ .Values.secretRefs.plane-other-secrets.name.PLANE_REDIS_CONNECTION_STRING }}"
+      remote_redis_url: "{{ .Values.env.remote_redis_url }}"
 
     postgres:
       local_setup: false
-      remote_pg_url: "{{ .Values.secretRefs.plane-other-secrets.name.PLANE_POSTGRES_CONNECTION_STRING }}"
+      remote_pg_url: "{{ .Values.env.pgdb_remote_url }}"
 
     minio:
       local_setup: false
-      remote_minio_url: "{{ .Values.secretRefs.plane-other-secrets.name.PLANE_MINIO_CONNECTION_STRING }}"
+      remote_minio_url: "{{ .Values.env.aws_s3_endpoint_url }}"
 
     web:
       replicas: 1
