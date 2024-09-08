@@ -110,8 +110,8 @@ spec:
         type: secret
         name: vikunja-secret
         advancedMounts:
-          main:
-            main:
+          app:
+            app:
               - subPath: "config.yml"
                 path: "/etc/vikunja/config.yml"
                 readOnly: true
