@@ -106,12 +106,9 @@ spec:
           - path: /etc/caddy/Caddyfile
             subPath: Caddyfile
       vikunja-config:
-        enabled: true
         type: secret
         name: vikunja-secret
-        advancedMounts:
-          app:
-            app:
-              - subPath: "config.yml"
-                path: "/etc/vikunja/config.yml"
-                readOnly: true
+        globalMounts:
+          - path: /app/vikunja/config.yaml
+            subPath: config.yaml
+            readOnly: true
