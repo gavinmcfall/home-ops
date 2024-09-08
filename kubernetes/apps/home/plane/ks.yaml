@@ -16,6 +16,9 @@ spec:
     name: home-kubernetes
   dependsOn:
     - name: cloudnative-pg-cluster
+    - name: external-secrets-stores
+    - name: dragonfly
+    - name: minio
   prune: true
   wait: false
   interval: 30m
