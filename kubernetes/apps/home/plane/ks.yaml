@@ -17,7 +17,7 @@ spec:
   dependsOn:
     - name: cloudnative-pg-cluster
     - name: external-secrets-stores
-    - name: dragonfly
+    - name: dragonfly-cluster
     - name: minio
   prune: true
   wait: false
