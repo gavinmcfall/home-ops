@@ -20,6 +20,7 @@ resources:
   - ./node-feature-discovery.yaml
   - ./openebs.yaml
   - ./piraeus-charts.yaml
+  - ./plane.yaml
   - ./postfinance.yaml
   - ./prometheus-community.yaml
   - ./redash.yaml
