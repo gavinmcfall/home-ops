@@ -121,23 +121,23 @@ spec:
 
     env:
       # POSTGRES DB VALUES
-      pgdb_username: "{{ .PLANE_POSTGRES_USER}}"
-      pgdb_password: "{{ .PLANE_POSTGRES_PASSWORD}}"
-      pgdb_name: "{{ .PLANE_POSTGRES_DB}}"
-      pgdb_remote_url: "{{ .PLANE_POSTGRES_CONNECTION_STRING}}"
+      pgdb_username: "{{ .PLANE_POSTGRES_USER }}"
+      pgdb_password: "{{ .PLANE_POSTGRES_PASSWORD }}"
+      pgdb_name: "{{ .PLANE_POSTGRES_DB }}"
+      pgdb_remote_url: "{{ .PLANE_POSTGRES_CONNECTION_STRING }}"
 
       # REDIS
-      remote_redis_url: "{{ .PLANE_REDIS_CONNECTION_STRING}}"
+      remote_redis_url: "{{ .PLANE_REDIS_CONNECTION_STRING }}"
 
       # DATA STORE
       docstore_bucket: "plane-uploads"
       doc_upload_size_limit: "52428800" # 50MB
 
       # REQUIRED IF MINIO LOCAL SETUP IS FALSE
-      aws_access_key: "{{ .PLANE_MINIO_ACCESS_KEY}}"
-      aws_secret_access_key: "{{ .PLANE_MINIO_SECRET_KEY}}"
+      aws_access_key: "{{ .PLANE_MINIO_ACCESS_KEY }}"
+      aws_secret_access_key: "{{ .PLANE_MINIO_SECRET_KEY }}"
       aws_region: nz-north-1
-      aws_s3_endpoint_url: "{{ .PLANE_MINIO_CONNECTION_STRING}}"
+      aws_s3_endpoint_url: "{{ .PLANE_MINIO_CONNECTION_STRING }}"
 
       sentry_dsn: ""
       sentry_environment: ""
