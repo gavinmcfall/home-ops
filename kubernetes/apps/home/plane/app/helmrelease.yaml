@@ -1,0 +1,146 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app plane
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: plane-ce
+      version: 1.0.22
+      sourceRef:
+        kind: HelmRepository
+        name: plane
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    global:
+      deploymentAnnotations:
+        secret.reloader.stakater.com/reload: "plane-other-secret"
+      envFrom:
+        - secretRef:
+            name: plane-other-secret
+
+    planeVersion: stable
+
+    dockerRegistry:
+      enabled: false
+
+    ingress:
+      enabled: true
+      appHost: "plane.${SECRET_DOMAIN}"
+      minioHost: ""
+      ingressClass: "external"
+      ingress_annotations:
+        {
+          "nginx.ingress.kubernetes.io/proxy-body-size": "5m",
+          "external-dns.alpha.kubernetes.io/target": "external.${SECRET_DOMAIN}",
+          "gethomepage.dev/enabled": "true",
+          "gethomepage.dev/group": "Productivity",
+          "gethomepage.dev/name": "Plane",
+          "gethomepage.dev/app": "plane-web",
+          "gethomepage.dev/icon": "https://plane-marketing.s3.ap-south-1.amazonaws.com/plane-readme/plane_logo_.webp",
+          "gethomepage.dev/description": "Project Management",
+        }
+
+    # SSL Configuration - Valid only if ingress.enabled is true
+    ssl:
+      createIssuer: false
+
+    redis:
+      local_setup: false
+      remote_redis_url: ${PLANE_REDIS_CONNECTION_STRING}
+
+    postgres:
+      local_setup: false
+      remote_pg_url: ${PLANE_POSTGRES_CONNECTION_STRING}
+
+    minio:
+      local_setup: false
+      remote_minio_url: ${PLANE_MINIO_CONNECTION_STRING}
+
+    web:
+      replicas: 1
+      memoryLimit: 1000Mi
+      cpuLimit: 500m
+      image: makeplane/plane-frontend
+      pullPolicy: IfNotPresent
+      assign_cluster_ip: true
+
+    space:
+      replicas: 1
+      memoryLimit: 1000Mi
+      cpuLimit: 500m
+      image: makeplane/plane-space
+      pullPolicy: IfNotPresent
+      assign_cluster_ip: true
+
+    admin:
+      replicas: 1
+      memoryLimit: 1000Mi
+      cpuLimit: 500m
+      image: makeplane/plane-admin
+      pullPolicy: IfNotPresent
+      assign_cluster_ip: true
+
+    api:
+      replicas: 1
+      memoryLimit: 1000Mi
+      cpuLimit: 500m
+      image: makeplane/plane-backend
+      pullPolicy: IfNotPresent
+      assign_cluster_ip: false
+
+    worker:
+      replicas: 1
+      memoryLimit: 1000Mi
+      cpuLimit: 500m
+      image: makeplane/plane-backend
+      pullPolicy: IfNotPresent
+
+    beatworker:
+      replicas: 1
+      memoryLimit: 1000Mi
+      cpuLimit: 500m
+      image: makeplane/plane-backend
+      pullPolicy: IfNotPresent
+
+    secretRefs:
+      planeAppSecrets:
+        name: plane-secret
+
+    env:
+      # POSTGRES DB VALUES
+      pgdb_username: ${PLANE_POSTGRES_USER}
+      pgdb_password: ${PLANE_POSTGRES_PASSWORD}
+      pgdb_name: ${PLANE_POSTGRES_DB}
+      pgdb_remote_url: ${PLANE_POSTGRES_CONNECTION_STRING}
+
+      # REDIS
+      remote_redis_url: ${PLANE_REDIS_CONNECTION_STRING}
+
+      # DATA STORE
+      docstore_bucket: "plane-uploads"
+      doc_upload_size_limit: "52428800" # 50MB
+
+      # REQUIRED IF MINIO LOCAL SETUP IS FALSE
+      aws_access_key: ${PLANE_MINIO_ACCESS_KEY}
+      aws_secret_access_key: ${PLANE_MINIO_SECRET_KEY}
+      aws_region: nz-north-1
+      aws_s3_endpoint_url: ${PLANE_MINIO_CONNECTION_STRING}
+
+      sentry_dsn: ""
+      sentry_environment: ""
+
+      cors_allowed_origins: ""
+      default_cluster_domain: cluster.local
