@@ -109,6 +109,6 @@ spec:
         type: secret
         name: vikunja-secret
         globalMounts:
-          - path: /app/vikunja/config.yaml
-            subPath: config.yaml
+          - path: /app/vikunja/config.yml
+            subPath: config.yml
             readOnly: true
