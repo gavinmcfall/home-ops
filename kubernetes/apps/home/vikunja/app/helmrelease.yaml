@@ -108,7 +108,7 @@ spec:
       vikunja-config:
         enabled: true
         type: secret
-        name: "vikunja-secrets"
+        name: vikunja-secret
         advancedMounts:
           main:
             main:
