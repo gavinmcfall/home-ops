@@ -4,7 +4,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app vikunja
-  namespace: default
+  namespace: home
 spec:
   interval: 30m
   chart:
@@ -37,7 +37,6 @@ spec:
       vikunja:
         annotations:
           reloader.stakater.com/auto: "true"
-          configmap.reloader.stakater.com/reload: lidarr-pushover
         initContainers:
           init-db:
             image:
@@ -66,16 +65,17 @@ spec:
             image:
               repository: vikunja/frontend
               tag: 0.22.1@sha256:f0223d441997fe29c377d0b476dc4bb2fc091b44b9c24d76b1b88c213df520c5
-          proxy:
-            image:
-              repository: caddy
-              tag: 2.8.4-alpine@sha256:221bcf3be161b0d856bdb7bea76b42386d732d19348f79692404829532d83f4a
     service:
       app:
         controller: *app
         ports:
           http:
-            port: 8080
+            port: 3456
+      frontend:
+        controller: *app
+        ports:
+          http:
+            port: 80
     ingress:
       app:
         annotations:
@@ -89,22 +89,28 @@ spec:
         hosts:
           - host: "projects.${SECRET_DOMAIN}"
             paths:
-              - path: /
+              - path: /api
                 service:
                   identifier: app
-                  port: http
+                  port: 3456
+              - path: /dav
+                service:
+                  identifier: app
+                  port: 3456
+              - path: /.well-known
+                service:
+                  identifier: app
+                  port: 3456
+              - path: /
+                service:
+                  identifier: frontend
+                  port: 80
     persistence:
       config:
         enabled: true
         existingClaim: *app
         globalMounts:
           - path: /app/vikunja/files
-      # caddy-config:
-      #   type: configMap
-      #   name: vikunja-configmap
-      #   globalMounts:
-      #     - path: /etc/caddy/Caddyfile
-      #       subPath: Caddyfile
       vikunja-config:
         type: secret
         name: vikunja-secret
