@@ -99,12 +99,12 @@ spec:
         existingClaim: *app
         globalMounts:
           - path: /app/vikunja/files
-      caddy-config:
-        type: configMap
-        name: vikunja-configmap
-        globalMounts:
-          - path: /etc/caddy/Caddyfile
-            subPath: Caddyfile
+      # caddy-config:
+      #   type: configMap
+      #   name: vikunja-configmap
+      #   globalMounts:
+      #     - path: /etc/caddy/Caddyfile
+      #       subPath: Caddyfile
       vikunja-config:
         type: secret
         name: vikunja-secret
