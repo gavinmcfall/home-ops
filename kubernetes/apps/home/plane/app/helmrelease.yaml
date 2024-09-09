@@ -42,15 +42,12 @@ spec:
 
     redis:
       local_setup: false
-      remote_redis_url: "$(REDIS_URL)" # This refers to the environment variable set in the deployment
 
     postgres:
       local_setup: false
-      remote_pg_url: "$(PLANE_POSTGRES_CONNECTION_STRING)" # This refers to the environment variable set in the deployment
 
     minio:
       local_setup: false
-      remote_minio_url: "$(PLANE_MINIO_CONNECTION_STRING)" # This refers to the environment variable set in the deployment
 
     web:
       replicas: 1
@@ -83,32 +80,6 @@ spec:
       image: makeplane/plane-backend
       pullPolicy: IfNotPresent
       assign_cluster_ip: false
-      env:
-        - name: PLANE_POSTGRES_CONNECTION_STRING
-          valueFrom:
-            secretKeyRef:
-              name: plane-other-secrets
-              key: PLANE_POSTGRES_CONNECTION_STRING
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: plane-other-secrets
-              key: PLANE_REDIS_CONNECTION_STRING
-        - name: PLANE_MINIO_CONNECTION_STRING
-          valueFrom:
-            secretKeyRef:
-              name: plane-other-secrets
-              key: PLANE_MINIO_CONNECTION_STRING
-        - name: PLANE_POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: plane-other-secrets
-              key: PLANE_POSTGRES_USER
-        - name: PLANE_POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: plane-other-secrets
-              key: PLANE_POSTGRES_PASSWORD
 
     worker:
       replicas: 1
@@ -116,12 +87,6 @@ spec:
       cpuLimit: 500m
       image: makeplane/plane-backend
       pullPolicy: IfNotPresent
-      env:
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: plane-other-secrets
-              key: PLANE_REDIS_CONNECTION_STRING
 
     beatworker:
       replicas: 1
@@ -129,30 +94,26 @@ spec:
       cpuLimit: 500m
       image: makeplane/plane-backend
       pullPolicy: IfNotPresent
-      env:
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: plane-other-secrets
-              key: PLANE_REDIS_CONNECTION_STRING
-
-    secretRefs:
-      planeAppSecrets:
-        name: plane-other-secrets
 
     env:
       pgdb_username: "$(PLANE_POSTGRES_USER)"
       pgdb_password: "$(PLANE_POSTGRES_PASSWORD)"
       pgdb_name: "$(PLANE_POSTGRES_DB)"
       pgdb_remote_url: "$(PLANE_POSTGRES_CONNECTION_STRING)"
+
       remote_redis_url: "$(PLANE_REDIS_CONNECTION_STRING)"
+
+      docstore_bucket: "uploads"
+      doc_upload_size_limit: "5242880" # 5MB
+
       aws_access_key: "$(PLANE_MINIO_ACCESS_KEY)"
       aws_secret_access_key: "$(PLANE_MINIO_SECRET_KEY)"
       aws_s3_endpoint_url: "$(PLANE_MINIO_CONNECTION_STRING)"
 
-    Global:
-      deploymentAnnotations:
-        secret.reloader.stakater.com/reload: "plane-other-secrets"
-      envFrom:
-        secretRef:
-          name: plane-other-secrets
+      secret_key: "$(PLANE_SECRET_KEY)"
+
+      sentry_dsn: ""
+      sentry_environment: ""
+
+      cors_allowed_origins: ""
+      default_cluster_domain: cluster.local
