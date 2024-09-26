@@ -4,7 +4,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app immich-microservices
-  namespace: selfhosted
+  namespace: home
 spec:
   interval: 30m
   chart:
@@ -27,7 +27,7 @@ spec:
     keepHistory: false
   dependsOn:
     - name: dragonfly-operator
-      namespace: databases
+      namespace: database
   values:
     defaultPodOptions:
       securityContext:
@@ -44,13 +44,13 @@ spec:
             matchLabels:
               app.kubernetes.io/name: *app
       nodeSelector:
-        intel.feature.node.kubernetes.io/gpu: 'true'
+        intel.feature.node.kubernetes.io/gpu: "true"
     controllers:
       immich-microservices:
         type: statefulset
         annotations:
           configmap.reloader.stakater.com/reload: &configMap immich-configmap
-          secret.reloader.stakater.com/reload: &secret immich
+          secret.reloader.stakater.com/reload: &secret immich-secret
         containers:
           app:
             image:

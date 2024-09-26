@@ -4,7 +4,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app immich-machine-learning
-  namespace: selfhosted
+  namespace: home
 spec:
   interval: 30m
   chart:
@@ -27,9 +27,9 @@ spec:
     keepHistory: false
   dependsOn:
     - name: immich-server
-      namespace: selfhosted
+      namespace: home
     - name: dragonfly-operator
-      namespace: databases
+      namespace: database
   values:
     defaultPodOptions:
       securityContext:
@@ -49,7 +49,7 @@ spec:
         type: statefulset
         annotations:
           configmap.reloader.stakater.com/reload: &configMap immich-configmap
-          secret.reloader.stakater.com/reload: &secret immich
+          secret.reloader.stakater.com/reload: &secret immich-secret
         containers:
           app:
             image:
