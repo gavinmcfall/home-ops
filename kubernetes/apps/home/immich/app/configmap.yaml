@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: immich-configmap
+  namespace: home
+data:
+  DB_PORT: "5432"
+  IMMICH_MACHINE_LEARNING_URL: http://immich-machine-learning.home.svc.cluster.local:3003
+  IMMICH_SERVER_URL: http://immich-server.home.svc.cluster.local:3001
+  IMMICH_WEB_URL: http://immich-web.home.svc.cluster.local:3000
+  LOG_LEVEL: verbose
+  REDIS_HOSTNAME: dragonfly.databases.svc.cluster.local
+  REDIS_PORT: "6379"
+  TRANSFORMERS_CACHE: /usr/src/app/.transformers_cache
