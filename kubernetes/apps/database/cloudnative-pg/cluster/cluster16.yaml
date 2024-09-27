@@ -6,7 +6,11 @@ metadata:
   name: postgres16
 spec:
   instances: 3
-  imageName: ghcr.io/cloudnative-pg/postgresql:16.3-7
+  # CNPG Offical Image
+  # imageName: ghcr.io/cloudnative-pg/postgresql:16.3-7
+
+  # Tensorcord CNPG Image with pgvector extension
+  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.4
   primaryUpdateStrategy: unsupervised
   storage:
     size: 20Gi
@@ -18,6 +22,8 @@ spec:
     parameters:
       max_connections: "200"
       shared_buffers: 256MB
+    shared_preload_libraries:
+      - "vectors.so"
   resources:
     requests:
       cpu: 100m
@@ -53,6 +59,10 @@ spec:
   bootstrap:
     recovery:
       source: &previousCluster postgres16-v3
+    initdb:
+      postInitSQL:
+        - ALTER SYSTEM SET search_path TO "$user", public, vectors;
+        - CREATE EXTENSION IF NOT EXISTS "vectors";
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   externalClusters:
     - name: *previousCluster
