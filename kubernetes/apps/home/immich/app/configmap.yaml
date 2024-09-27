@@ -10,6 +10,6 @@ data:
   IMMICH_SERVER_URL: http://immich-server.home.svc.cluster.local:3001
   IMMICH_WEB_URL: http://immich-web.home.svc.cluster.local:3000
   LOG_LEVEL: verbose
-  REDIS_HOSTNAME: dragonfly.databases.svc.cluster.local
+  REDIS_HOSTNAME: dragonfly.database.svc.cluster.local
   REDIS_PORT: "6379"
   TRANSFORMERS_CACHE: /usr/src/app/.transformers_cache
