@@ -13,7 +13,6 @@ resources:
   - ./network-ups-tools/ks.yaml
   - ./prometheus-operator-crds/ks.yaml
   - ./promtail/ks.yaml
-  # - ./redash/ks.yaml
   - ./redisinsight/ks.yaml
   - ./thanos/ks.yaml
   # - ./unpoller/ks.yaml
