@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: pasta
-  namespace: media
+  namespace: entertainment
 spec:
   type: ClusterIP
   selector:
