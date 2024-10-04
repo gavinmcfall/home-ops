@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pasta
+  namespace: entertainment
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pasta
+  template:
+    metadata:
+      labels:
+        app: pasta
+    spec:
+      containers:
+        - name: pasta
+          image: cglatot/pasta:latest
+          resources:
+            requests:
+              cpu: "10m"
+            limits:
+              memory: "64Mi"

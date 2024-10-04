@@ -9,7 +9,6 @@ resources:
   - ./calibre-web/ks.yaml
   - ./kavita/ks.yaml
   - ./overseerr/ks.yaml
-  # - ./pasta/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
   # - ./wizarr/ks.yaml
