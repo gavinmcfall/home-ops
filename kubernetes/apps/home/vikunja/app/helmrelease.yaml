@@ -83,7 +83,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Vikunja
           gethomepage.dev/description: Tasks and project management platform.
-          gethomepage.dev/group: ApplicationsHome
+          gethomepage.dev/group: Home
           gethomepage.dev/icon: vikunja.png
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         className: external
