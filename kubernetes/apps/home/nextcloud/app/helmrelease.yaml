@@ -77,7 +77,9 @@ spec:
               0 => '127.0.0.1',
               1 => 'kumo.${SECRET_DOMAIN}',
               2 => 'kumo.home.svc.cluster.local',
-              3 => '${LAN_CIDR}',
+              3 => '${LOCAL_CIDR}',
+              4 => '${CLUSTER_POD_CIDR}',
+              5 => '${CLUSTER_SERVICE_CIDR}',
             ),
             'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
           ); ?>
