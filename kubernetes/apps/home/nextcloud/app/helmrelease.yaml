@@ -73,10 +73,6 @@ spec:
               1 => '${CLUSTER_POD_CIDR}',
               2 => '${CLUSTER_SERVICE_CIDR}',
             ),
-            'trusted_domains' => array(
-              0 => '127.0.0.1',
-              1 => 'kumo.${SECRET_DOMAIN}',
-            ),
             'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
           ); ?>
         misc.config.php: |-
@@ -101,7 +97,7 @@ spec:
       enabled: true
       className: external
       annotations:
-        external-dns.alpha.kubernetes.io/target: external.${CLUSTER_DOMAIN}
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         gethomepage.dev/enabled: "true"
         gethomepage.dev/group: Home
         gethomepage.dev/name: Nextcloud
