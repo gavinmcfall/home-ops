@@ -7,7 +7,7 @@ resources:
   - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
   - ./manyfold/ks.yaml
-  # - ./nextcloud/ks.yaml
+  - ./nextcloud/ks.yaml
   # - ./plane/ks.yaml
   - ./smtp-relay/ks.yaml
   - ./thelounge/ks.yaml
