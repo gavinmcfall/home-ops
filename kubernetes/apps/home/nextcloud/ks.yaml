@@ -26,5 +26,5 @@ spec:
     substitute:
       APP: *app
       GATUS_SUBDOMAIN: kumo
-      VOLSYNC_CLAIM: *app
+      VOLSYNC_CLAIM: nextcloud-config
       VOLSYNC_CAPACITY: 5Gi
