@@ -73,6 +73,12 @@ spec:
               1 => '${CLUSTER_POD_CIDR}',
               2 => '${CLUSTER_SERVICE_CIDR}',
             ),
+            'trusted_domains' => array(
+              0 => '127.0.0.1',
+              1 => 'kumo.${SECRET_DOMAIN}',
+              2 => 'kumo.home.svc.cluster.local',
+              3 => '${LAN_CIDR}',
+            ),
             'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
           ); ?>
         misc.config.php: |-
