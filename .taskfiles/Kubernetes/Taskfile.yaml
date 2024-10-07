@@ -52,3 +52,14 @@ tasks:
       cluster: '{{.cluster | default "main"}}'
     preconditions:
       - kubectl --namespace {{.ns}} get externalsecret {{.secret}}
+
+  network:
+    desc: Create a netshoot container for a cluster
+    summary: |
+      Args:
+        ns: Namespace the PVC is in (default: default)
+    interactive: true
+    cmd: |
+      kubectl run -n {{.ns}} netshoot --rm -i --tty --image ghcr.io/nicolaka/netshoot:latest {{.CLI_ARGS}}
+    vars:
+      ns: '{{.ns | default "default"}}'
