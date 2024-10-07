@@ -24,7 +24,7 @@ metadata:
   name: nextcloud-data
 spec:
   accessModes: ["ReadWriteMany"]
-  storageClassName: nextcloud-nfs
+  storageClassName: nextcloud-data
   resources:
     requests:
       storage: 1Mi
