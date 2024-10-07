@@ -17,6 +17,7 @@ resources:
   - ./jetstack.yaml
   - ./k8s-gateway.yaml
   - ./metrics-server.yaml
+  - ./nextcloud.yaml
   - ./node-feature-discovery.yaml
   - ./openebs.yaml
   - ./piraeus-charts.yaml
