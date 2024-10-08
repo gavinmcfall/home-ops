@@ -79,12 +79,6 @@ spec:
             ),
             'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
           ); ?>
-        ingress.config.php: |-
-          <?php
-          $CONFIG = array (
-            'overwrite.cli.url' => 'https://kumo.${SECRET_DOMAIN}',
-            'overwriteprotocol' => 'https',
-          );
         misc.config.php: |-
           <?php
           $CONFIG = array (
