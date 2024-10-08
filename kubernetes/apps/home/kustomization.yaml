@@ -6,7 +6,7 @@ resources:
   # Applications
   - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
-  - ./immich/ks.yaml
+  # - ./immich/ks.yaml
   - ./manyfold/ks.yaml
   - ./nextcloud/ks.yaml
   # - ./plane/ks.yaml
