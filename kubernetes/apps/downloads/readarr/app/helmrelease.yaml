@@ -46,7 +46,7 @@ spec:
           app:
             image:
               repository: ghcr.io/joryirving/readarr-develop
-              tag: 0.4.0.2634@sha256:ad7411ea5d83103aa97480ab5d0507fea86cd7c48171deb2f26d82b5cf951fc1
+              tag: 0.4.0.2634@sha256:f5d36c4f849e3cb27b616199d7443d36e1eb10ac3d1765a503e3c62c4b700228
             env:
               READARR__APP__INSTANCENAME: Readarr
               READARR__APP__THEME: dark
