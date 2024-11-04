@@ -47,6 +47,15 @@
       "ignoreTests": true,
       "matchUpdateTypes": ["minor", "patch"]
     },
+    {
+      "packageRules": [
+        {
+          "matchUpdateTypes": ["minor", "patch"],
+          "matchCurrentVersion": "!/^0/",
+          "automerge": true
+        }
+      ]
+    }
     // groups
     {
       "description": ["Flux Group"],
