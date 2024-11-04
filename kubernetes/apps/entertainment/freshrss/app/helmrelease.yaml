@@ -72,7 +72,7 @@ spec:
     ingress:
       app:
         enabled: true
-        className: nginx
+        className: external
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: FreshRSS
@@ -80,6 +80,7 @@ spec:
           gethomepage.dev/group: Entertainment
           gethomepage.dev/icon: freshrss.png
           gethomepage.dev/href: https://freshrss.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           gethomepage.dev/pod-selector: >-
             app in (
               freshrss
