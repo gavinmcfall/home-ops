@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app freshrss
+  namespace: entertainment
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      freshrss:
+        annotations:
+          reloader.stakater.com/auto: "true"
+          secret.reloader.stakater.com/reload: authentik-secret
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16
+            envFrom: &envFrom
+              - secretRef:
+                  name: freshrss-secret
+        containers:
+          app:
+            image:
+              repository: freshrss/freshrss
+              tag: 1.24.3@sha256:baedf173d60b63c72f93fdb8480ee002d4622cd34103aac6510f45fdff41effe
+            env:
+              TZ: ${TIMEZONE}
+              CRON_MIN: 18,48
+              DOMAIN: "https://freshrss.${SECRET_DOMAIN}/"
+              OIDC_ENABLED: 1
+              OIDC_PROVIDER_METADATA_URL: https://authentik.${SECRET_DOMAIN}/application/o/freshrss/.well-known/openid-configuration
+              OIDC_REMOTE_USER_CLAIM: preferred_username
+              OIDC_SCOPES: openid email profile
+              OIDC_X_FORWARDED_HEADERS: X-Forwarded-Port X-Forwarded-Proto X-Forwarded-Host
+            envFrom: *envFrom
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 80
+    ingress:
+      app:
+        enabled: true
+        className: nginx
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: FreshRSS
+          gethomepage.dev/description: Self-hosted RSS feed aggregator
+          gethomepage.dev/group: Entertainment
+          gethomepage.dev/icon: freshrss.png
+          gethomepage.dev/href: https://freshrss.${SECRET_DOMAIN}
+          gethomepage.dev/pod-selector: >-
+            app in (
+              freshrss
+            )
+        hosts:
+          - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+    persistence:
+      config:
+        enabled: true
+        existingClaim: *app
+        globalMounts:
+          - path: /var/www/FreshRSS/data
