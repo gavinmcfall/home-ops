@@ -53,7 +53,7 @@ spec:
               TZ: ${TIMEZONE}
               CRON_MIN: 18,48
               DOMAIN: "https://freshrss.${SECRET_DOMAIN}/"
-              OIDC_ENABLED: 0
+              OIDC_ENABLED: 1
               OIDC_PROVIDER_METADATA_URL: https://id.${SECRET_DOMAIN}/application/o/freshrss/.well-known/openid-configuration
               OIDC_REMOTE_USER_CLAIM: preferred_username
               OIDC_SCOPES: openid email profile
