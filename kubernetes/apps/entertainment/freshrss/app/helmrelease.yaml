@@ -57,7 +57,7 @@ spec:
               OIDC_PROVIDER_METADATA_URL: https://id.${SECRET_DOMAIN}/application/o/freshrss/.well-known/openid-configuration
               OIDC_REMOTE_USER_CLAIM: preferred_username
               OIDC_SCOPES: openid email profile
-              OIDC_X_FORWARDED_HEADERS: X-Forwarded-Port X-Forwarded-Proto X-Forwarded-Host
+              OIDC_X_FORWARDED_HEADERS: X-Forwarded-Port X-Forwarded-Proto X-Forwarded-Host X-Forwarded-Prefix
             envFrom: *envFrom
             resources:
               requests:
