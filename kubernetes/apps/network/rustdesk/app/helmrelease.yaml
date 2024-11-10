@@ -34,6 +34,9 @@ spec:
               tag: 1.1.12@sha256:9b1197d116f7bb4d3ad93a50bc1bc59ddb388de267df221a351f5ce10fac3dcf
             env:
               TZ: ${TIMEZONE}
+            envFrom:
+              - secretRef:
+                  name: rustdesk-secret
             command: ["hbbr"]
             probes: &probes
               liveness:
@@ -58,7 +61,7 @@ spec:
               TZ: ${TIMEZONE}
               DB_URL: /db/db_v2.sqlite3
               RELAY: "${SVC_RUSTDESK_ADDR}:21117"
-            command: [ "hbbs", "-r rustdesk:21117" ]
+            command: ["hbbs", "-r rustdesk:21117"]
             probes: *probes
             securityContext: *securityContext
             resources: *resources
@@ -109,15 +112,15 @@ spec:
         existingClaim: *app
         globalMounts:
           - path: /db
-      # hbbs-key:
-      #   type: secret
-      #   name: *app
-      #   advancedMounts:
-      #     rustdesk:
-      #       hbbs:
-      #         - subPath: key_pub
-      #           path: /data/id_ed25519.pub
-      #           readOnly: true
-      #         - subPath: key_priv
-      #           path: /data/id_ed25519
-      #           readOnly: true
+      hbbs-key:
+        type: secret
+        name: rustdesk-secret
+        advancedMounts:
+          rustdesk:
+            hbbs:
+              - subPath: key_pub
+                path: /data/id_ed25519.pub
+                readOnly: true
+              - subPath: key_priv
+                path: /data/id_ed25519
+                readOnly: true
