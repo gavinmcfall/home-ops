@@ -109,15 +109,15 @@ spec:
         existingClaim: *app
         globalMounts:
           - path: /db
-      hbbs-key:
-        type: secret
-        name: *app
-        advancedMounts:
-          rustdesk:
-            hbbs:
-              - subPath: key_pub
-                path: /data/id_ed25519.pub
-                readOnly: true
-              - subPath: key_priv
-                path: /data/id_ed25519
-                readOnly: true
+      # hbbs-key:
+      #   type: secret
+      #   name: *app
+      #   advancedMounts:
+      #     rustdesk:
+      #       hbbs:
+      #         - subPath: key_pub
+      #           path: /data/id_ed25519.pub
+      #           readOnly: true
+      #         - subPath: key_priv
+      #           path: /data/id_ed25519
+      #           readOnly: true
