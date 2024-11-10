@@ -31,3 +31,4 @@ resources:
   - ./stakater.yaml
   - ./tailscale.yaml
   - ./weave-gitops.yaml
+  - ./wger.yaml
