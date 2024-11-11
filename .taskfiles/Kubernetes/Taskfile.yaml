@@ -4,6 +4,7 @@ version: "3"
 
 vars:
   KUBECONFORM_SCRIPT: "{{.SCRIPTS_DIR}}/kubeconform.sh"
+  KUBERNETES_RESOURCES_DIR: "{{.ROOT_DIR}}/.taskfiles/Kubernetes/resources"
 
 tasks:
   resources:
@@ -63,3 +64,13 @@ tasks:
       kubectl run -n {{.ns}} netshoot --rm -i --tty --image ghcr.io/nicolaka/netshoot:latest {{.CLI_ARGS}}
     vars:
       ns: '{{.ns | default "default"}}'
+
+  privileged:
+    desc: Run a privileged pod
+    cmd: |
+      kubectl run privileged-{{.node}} -i --rm --image=null \
+        --overrides="$(yq {{.KUBERNETES_RESOURCES_DIR}}/privileged-pod.tmpl.yaml -o=json | envsubst)"
+    env:
+      node: "{{.node}}"
+    preconditions:
+      - test -f {{.KUBERNETES_RESOURCES_DIR}}/privileged-pod.tmpl.yaml
