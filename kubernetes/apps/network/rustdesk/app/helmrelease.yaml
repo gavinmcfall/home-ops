@@ -105,20 +105,21 @@ spec:
             enabled: true
             port: 21118
             protocol: "TCP"
-    ingress:
-      tailscale:
-        enabled: true
-        className: tailscale
-        hosts:
-          - host: &app "{{ .Release.Name }}"
-            paths:
-              - path: /
-                service:
-                  identifier: hbbs
-                  port: http
-        tls:
-          - hosts:
-              - *app
+ingress:
+  tailscale:
+    enabled: true
+    className: tailscale
+    hosts:
+      - host: "{{ .Release.Name }}"
+        paths:
+          - path: /
+            service:
+              identifier: hbbs
+              port: 21115 # Replace with the actual port number if different
+    tls:
+      - hosts:
+          - "{{ .Release.Name }}"
+
     persistence:
       tmp:
         type: emptyDir
