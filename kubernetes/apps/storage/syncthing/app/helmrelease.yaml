@@ -43,8 +43,8 @@ spec:
               repository: syncthing/syncthing
               tag: 1.28.0@sha256:30b6a53436527edf31d791361d14b1f5119cc6882dbcf07822b618ee7a74e115
             env:
-              PUID: "1000"
-              PGID: "1000"
+              PUID: "568"
+              PGID: "568"
             securityContext:
               # allowPrivilegeEscalation: false
               # readOnlyRootFilesystem: false
@@ -58,9 +58,9 @@ spec:
 
     defaultPodOptions:
       securityContext:
-        runAsGroup: 1000
-        runAsUser: 1000
-        fsGroup: 1000
+        runAsGroup: 568
+        runAsUser: 568
+        fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         # runAsNonRoot: true
         seccompProfile:
