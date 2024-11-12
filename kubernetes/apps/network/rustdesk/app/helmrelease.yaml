@@ -115,7 +115,7 @@ spec:
             paths: &paths
               - path: /
                 service:
-                  identifier: hbbs
+                  identifier: *app
                   port: http
       tailscale:
         enabled: true
