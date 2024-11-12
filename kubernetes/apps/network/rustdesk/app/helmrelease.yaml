@@ -105,6 +105,16 @@ spec:
             enabled: true
             port: 21118
             protocol: "TCP"
+    ingress:
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
     persistence:
       tmp:
         type: emptyDir
