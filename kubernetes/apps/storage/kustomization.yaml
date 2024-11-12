@@ -5,3 +5,4 @@ resources:
   - ./namespace.yaml
   # apps
   - ./minio/ks.yaml
+  - ./syncthing/ks.yaml
