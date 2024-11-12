@@ -111,7 +111,11 @@ spec:
         className: tailscale
         hosts:
           - host: &app "{{ .Release.Name }}"
-            paths: *paths
+            paths:
+              - path: /
+                service:
+                  identifier: hbbs
+                  port: http
         tls:
           - hosts:
               - *app
