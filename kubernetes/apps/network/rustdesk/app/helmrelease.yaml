@@ -116,7 +116,7 @@ spec:
               - path: /
                 service:
                   identifier: hbbs
-                  port: http
+                  port: 21115
       tailscale:
         enabled: true
         className: tailscale
