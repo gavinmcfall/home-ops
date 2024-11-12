@@ -111,3 +111,9 @@ spec:
         existingClaim: *app
         globalMounts:
           - path: /var/syncthing
+      files:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media/
+        globalMounts:
+          - path: /syncthing
