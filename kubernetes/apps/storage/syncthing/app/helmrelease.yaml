@@ -116,4 +116,5 @@ spec:
         server: citadel.internal
         path: /mnt/storage0/media/
         globalMounts:
-          - path: /syncthing
+          - path: /files
+            subPath: /syncthing
