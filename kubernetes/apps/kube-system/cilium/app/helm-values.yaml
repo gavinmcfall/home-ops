@@ -35,6 +35,8 @@ operator:
   rollOutPods: true
 rollOutCiliumPods: true
 routingMode: native
+socketLB:
+  hostNamespaceOnly: true
 securityContext:
   capabilities:
     ciliumAgent:
