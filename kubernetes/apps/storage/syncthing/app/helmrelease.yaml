@@ -117,4 +117,4 @@ spec:
         path: /mnt/storage0/media/
         globalMounts:
           - path: /files
-            subPath: /syncthing
+            subPath: syncthing
