@@ -11,7 +11,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: rook-ceph-cluster
+    - name: cluster-apps-rook-ceph-cluster
   path: ./kubernetes/apps/storage/syncthing/app
   prune: true
   sourceRef:
