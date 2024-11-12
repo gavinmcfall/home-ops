@@ -79,7 +79,7 @@ spec:
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: ${SVC_RUSTDESK_ADDR}
-          external-dns.alpha.kubernetes.io/hostname: rustdesk.${SECRET_DOMAIN}
+          #external-dns.alpha.kubernetes.io/hostname: rustdesk.${SECRET_DOMAIN}
         ports:
           hbbr-1:
             enabled: true
@@ -105,6 +105,27 @@ spec:
             enabled: true
             port: 21118
             protocol: "TCP"
+    ingress:
+      hbbs:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        className: internal
+        hosts:
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths: &paths
+              - path: /
+                service:
+                  identifier: hbbs
+                  port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
     persistence:
       tmp:
         type: emptyDir
