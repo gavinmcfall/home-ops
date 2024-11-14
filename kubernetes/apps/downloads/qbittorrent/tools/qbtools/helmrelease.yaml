@@ -25,12 +25,12 @@ spec:
     controllers:
       tagging:
         type: cronjob
-        cronjob: &cronjob
+        cronjob:
           schedule: "@hourly"
           timeZone: &timeZone ${TIMEZONE}
           concurrencyPolicy: Forbid
           successfulJobsHistory: 1
-          failedJobsHistory: 1
+          failedJobsHistory: 3
         initContainers:
           tagging: &container
             image:
@@ -43,10 +43,15 @@ spec:
               - --last-activity
               - --sites
               - --unregistered
-              - --server=qbittorrent.downloads.svc.cluster.local
-              - --port=80
             env:
+              QBITTORRENT_HOST: qb.downloads.svc.cluster.local
+              QBITTORRENT_PORT: 80
+              SABNZBD_HOST: sab.media.svc.cluster.local
+              SABNZBD_PORT: 80
               TZ: *timeZone
+            envFrom:
+              - secretRef:
+                  name: qbtools-secret
             resources:
               requests:
                 cpu: 25m
@@ -59,76 +64,49 @@ spec:
                 drop:
                   - ALL
         containers:
-          unregistered:
+          prune-unregistered:
             <<: *container
             args:
               - prune
               - --exclude-tag=expired
+              - --exclude-tag=added:1d
               - --include-tag=unregistered
-              - --server=qbittorrent.downloads.svc.cluster.local
-              - --port=80
-          expired:
+              - --with-data
+          prune-expired:
             <<: *container
             args:
               - prune
               - --exclude-category=manual
-              - --exclude-tag=activity:24h
+              - --exclude-tag=activity:1d
               - --include-tag=expired
-              - --server=qbittorrent.downloads.svc.cluster.local
-              - --port=80
+              - --with-data
         pod:
-          restartPolicy: OnFailure
-          securityContext: &podSecurityContext
-            runAsNonRoot: true
-            runAsUser: 568
-            runAsGroup: 568
-      orphaned:
-        type: cronjob
-        cronjob:
-          <<: *cronjob
-          schedule: "@daily"
-        containers:
-          app:
-            <<: *container
-            args:
-              - orphaned
-              - --exclude-pattern="*_unpackerred"
-              - --exclude-pattern="*/manual/*"
-              - --server=qbittorrent.downloads.svc.cluster.local
-              - --port=80
-        pod:
-          restartPolicy: OnFailure
-          securityContext:
-            <<: *podSecurityContext
-            fsGroup: 568
-            fsGroupChangePolicy: OnRootMismatch
-            supplementalGroups:
-              - 65536
+          restartPolicy: never
       reannounce:
         containers:
           app:
             <<: *container
             args:
               - reannounce
-              - --process-seeding
-              - --server=qbittorrent.downloads.svc.cluster.local
-              - --port=80
-        pod:
-          securityContext: *podSecurityContext
+      limiter:
+        containers:
+          app:
+            <<: *container
+            args:
+              - limiter
+              - --max-line-speed-mbps=500
+              - --max-percent=0.8
+              - --limit-percent=0.4
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
     persistence:
       config:
         type: configMap
         name: qbtools-configmap
-        advancedMounts:
-          tagging:
-            tagging:
-              - path: /config/config.yaml
-                subPath: config.yaml
-                readOnly: true
-      media:
-        type: nfs
-        server: citadel.internal
-        path: /mnt/storage0/media
         globalMounts:
-          - path: /media/Downloads/qbittorrent
-            subPath: Downloads/qbittorrent
+          - path: /config/config.yaml
+            subPath: config.yaml
+            readOnly: true
