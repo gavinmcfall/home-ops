@@ -5,5 +5,5 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  - ../../../../templates/gatus/extermal
+  - ../../../../templates/gatus/external
   - ../../../../templates/volsync
