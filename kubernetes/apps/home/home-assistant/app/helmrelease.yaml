@@ -25,53 +25,61 @@ spec:
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
-    - name: volsync
-      namespace: volsync-system
   values:
     controllers:
       home-assistant:
         annotations:
           reloader.stakater.com/auto: "true"
-        pod:
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 568
-            runAsGroup: 568
-            fsGroup: 568
-            fsGroupChangePolicy: OnRootMismatch
-            seccompProfile: { type: RuntimeDefault }
         containers:
           app:
             image:
               repository: ghcr.io/onedr0p/home-assistant
               tag: 2024.11.3@sha256:f45f502b1738e46eb435fbc8947cdcc2574f3713b156c6738129ea2ea9b49018
+            env:
+              TZ: America/New_York
+              HASS_HTTP_TRUSTED_PROXY_1: 192.168.42.0/24
+              HASS_HTTP_TRUSTED_PROXY_2: 10.42.0.0/16
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secret
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
-                cpu: 100m
-                memory: 1Gi
+                cpu: 10m
               limits:
-                memory: 1Gi
+                memory: 2Gi
           code-server:
             image:
               repository: ghcr.io/coder/code-server
               tag: 4.95.3@sha256:6d74583d68179cbb6ddadc2518b450d2ac3eaec2d342474fe1941e03371cd2cf
             args:
-              - "--auth"
-              - "none"
-              - "--user-data-dir"
-              - "/config/.vscode"
-              - "--extensions-dir"
-              - "/config/.vscode"
-              - "/config"
+              [
+                "--auth",
+                "none",
+                "--user-data-dir",
+                "/config/.vscode",
+                "--extensions-dir",
+                "/config/.vscode",
+                "--port",
+                "12321",
+                "/config",
+              ]
             resources:
               requests:
                 cpu: 10m
               limits:
                 memory: 512Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
     service:
       app:
         controller: home-assistant
@@ -79,14 +87,12 @@ spec:
           http:
             port: 8123
           code-server:
-            port: 8080
+            port: 12321
     ingress:
       app:
-        className: external
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-          # disabled for 403
-          nginx.ingress.kubernetes.io/custom-http-errors: 400,404,405,409,410,411,412,413,414,415,416,417,418,421,425,431,451,500,501,502,503,504,505,506,510
+        className: external
         hosts:
           - host: hass.${SECRET_DOMAIN}
             paths:
@@ -95,11 +101,9 @@ spec:
                   identifier: app
                   port: http
       code-server:
-        className: internal
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-          # disabled for 404
-          nginx.ingress.kubernetes.io/custom-http-errors: 400,403,405,409,410,411,412,413,414,415,416,417,418,421,425,431,451,500,501,502,503,504,505,506,510
+        className: internal
         hosts:
           - host: hass-code.${SECRET_DOMAIN}
             paths:
@@ -110,6 +114,8 @@ spec:
     persistence:
       config:
         existingClaim: home-assistant
+        globalMounts:
+          - path: /config
       logs:
         type: emptyDir
         globalMounts:
@@ -120,3 +126,5 @@ spec:
           - path: /config/tts
       tmp:
         type: emptyDir
+        globalMounts:
+          - path: /tmp
