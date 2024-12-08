@@ -74,6 +74,8 @@ spec:
               limits:
                 memory: 512Mi
     defaultPodOptions:
+      nodeSelector:
+        kubernetes.io/hostname: "stanton-03"
       # hostNetwork: true
       securityContext:
         runAsNonRoot: false
