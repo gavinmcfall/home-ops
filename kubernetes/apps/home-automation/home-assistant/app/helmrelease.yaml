@@ -76,7 +76,7 @@ spec:
     defaultPodOptions:
       # hostNetwork: true
       securityContext:
-        runAsNonRoot: true
+        runAsNonRoot: false
         runAsUser: 568
         runAsGroup: 568
         fsGroup: 568
