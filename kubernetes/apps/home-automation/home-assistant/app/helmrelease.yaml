@@ -87,9 +87,6 @@ spec:
     service:
       app:
         controller: home-assistant
-        type: LoadBalancer
-        annotations:
-          io.cilium/lb-ipam-ips: 10.90.3.208
         ports:
           http:
             port: 8123
