@@ -40,6 +40,7 @@ spec:
               HASS_HTTP_TRUSTED_PROXY_1: ${LOCAL_CIDR}
               HASS_HTTP_TRUSTED_PROXY_2: ${CLUSTER_POD_CIDR}
               HASS_HTTP_TRUSTED_PROXY_3: ${CLUSTER_SERVICE_CIDR}
+              ENABLE_AVAHI: "1"
             envFrom:
               - secretRef:
                   name: home-assistant-secret
