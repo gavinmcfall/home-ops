@@ -76,7 +76,7 @@ spec:
     defaultPodOptions:
       nodeSelector:
         kubernetes.io/hostname: "stanton-03"
-      # hostNetwork: true
+      hostNetwork: true
       securityContext:
         runAsNonRoot: false
         runAsUser: 0
