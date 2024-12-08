@@ -1,12 +1,7 @@
 ---
 autoDirectNodeRoutes: true
-bandwidthManager:
-  enabled: false
-  bbr: false
 bpf:
   masquerade: false # Required for Talos `.machine.features.hostDNS.forwardKubeDNSToHost`
-  preallocateMaps: false
-  tproxy: false
 cgroup:
   automount:
     enabled: false
@@ -15,7 +10,7 @@ cluster:
   id: 1
   name: "home-kubernetes"
 cni:
-  exclusive: true
+  exclusive: false
 # NOTE: devices might need to be set if you have more than one active NIC on your hosts
 # devices: eno+ eth+
 endpointRoutes:
