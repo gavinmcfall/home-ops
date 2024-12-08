@@ -76,7 +76,7 @@ spec:
     defaultPodOptions:
       nodeSelector:
         kubernetes.io/hostname: "stanton-03"
-      hostNetwork: true
+      # hostNetwork: true
       securityContext:
         runAsNonRoot: false
         runAsUser: 0
@@ -90,8 +90,13 @@ spec:
         ports:
           http:
             port: 8123
+          homekit:
+            port: 21063
           code-server:
             port: 12321
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: 10.90.3.208
     ingress:
       app:
         annotations:
