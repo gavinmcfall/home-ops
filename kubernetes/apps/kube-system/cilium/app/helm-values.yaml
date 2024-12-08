@@ -1,12 +1,12 @@
 ---
 autoDirectNodeRoutes: true
 bandwidthManager:
-  enabled: true
-  bbr: true
+  enabled: false
+  bbr: false
 bpf:
   masquerade: false # Required for Talos `.machine.features.hostDNS.forwardKubeDNSToHost`
-  preallocateMaps: true
-  tproxy: true
+  preallocateMaps: false
+  tproxy: false
 cgroup:
   automount:
     enabled: false
