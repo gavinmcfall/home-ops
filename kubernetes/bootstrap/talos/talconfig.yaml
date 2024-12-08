@@ -136,6 +136,7 @@ patches:
   - "@./patches/global/containerd.yaml"
   - "@./patches/global/disable-search-domain.yaml"
   - "@./patches/global/hostdns.yaml"
+  - "@./patches/global/local-dns.yaml"
   - "@./patches/global/kubelet.yaml"
   - "@./patches/global/openebs-local.yaml"
   - "@./patches/global/sysctl.yaml"

@@ -1,0 +1,4 @@
+machine:
+  network:
+    nameservers:
+      - 10.90.254.1
