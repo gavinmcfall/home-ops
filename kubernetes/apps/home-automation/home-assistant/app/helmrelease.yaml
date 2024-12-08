@@ -93,8 +93,6 @@ spec:
         ports:
           http:
             port: 8123
-          homekit:
-            port: 21063
           code-server:
             port: 12321
     ingress:
