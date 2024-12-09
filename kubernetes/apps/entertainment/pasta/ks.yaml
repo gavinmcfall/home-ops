@@ -5,6 +5,8 @@ kind: Kustomization
 metadata:
   name: &app pasta
   namespace: flux-system
+  labels:
+    app.kubernetes.io/name: pasta
 spec:
   targetNamespace: entertainment
   commonMetadata:
