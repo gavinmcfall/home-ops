@@ -70,7 +70,7 @@ spec:
           http:
             port: 8123
           homekit:
-            port: 21063
+            port: 21064
     ingress:
       app:
         annotations:
