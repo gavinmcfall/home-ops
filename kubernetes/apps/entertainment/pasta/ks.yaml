@@ -6,7 +6,7 @@ metadata:
   name: &app pasta
   namespace: flux-system
   labels:
-    app.kubernetes.io/name: pasta
+    app.kubernetes.io/name: *app
 spec:
   targetNamespace: entertainment
   commonMetadata:
