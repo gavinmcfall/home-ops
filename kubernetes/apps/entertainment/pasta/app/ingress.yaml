@@ -7,7 +7,7 @@ metadata:
     gethomepage.dev/enabled: "true"
     gethomepage.dev/name: Pasta
     gethomepage.dev/description: Plex Audio Management
-    gethomepage.dev/group: Home
+    gethomepage.dev/group: Entertainment
     gethomepage.dev/icon: mdi-noodles-#FFFFFF
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
