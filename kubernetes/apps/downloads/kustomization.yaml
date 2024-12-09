@@ -9,7 +9,7 @@ resources:
   - ./flaresolverr/ks.yaml
   - ./kapowarr/ks.yaml
   - ./metube/ks.yaml
-  - ./mylar/ks.yaml
+  # - ./mylar/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
   - ./radarr/ks.yaml
