@@ -6,9 +6,9 @@
         description: Cloudflared Tunnel Status
         widget:
           type: cloudflared
-          accountid: {{HOMEPAGE_VAR_CLOUDFLARED_ACCOUNTID}}
-          tunnelid: {{HOMEPAGE_VAR_CLOUDFLARED_TUNNELID}}
-          key: {{HOMEPAGE_VAR_CLOUDFLARED_API_TOKEN}}
+          accountid: { { HOMEPAGE_VAR_CLOUDFLARED_ACCOUNTID } }
+          tunnelid: { { HOMEPAGE_VAR_CLOUDFLARED_TUNNELID } }
+          key: { { HOMEPAGE_VAR_CLOUDFLARED_API_TOKEN } }
           fields: ["status"]
     - Healthchecks:
         href: https://dashboard.uptimerobot.com/monitors#mainDashboard
@@ -17,7 +17,7 @@
         widget:
           type: uptimerobot
           url: https://api.uptimerobot.com
-          key: {{HOMEPAGE_VAR_UPTIMEROBOT_TOKEN}}
+          key: { { HOMEPAGE_VAR_UPTIMEROBOT_TOKEN } }
     - Unifi:
         href: https://unifi.ui.com
         icon: unifi.png
@@ -25,8 +25,8 @@
         widget:
           type: unifi
           url: https://unifi.${SECRET_DOMAIN}
-          username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
-          password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
+          username: { { HOMEPAGE_VAR_UNIFI_USERNAME } }
+          password: { { HOMEPAGE_VAR_UNIFI_PASSWORD } }
     - Truenas:
         href: https://citadel.${SECRET_DOMAIN}
         icon: truenas.png
@@ -34,7 +34,7 @@
         widget:
           type: truenas
           url: https://citadel.${SECRET_DOMAIN}
-          key: {{HOMEPAGE_VAR_TRUENAS_TOKEN}}
+          key: { { HOMEPAGE_VAR_TRUENAS_TOKEN } }
           enablePools: true
           nasType: scale
 - Events:
@@ -53,12 +53,12 @@
             - type: readarr # active widget type that is currently enabled on homepage - possible values: radarr, sonar>
               service_group: Downloads # group name where widget exists
               service_name: Readarr # service name for that widget
-# - Home:
-#     - Home-Assistant:
-#         href: https://hass.${SECRET_DOMAIN}
-#         icon: home-assistant.png
-#         description: Home Automation Software
-#         widget:
-#           type: homeassistant
-#           url: https://hass.${SECRET_DOMAIN}
-#           key: {{HOMEPAGE_VAR_HASS_TOKEN}}
+- Home Automation:
+    - Home-Assistant:
+        href: https://hass.${SECRET_DOMAIN}
+        icon: home-assistant.png
+        description: Home Automation Software
+        widget:
+          type: homeassistant
+          url: https://hass.${SECRET_DOMAIN}
+          key: { { HOMEPAGE_VAR_HASS_TOKEN } }
