@@ -35,3 +35,11 @@ layout:
     style: row
     columns: 4
     icon: mdi-download-circle
+  Home:
+    style: row
+    columns: 2
+    icon: mdi-home
+  Home Automation:
+    style: row
+    columns: 2
+    icon: mdi-home-automation
