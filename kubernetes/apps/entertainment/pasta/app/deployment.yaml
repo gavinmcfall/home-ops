@@ -5,6 +5,8 @@ metadata:
   namespace: entertainment
   annotations:
     reloader.stakater.com/auto: "true"
+  labels:
+    app.kubernetes.io/name: pasta
 spec:
   replicas: 1
   selector:
@@ -23,3 +25,4 @@ spec:
               cpu: "10m"
             limits:
               memory: "64Mi"
+
