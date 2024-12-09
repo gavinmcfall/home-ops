@@ -5,17 +5,15 @@ metadata:
   namespace: entertainment
   annotations:
     reloader.stakater.com/auto: "true"
-  labels:
+  labels: &labels
     app.kubernetes.io/name: pasta
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: pasta
+    matchLabels: *labels
   template:
     metadata:
-      labels:
-        app: pasta
+      labels: *labels
     spec:
       containers:
         - name: pasta
@@ -25,4 +23,3 @@ spec:
               cpu: "10m"
             limits:
               memory: "64Mi"
-
