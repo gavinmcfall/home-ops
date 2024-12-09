@@ -36,10 +36,10 @@ layout:
     columns: 4
     icon: mdi-download-circle
   Home:
-    style: row
+    style: column
     columns: 2
     icon: mdi-home
   Home Automation:
-    style: row
+    style: column
     columns: 2
     icon: mdi-home-automation
