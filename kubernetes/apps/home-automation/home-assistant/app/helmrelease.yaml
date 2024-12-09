@@ -71,7 +71,7 @@ spec:
             port: 8123
           hass:
             port: 21064
-          mDNS:
+          mdns:
             port: 5353
             protocol: UDP
           homekit:
