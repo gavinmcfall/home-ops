@@ -52,6 +52,27 @@ spec:
                 cpu: 10m
               limits:
                 memory: 2Gi
+          code-server:
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: 4.95.3@sha256:6d74583d68179cbb6ddadc2518b450d2ac3eaec2d342474fe1941e03371cd2cf
+            args:
+              [
+                "--auth",
+                "none",
+                "--user-data-dir",
+                "/config/.vscode",
+                "--extensions-dir",
+                "/config/.vscode",
+                "--port",
+                "12321",
+                "/config",
+              ]
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -62,20 +83,12 @@ spec:
         seccompProfile: { type: RuntimeDefault }
     service:
       app:
-        controller: *app
-        # type: LoadBalancer
-        # annotations:
-        #   io.cilium/lb-ipam-ips: 10.90.3.208
+        controller: home-assistant
         ports:
           http:
             port: 8123
-          # hass:
-          #   port: 21064
-          # mdns:
-          #   port: 5353
-          #   protocol: UDP
-          # homekit:
-          #   port: 51827
+          code-server:
+            port: 12321
     ingress:
       app:
         annotations:
@@ -88,6 +101,17 @@ spec:
                 service:
                   identifier: app
                   port: http
+      code-server:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        className: internal
+        hosts:
+          - host: hass-code.${SECRET_DOMAIN}}
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: code-server
     persistence:
       config:
         existingClaim: home-assistant
