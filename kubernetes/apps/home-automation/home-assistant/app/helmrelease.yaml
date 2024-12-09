@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app home-assistant
+  name: home-assistant
 spec:
   interval: 30m
   chart:
@@ -106,7 +106,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         className: internal
         hosts:
-          - host: hass-code.${SECRET_DOMAIN}}
+          - host: hass-code.${SECRET_DOMAIN}
             paths:
               - path: /
                 service:
