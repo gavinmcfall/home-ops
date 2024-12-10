@@ -1,3 +1,4 @@
+#prettier-ignore
 ---
 - logo:
     icon: https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/icons/Nerdz_200x200_transparent.png
@@ -31,5 +32,5 @@
       hourCycle: h23
 - unifi_console:
     url: https://unifi.${SECRET_DOMAIN}
-    username: { { HOMEPAGE_VAR_UNIFI_USERNAME } }
-    password: { { HOMEPAGE_VAR_UNIFI_PASSWORD } }
+    username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
+    password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
