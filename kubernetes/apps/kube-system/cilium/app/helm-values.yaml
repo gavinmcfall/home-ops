@@ -18,6 +18,7 @@ cluster:
   name: "home-kubernetes"
 cni:
   exclusive: false
+devices: "bond0"
 endpointRoutes:
   enabled: true
 hubble:

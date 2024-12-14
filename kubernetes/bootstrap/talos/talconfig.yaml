@@ -47,6 +47,11 @@ nodes:
             vlanId: 107
             mtu: 1500
             dhcp: false
+            addresses:
+              - "10.99.107.101/24"
+            routes:
+              - network: 0.0.0.0/0
+                gateway: "10.99.107.1"
             dhcpOptions:
               routeMetric: 4096
       #############################################
@@ -98,6 +103,11 @@ nodes:
             vlanId: 107
             mtu: 1500
             dhcp: false
+            addresses:
+              - "10.99.107.102/24"
+            routes:
+              - network: 0.0.0.0/0
+                gateway: "10.99.107.1"
             dhcpOptions:
               routeMetric: 4096
       #############################################
@@ -149,6 +159,11 @@ nodes:
             vlanId: 107
             mtu: 1500
             dhcp: false
+            addresses:
+              - "10.99.107.103/24"
+            routes:
+              - network: 0.0.0.0/0
+                gateway: "10.99.107.1"
             dhcpOptions:
               routeMetric: 4096
       #############################################
