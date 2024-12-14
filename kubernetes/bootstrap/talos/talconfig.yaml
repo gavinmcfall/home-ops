@@ -28,8 +28,11 @@ nodes:
     talosImageURL: factory.talos.dev/installer/9815c9b5e00515fccee82e1a367d6b47a4e906ab8fa3256e7721c6a33f274060
     controlPlane: true
     networkInterfaces:
-      - deviceSelector:
-          hardwareAddr: "58:47:ca:76:16:d2"
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: "58:47:ca:76:16:d2"
         dhcp: false
         addresses:
           - "10.90.3.101/16"
@@ -39,6 +42,16 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.90.3.100"
+        vlans:
+          - &vlan107
+            vlanId: 107
+            mtu: 1500
+            dhcp: false
+            dhcpOptions:
+              routeMetric: 4096
+      #############################################
+      #         Thunerbolt Configuration          #
+      #############################################
       - deviceSelector:
           busPath: 0-1.0 # stanton-02
         dhcp: false
@@ -57,6 +70,8 @@ nodes:
         routes:
           - network: 169.254.255.103/32
             metric: 2048
+  ###################################################################
+  ###################################################################
   - hostname: "stanton-02"
     ipAddress: "10.90.3.102"
     installDiskSelector:
@@ -64,8 +79,11 @@ nodes:
     talosImageURL: factory.talos.dev/installer/9815c9b5e00515fccee82e1a367d6b47a4e906ab8fa3256e7721c6a33f274060
     controlPlane: true
     networkInterfaces:
-      - deviceSelector:
-          hardwareAddr: "58:47:ca:76:0b:fe"
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: "58:47:ca:76:0b:fe"
         dhcp: false
         addresses:
           - "10.90.3.102/16"
@@ -75,6 +93,16 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.90.3.100"
+        vlans:
+          - &vlan107
+            vlanId: 107
+            mtu: 1500
+            dhcp: false
+            dhcpOptions:
+              routeMetric: 4096
+      #############################################
+      #         Thunerbolt Configuration          #
+      #############################################
       - deviceSelector:
           busPath: 0-1.0 # stanton-01
         dhcp: false
@@ -93,6 +121,8 @@ nodes:
         routes:
           - network: 169.254.255.103/32
             metric: 2048
+  ###################################################################
+  ###################################################################
   - hostname: "stanton-03"
     ipAddress: "10.90.3.103"
     installDiskSelector:
@@ -100,8 +130,11 @@ nodes:
     talosImageURL: factory.talos.dev/installer/9815c9b5e00515fccee82e1a367d6b47a4e906ab8fa3256e7721c6a33f274060
     controlPlane: true
     networkInterfaces:
-      - deviceSelector:
-          hardwareAddr: "58:47:ca:76:0e:de"
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: "58:47:ca:76:0e:de"
         dhcp: false
         addresses:
           - "10.90.3.103/16"
@@ -111,6 +144,16 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.90.3.100"
+        vlans:
+          - &vlan107
+            vlanId: 107
+            mtu: 1500
+            dhcp: false
+            dhcpOptions:
+              routeMetric: 4096
+      #############################################
+      #         Thunerbolt Configuration          #
+      #############################################
       - deviceSelector:
           busPath: 0-1.0 # stanton-01
         dhcp: false
@@ -129,7 +172,6 @@ nodes:
         routes:
           - network: 169.254.255.102/32
             metric: 2048
-
 # Global patches
 patches:
   - "@./patches/global/cluster-discovery.yaml"
