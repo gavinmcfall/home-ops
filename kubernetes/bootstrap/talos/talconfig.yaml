@@ -33,6 +33,7 @@ nodes:
           mode: active-backup
           deviceSelectors:
             - hardwareAddr: "58:47:ca:76:16:d2"
+              driver: igc
         dhcp: false
         addresses:
           - "10.90.3.101/16"
@@ -42,18 +43,18 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.90.3.100"
-        vlans:
-          - &vlan107
-            vlanId: 107
-            mtu: 1500
-            dhcp: false
-            addresses:
-              - "10.99.107.101/24"
-            routes:
-              - network: 0.0.0.0/0
-                gateway: "10.99.107.1"
-            dhcpOptions:
-              routeMetric: 4096
+        # vlans:
+        #   - &vlan107
+        #     vlanId: 107
+        #     mtu: 1500
+        #     dhcp: false
+        #     addresses:
+        #       - "10.99.107.101/24"
+        #     routes:
+        #       - network: 0.0.0.0/0
+        #         gateway: "10.99.107.1"
+        #     dhcpOptions:
+        #       routeMetric: 4096
       #############################################
       #         Thunerbolt Configuration          #
       #############################################
@@ -89,6 +90,7 @@ nodes:
           mode: active-backup
           deviceSelectors:
             - hardwareAddr: "58:47:ca:76:0b:fe"
+              driver: igc
         dhcp: false
         addresses:
           - "10.90.3.102/16"
@@ -98,18 +100,18 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.90.3.100"
-        vlans:
-          - &vlan107
-            vlanId: 107
-            mtu: 1500
-            dhcp: false
-            addresses:
-              - "10.99.107.102/24"
-            routes:
-              - network: 0.0.0.0/0
-                gateway: "10.99.107.1"
-            dhcpOptions:
-              routeMetric: 4096
+        # vlans:
+        #   - &vlan107
+        #     vlanId: 107
+        #     mtu: 1500
+        #     dhcp: false
+        #     addresses:
+        #       - "10.99.107.102/24"
+        #     routes:
+        #       - network: 0.0.0.0/0
+        #         gateway: "10.99.107.1"
+        #     dhcpOptions:
+        #       routeMetric: 4096
       #############################################
       #         Thunerbolt Configuration          #
       #############################################
@@ -145,6 +147,7 @@ nodes:
           mode: active-backup
           deviceSelectors:
             - hardwareAddr: "58:47:ca:76:0e:de"
+              driver: igc
         dhcp: false
         addresses:
           - "10.90.3.103/16"
@@ -154,18 +157,18 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.90.3.100"
-        vlans:
-          - &vlan107
-            vlanId: 107
-            mtu: 1500
-            dhcp: false
-            addresses:
-              - "10.99.107.103/24"
-            routes:
-              - network: 0.0.0.0/0
-                gateway: "10.99.107.1"
-            dhcpOptions:
-              routeMetric: 4096
+        # vlans:
+        #   - &vlan107
+        #     vlanId: 107
+        #     mtu: 1500
+        #     dhcp: false
+        #     addresses:
+        #       - "10.99.107.103/24"
+        #     routes:
+        #       - network: 0.0.0.0/0
+        #         gateway: "10.99.107.1"
+        #     dhcpOptions:
+        #       routeMetric: 4096
       #############################################
       #         Thunerbolt Configuration          #
       #############################################
