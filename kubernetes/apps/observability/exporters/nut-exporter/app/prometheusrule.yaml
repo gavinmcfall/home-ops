@@ -86,6 +86,7 @@ spec:
       params:
         server:
           - network-ups-tools.observability
+          - 10.90.1.1
       path: /ups_metrics
       port: metrics
       scheme: http
