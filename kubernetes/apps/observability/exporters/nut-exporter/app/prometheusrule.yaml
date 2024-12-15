@@ -63,7 +63,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app.kubernetes.io/component: metrics
-    app.kubernetes.io/instance: servers
+    app.kubernetes.io/instance: k8scluster
     app.kubernetes.io/name: nut-exporter
     prometheus: kube-prometheus
   name: nut-exporter-server
@@ -85,8 +85,38 @@ spec:
           regex: (pod)
       params:
         server:
-          - network-ups-tools.observability
-          - 10.90.1.1
+          - network-ups-tools.observability.svc.cluster.local
+      relabelings:
+        - targetLabel: ups
+          replacement: Kubernetes-Nodes
+      path: /ups_metrics
+      port: metrics
+      scheme: http
+      scrapeTimeout: 30s
+    #########################################################
+    #########################################################
+    #########################################################
+    - interval: 30s
+      metricRelabelings:
+        - action: replace
+          replacement: server
+          sourceLabels:
+            - instance
+          targetLabel: instance
+        - action: replace
+          replacement: server
+          sourceLabels:
+            - server
+          targetLabel: server
+      params:
+        server: [10.90.1.1]
+        username:
+          - ${UPS_NEXUS_USERNAME}
+        password:
+          - ${UPS_NEXUS_PASSWORD}
+      relabelings:
+        - targetLabel: ups
+          replacement: Nexus-Server
       path: /ups_metrics
       port: metrics
       scheme: http
@@ -99,45 +129,3 @@ spec:
     matchLabels:
       app.kubernetes.io/instance: nut-exporter
       app.kubernetes.io/name: nut-exporter
-# ---
-# # yaml-language-server: $schema=https://lds-schemas.pages.dev/monitoring.coreos.com/servicemonitor_v1.json
-# apiVersion: monitoring.coreos.com/v1
-# kind: ServiceMonitor
-# metadata:
-#   labels:
-#     app.kubernetes.io/component: metrics
-#     app.kubernetes.io/instance: servers
-#     app.kubernetes.io/name: nut-exporter
-#     prometheus: kube-prometheus
-#   name: nut-exporter-network
-# spec:
-#   endpoints:
-#     - interval: 30s
-#       metricRelabelings:
-#         - action: replace
-#           replacement: network
-#           sourceLabels:
-#             - instance
-#           targetLabel: instance
-#         - action: replace
-#           replacement: network
-#           sourceLabels:
-#             - server
-#           targetLabel: server
-#         - action: labeldrop
-#           regex: (pod)
-#       params:
-#         server:
-#           - network-nut.${SECRET_DOMAIN}
-#       path: /ups_metrics
-#       port: metrics
-#       scheme: http
-#       scrapeTimeout: 30s
-#   jobLabel: nut-exporter
-#   namespaceSelector:
-#     matchNames:
-#       - observability
-#   selector:
-#     matchLabels:
-#       app.kubernetes.io/instance: nut-exporter
-#       app.kubernetes.io/name: nut-exporter
