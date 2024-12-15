@@ -10,7 +10,7 @@ resources:
   - ./kromgo/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
   - ./loki/ks.yaml
-  - ./network-ups-tools/ks.yaml #Turning off till I get a replacement UPS
+  # - ./network-ups-tools/ks.yaml #Turning off till I get a replacement UPS
   - ./prometheus-operator-crds/ks.yaml
   - ./promtail/ks.yaml
   - ./redisinsight/ks.yaml
