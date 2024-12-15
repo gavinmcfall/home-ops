@@ -60,3 +60,9 @@ spec:
         globalMounts:
           - path: /etc/nut
             readOnly: true
+      ups:
+        type: hostPath
+        hostPath: /dev/bus/usb/003/002 #USB device path for UPS
+        globalMounts:
+          - path: /dev/bus/usb/001/001
+            readOnly: false
