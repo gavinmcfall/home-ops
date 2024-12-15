@@ -53,10 +53,46 @@ spec:
             port: 3493
             protocol: TCP
     persistence:
+      ups:
+        type: hostPath
+        hostPath: /dev/bus/usb/003/002
+        globalMounts:
+          - path: /dev/bus/usb/001/001
+            readOnly: false
+    configMaps:
       config:
         enabled: true
-        type: configMap
-        name: *config
-        globalMounts:
-          - path: /etc/nut
-            readOnly: true
+        data:
+          nut.conf: |-
+            MODE=netserver
+          upsd.conf: |-
+            MAXAGE 20
+            LISTEN 0.0.0.0
+            LISTEN ::
+          upsd.users: |-
+            [upsmon]
+              password  = "${NUT_PASSWORD}"
+              actions = SET
+              instcmds = ALL
+              upsmon primary
+          ups.conf: |-
+            [kubernetes]
+              driver = "usbhid-ups"
+              port = auto
+              desc = "Eaton5E for k8s"
+              pollinterval = 10
+            [nexus]
+              driver = "dummy-ups"
+              port = auto
+              desc = "Eaton5s for Proxmox/TrueNAS"
+              host = 10.90.1.1
+              pollinterval = 10
+          upsmon.conf: |-
+            MONITOR kubernetes@localhost:3493 1 upsmon "${NUT_PASSWORD}" primary
+            SHUTDOWNCMD "/sbin/shutdown -h +0"
+            POWERDOWNFLAG /etc/killpower
+            POLLFREQ 15
+            POLLFREQALERT 5
+            HOSTSYNC 15
+
+            MONITOR nexus@10.90.1.1:3493 2 upsmon "${NUT_PASSWORD}" slave
