@@ -87,12 +87,6 @@ spec:
         seccompProfile: {type: RuntimeDefault}
     service:
       app:
-        labels:
-          com.dashbrr.service.type: "radarr" # Required: Service type
-          com.dashbrr.service.url: "http://radarr.downloads.svc.cluster.local:80" # Required: Service URL
-          com.dashbrr.service.apikey: "${RADARR_API_KEY}" # Required: API key (supports env vars)
-          com.dashbrr.service.name: "Radarr" # Optional: Custom display name
-          com.dashbrr.service.enabled: "true" # Optional: Enable/disable service
         controller: radarr
         ports:
           http:
