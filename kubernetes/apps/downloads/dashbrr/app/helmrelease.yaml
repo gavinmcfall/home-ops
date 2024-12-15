@@ -1,9 +1,8 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app radarr
+  name: &app dashbrr
 spec:
   interval: 30m
   chart:
@@ -25,9 +24,13 @@ spec:
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
+    - name: volsync
+      namespace: volsync
   values:
     controllers:
-      radarr:
+      dashbrr:
+        labels:
+          postgres: "true"
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -37,31 +40,28 @@ spec:
               tag: 16
             envFrom: &envFrom
               - secretRef:
-                  name: radarr-secret
+                  name: dashbrr-secret
         containers:
           app:
             image:
-              repository: ghcr.io/onedr0p/radarr-develop
-              tag: 5.16.0.9485@sha256:f21d401a2ce6ebf5401c4dc71e3184ece740fff227a6af0ffa1a51fe4af7627c
+              repository: ghcr.io/autobrr/dashbrr
+              tag: pr-67
+              # tag: v0.2.0@sha256:b3b898d4bf9b463bf802e7af188de45e6ca08eb96e828b4e9cbfde6e418441ad
             env:
-              RADARR__APP__INSTANCENAME: Radarr
-              RADARR__APP__THEME: dark
-              RADARR__AUTH__METHOD: External
-              RADARR__AUTH__REQUIRED: DisabledForLocalAddresses
-              RADARR__LOG__DBENABLED: "False"
-              RADARR__LOG__LEVEL: info
-              RADARR__SERVER__PORT: &port 80
-              RADARR__UPDATE__BRANCH: develop
+              DASHBRR__CONFIG_PATH: /config/config.toml
+              DASHBRR__DB_PATH: /cache/._ # cache path is derived from DASHBRR__DB_PATH
+              DASHBRR__LISTEN_ADDR: 0.0.0.0:8080
+              GIN_MODE: debug
               TZ: ${TIMEZONE}
             envFrom: *envFrom
             probes:
               liveness: &probes
-                enabled: false
+                enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /ping
-                    port: *port
+                    path: /health
+                    port: &port 8080
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
@@ -71,11 +71,6 @@ spec:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: {drop: ["ALL"]}
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 2Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -83,34 +78,26 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [10000]
         seccompProfile: {type: RuntimeDefault}
     service:
       app:
-        # labels:
-        #   com.dashbrr.service.type: "radarr" # Required: Service type
-        #   com.dashbrr.service.url: "http://radarr:80" # Required: Service URL
-        #   com.dashbrr.service.apikey: "${RADARR_API_KEY}" # Required: API key (supports env vars)
-        #   com.dashbrr.service.name: "Radarr" # Optional: Custom display name
-        #   com.dashbrr.service.enabled: "true" # Optional: Enable/disable service
-        controller: radarr
+        controller: *app
         ports:
           http:
             port: *port
     ingress:
       app:
-        annotations:
-          gethomepage.dev/enabled: "true"
-          gethomepage.dev/group: Downloads
-          gethomepage.dev/name: Radarr
-          gethomepage.dev/app: *app
-          gethomepage.dev/icon: radarr.png
-          gethomepage.dev/description: Movie Downloads
-          gethomepage.dev/widget.type: radarr
-          gethomepage.dev/widget.url: http://radarr.downloads
-          gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_RADARR_TOKEN}}` }}"
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         className: internal
+        annotations:
+          # gethomepage.dev/enabled: "true"
+          # gethomepage.dev/group: Downloads
+          # gethomepage.dev/name: dashbrr
+          # gethomepage.dev/icon: dashbrr.png
+          # gethomepage.dev/description: Media stack management
+          # gethomepage.dev/widget.type: dashbrr
+          # gethomepage.dev/widget.url: http://dashbrr.downloads
+          # gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_DASHBRR_TOKEN}}` }}"
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hosts:
           - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
             paths: &paths
@@ -122,27 +109,18 @@ spec:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "{{ .Release.Name }}"
+          - host: "{{ .Release.Name }}"
             paths: *paths
         tls:
           - hosts:
               - *app
+    serviceAccount:
+      create: true
+      name: dashbrr
     persistence:
-      config:
-        existingClaim: radarr
-      pushover-notify:
-        type: configMap
-        name: radarr-configmap
-        defaultMode: 0775
-        globalMounts:
-          - path: /scripts/pushover-notify.sh
-            subPath: pushover-notify.sh
-            readOnly: true
-      tmp:
+      cache:
         type: emptyDir
-      media:
-        type: nfs
-        server: 10.90.1.69
-        path: /mnt/storage0/media
-        globalMounts:
-          - path: /media
+        sizeLimit: 1Gi
+      config:
+        type: configMap
+        name: dashbrr-config
