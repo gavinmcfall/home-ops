@@ -1,0 +1,15 @@
+scrape_configs:
+  - job_name: ups
+    static_configs:
+      - targets: [
+            "network-ups-tools.observability.svc.cluster.local",
+            "10.90.1.1",
+          ] # nut exporter
+    metrics_path: /ups_metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_server
+      - source_labels: [__param_server]
+        target_label: instance
+      - target_label: __address__
+        replacement: nut-exporter.observability.svc.cluster.local:9199
