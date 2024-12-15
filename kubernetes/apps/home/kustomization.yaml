@@ -12,5 +12,5 @@ resources:
   # - ./plane/ks.yaml
   - ./smtp-relay/ks.yaml
   - ./thelounge/ks.yaml
-  - ./vikunja/ks.yaml
-  - ./wikijs/ks.yaml
+  # - ./vikunja/ks.yaml
+  # - ./wikijs/ks.yaml
