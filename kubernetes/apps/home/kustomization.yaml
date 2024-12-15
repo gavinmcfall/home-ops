@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   # Applications
+  - ./atuin/ks.yaml
   - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
   - ./manyfold/ks.yaml
