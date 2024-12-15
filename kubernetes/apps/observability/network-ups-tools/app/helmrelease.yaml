@@ -53,6 +53,12 @@ spec:
             port: 3493
             protocol: TCP
     persistence:
+      config:
+        type: configMap
+        name: network-ups-tools-config
+        defaultMode: 0400
+        globalMounts:
+          - path: /etc/nut
       ups:
         type: hostPath
         hostPath: /dev/bus/usb/003/002
