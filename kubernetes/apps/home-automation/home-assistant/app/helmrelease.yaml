@@ -30,15 +30,15 @@ spec:
       home-assistant:
         annotations:
           reloader.stakater.com/auto: "true"
-        pod:
-          annotations:
-            k8s.v1.cni.cncf.io/networks: |
-              [{
-                "name":"multus-iot",
-                "namespace": "network",
-                "ips": ["10.99.107.69/24"],
-                "mac": "02:62:6f:3e:1e:c5"
-              }]
+        # pod:
+        #   annotations:
+        #     k8s.v1.cni.cncf.io/networks: |
+        #       [{
+        #         "name":"multus-iot",
+        #         "namespace": "network",
+        #         "ips": ["10.99.107.69/24"],
+        #         "mac": "02:62:6f:3e:1e:c5"
+        #       }]
         containers:
           app:
             image:
