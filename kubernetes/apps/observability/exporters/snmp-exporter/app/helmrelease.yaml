@@ -30,15 +30,15 @@ spec:
     serviceMonitor:
       enabled: true
       params:
-        - name: apcups
-          module: ["apcups"]
-          target: 192.168.1.80
+        - name: Kubernetes-UPS
+          module: ["kubernetes"]
+          target: network-ups-tools.observability.svc.cluster.local
           auth: ["public_v2"]
-        - name: dell
-          module: ["dell"]
-          target: 192.168.1.82
+        - name: Nexus-UPS
+          module: ["nexus"]
+          target: 10.90.1.1
           auth: ["public_v2"]
       path: /snmp
       scrapeTimeout: 10s
       relabelings:
-        - { sourceLabels: ["__param_target"], targetLabel: instance }
+        - {sourceLabels: ["__param_target"], targetLabel: instance}
