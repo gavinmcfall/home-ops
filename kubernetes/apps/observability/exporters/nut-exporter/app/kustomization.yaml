@@ -5,3 +5,7 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./prometheusrule.yaml
+configMapGenerator:
+  - name: network-ups-tools-config
+    files:
+      - ./config/prometheus.yml
