@@ -2,4 +2,4 @@
   password  = "${NUT_PASSWORD}"
   actions = SET
   instcmds = ALL
-  upsmon primary
+  upsmon master
