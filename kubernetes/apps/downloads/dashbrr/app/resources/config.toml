@@ -1,12 +1,1 @@
-services:
-  radarr:
-    - url: "http://radarr.downloads.svc.cluster.local:80"
-      apikey: "${RADARR_API_KEY}"
-      name: "Movies" # Optional
-  sonarr:
-    - url: "http://sonarr.downloads.svc.cluster.local:80"
-      apikey: "${SONARR_API_KEY}"
-      name: "TV Shows"
-  prowlarr:
-    - url: "http://prowlarr.downloads.svc.cluster.local:9696"
-      apikey: "${PROWLARR_API_KEY}"
+
