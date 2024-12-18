@@ -13,7 +13,7 @@ spec:
   dependsOn:
     - name: plex
     - name: overseerr
-  path: ./kubernetes/main/apps/entertainment/wizarr/app
+  path: ./kubernetes/apps/entertainment/wizarr/app
   prune: true
   sourceRef:
     kind: GitRepository
