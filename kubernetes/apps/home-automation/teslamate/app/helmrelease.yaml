@@ -1,0 +1,92 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: teslamate
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      teslamate:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/onedr0p/postgres-init
+              tag: 16.6@sha256:c1d3a845d47fe1aeebd110fefb5f43f54c4735aec1d2b0c01de8d4d5e8cdd6a4
+            envFrom: &envFrom
+              - secretRef:
+                  name: teslamate-secret
+        containers:
+          app:
+            image:
+              repository: teslamate/teslamate
+              tag: 1.32.0
+            env:
+              TZ: &tz ${TIMEZONE}
+              DISABLE_MQTT: "false"
+              MQTT_HOST: emqx-listeners.database.svc.cluster.local
+            envFrom: *envFrom
+
+    service:
+      app:
+        controller: teslamate
+        ports:
+          http:
+            port: 4000
+
+    ingress:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Home Automation
+          gethomepage.dev/name: Teslamate
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: teslamate.png
+          gethomepage.dev/description: Tesla Analytics
+          gethomepage.dev/widget.type: sonarr
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        className: internal
+        hosts:
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths: &paths
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
+
+    resources:
+      requests:
+        memory: 250Mi
+        cpu: 50m
+      limits:
+        memory: 500Mi
