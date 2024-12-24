@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: ghcr.io/linuxserver/mylar3
-              tag: version-v0.8.0@sha256:d07d4e1709b586a4d8c18bbb516b2ddd49d1a590820230e031b72bd76674bab4
+              tag: version-v0.8.0@sha256:4395b8b36bf459898ba62e996d1a256cd985a910a5a39faa55d739b094e268c6
             env:
               TZ: ${TIMEZONE}
               UID: 1000
