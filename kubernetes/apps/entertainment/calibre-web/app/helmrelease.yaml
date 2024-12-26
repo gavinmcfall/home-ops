@@ -95,11 +95,3 @@ spec:
         globalMounts:
           - path: /media # This is the path inside the container
             readOnly: false
-        mountOptions:
-          - nfsvers=4
-          - rsize=8192
-          - wsize=8192
-          - hard
-          - timeo=600
-          - retrans=2
-          - actimeo=0
