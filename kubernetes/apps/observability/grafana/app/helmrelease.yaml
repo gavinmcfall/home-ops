@@ -86,6 +86,7 @@ spec:
             jsonData:
               postgresVersion: 1000
               sslmode: disable
+              authType: scram-sha-256
 
     dashboardProviders:
       dashboardproviders.yaml:
