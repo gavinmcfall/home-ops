@@ -70,12 +70,25 @@ spec:
                 cpu: 100m
               limits:
                 memory: 1Gi
+          abs-tract:
+            image:
+              repository: arranhs/abs-tract
+              tag: latest
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
     service:
       app:
         controller: audiobookshelf
         ports:
           http:
             port: *port
+      abs-tract:
+        controller: audiobookshelf
+        ports:
+          http:
+            port: 5555
     ingress:
       app:
         annotations:
