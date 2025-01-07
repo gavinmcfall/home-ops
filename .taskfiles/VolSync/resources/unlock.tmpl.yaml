@@ -11,12 +11,12 @@ spec:
       automountServiceAccountToken: false
       restartPolicy: OnFailure
       containers:
-        - name: minio
+        - name: backblaze
           image: docker.io/restic/restic:latest
           args: ["unlock", "--remove-all"]
           envFrom:
             - secretRef:
-                name: ${app}-volsync-secret
+                name: ${app}-volsync-backblaze-secret
           resources: {}
         - name: r2
           image: docker.io/restic/restic:latest
