@@ -24,6 +24,5 @@ spec:
   postBuild:
     substitute:
       APP: *app
-      GATUS_PATH: /i/
-      GATUS_STATUS: "401"
+      GATUS_SUBDOMAIN: freshrss
       VOLSYNC_CAPACITY: 2Gi
