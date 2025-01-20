@@ -5,7 +5,7 @@ kind: Cluster
 metadata:
   name: postgres16
 spec:
-  instances: 3
+  instances: 1
   # CNPG Offical Image
   # imageName: ghcr.io/cloudnative-pg/postgresql:16.3-7
 
