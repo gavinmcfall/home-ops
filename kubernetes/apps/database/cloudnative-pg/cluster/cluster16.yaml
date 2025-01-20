@@ -10,7 +10,7 @@ spec:
   # imageName: ghcr.io/cloudnative-pg/postgresql:16.3-7
 
   # Tensorcord CNPG Image with pgvector extension
-  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.6
+  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.4
   primaryUpdateStrategy: unsupervised
   storage:
     size: 20Gi
@@ -47,7 +47,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://nerdz-cloudnative-pg/
       endpointURL: https://s3.us-east-005.backblazeb2.com
-      serverName: &currentCluster postgres16-v1
+      serverName: &currentCluster postgres16-v2
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -58,7 +58,7 @@ spec:
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   bootstrap:
     recovery:
-      source: &previousCluster postgres16-v3
+      source: &previousCluster postgres16-v1
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   externalClusters:
     - name: *previousCluster
