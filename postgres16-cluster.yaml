@@ -1,0 +1,236 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  creationTimestamp: "2025-01-20T04:11:11Z"
+  generation: 6
+  labels:
+    app.kubernetes.io/name: cloudnative-pg-cluster
+    kustomize.toolkit.fluxcd.io/name: cloudnative-pg-cluster
+    kustomize.toolkit.fluxcd.io/namespace: flux-system
+  name: postgres16
+  namespace: database
+  resourceVersion: "187040264"
+  uid: 0c49902f-bb31-4b2b-9be1-6f128dc2b8b7
+spec:
+  affinity:
+    podAntiAffinityType: preferred
+  backup:
+    barmanObjectStore:
+      data:
+        compression: bzip2
+      destinationPath: s3://nerdz-cloudnative-pg/
+      endpointURL: https://s3.us-east-005.backblazeb2.com
+      s3Credentials:
+        accessKeyId:
+          key: aws-access-key-id
+          name: cloudnative-pg-secret
+        secretAccessKey:
+          key: aws-secret-access-key
+          name: cloudnative-pg-secret
+      serverName: postgres16-v2
+      wal:
+        compression: bzip2
+        maxParallel: 8
+    retentionPolicy: 30d
+    target: prefer-standby
+  bootstrap:
+    recovery:
+      database: app
+      owner: app
+      source: postgres16-v1
+  enablePDB: true
+  enableSuperuserAccess: true
+  externalClusters:
+  - barmanObjectStore:
+      data:
+        compression: bzip2
+      destinationPath: s3://nerdz-cloudnative-pg/
+      endpointURL: https://s3.us-east-005.backblazeb2.com
+      s3Credentials:
+        accessKeyId:
+          key: aws-access-key-id
+          name: cloudnative-pg-secret
+        secretAccessKey:
+          key: aws-secret-access-key
+          name: cloudnative-pg-secret
+      serverName: postgres16-v1
+      wal:
+        compression: bzip2
+        maxParallel: 8
+    name: postgres16-v1
+  failoverDelay: 0
+  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.6-v0.4.0
+  instances: 1
+  logLevel: info
+  maxSyncReplicas: 0
+  minSyncReplicas: 0
+  monitoring:
+    customQueriesConfigMap:
+    - key: queries
+      name: cnpg-default-monitoring
+    disableDefaultQueries: false
+    enablePodMonitor: true
+    podMonitorMetricRelabelings:
+    - action: replace
+      sourceLabels:
+      - cluster
+      targetLabel: cnpg_cluster
+    - action: labeldrop
+      regex: cluster
+  postgresGID: 26
+  postgresUID: 26
+  postgresql:
+    parameters:
+      archive_mode: "on"
+      archive_timeout: 5min
+      dynamic_shared_memory_type: posix
+      full_page_writes: "on"
+      log_destination: csvlog
+      log_directory: /controller/log
+      log_filename: postgres
+      log_rotation_age: "0"
+      log_rotation_size: "0"
+      log_truncate_on_rotation: "false"
+      logging_collector: "on"
+      max_connections: "200"
+      max_parallel_workers: "32"
+      max_replication_slots: "32"
+      max_worker_processes: "32"
+      shared_buffers: 256MB
+      shared_memory_type: mmap
+      shared_preload_libraries: ""
+      ssl_max_protocol_version: TLSv1.3
+      ssl_min_protocol_version: TLSv1.3
+      wal_keep_size: 512MB
+      wal_level: logical
+      wal_log_hints: "on"
+      wal_receiver_timeout: 5s
+      wal_sender_timeout: 5s
+    shared_preload_libraries:
+    - vectors.so
+    syncReplicaElectionConstraint:
+      enabled: false
+  primaryUpdateMethod: restart
+  primaryUpdateStrategy: unsupervised
+  replicationSlots:
+    highAvailability:
+      enabled: true
+      slotPrefix: _cnpg_
+    synchronizeReplicas:
+      enabled: true
+    updateInterval: 30
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      cpu: 100m
+  smartShutdownTimeout: 180
+  startDelay: 3600
+  stopDelay: 1800
+  storage:
+    resizeInUseVolumes: true
+    size: 20Gi
+    storageClass: openebs-hostpath
+  superuserSecret:
+    name: cloudnative-pg-secret
+  switchoverDelay: 3600
+status:
+  availableArchitectures:
+  - goArch: amd64
+    hash: 58242fc95faa81d6bba0ba19ea959b82d9b49dc5f8e6c755f3c663665ff0ce1d
+  - goArch: arm64
+    hash: 8e5ef490a05bbd5700047edda5e2440acd14bafa256dbfcc7d4a5107573df75b
+  certificates:
+    clientCASecret: postgres16-ca
+    expirations:
+      postgres16-ca: 2025-04-20 04:06:11 +0000 UTC
+      postgres16-replication: 2025-04-20 04:06:11 +0000 UTC
+      postgres16-server: 2025-04-20 04:06:11 +0000 UTC
+    replicationTLSSecret: postgres16-replication
+    serverAltDNSNames:
+    - postgres16-rw
+    - postgres16-rw.database
+    - postgres16-rw.database.svc
+    - postgres16-rw.database.svc.cluster.local
+    - postgres16-r
+    - postgres16-r.database
+    - postgres16-r.database.svc
+    - postgres16-r.database.svc.cluster.local
+    - postgres16-ro
+    - postgres16-ro.database
+    - postgres16-ro.database.svc
+    - postgres16-ro.database.svc.cluster.local
+    serverCASecret: postgres16-ca
+    serverTLSSecret: postgres16-server
+  cloudNativePGCommitHash: bad5a251
+  cloudNativePGOperatorHash: 58242fc95faa81d6bba0ba19ea959b82d9b49dc5f8e6c755f3c663665ff0ce1d
+  conditions:
+  - lastTransitionTime: "2025-01-20T04:11:12Z"
+    message: Cluster Is Not Ready
+    reason: ClusterIsNotReady
+    status: "False"
+    type: Ready
+  - lastTransitionTime: "2025-01-20T04:13:03Z"
+    message: Continuous archiving is working
+    reason: ContinuousArchivingSuccess
+    status: "True"
+    type: ContinuousArchiving
+  - lastTransitionTime: "2025-01-20T04:14:36Z"
+    message: Backup was successful
+    reason: LastBackupSucceeded
+    status: "True"
+    type: LastBackupSucceeded
+  configMapResourceVersion:
+    metrics:
+      cnpg-default-monitoring: "186978871"
+  currentPrimary: postgres16-1
+  currentPrimaryTimestamp: "2025-01-20T04:13:02.211734Z"
+  firstRecoverabilityPoint: "2025-01-20T04:14:23Z"
+  firstRecoverabilityPointByMethod:
+    barmanObjectStore: "2025-01-20T04:14:23Z"
+  healthyPVC:
+  - postgres16-1
+  image: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.6-v0.4.0
+  initializingPVC:
+  - postgres16-3
+  instanceNames:
+  - postgres16-1
+  - postgres16-3
+  instances: 2
+  instancesReportedState:
+    postgres16-1:
+      isPrimary: true
+      timeLineID: 33
+  instancesStatus:
+    healthy:
+    - postgres16-1
+  jobCount: 2
+  lastSuccessfulBackup: "2025-01-20T04:14:23Z"
+  lastSuccessfulBackupByMethod:
+    barmanObjectStore: "2025-01-20T04:14:23Z"
+  latestGeneratedNode: 3
+  managedRolesStatus: {}
+  phase: Creating a new replica
+  phaseReason: Creating replica postgres16-3-join
+  poolerIntegrations:
+    pgBouncerIntegration: {}
+  pvcCount: 2
+  readService: postgres16-r
+  readyInstances: 1
+  secretsResourceVersion:
+    applicationSecretVersion: "186979229"
+    clientCaSecretVersion: "186979218"
+    replicationSecretVersion: "186979227"
+    serverCaSecretVersion: "186979218"
+    serverSecretVersion: "186979222"
+    superuserSecretVersion: "186978661"
+  switchReplicaClusterStatus: {}
+  targetPrimary: postgres16-1
+  targetPrimaryTimestamp: "2025-01-20T04:11:12.357697Z"
+  timelineID: 33
+  topology:
+    instances:
+      postgres16-1: {}
+    nodesUsed: 1
+    successfullyExtracted: true
+  writeService: postgres16-rw
