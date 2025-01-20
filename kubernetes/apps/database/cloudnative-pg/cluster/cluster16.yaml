@@ -10,7 +10,7 @@ spec:
   # imageName: ghcr.io/cloudnative-pg/postgresql:16.3-7
 
   # Tensorcord CNPG Image with pgvector extension
-  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.6
+  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.6-v0.4.0 
   primaryUpdateStrategy: unsupervised
   storage:
     size: 20Gi
