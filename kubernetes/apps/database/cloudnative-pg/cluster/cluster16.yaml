@@ -48,7 +48,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://nerdz-cloudnative-pg/
       endpointURL: https://s3.us-east-005.backblazeb2.com
-      serverName: &currentCluster postgres16-v3
+      serverName: &currentCluster postgres16-v4
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
