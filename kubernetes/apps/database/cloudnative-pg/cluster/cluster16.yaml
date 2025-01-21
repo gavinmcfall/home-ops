@@ -10,7 +10,8 @@ spec:
   # imageName: ghcr.io/cloudnative-pg/postgresql:16.3-7
 
   # Tensorcord CNPG Image with pgvector extension
-  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.6-v0.4.0 
+  # imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.6-v0.4.0
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.6@sha256:8639816680de815539ddd00e8e487623f144c85dc6c83d37b7282a186fb12cbf
   primaryUpdateStrategy: unsupervised
   storage:
     size: 20Gi
@@ -22,8 +23,8 @@ spec:
     parameters:
       max_connections: "200"
       shared_buffers: 256MB
-    shared_preload_libraries:
-      - "vectors.so"
+    # shared_preload_libraries:
+    #   - "vectors.so"
   resources:
     requests:
       cpu: 100m
