@@ -6,9 +6,9 @@ metadata:
   name: palworld
 spec:
   endpoints:
-    - dnsName: "palworld.jory.dev"
+    - dnsName: "palworld.nerdz.cloud"
       recordType: CNAME
-      targets: ["ipv4.jory.dev"]
+      targets: ["ipv4.nerdz.cloud"]
       providerSpecific:
         - name: external-dns.alpha.kubernetes.io/cloudflare-proxied
           value: 'false'
