@@ -43,7 +43,7 @@ spec:
               ACCOUNT_TOKEN:
                 valueFrom:
                   secretKeyRef:
-                    name: cloudflare-ddns
+                    name: cloudflare-ddns-secret
                     key: CLOUDFLARE_API_KEY
             probes:
               liveness:
