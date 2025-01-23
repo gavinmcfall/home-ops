@@ -8,7 +8,6 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  interval: 30m
   path: ./kubernetes/apps/games/palworld/app
   prune: true
   sourceRef:
