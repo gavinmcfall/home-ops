@@ -41,7 +41,7 @@ spec:
               - random
             envFrom:
               - secretRef:
-                  name: cloudflare-ddns
+                  name: cloudflare-ddns-secret
             probes:
               liveness:
                 enabled: true
