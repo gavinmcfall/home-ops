@@ -68,3 +68,11 @@ tasks:
         sh: test -f {{.AGE_FILE}}
       - msg: Missing Github deploy key file
         sh: test -f {{.GITHUB_DEPLOY_KEY_FILE}}
+
+  hr-restart:
+      desc: Restart all failed Helm Releases
+      requires:
+        vars: ["cluster"]
+      cmds:
+        - kubectl --context {{.cluster}} get hr --all-namespaces | grep False | awk '{print $2, $1}' | xargs -l bash -c 'flux --context {{.cluster}} suspend hr $0 -n $1'
+        - kubectl --context {{.cluster}} get hr --all-namespaces | grep False | awk '{print $2, $1}' | xargs -l bash -c 'flux --context {{.cluster}} resume hr $0 -n $1'
