@@ -39,12 +39,9 @@ spec:
               - ipv4.nerdz.cloud
               - --provider
               - random
-            env:
-              ACCOUNT_TOKEN:
-                valueFrom:
-                  secretKeyRef:
-                    name: cloudflare-ddns-secret
-                    key: CLOUDFLARE_API_KEY
+            envFrom:
+              - secretRef:
+                  name: cloudflare-ddns
             probes:
               liveness:
                 enabled: true
