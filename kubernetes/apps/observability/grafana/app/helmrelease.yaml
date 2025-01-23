@@ -203,12 +203,6 @@ spec:
         flux-control-plane:
           url: https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/control-plane.json
           datasource: Prometheus
-      game-servers:
-        palworld:
-          # renovate: depName="Palworld"
-          gnetId: 20421
-          revision: 1
-          datasource: Prometheus
         kubernetes-api-server:
           # renovate: depName="Kubernetes / System / API Server"
           gnetId: 15761
@@ -310,7 +304,12 @@ spec:
           gnetId: 7845
           revision: 4
           datasource: Prometheus
-
+      game-servers:
+        palworld:
+          # renovate: depName="Palworld"
+          gnetId: 20421
+          revision: 1
+          datasource: Prometheus
       kubernetes:
         k8s-system-api-server:
           # renovate: dashboardName="Kubernetes / System / API Server"
