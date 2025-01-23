@@ -39,7 +39,7 @@ spec:
         check_for_plugin_updates: false
         reporting_enabled: false
       auth.anonymous:
-        enabled: true
+        enabled: false
         org_id: 1
         org_name: Main Org.
         org_role: Viewer
