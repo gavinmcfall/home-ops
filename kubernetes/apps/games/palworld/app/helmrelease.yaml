@@ -22,10 +22,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-  - name: rook-ceph-cluster
-    namespace: rook-ceph
-  - name: volsync
-    namespace: volsync-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
   values:
     controllers:
       palworld:
@@ -38,17 +38,17 @@ spec:
               tag: master@sha256:92693701a6a0559e87a8fcb2113d8f317264ed5dc77f610296c48eb448aa8dbd
             env:
               ## Vars can be found here: https://github.com/jammsen/docker-palworld-dedicated-server/blob/develop/docs/ENV_VARS.md
-              ## Container Settings    
+              ## Container Settings
               ALWAYS_UPDATE_ON_START: true
               BACKUP_ENABLED: false #volsync is backing up the PVC
               COMMUNITY_SERVER: false
               MULTITHREAD_ENABLED: true
-              RESTART_ENABLED: true 
+              RESTART_ENABLED: true
               RESTART_CRON_EXPRESSION: 0 5 * * * #5am daily
               SERVER_SETTINGS_MODE: auto
               TZ: ${TIMEZONE}
               ## Server Gameplay Settings
-              BASE_CAMP_MAX_NUM: 5 #Max Base Camps: The higher this number is, the more base camps you can have. Default for Normal Mode = 128
+              BASE_CAMP_MAX_NUM: 10 #Max Base Camps: The higher this number is, the more base camps you can have. Default for Normal Mode = 128
               BASE_CAMP_WORKER_MAXNUM: 30 #Max Pals Working at Base: The higher this number is, the more Pals you can deploy to your base. You will still need to complete base missions to increase the capacity. Default for Normal Mode = 15
               BUILD_OBJECT_DETERIORATION_DAMAGE_RATE: "0" #Structure Deterioration Rate: The lower this number is, the slower the deterioration will be for structures and builds, with 0 meaning no deterioration. Default for Normal Mode = 1.000000
               COLLECTION_DROP_RATE: "1.000000" #Gatherable Items Multiplier: The higher this number is, the more resources you will receive from mining, lumbering etc. Default for Normal Mode = 1.000000
@@ -56,9 +56,9 @@ spec:
               ENABLE_FAST_TRAVEL: true
               ENABLE_NON_LOGIN_PENALTY: false
               ENEMY_DROP_ITEM_RATE: "1.000000" #Dropped Items Multiplier: The higher this number is, the more items/materials you will receive when defeating a Pal. Default for Normal Mode = 1.000000
-              EXP_RATE: "4.000000" #Default for Normal Mode = 1.000000
+              EXP_RATE: "5.000000" #Default for Normal Mode = 1.000000
               PAL_CAPTURE_RATE: "1.000000" #Default for Normal Mode = 1.000000
-              PAL_EGG_DEFAULT_HATCHING_TIME: "4.000000" #Incubate Egg Timer: The lower this number is, the faster eggs will hatch. Default for Normal Mode 72.000000
+              PAL_EGG_DEFAULT_HATCHING_TIME: "5.000000" #Incubate Egg Timer: The lower this number is, the faster eggs will hatch. Default for Normal Mode 72.000000
               PAL_SPAWN_NUM_RATE: "1.000000" #Pal Appearance Rate: The higher this number is, the more Pals that will spawn. Default for Normal Mode =  1.000000
               PLAYER_AUTO_HP_REGENE_RATE: "4.000000" #Player Sleep HP Regeneration Rate: The higher this number is, the faster your character will recover health when sleeping. Default for Normal Mode = 1.000000
               PLAYER_STOMACH_DECREASE_RATE: "0.500000" #Player Hunger Depletion Rate: The lower this number is, the longer it will take for your character to get hungry. Default for Normal Mode = 1.000000
@@ -72,8 +72,8 @@ spec:
               ## Webhook Settings
               WEBHOOK_ENABLED: true
             envFrom:
-            - secretRef:
-                name: palworld-secret
+              - secretRef:
+                  name: palworld-secret
             probes:
               liveness: &disabled
                 enabled: false
@@ -95,8 +95,8 @@ spec:
               RCON_PORT: *rcon-port
               SAVE_DIRECTORY: /palworld
             envFrom:
-            - secretRef:
-                name: palworld-secret
+              - secretRef:
+                  name: palworld-secret
             resources:
               limits:
                 memory: 256Mi
@@ -104,7 +104,7 @@ spec:
                 cpu: 5m
             securityContext:
               allowPrivilegeEscalation: false
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
         # pod:
         #   securityContext:
         #     runAsUser: 1000
@@ -141,17 +141,17 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: ipv4.${SECRET_DOMAIN}
         hosts:
-        - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: game
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: game
     persistence:
       config:
         existingClaim: *app
         globalMounts:
-        - path: /palworld
+          - path: /palworld
       cache:
         existingClaim: palworld-cache
         globalMounts:
