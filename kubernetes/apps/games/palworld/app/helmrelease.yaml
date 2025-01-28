@@ -58,7 +58,7 @@ spec:
               ENEMY_DROP_ITEM_RATE: "1.000000" #Dropped Items Multiplier: The higher this number is, the more items/materials you will receive when defeating a Pal. Default for Normal Mode = 1.000000
               EXP_RATE: "5.000000" #Default for Normal Mode = 1.000000
               PAL_CAPTURE_RATE: "1.000000" #Default for Normal Mode = 1.000000
-              PAL_EGG_DEFAULT_HATCHING_TIME: "5.000000" #Incubate Egg Timer: The lower this number is, the faster eggs will hatch. Default for Normal Mode 72.000000
+              PAL_EGG_DEFAULT_HATCHING_TIME: "2.000000" #Incubate Egg Timer: The lower this number is, the faster eggs will hatch. Default for Normal Mode 72.000000
               PAL_SPAWN_NUM_RATE: "1.000000" #Pal Appearance Rate: The higher this number is, the more Pals that will spawn. Default for Normal Mode =  1.000000
               PLAYER_AUTO_HP_REGENE_RATE: "4.000000" #Player Sleep HP Regeneration Rate: The higher this number is, the faster your character will recover health when sleeping. Default for Normal Mode = 1.000000
               PLAYER_STOMACH_DECREASE_RATE: "0.500000" #Player Hunger Depletion Rate: The lower this number is, the longer it will take for your character to get hungry. Default for Normal Mode = 1.000000
