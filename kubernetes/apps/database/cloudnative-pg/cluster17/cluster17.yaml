@@ -56,13 +56,13 @@ spec:
   bootstrap:
     # recovery:
     #   source: &previousCluster postgres17v1
-    #    initdb:
-    import:
-      type: monolith
-      databases: ["*"]
-      roles: ["*"]
-      source:
-        externalCluster: cnpg16
+    initdb:
+      import:
+        type: monolith
+        databases: ["*"]
+        roles: ["*"]
+        source:
+          externalCluster: cnpg16
   # Note: externalClusters is needed when recovering from an existing cnpg cluster
   externalClusters:
     # - name: *previousCluster
