@@ -5,7 +5,7 @@ kind: Cluster
 metadata:
   name: postgres17
 spec:
-  instances: 1
+  instances: 3
   # CNPG Offical Image
   imageName: ghcr.io/cloudnative-pg/postgresql:17.2@sha256:b17d21f8ec36add9b3c0ea3fb354d05f62a8fddf8ba65ae94e63ba77bc42202e
   primaryUpdateStrategy: unsupervised
