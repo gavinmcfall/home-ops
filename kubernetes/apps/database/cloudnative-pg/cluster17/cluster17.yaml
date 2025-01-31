@@ -1,0 +1,79 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres17
+spec:
+  instances: 1
+  # CNPG Offical Image
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.2@sha256:b17d21f8ec36add9b3c0ea3fb354d05f62a8fddf8ba65ae94e63ba77bc42202e
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 20Gi
+    storageClass: openebs-hostpath
+  superuserSecret:
+    name: cloudnative-pg-secret
+  enableSuperuserAccess: true
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: 256MB
+    # shared_preload_libraries:
+    #   - "vectors.so"
+  resources:
+    requests:
+      cpu: 100m
+    limits:
+      memory: 1Gi
+  monitoring:
+    enablePodMonitor: true
+    podMonitorMetricRelabelings:
+      - sourceLabels: ["cluster"]
+        targetLabel: cnpg_cluster
+        action: replace
+      - regex: cluster
+        action: labeldrop
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore: &barmanObjectStore
+      data:
+        compression: bzip2
+      wal:
+        compression: bzip2
+        maxParallel: 8
+      destinationPath: s3://nerdz-cloudnative-pg/
+      endpointURL: https://s3.us-east-005.backblazeb2.com
+      serverName: &currentCluster postgres17-v1
+      s3Credentials:
+        accessKeyId:
+          name: cloudnative-pg-secret
+          key: aws-access-key-id
+        secretAccessKey:
+          name: cloudnative-pg-secret
+          key: aws-secret-access-key
+  # Note: externalClusters is needed when recovering from an existing cnpg cluster
+  bootstrap:
+    # recovery:
+    #   source: &previousCluster postgres17v1
+    #    initdb:
+     import:
+       type: monolith
+       databases: ["*"]
+       roles: ["*"]
+       source:
+         externalCluster: cnpg16
+  # Note: externalClusters is needed when recovering from an existing cnpg cluster
+  externalClusters:
+    # - name: *previousCluster
+    #   barmanObjectStore:
+    #     <<: *barmanObjectStore
+    #     serverName: *previousCluster
+    - name: cnpg16
+      connectionParameters:
+        host: postgres16-rw.database.svc.cluster.local
+        user: postgres
+        dbname: postgres
+      password:
+        name: cloudnative-pg-secret
+        key: password
