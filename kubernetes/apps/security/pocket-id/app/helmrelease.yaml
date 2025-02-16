@@ -104,7 +104,7 @@ spec:
               - id.${SECRET_DOMAIN}
     persistence:
       data:
-        existingClaim: pocket-id-config
+        existingClaim: *app
         globalMounts:
           - path: /data
           - path: /app/backend/data
