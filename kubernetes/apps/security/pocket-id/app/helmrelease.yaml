@@ -29,7 +29,7 @@ spec:
         initContainers:
           init-db:
             image:
-              repository: ghcr.io/solanyn/postgres-init
+              repository: ghcr.io/onedr0p/postgres-init
               tag: 16
             envFrom: &envFrom
               - secretRef:
@@ -42,11 +42,11 @@ spec:
             command: ["/bin/sh", "/app/scripts/docker/entrypoint.sh"]
             env:
               DB_PROVIDER: postgres
-              PUID: 1000
-              PGID: 1000
-              PUBLIC_APP_URL: https://id.goyangi.cloud
+              PUID: 568
+              PGID: 568
+              PUBLIC_APP_URL: https://id.${SECRET_DOMAIN}
               TRUST_PROXY: true
-              TZ: Australia/Sydney
+              TZ: ${TIMEZONE}
               UPLOAD_PATH: /data/uploads
             envFrom:
               - secretRef:
@@ -77,9 +77,9 @@ spec:
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile: {type: RuntimeDefault}
         supplementalGroups: [10000]
@@ -93,12 +93,15 @@ spec:
       app:
         className: internal
         hosts:
-          - host: id.goyangi.cloud
+          - host: id.${SECRET_DOMAIN}
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
+        tls:
+          - hosts:
+              - id.${SECRET_DOMAIN}
     persistence:
       data:
         existingClaim: *app
