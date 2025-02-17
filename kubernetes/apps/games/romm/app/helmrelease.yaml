@@ -105,6 +105,11 @@ spec:
                   identifier: app
                   port: http
     persistence:
+      config:
+        existingClaim: romm-config
+        globalMounts:
+          - path: /romm/config
+            readOnly: false
       # config:
       #   type: configMap
       #   name: romm-config
