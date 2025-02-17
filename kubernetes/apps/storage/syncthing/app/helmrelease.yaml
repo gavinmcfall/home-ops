@@ -125,3 +125,10 @@ spec:
         globalMounts:
           - path: /roms
             subPath: Library/Emulation/roms/
+      emu-bios:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media/
+        globalMounts:
+          - path: /bios
+            subPath: Library/Emulation/bios/
