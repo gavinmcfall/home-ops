@@ -102,7 +102,7 @@ spec:
         type: configMap
         name: romm-configmap
         globalMounts:
-          - path: /romm/config/config.yml
+          - path: /romm/resources/config.yml
             subPath: config.yml
             readOnly: true
       tmp:
