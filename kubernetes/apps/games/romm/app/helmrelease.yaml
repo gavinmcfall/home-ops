@@ -44,7 +44,7 @@ spec:
               tag: 3.7.3@sha256:45bfde6088e217b0f050064ca2146bbbf052a559112567cf129e17f52fd07f5b
             env:
               ROMM_DB_DRIVER: postgresql
-              ROMM_BASE_PATH: /config
+              ROMM_BASE_PATH: /romm
               DISABLE_DOWNLOAD_ENDPOINT_AUTH: true
               ENABLE_SCHEDULED_RESCAN: "true"
               SCHEDULED_RESCAN_CRON: "0 3 * * *"
@@ -80,9 +80,9 @@ spec:
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [44, 10000]
         seccompProfile: {type: RuntimeDefault}
