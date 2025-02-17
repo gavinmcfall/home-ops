@@ -109,13 +109,8 @@ spec:
         type: configMap
         name: romm-config
         globalMounts:
-          - path: /romm/config/config.yml  # Place ConfigMap inside PVC
+          - path: /romm/config/config.yml
             subPath: config.yml
-      config:
-        existingClaim: *app
-        globalMounts:
-          - path: /romm/config
-            readOnly: false
       assets:
         existingClaim: romm-assets
         globalMounts:
