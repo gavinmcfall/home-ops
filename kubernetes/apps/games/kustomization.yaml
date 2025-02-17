@@ -6,4 +6,4 @@ resources:
   - ./namespace.yaml
   # Flux-Kustomizations
   - ./palworld/ks.yaml
-  # - ./romm/ks.yaml
+  - ./romm/ks.yaml

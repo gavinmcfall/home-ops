@@ -7,9 +7,9 @@ resources:
   - ./pvc.yaml
   - ../../../../templates/volsync
   - ../../../../templates/gatus/guarded
-configMapGenerator:
-- name: romm-config
-  files:
-    - ./config/config.yml
-  options:
-    disableNameSuffixHash: true
+# configMapGenerator:
+# - name: romm-config
+#   files:
+#     - ./config/config.yml
+#   options:
+#     disableNameSuffixHash: true
