@@ -9,4 +9,4 @@ resources:
 configMapGenerator:
   - name: romm-configmap
     files:
-      - config.yml=./resources/config.yml
+      - config.yml=./resources/config.yaml
