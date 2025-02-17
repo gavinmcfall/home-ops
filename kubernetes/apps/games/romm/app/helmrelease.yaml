@@ -105,13 +105,13 @@ spec:
                   identifier: app
                   port: http
     persistence:
-      config:
-        type: configMap
-        name: romm-config
-        globalMounts:
-          - path: /romm/config/config.yml
-            subPath: config.yml
-            readOnly: false
+      # config:
+      #   type: configMap
+      #   name: romm-config
+      #   globalMounts:
+      #     - path: /romm/config/config.yml
+      #       subPath: config.yml
+      #       readOnly: false
       assets:
         existingClaim: romm-assets
         globalMounts:
