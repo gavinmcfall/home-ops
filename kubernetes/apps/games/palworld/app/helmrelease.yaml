@@ -56,8 +56,7 @@ spec:
               ENABLE_FAST_TRAVEL: true
               ENABLE_NON_LOGIN_PENALTY: false
               ENEMY_DROP_ITEM_RATE: "1.000000" #Dropped Items Multiplier: The higher this number is, the more items/materials you will receive when defeating a Pal. Default for Normal Mode = 1.000000
-              #EXP_RATE: "5.000000" #Default for Normal Mode = 1.000000
-              EXP_RATE: "100.000000" #Default for Normal Mode = 1.000000
+              EXP_RATE: "5.000000" #Default for Normal Mode = 1.000000
               PAL_CAPTURE_RATE: "1.000000" #Default for Normal Mode = 1.000000
               PAL_EGG_DEFAULT_HATCHING_TIME: "2.000000" #Incubate Egg Timer: The lower this number is, the faster eggs will hatch. Default for Normal Mode 72.000000
               PAL_SPAWN_NUM_RATE: "1.000000" #Pal Appearance Rate: The higher this number is, the more Pals that will spawn. Default for Normal Mode =  1.000000
