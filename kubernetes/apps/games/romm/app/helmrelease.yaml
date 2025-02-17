@@ -106,7 +106,7 @@ spec:
                   port: http
     persistence:
       config:
-        existingClaim: romm-config
+        existingClaim: *app
         globalMounts:
           - path: /romm/config
             readOnly: false
