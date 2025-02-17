@@ -80,9 +80,9 @@ spec:
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [44, 10000]
         seccompProfile: {type: RuntimeDefault}
@@ -105,12 +105,13 @@ spec:
                   identifier: app
                   port: http
     persistence:
-      configmap:
+      config:
         type: configMap
-        name: romm-config
+        name: romm-configmap
         globalMounts:
           - path: /romm/config/config.yml
             subPath: config.yml
+            readOnly: true
       assets:
         existingClaim: romm-assets
         globalMounts:
