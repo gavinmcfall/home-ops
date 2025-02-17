@@ -6,9 +6,9 @@ resources:
   - ./helmrelease.yaml
   - ../../../../templates/volsync
   - ../../../../templates/gatus/guarded
-# configMapGenerator:
-#   - name: romm-configmap
-#     files:
-#       - config.yml=./resources/config.yml
-# generatorOptions:
-#   disableNameSuffixHash: true
+configMapGenerator:
+  - name: romm-configmap
+    files:
+      - config.yml=./resources/config.yml
+generatorOptions:
+  disableNameSuffixHash: true

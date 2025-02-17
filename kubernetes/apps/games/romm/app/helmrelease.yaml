@@ -98,19 +98,19 @@ spec:
                   identifier: app
                   port: http
     persistence:
-      config:
-        type: emptyDir
-        globalMounts:
-          - path: /config
-            readOnly: false
-
       # config:
-      #   type: configMap
-      #   name: romm-configmap
+      #   type: emptyDir
       #   globalMounts:
-      #     - path: /romm/resources/config.yml
-      #       subPath: config.yml
-      #       readOnly: true
+      #     - path: /config
+      #       readOnly: false
+
+      config:
+        type: configMap
+        name: romm-configmap
+        globalMounts:
+          - path: /romm/resources/config.yml
+            subPath: config.yml
+            readOnly: true
       tmp:
         type: emptyDir
         sizeLimit: 1Gi
