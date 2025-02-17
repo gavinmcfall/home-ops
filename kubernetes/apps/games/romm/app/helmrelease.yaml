@@ -107,7 +107,7 @@ spec:
     persistence:
       config:
         type: configMap
-        name: romm-configmap
+        name: romm-config
         globalMounts:
           - path: /romm/config/config.yml
             subPath: config.yml
