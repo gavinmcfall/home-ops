@@ -105,12 +105,17 @@ spec:
                   identifier: app
                   port: http
     persistence:
-      config:
+      configmap:
         type: configMap
         name: romm-config
         globalMounts:
           - path: /romm/config/config.yml  # Place ConfigMap inside PVC
             subPath: config.yml
+      config:
+        existingClaim: *app
+        globalMounts:
+          - path: /romm/config
+            readOnly: false
       assets:
         existingClaim: romm-assets
         globalMounts:
