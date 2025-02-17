@@ -77,7 +77,7 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [10000]
+        supplementalGroups: [44, 10000]
         seccompProfile: {type: RuntimeDefault}
     service:
       app:
@@ -111,6 +111,6 @@ spec:
       media:
         type: nfs
         server: citadel.internal
-        path: /mnt/world/media/games
+        path: /mnt/storage0/media
         globalMounts:
           - path: /media
