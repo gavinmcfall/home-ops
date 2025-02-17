@@ -98,17 +98,16 @@ spec:
                   identifier: app
                   port: http
     persistence:
-      # config:
-      #   type: emptyDir
-      #   globalMounts:
-      #     - path: /config
-      #       readOnly: false
-
       config:
+        existingClaim: romm-config  # PVC for writable config storage
+        globalMounts:
+          - path: /config
+            readOnly: false  # Ensure it's writable
+      romm-configmap:
         type: configMap
         name: romm-configmap
         globalMounts:
-          - path: /romm/resources/config.yml
+          - path: /romm/resources/config.yml  # Place ConfigMap inside PVC
             subPath: config.yml
             readOnly: true
       tmp:
