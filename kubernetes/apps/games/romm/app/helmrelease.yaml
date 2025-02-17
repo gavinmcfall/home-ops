@@ -111,7 +111,7 @@ spec:
         globalMounts:
           - path: /romm/config/config.yml
             subPath: config.yml
-            readOnly: true
+            readOnly: false
       assets:
         existingClaim: romm-assets
         globalMounts:
@@ -128,6 +128,6 @@ spec:
       media:
         type: nfs
         server: citadel.internal
-        path: /mnt/storage0/media/Library/Emulation/ROMS
+        path: /mnt/storage0/media/Library/Emulation/
         globalMounts:
           - path: /romm/library
