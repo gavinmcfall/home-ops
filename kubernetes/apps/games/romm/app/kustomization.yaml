@@ -10,6 +10,6 @@ resources:
 configMapGenerator:
 - name: romm-config
   files:
-    - ./config/config.yml
+    - ./resources/config.yml
   options:
     disableNameSuffixHash: true
