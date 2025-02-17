@@ -118,3 +118,10 @@ spec:
         globalMounts:
           - path: /files
             subPath: syncthing
+      roms:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media/
+        globalMounts:
+          - path: /roms
+            subPath: Library/Emulation/roms/
