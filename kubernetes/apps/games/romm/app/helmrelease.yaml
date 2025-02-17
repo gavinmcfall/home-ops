@@ -99,9 +99,12 @@ spec:
                   port: http
     persistence:
       config:
-        existingClaim: romm-config
+        type: configMap
+        name: romm-configmap
         globalMounts:
-          - path: /config
+          - path: /romm/config/config.yml
+            subPath: config.yml
+            readOnly: true
       tmp:
         type: emptyDir
         sizeLimit: 1Gi
