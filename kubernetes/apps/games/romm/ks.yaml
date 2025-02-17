@@ -15,7 +15,6 @@ spec:
   prune: true
   interval: 30m
   path: "./kubernetes/apps/games/romm/app"
-  prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
