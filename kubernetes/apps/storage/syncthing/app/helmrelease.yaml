@@ -123,5 +123,5 @@ spec:
         server: citadel.internal
         path: /mnt/storage0/media/
         globalMounts:
-          - path: /emulation/roms
+          - path: /emulation/
             subPath: Library/Emulation/
