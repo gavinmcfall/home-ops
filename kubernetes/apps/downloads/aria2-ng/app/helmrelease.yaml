@@ -80,16 +80,16 @@ spec:
         tls:
           - hosts:
               - *app
-persistence:
-  config:
-    existingClaim: *app
-    globalMounts:
-      - path: /aria2/conf
-        subPath: config
-  downloads:
-    type: nfs
-    server: citadel.internal
-    path: /mnt/storage0/media
-    globalMounts:
-      - path: /aria2/data
-        subPath: downloads/aria2-ng
+    persistence:
+      config:
+        existingClaim: *app
+        globalMounts:
+          - path: /aria2/conf
+            subPath: config
+      downloads:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /aria2/data
+            subPath: downloads/aria2-ng
