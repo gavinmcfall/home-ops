@@ -40,8 +40,8 @@ spec:
               repository: hurlenko/aria2-ariang
               tag: "1.3.10"
             env:
-              UID: &UID 568
-              GID: &GID 568
+              UID: 568
+              GID: 568
               ARIA2RPCPORTT: 443
             envFrom:
               - secretRef:
@@ -49,9 +49,9 @@ spec:
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
-        runAsUser: *UID
-        runAsGroup: *GID
-        fsGroup: *GID
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [10000]
         seccompProfile: {type: RuntimeDefault}
