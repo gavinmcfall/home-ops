@@ -43,7 +43,9 @@ spec:
               UID: &UID 568
               GID: &GID 568
               ARIA2RPCPORTT: 443
-            envFrom: aria2-ng-secret
+            envFrom:
+              - secretRef:
+                  name: aria2-ng-secret
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
