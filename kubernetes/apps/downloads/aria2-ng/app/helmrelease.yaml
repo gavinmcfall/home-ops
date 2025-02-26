@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: hurlenko/aria2-ariang
-              tag: "1.3.10@sha256:fe9ddd5e8edb3c01148ba5d2afef5c49dfdeabaf1b7a55aa72f7ba1cc1768054"
+              tag: "1.3.10"
             env:
               UID: &UID 568
               GID: &GID 568
