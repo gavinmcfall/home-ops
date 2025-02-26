@@ -47,9 +47,17 @@ spec:
               - secretRef:
                   name: aria2-ng-secret
             securityContext: 
-              allowPrivilegeEscalation: true #true for launch to create files
-              readOnlyRootFilesystem: true #false for launch to create files
-              capabilities: { drop: ["ALL"] }
+              allowPrivilegeEscalation: true
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+                add:
+                  - CHOWN
+                  - SETUID
+                  - SETGID
+                  - FOWNER
+                  - NET_BIND_SERVICE
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
