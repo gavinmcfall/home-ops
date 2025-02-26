@@ -40,19 +40,19 @@ spec:
               repository: hurlenko/aria2-ariang
               tag: "1.3.10"
             env:
-              UID: 568
-              GID: 568
+              PUID: 568
+              GUID: 568
               ARIA2RPCPORTT: 443
             envFrom:
               - secretRef:
                   name: aria2-ng-secret
             securityContext: 
-              allowPrivilegeEscalation: true #true for launch to create files
-              readOnlyRootFilesystem: false #false for launch to create files
+              allowPrivilegeEscalation: false #true for launch to create files
+              readOnlyRootFilesystem: true #false for launch to create files
               capabilities: { drop: ["ALL"] }
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: false
+        runAsNonRoot: true
         runAsUser: 568
         runAsGroup: 568
         fsGroup: 568
