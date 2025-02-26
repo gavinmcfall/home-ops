@@ -29,7 +29,7 @@ spec:
       namespace: volsync-system
   values:
     controllers:
-      aria2-ariang:
+      aria2-ng:
         labels:
           nfsMount: "true"
         annotations:
