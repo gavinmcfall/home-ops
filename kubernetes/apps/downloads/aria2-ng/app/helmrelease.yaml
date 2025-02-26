@@ -1,0 +1,95 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app aria2-ng
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.6.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
+  values:
+    controllers:
+      aria2-ariang:
+        labels:
+          nfsMount: "true"
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: hurlenko/aria2-ariang
+              tag: "1.3.10@sha256:fe9ddd5e8edb3c01148ba5d2afef5c49dfdeabaf1b7a55aa72f7ba1cc1768054"
+            env:
+              UID: &UID 568
+              GID: &GID 568
+              ARIA2RPCPORTT: 443
+            envFrom: aria2-ng-secret
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: *UID
+        runAsGroup: *GID
+        fsGroup: *GID
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: {type: RuntimeDefault}
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 80
+    ingress:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        className: internal
+        hosts:
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths: &paths
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
+persistence:
+  config:
+    existingClaim: *app
+    globalMounts:
+      - path: /aria2/conf
+        subPath: config
+  downloads:
+    type: nfs
+    server: citadel.internal
+    path: /mnt/storage0/media
+    globalMounts:
+      - path: /aria2/data
+        subPath: downloads/aria2-ng
