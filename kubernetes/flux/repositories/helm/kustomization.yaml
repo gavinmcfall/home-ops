@@ -16,6 +16,7 @@ resources:
   - ./grafana.yaml
   - ./ingress-nginx.yaml
   - ./intel-charts.yaml
+  - ./itzg.yaml
   - ./jetstack.yaml
   - ./k8s-gateway.yaml
   - ./metrics-server.yaml
