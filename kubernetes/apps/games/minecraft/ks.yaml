@@ -11,8 +11,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: external-secrets
-      namespace: external-secrets
+    - name: external-secrets-stores
   path: ./kubernetes/apps/games/minecraft/app
   prune: true
   sourceRef:
