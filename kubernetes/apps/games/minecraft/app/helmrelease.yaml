@@ -53,8 +53,7 @@ spec:
       autoCurseForge:
         apiKey:
           existingSecret: *secret
-        slug: 
-          - all-the-mods-10
+        slug: all-the-mods-10
         excludeMods:
           - sodium
           - sodium-extra
