@@ -75,7 +75,7 @@ spec:
       ops: ${MINECRAFT_ADMIN}
       whitelist: ${MINECRAFT_WHITELIST}
       pvp: true
-      motd: "\u00a79\u00a7lATM10 + Pixelmon\u00a7r\n\u26cf Chaos is the score upon which reality is written \u26cf"
+      motd: "\u00a79\u00a7lATM10\u00a7r\n\u26cf Chaos is the score upon which reality is written \u26cf"
       worldSaveName: world
       viewDistance: 10
       # forceReDownload: true
