@@ -37,6 +37,7 @@ spec:
       DUMP_SERVER_PROPERTIES: true
       INIT_MEMORY: 1G
       MAX_MEMORY: *memory-limit
+      SEED: "-2909343002793827664"
     persistence:
       storageClass: ${CLUSTER_STORAGE_BLOCK}
       dataDir:
@@ -76,7 +77,7 @@ spec:
       whitelist: ${MINECRAFT_WHITELIST}
       pvp: true
       motd: "\u00a79\u00a7lATM10\u00a7r\n\u26cf Chaos is the score upon which reality is written \u26cf"
-      levelseed: "-2909343002793827664" # https://www.rockpapershotgun.com/best-minecraft-seeds-java-survival-seeds
+      #levelseed: "-2909343002793827664" # https://www.rockpapershotgun.com/best-minecraft-seeds-java-survival-seeds
       worldSaveName: world
       viewDistance: 10
       # forceReDownload: true
