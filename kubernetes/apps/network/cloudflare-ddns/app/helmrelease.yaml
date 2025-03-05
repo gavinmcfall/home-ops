@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: ghcr.io/larivierec/cloudflare-ddns
-              tag: v1.0.4@sha256:f123e68ef898c0618d3e20085e5b4ac82e936df433a2be193316cfc5318b4083
+              tag: v1.0.8@sha256:50aea3e8bd93148b8c5b945ca670e175bb1d7dc7b820b77aefcc0dd7951254a9
             args:
               - --zone-name
               - nerdz.cloud
