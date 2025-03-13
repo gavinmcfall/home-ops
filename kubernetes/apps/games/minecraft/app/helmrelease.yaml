@@ -55,7 +55,7 @@ spec:
         apiKey:
           existingSecret: *secret
         slug: all-the-mods-10
-        file_id: "6273343" # https://www.curseforge.com/minecraft/modpacks/all-the-mods-10/files/6273343
+        fileId: "6273343" # https://www.curseforge.com/minecraft/modpacks/all-the-mods-10/files/6273343
         excludeMods:
           - sodium
           - sodium-extra
