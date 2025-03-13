@@ -79,4 +79,9 @@ spec:
         existingClaim: netboot
       assets:
         enabled: true
-        type: emptyDir
+        storageClass: ceph-filesystem
+        accessMode: ReadWriteMany
+        size: 50Gi
+        globalMounts:
+          - path: /assets
+        retain: true

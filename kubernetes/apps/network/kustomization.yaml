@@ -12,5 +12,5 @@ resources:
   - ./ingress-nginx/ks.yaml
   - ./k8s-gateway/ks.yaml
   - ./multus/ks.yaml
-  # - ./netboot/ks.yaml
+  - ./netboot/ks.yaml
   - ./tailscale/ks.yaml
