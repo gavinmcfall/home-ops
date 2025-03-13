@@ -38,6 +38,10 @@ spec:
       INIT_MEMORY: 1G
       MAX_MEMORY: *memory-limit
       SEED: "-2909343002793827664"
+    lifecycle:
+      postStart:
+        exec:
+          command: ["/bin/sh", "-c", "sed -i 's/disableUncrafting = true/disableUncrafting = false/' /config/twilightforest-common.toml"]
     persistence:
       storageClass: ${CLUSTER_STORAGE_BLOCK}
       dataDir:
