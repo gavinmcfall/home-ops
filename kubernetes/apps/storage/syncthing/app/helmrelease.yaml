@@ -117,7 +117,7 @@ spec:
         path: /mnt/storage0/media/
         globalMounts:
           - path: /files
-            subPath: syncthing
+            subPath: Syncthing
       emulation:
         type: nfs
         server: citadel.internal
