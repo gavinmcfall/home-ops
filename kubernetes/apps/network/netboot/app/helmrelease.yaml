@@ -21,7 +21,7 @@ spec:
           app:
             image:
               repository: ghcr.io/netbootxyz/netbootxyz
-              tag: 0.7.5-nbxyz2@sha256:91a61269a75cba61112804750947c18921b46c21d9dd4f7cb07cb5d26e1b390b
+              tag: 0.7.5-nbxyz2@sha256:731018ae8aa03c5d50d7564c5715f74c37d72316d13d3cc52ab368f2da9b9596
     service:
       app:
         controller: app
