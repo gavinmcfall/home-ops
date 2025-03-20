@@ -48,6 +48,8 @@ spec:
     service:
       app:
         controller: *app
+        type: LoadBalancer
+        loadBalancerIP: 10.90.3.213
         ports:
           http:
             port: 3493
