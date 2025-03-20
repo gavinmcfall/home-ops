@@ -109,14 +109,14 @@ spec:
             - server
           targetLabel: server
       params:
-        server: [10.90.1.1]
+        server: [10.90.1.69]
         username:
-          - ${UPS_NEXUS_USERNAME}
+          - ${UPS_CITADEL_USERNAME}
         password:
-          - ${UPS_NEXUS_PASSWORD}
+          - ${UPS_CITADEL_PASSWORD}
       relabelings:
         - targetLabel: ups
-          replacement: Nexus-Server
+          replacement: Citadel-Server
       path: /ups_metrics
       port: metrics
       scheme: http
