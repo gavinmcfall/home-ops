@@ -33,7 +33,7 @@ spec:
           init-db:
             image:
               repository: ghcr.io/onedr0p/postgres-init
-              tag: 16.6@sha256:a37bbb04a0ea3f15b505c6f97637e7ae89bc66541ae23b8d3848024087980e76
+              tag: 17.4@sha256:43dd04e91e861cf912378bad987afa168fa4f13d05528304907ad0aa351195d6
             envFrom: &envFrom
               - secretRef:
                   name: teslamate-secret
