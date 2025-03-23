@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: ghcr.io/kareadita/kavita
-              tag: 0.8.4@sha256:7f4d5de5f9a5a842a83324429d59730b761dca422b8aa2caf28155aa42996421
+              tag: 0.8.5@sha256:0e62f989133bb5d4e2b470b50c012e448b4ef3d4d12c33ce4386083388ad4c1c
             env:
               TZ: ${TIMEZONE}
             resources:
