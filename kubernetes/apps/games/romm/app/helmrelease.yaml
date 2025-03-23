@@ -112,6 +112,10 @@ spec:
           - path: /romm/config/config.yml
             subPath: config.yml
             readOnly: false
+      nginx-conf:
+        type: emptyDir
+        globalMounts:
+          - path: /etc/nginx/conf.d
       assets:
         existingClaim: romm-assets
         globalMounts:
