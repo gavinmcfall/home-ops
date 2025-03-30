@@ -39,7 +39,7 @@ spec:
               tag: 5.0.4@sha256:995c561247b069c10b1fa098186f35b3155c2df63912041f70637a9232755756
             env:
               TZ: ${TIMEZONE}
-              QBITTORRENT__PORT: &port 80
+              QBT_WEBUI_PORT: &port 80
               QBITTORRENT__BT_PORT: &bittorrentPort 50413
               QBT_Preferences__WebUI__AlternativeUIEnabled: false
               QBT_Preferences__WebUI__AuthSubnetWhitelistEnabled: true
@@ -68,8 +68,8 @@ spec:
               startup:
                 enabled: true
                 spec:
-                  failureThreshold: 60
-                  periodSeconds: 30
+                  failureThreshold: 30
+                  periodSeconds: 10
             securityContext:
               runAsUser: 568
               runAsGroup: 568
