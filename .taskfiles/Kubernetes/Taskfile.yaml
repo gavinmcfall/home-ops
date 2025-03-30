@@ -68,6 +68,7 @@ tasks:
   privileged:
     desc: Run a privileged pod
     cmd: |
+      echo "Using envsubst: $(which envsubst)"
       kubectl run privileged-{{.node}} -i --rm --image=null \
         --overrides="$(yq {{.KUBERNETES_RESOURCES_DIR}}/privileged-pod.tmpl.yaml -o=json | envsubst)"
     env:
