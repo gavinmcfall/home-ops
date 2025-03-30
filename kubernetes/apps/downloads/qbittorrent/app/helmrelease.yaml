@@ -68,8 +68,8 @@ spec:
               startup:
                 enabled: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 10
+                  failureThreshold: 60
+                  periodSeconds: 30
             securityContext:
               runAsUser: 568
               runAsGroup: 568
