@@ -63,3 +63,46 @@
           type: homeassistant
           url: https://hass.${SECRET_DOMAIN}
           key: {{HOMEPAGE_VAR_HASS_TOKEN}}
+# - Cortex:
+#     - Open WebUI:
+#         icon: chatbot
+#         description: Chat interface for local models
+#         href: http://openwebui.cortex.svc.cluster.local:80
+#         widget:
+#           type: service
+#           url: http://openwebui.cortex.svc.cluster.local:80
+#     - TinyLLaMA:
+#         icon: brain
+#         description: Fast lightweight model
+#         href: http://tinyllama.cortex.svc.cluster.local:8080
+#         widget:
+#           type: service
+#           url: http://tinyllama.cortex.svc.cluster.local:8080
+#     - Mistral 7B:
+#         icon: brain-circuit
+#         description: General purpose assistant
+#         href: http://mistral-7b.cortex.svc.cluster.local:8080
+#         widget:
+#           type: service
+#           url: http://mistral-7b.cortex.svc.cluster.local:8080
+#     - Code LLaMA:
+#         icon: code
+#         description: Dev/code assistant
+#         href: http://codellama-7b.cortex.svc.cluster.local:8080
+#         widget:
+#           type: service
+#           url: http://codellama-7b.cortex.svc.cluster.local:8080
+#     - Mixtral:
+#         icon: cpu
+#         description: High-accuracy research model
+#         href: http://mixtral-8x7b.cortex.svc.cluster.local:8080
+#         widget:
+#           type: service
+#           url: http://mixtral-8x7b.cortex.svc.cluster.local:8080
+#     - WizardCoder:
+#         icon: wand
+#         description: Advanced code gen model
+#         href: http://wizardcoder-15b.cortex.svc.cluster.local:8080
+#         widget:
+#           type: service
+#           url: http://wizardcoder-15b.cortex.svc.cluster.local:8080
