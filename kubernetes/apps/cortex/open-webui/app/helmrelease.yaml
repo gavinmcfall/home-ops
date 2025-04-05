@@ -1,0 +1,91 @@
+---
+# HelmRelease for Open WebUI
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openwebui
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    controllers:
+      openwebui:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17.4.0@sha256:a9f405688344a8a6f718e2c344438342ad21540986aeb5ab5fa781831eb2c597
+            envFrom: &envFrom
+              - secretRef:
+                  name: openwebui-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/open-webui/open-webui
+              tag: 0.6.1@sha256:d8d83bd266bc5c3810d89a0402f541065de5f9b650167a27db5288ec5ffad68e
+            env:
+              OPENWEBUI__DB__TYPE: postgres
+              OPENWEBUI__PORT: &port 80
+              TZ: ${TIMEZONE}
+            envFrom: *envFrom
+            ports:
+              - name: http
+                containerPort: *port
+            resources:
+              requests:
+                cpu: 250m
+              limits:
+                memory: 2Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: openwebui
+        ports:
+          http:
+            port: *port
+    ingress:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        className: internal
+        hosts:
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths: &paths
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
+    persistence:
+      config:
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: rook-ceph-block
+      tmp:
+        type: emptyDir
+
+---
