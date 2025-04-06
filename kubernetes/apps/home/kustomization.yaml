@@ -8,5 +8,6 @@ resources:
   - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
   - ./manyfold/ks.yaml
+  - ./searxng/ks.yaml
   - ./smtp-relay/ks.yaml
   - ./thelounge/ks.yaml

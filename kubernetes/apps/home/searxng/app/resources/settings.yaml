@@ -11,7 +11,6 @@ search:
   autocomplete: google
   favicon_resolver: duckduckgo
   languages:
-    - all
     - en
     - en-NZ
 
@@ -63,11 +62,11 @@ engines:
     adobe_order: relevance
     adobe_content_types: ["photo", "illustration", "zip_vector", "template", "3d", "image"]
     timeout: 6
-    disabled: true
+    disabled: false
 
   - name: annas archive
     engine: annas_archive
-    disabled: true
+    disabled: false
     shortcut: aa
 
   - name: wikipedia
@@ -102,7 +101,7 @@ engines:
     url_query: SourceURL
     title_query: Title
     content_query: Description
-    disabled: true
+    disabled: false
     about:
       website: https://encyclosearch.org
       official_api_documentation: https://encyclosearch.org/docs/#/rest-api
@@ -118,7 +117,7 @@ engines:
     engine: goodreads
     shortcut: good
     timeout: 4.0
-    disabled: true
+    disabled: false
 
   - name: google
     engine: google
@@ -135,4 +134,4 @@ engines:
     engine: reddit
     shortcut: re
     page_size: 25
-    disabled: true
+    disabled: false
