@@ -107,8 +107,8 @@ spec:
           - path: /etc/searxng/limiter.toml
             subPath: limiter.toml
             readOnly: true
-      tmpfs:
-        enabled: true
+      tmp:
         type: emptyDir
         globalMounts:
           - path: /etc/searxng
+          - path: /tmp
