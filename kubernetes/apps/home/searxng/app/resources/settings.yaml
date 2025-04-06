@@ -24,6 +24,7 @@ ui:
   static_use_hash: true
   theme_args:
     simple_style: auto
+  default_locale: en-NZ
 
 categories_as_tabs:
   general:
