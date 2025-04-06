@@ -133,27 +133,6 @@ engines:
       - cr: countryNZ
       - tbs: ctr:countryNZ
 
-  - name: google-cn
-    engine: google
-    shortcut: gcn
-    parameters:
-      - hl: en
-      - gl: cn
-      - cr: countryCN
-      - lr: lang_en
-      - tbs: ctr:countryCN
-
-  - name: google-jp
-    engine: google
-    shortcut: gjp
-    parameters:
-      - hl: en
-      - gl: jp
-      - cr: countryJP
-      - lr: lang_en
-      - tbs: ctr:countryJP
-
-
   - name: google images
     engine: google_images
     shortcut: gi
