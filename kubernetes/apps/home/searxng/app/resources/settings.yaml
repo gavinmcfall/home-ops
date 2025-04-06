@@ -11,7 +11,7 @@ search:
   autocomplete: google
   favicon_resolver: duckduckgo
   languages:
-    - en_NZ
+    - en-NZ
 
 general:
   instance_name: Nerdz Search
@@ -24,7 +24,7 @@ ui:
   static_use_hash: true
   theme_args:
     simple_style: auto
-  default_locale: en_NZ
+  default_locale: en
 
 categories_as_tabs:
   general:
