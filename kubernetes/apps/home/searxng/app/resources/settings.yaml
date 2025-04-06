@@ -12,7 +12,11 @@ search:
   favicon_resolver: duckduckgo
   default_lang: en-NZ
   languages:
-    - all
+    - en-AU
+    - en-CA
+    - en-GB
+    - en-NZ
+    - en-US
 
 general:
   instance_name: Nerdz Search
@@ -128,6 +132,27 @@ engines:
       - gl: nz # This tells Google: "give me NZ-localized results"
       - cr: countryNZ
       - tbs: ctr:countryNZ
+
+  - name: google-cn
+    engine: google
+    shortcut: gcn
+    parameters:
+      - hl: en
+      - gl: cn
+      - cr: countryCN
+      - lr: lang_en
+      - tbs: ctr:countryCN
+
+  - name: google-jp
+    engine: google
+    shortcut: gjp
+    parameters:
+      - hl: en
+      - gl: jp
+      - cr: countryJP
+      - lr: lang_en
+      - tbs: ctr:countryJP
+
 
   - name: google images
     engine: google_images
