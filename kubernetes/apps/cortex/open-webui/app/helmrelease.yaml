@@ -55,6 +55,8 @@ spec:
                 value: "false"
               - name: ENABLE_OPENAI_API
                 value: "true"
+              - name: ENABLE_WEBSOCKET_SUPPORT
+                value: "true"
               - name: ENABLE_RAG_WEB_SEARCH
                 value: true
               - name: RAG_WEB_SEARCH_ENGINE
