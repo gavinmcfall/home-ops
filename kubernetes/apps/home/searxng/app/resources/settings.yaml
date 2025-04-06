@@ -10,8 +10,9 @@ server:
 search:
   autocomplete: google
   favicon_resolver: duckduckgo
+  default_lang: en-NZ
   languages:
-    - en-NZ
+    - all
 
 general:
   instance_name: Nerdz Search
