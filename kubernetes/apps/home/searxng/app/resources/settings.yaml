@@ -126,6 +126,7 @@ engines:
       - hl: en
       - gl: nz # This tells Google: "give me NZ-localized results"
       - cr: countryNZ
+      - tbs: ctr:countryNZ
 
   - name: google images
     engine: google_images
