@@ -6,3 +6,10 @@ resources:
   - ./helmrelease.yaml
   - ./externalsecret.yaml
   - ../../../../templates/gatus/guarded
+configMapGenerator:
+  - name: searxng-config
+    files:
+      - settings.yml=./resources/settings.yaml
+      - limiter.toml=./resources/limiter.toml
+generatorOptions:
+  disableNameSuffixHash: true

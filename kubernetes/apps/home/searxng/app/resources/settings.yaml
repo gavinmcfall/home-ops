@@ -13,12 +13,10 @@ search:
   languages:
     - all
     - en
-    - en-US
-    - fi
-    - fi-FI
+    - en-NZ
 
 general:
-  instance_name: Skylab Search
+  instance_name: Nerdz Search
 
 ui:
   default_theme: simple
@@ -55,3 +53,86 @@ hostnames:
     - (.*\.)?stackoverflow.com$
     - (.*\.)?askubuntu.com$
     - (.*\.)?superuser.com$
+
+engines:
+  - name: adobe stock
+    engine: adobe_stock
+    shortcut: asi
+    categories: ["images"]
+    # https://docs.searxng.org/dev/engines/online/adobe_stock.html
+    adobe_order: relevance
+    adobe_content_types: ["photo", "illustration", "zip_vector", "template", "3d", "image"]
+    timeout: 6
+    disabled: true
+
+  - name: annas archive
+    engine: annas_archive
+    disabled: true
+    shortcut: aa
+
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
+    # add "list" to the array to get results in the results list
+    display_type: ["infobox"]
+    categories: [general]
+
+  - name: currency
+    engine: currency_convert
+    categories: general
+    shortcut: cc
+
+  - name: deviantart
+    engine: deviantart
+    shortcut: da
+    timeout: 3.0
+
+  - name: docker hub
+    engine: docker_hub
+    shortcut: dh
+    categories: [it, packages]
+
+  - name: encyclosearch
+    engine: json_engine
+    shortcut: es
+    categories: general
+    paging: true
+    search_url: https://encyclosearch.org/encyclosphere/search?q={query}&page={pageno}&resultsPerPage=15
+    results_query: Results
+    url_query: SourceURL
+    title_query: Title
+    content_query: Description
+    disabled: true
+    about:
+      website: https://encyclosearch.org
+      official_api_documentation: https://encyclosearch.org/docs/#/rest-api
+      use_official_api: true
+      require_api_key: false
+      results: JSON
+
+  - name: github
+    engine: github
+    shortcut: gh
+
+  - name: goodreads
+    engine: goodreads
+    shortcut: good
+    timeout: 4.0
+    disabled: true
+
+  - name: google
+    engine: google
+    shortcut: g
+    parameters:
+      - hl: en
+      - gl: nz # This tells Google: "give me NZ-localized results"
+
+  - name: google images
+    engine: google_images
+    shortcut: gi
+
+  - name: reddit
+    engine: reddit
+    shortcut: re
+    page_size: 25
+    disabled: true
