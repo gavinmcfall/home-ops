@@ -64,12 +64,27 @@ spec:
               - name: SEARXNG_QUERY_URL
                 value: http://searxng.services.svc.cluster.local:8080/search?q=<query>
             envFrom: *envFrom
+            probes:
+              liveness: &probe
+                enabled: true
+                type: HTTP
+                path: /health
+              readiness: *probe
+              startup:
+                <<: *probe
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 500m
                 memory: 2Gi
               limits:
                 memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: [ALL]}
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
