@@ -44,7 +44,7 @@ spec:
               - name: WEBUI_NAME
                 value: "Cortex"
               - name: WEBUI_URL
-                value: "https://{{ .Release.Name }}.${SECRET_DOMAIN}"
+                value: "https://cortex.${SECRET_DOMAIN}"
               - name: ENABLE_SIGNUP
                 value: "true"
               - name: ENABLE_LOGIN_FORM
