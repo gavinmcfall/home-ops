@@ -41,6 +41,7 @@ spec:
               repository: ghcr.io/open-webui/open-webui
               tag: 0.6.1@sha256:d8d83bd266bc5c3810d89a0402f541065de5f9b650167a27db5288ec5ffad68e
             env:
+              GLOBAL_LOG_LEVEL: "DEBUG"
               OAUTH_MERGE_ACCOUNTS_BY_EMAIL: true
               ENABLE_OPENAI_API: "true"
               ENABLE_WEBSOCKET_SUPPORT: "true"
