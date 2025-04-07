@@ -45,6 +45,7 @@ spec:
               ENABLE_LOGIN_FORM: "false"
               OAUTH_MERGE_ACCOUNTS_BY_EMAIL: true
               ENABLE_OPENAI_API: "true"
+              ENABLE_OAUTH_SIGNUP: "true"
               ENABLE_WEBSOCKET_SUPPORT: "true"
               WEBSOCKET_MANAGER: "redis"
               WEBSOCKET_REDIS_URL: "redis://dragonfly.database.svc.cluster.local:6379"
