@@ -43,6 +43,7 @@ spec:
             env:
               WEBUI_NAME: "Cortex"
               WEBUI_URL: "https://cortex.${SECRET_DOMAIN}"
+              OAUTH_MERGE_ACCOUNTS_BY_EMAIL: true
               ENABLE_SIGNUP: "true"
               ENABLE_LOGIN_FORM: "false"
               ENABLE_OAUTH_SIGNUP: "true"
