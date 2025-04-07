@@ -93,10 +93,10 @@ spec:
     ingress:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        className: external
         hosts:
-          - host: "cortex.${SECRET_DOMAIN}"
+          - host: "chat.${SECRET_DOMAIN}"
             paths: &paths
               - path: /
                 service:
@@ -106,7 +106,7 @@ spec:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "cortex"
+          - host: &app "chat"
             paths: *paths
         tls:
           - hosts:
