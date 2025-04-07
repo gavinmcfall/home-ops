@@ -130,7 +130,7 @@ spec:
             app:
               - path: /app/backend/data
                 subPath: data
-              - path: /app/backend/static
+              - path: /app/backend/open_webui/static
                 subPath: static
       tmp:
         type: emptyDir
