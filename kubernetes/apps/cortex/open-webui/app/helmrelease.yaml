@@ -51,7 +51,7 @@ spec:
               WEBSOCKET_REDIS_URL: "redis://dragonfly.database.svc.cluster.local:6379"
               ENABLE_RAG_WEB_SEARCH: true
               RAG_WEB_SEARCH_ENGINE: searxng
-              SEARXNG_QUERY_URL: http://searxng.services.svc.cluster.local:8080/search?q=<query>
+              SEARXNG_QUERY_URL: http://searxng.home.svc.cluster.local:8080/search?q=<query>
             envFrom: *envFrom
             probes:
               liveness: &probe
