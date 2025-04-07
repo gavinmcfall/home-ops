@@ -5,7 +5,7 @@ server:
   limiter: true
   image_proxy: true
   method: GET # https://github.com/searxng/searxng/pull/3619
-  public_instance: true
+  public_instance: false
 
 search:
   autocomplete: google
@@ -17,6 +17,9 @@ search:
     - en-GB
     - en-NZ
     - en-US
+  formats:
+    - html
+    - json
 
 general:
   instance_name: Nerdz Search
