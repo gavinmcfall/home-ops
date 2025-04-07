@@ -129,5 +129,8 @@ spec:
           open-webui:
             app:
               - path: /app/backend/data
+                subPath: data
+              - path: /app/backend/static
+                subPath: static
       tmp:
         type: emptyDir
