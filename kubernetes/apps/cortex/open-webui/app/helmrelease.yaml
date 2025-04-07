@@ -102,7 +102,7 @@ spec:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "{{ .Release.Name }}"
+          - host: &app "cortex"
             paths: *paths
         tls:
           - hosts:
