@@ -5,7 +5,7 @@ server:
   limiter: true
   image_proxy: true
   method: GET # https://github.com/searxng/searxng/pull/3619
-  public_instance: false
+  public_instance: true
 
 search:
   autocomplete: google
