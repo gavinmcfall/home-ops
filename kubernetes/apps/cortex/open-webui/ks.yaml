@@ -10,7 +10,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/cortex/home/open-webui/app
+  path: ./kubernetes/cortex/open-webui/app
   prune: true
   sourceRef:
     kind: GitRepository
