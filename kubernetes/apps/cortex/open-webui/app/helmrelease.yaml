@@ -41,28 +41,17 @@ spec:
               repository: ghcr.io/open-webui/open-webui
               tag: 0.6.1@sha256:d8d83bd266bc5c3810d89a0402f541065de5f9b650167a27db5288ec5ffad68e
             env:
-              - name: WEBUI_NAME
-                value: "Cortex"
-              - name: WEBUI_URL
-                value: "https://cortex.${SECRET_DOMAIN}"
-              - name: ENABLE_SIGNUP
-                value: "true"
-              - name: ENABLE_LOGIN_FORM
-                value: "false"
-              - name: ENABLE_OAUTH_SIGNUP
-                value: "true"
-              - name: ENABLE_OLLAMA_API
-                value: "false"
-              - name: ENABLE_OPENAI_API
-                value: "true"
-              - name: ENABLE_WEBSOCKET_SUPPORT
-                value: "true"
-              - name: ENABLE_RAG_WEB_SEARCH
-                value: true
-              - name: RAG_WEB_SEARCH_ENGINE
-                value: searxng
-              - name: SEARXNG_QUERY_URL
-                value: http://searxng.services.svc.cluster.local:8080/search?q=<query>
+              WEBUI_NAME: "Cortex"
+              WEBUI_URL: "https://cortex.${SECRET_DOMAIN}"
+              ENABLE_SIGNUP: "true"
+              ENABLE_LOGIN_FORM: "false"
+              ENABLE_OAUTH_SIGNUP: "true"
+              ENABLE_OLLAMA_API: "false"
+              ENABLE_OPENAI_API: "true"
+              ENABLE_WEBSOCKET_SUPPORT: "true"
+              ENABLE_RAG_WEB_SEARCH: true
+              RAG_WEB_SEARCH_ENGINE: searxng
+              SEARXNG_QUERY_URL: http://searxng.services.svc.cluster.local:8080/search?q=<query>
             envFrom: *envFrom
             probes:
               liveness: &probe
