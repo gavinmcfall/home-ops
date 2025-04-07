@@ -109,8 +109,10 @@ spec:
               - *app
     persistence:
       config:
-        accessMode: ReadWriteOnce
-        size: 5Gi
-        storageClass: rook-ceph-block
+        existingClaim: open-webui-config
+        advancedMounts:
+          open-webui:
+            app:
+              - path: /app/backend/data
       tmp:
         type: emptyDir
