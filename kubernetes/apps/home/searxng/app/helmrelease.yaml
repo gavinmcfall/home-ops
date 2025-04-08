@@ -93,9 +93,8 @@ spec:
             path: /metrics
             interval: 30s
             scrapeTimeout: 5s
-            authorization:
-              type: Bearer
-              credentials:
+            basicAuth:
+              password:
                 name: searxng-secret
                 key: SEARXNG_OPEN_METRICS_SECRET
 
