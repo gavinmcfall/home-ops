@@ -101,15 +101,15 @@ spec:
 
     ingress:
       app:
-        className: external
+        className: internal
         annotations:
-          nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/auth"
-          nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/start?rd=$scheme://$host$request_uri"
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-          nginx.ingress.kubernetes.io/auth-snippet: |
-            if ($request_uri ~ "^/metrics$") {
-              auth_request off;
-            }
+          # nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/auth"
+          # nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/start?rd=$scheme://$host$request_uri"
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          # nginx.ingress.kubernetes.io/auth-snippet: |
+          #   if ($request_uri ~ "^/metrics$") {
+          #     auth_request off;
+          #   }
         hosts:
           - host: search.${SECRET_DOMAIN}
             paths:
