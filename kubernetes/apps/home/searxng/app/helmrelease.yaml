@@ -4,9 +4,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: searxng
-  labels:
-    app.kubernetes.io/name: searxng
-    app.kubernetes.io/part-of: cortex
 spec:
   interval: 30m
   chart:
