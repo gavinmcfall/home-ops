@@ -88,7 +88,7 @@ spec:
       app:
         serviceName: searxng
         endpoints:
-          - port: http
+          - port: https
             scheme: https
             path: /metrics
             interval: 30s
