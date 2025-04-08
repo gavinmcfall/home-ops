@@ -132,8 +132,6 @@ spec:
             cpu: 100m
           limits:
             memory: 1500Mi
-        secrets:
-          - searxng-metrics-token
         storageSpec:
           volumeClaimTemplate:
             spec:
