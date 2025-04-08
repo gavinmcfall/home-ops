@@ -95,8 +95,8 @@ spec:
             scrapeTimeout: 5s
             basicAuth:
               username:
-                name: searxng
-                key: searxng
+                name: searxng-secret
+                key: SEARXNG_OPEN_METRICS_USER
               password:
                 name: searxng-secret
                 key: SEARXNG_OPEN_METRICS_SECRET
