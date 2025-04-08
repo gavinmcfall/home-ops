@@ -10,7 +10,6 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-      app.kubernetes.io/part-of: cortex
   path: ./kubernetes/apps/home/searxng/app
   prune: true
   sourceRef:
