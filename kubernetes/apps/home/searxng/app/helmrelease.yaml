@@ -93,7 +93,7 @@ spec:
             path: /metrics
             interval: 30s
             scrapeTimeout: 5s
-            bearerTokenFile: /etc/prometheus/secrets/searxng-token/token
+            bearerTokenFile: /etc/prometheus/secrets/searxng-metrics-token/token
 
     ingress:
       app:
