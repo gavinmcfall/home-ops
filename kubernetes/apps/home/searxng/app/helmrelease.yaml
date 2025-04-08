@@ -84,6 +84,17 @@ spec:
         ports:
           http:
             port: *httpPort
+    serviceMonitor:
+      app:
+        serviceName: searxng
+        endpoints:
+          - port: http
+            scheme: http
+            path: /metrics
+            interval: 30s
+            scrapeTimeout: 5s
+            bearerTokenFile: /etc/prometheus/secrets/searxng-token/token
+
     ingress:
       app:
         className: external
