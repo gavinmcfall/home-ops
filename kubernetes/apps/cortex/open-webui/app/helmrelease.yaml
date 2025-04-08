@@ -4,6 +4,9 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app open-webui
+  label:
+    app.kubernetes.io/name: open-webui
+    app.kubernetes.io/part-of: cortex
 spec:
   interval: 30m
   chart:
