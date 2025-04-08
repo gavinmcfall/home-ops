@@ -116,7 +116,7 @@ spec:
         enabled: true
       prometheusSpec:
         additionalScrapeConfigs:
-          name: additional-scrape-configs
+          name: kube-prometheus-stack-prometheus-scrape-confg
           key: additional-scrape-configs.yaml
         podMetadata:
           annotations:
