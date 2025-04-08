@@ -24,7 +24,7 @@ search:
 general:
   instance_name: Nerdz Search
   enable_metrics: true
-  open_metrics: ${SEARXNG_OPEN_METRICS_SECRET}
+  open_metrics: $${SEARXNG_OPEN_METRICS_SECRET}
 
 ui:
   default_theme: simple
