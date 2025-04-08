@@ -31,6 +31,7 @@ spec:
     - name: openebs
       namespace: openebs-system
   values:
+    additionalPrometheusRulesMap: {}
     crds:
       enabled: false
     cleanPrometheusOperatorObjectNames: true
@@ -115,6 +116,7 @@ spec:
       thanosServiceMonitor:
         enabled: true
       prometheusSpec:
+        overrideHonorLabels: true
         additionalScrapeConfigs:
           name: additional-scrape-configs
           key: additional-scrape-configs.yaml
