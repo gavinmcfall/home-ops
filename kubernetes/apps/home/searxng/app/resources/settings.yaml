@@ -23,6 +23,7 @@ search:
 
 general:
   instance_name: Nerdz Search
+  enable_metrics: true
 
 ui:
   default_theme: simple
