@@ -24,4 +24,4 @@ spec:
       APP: *app
     substituteFrom:
       - kind: Secret
-        name: searxng-secret
+        name: cluster-secrets
