@@ -39,7 +39,7 @@ spec:
           app:
             image:
               repository: ghcr.io/open-webui/open-webui
-              tag: 0.6.1@sha256:d8d83bd266bc5c3810d89a0402f541065de5f9b650167a27db5288ec5ffad68e
+              tag: 0.6.2@sha256:79f5f3ac1d2b41184e48a163ea9a7b9de42dea2111f7832017ddef385ead8369
             env:
               GLOBAL_LOG_LEVEL: "DEBUG"
               ENABLE_LOGIN_FORM: "false"
