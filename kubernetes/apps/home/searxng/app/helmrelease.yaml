@@ -88,8 +88,8 @@ spec:
       app:
         serviceName: searxng
         endpoints:
-          - port: https
-            scheme: https
+          - port: http
+            scheme: http
             path: /metrics
             interval: 30s
             scrapeTimeout: 5s
