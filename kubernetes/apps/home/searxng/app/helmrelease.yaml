@@ -89,7 +89,7 @@ spec:
         serviceName: searxng
         endpoints:
           - port: http
-            scheme: http
+            scheme: https
             path: /metrics
             interval: 30s
             scrapeTimeout: 5s
