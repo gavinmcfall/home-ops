@@ -1,32 +1,44 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
-apiVersion: monitoring.coreos.com/v1alpha1
-kind: ScrapeConfig
+apiVersion: v1
+kind: Secret
 metadata:
-  name: &name node-exporter
-spec:
-  staticConfigs:
-    - targets:
-        - expanse.internal:9100
-        - pikvm.internal:9100
-        - voyager.internal:9100
-  metricsPath: /metrics
-  relabelings:
-    - action: replace
-      targetLabel: job
-      replacement: *name
----
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
-apiVersion: monitoring.coreos.com/v1alpha1
-kind: ScrapeConfig
-metadata:
-  name: &name pikvm
-spec:
-  staticConfigs:
-    - targets:
-        - pikvm.internal
-  metricsPath: /api/export/prometheus/metrics
-  relabelings:
-    - action: replace
-      targetLabel: job
-      replacement: *name
+  name: additional-scrape-configs
+  namespace: observability
+type: Opaque
+stringData:
+  additional-scrape-configs.yaml: |
+    - job_name: cortex-pods
+      kubernetes_sd_configs:
+        - role: pod
+      relabel_configs:
+        # Only scrape running pods
+        - source_labels: [__meta_kubernetes_pod_phase]
+          regex: Running
+          action: keep
+
+        # Only target pods that are part of cortex
+        - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_part_of]
+          regex: cortex
+          action: keep
+
+        # Enable custom scrape path and port
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          regex: true
+          action: keep
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+          target_label: __metrics_path__
+        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+          target_label: __address__
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+
+        # Add useful metadata to metrics
+        - source_labels: [__meta_kubernetes_namespace]
+          target_label: namespace
+        - source_labels: [__meta_kubernetes_pod_name]
+          target_label: pod
+        - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+          target_label: app_kubernetes_io_name
+        - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_part_of]
+          target_label: app_kubernetes_io_part_of
+

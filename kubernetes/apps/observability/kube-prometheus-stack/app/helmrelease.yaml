@@ -115,6 +115,9 @@ spec:
       thanosServiceMonitor:
         enabled: true
       prometheusSpec:
+        additionalScrapeConfigs:
+          name: additional-scrape-configs
+          key: additional-scrape-configs.yaml
         podMetadata:
           annotations:
             secret.reloader.stakater.com/reload: &secret thanos-objstore-config
