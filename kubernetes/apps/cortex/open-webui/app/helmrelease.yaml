@@ -23,10 +23,6 @@ spec:
       retries: 3
       strategy: rollback
   values:
-    commonLabels:
-      app.kubernetes.io/part-of: cortex
-    podLabels:
-      app.kubernetes.io/part-of: cortex
     controllers:
       open-webui:
         annotations:
@@ -79,6 +75,8 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: {drop: [ALL]}
     defaultPodOptions:
+      labels:
+        app.kubernetes.io/part-of: cortex
       securityContext:
         runAsNonRoot: true
         runAsUser: 568

@@ -23,10 +23,6 @@ spec:
       retries: 3
       strategy: rollback
   values:
-    commonLabels:
-      app.kubernetes.io/part-of: cortex
-    podLabels:
-      app.kubernetes.io/part-of: cortex
     controllers:
       searxng:
         annotations:
