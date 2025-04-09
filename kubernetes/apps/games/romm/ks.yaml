@@ -26,4 +26,6 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 10Gi
       VOLSYNC_CLAIM: romm
+      GATUS_PATH: /
+      GATUS_STATUS: "200"
 
