@@ -161,6 +161,10 @@ spec:
               targetLabel: kubernetes_node
     kubeStateMetrics:
       enabled: true
+      serviceMonitor:
+        metricRelabelings:
+          - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_part_of]
+            targetLabel: app_kubernetes_io_part_of
     kube-state-metrics:
       fullnameOverride: kube-state-metrics
       metricLabelsAllowlist:
