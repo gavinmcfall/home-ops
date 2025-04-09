@@ -26,6 +26,7 @@ spec:
   values:
     controllers:
       ollama:
+        type: daemonset
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
