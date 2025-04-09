@@ -63,7 +63,7 @@ spec:
     persistence:
       models:
         enabled: true
-        existingClaim: ollama-models
+        existingClaim: ollama-models-shared
         advancedMounts:
           ollama:
             app:
