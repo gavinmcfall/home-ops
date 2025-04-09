@@ -63,6 +63,15 @@ spec:
     kubelet:
       enabled: true
       serviceMonitor:
+        relabelings:
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - sourceLabels: [__meta_kubernetes_pod_name]
+            targetLabel: pod
+          - sourceLabels: [__meta_kubernetes_pod_namespace]
+            targetLabel: namespace
+          - sourceLabels: [__meta_kubernetes_pod_container_name]
+            targetLabel: container
         metricRelabelings:
           # Drop high cardinality labels
           - action: labeldrop
