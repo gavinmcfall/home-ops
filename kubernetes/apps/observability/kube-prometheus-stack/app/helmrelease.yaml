@@ -31,8 +31,6 @@ spec:
     - name: openebs
       namespace: openebs-system
   values:
-    additionalPrometheusRulesMap: {}
-    additionalScrapeConfigs: null
     crds:
       enabled: false
     cleanPrometheusOperatorObjectNames: true
@@ -65,9 +63,6 @@ spec:
     kubelet:
       enabled: true
       serviceMonitor:
-        relabelings:
-          - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_part_of]
-            targetLabel: app_kubernetes_io_part_of
         metricRelabelings:
           # Drop high cardinality labels
           - action: labeldrop
@@ -77,8 +72,6 @@ spec:
           - action: drop
             sourceLabels: ["__name__"]
             regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
-
-
     kubeApiServer:
       enabled: true
       serviceMonitor:
@@ -117,10 +110,6 @@ spec:
       thanosServiceMonitor:
         enabled: true
       prometheusSpec:
-        overrideHonorLabels: true
-        additionalScrapeConfigs:
-          name: additional-scrape-configs
-          key: additional-scrape-configs.yaml
         podMetadata:
           annotations:
             secret.reloader.stakater.com/reload: &secret thanos-objstore-config
