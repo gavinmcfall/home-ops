@@ -108,6 +108,14 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/ceph
+          - name: "Cortex"
+            orgId: 1
+            folder: Cortex
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/cortex
           - name: flux
             orgId: 1
             folder: Flux
