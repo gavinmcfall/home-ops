@@ -47,6 +47,8 @@ spec:
               ENABLE_OPENAI_API: "true"
               ENABLE_OAUTH_SIGNUP: "true"
               ENABLE_WEBSOCKET_SUPPORT: "true"
+              ENABLE_OLLAMA_API: "true"
+              OLLAMA_BASE_URL: "http://ollama.cortex.svc.cluster.local:11434"
               WEBSOCKET_MANAGER: "redis"
               WEBSOCKET_REDIS_URL: "redis://dragonfly.database.svc.cluster.local:6379"
               ENABLE_RAG_WEB_SEARCH: true
