@@ -32,7 +32,7 @@ spec:
           app:
             image:
               repository: docker.io/ollama/ollama
-              tag: 0.6.2
+              tag: 0.6.5@sha256:96b7667cb536ab69bfd5cc0c2bd1e29602218e076fe6d34f402b786f17b4fde0
             env:
               - name: OLLAMA_HOST
                 value: 0.0.0.0
@@ -49,13 +49,13 @@ spec:
                 cpu: 500m
                 memory: 2Gi
               limits:
-                memory: 16Gi
+                memory: 12Gi
     service:
       app:
         controller: ollama
         type: LoadBalancer
         annotations:
-          lbipam.cilium.io/ips: ${LB_OLLAMA}
+          lbipam.cilium.io/ips: 10.90.3.212
         ports:
           http:
             port: 11434
