@@ -304,6 +304,16 @@ spec:
           gnetId: 7845
           revision: 4
           datasource: Prometheus
+      cortex:
+        cortex-searxng-metrics:
+          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cortex-searxng-metrics.json
+          datasource: Prometheus
+        cortex-overview:
+          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cortex-combined-overview.json
+          datasource: Prometheus
+        cortex-resource-overview:
+          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cortex-resource-overview.json
+          datasource: Prometheus
       game-servers:
         palworld:
           # renovate: depName="Palworld"
