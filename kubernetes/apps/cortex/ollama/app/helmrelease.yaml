@@ -29,11 +29,28 @@ spec:
         type: daemonset
         annotations:
           reloader.stakater.com/auto: "true"
+        initContainers:
+          model-pull:
+            image:
+              repository: &repo docker.io/ollama/ollama
+              tag: &tag 0.6.5@sha256:96b7667cb536ab69bfd5cc0c2bd1e29602218e076fe6d34f402b786f17b4fde0
+            command:
+              - sh
+              - -c
+              - |
+                for model in mistral deepseek-coder tinyllama; do
+                  if ! ollama list | grep -q "$model"; then
+                    echo "Pulling model: $model"
+                    ollama pull "$model"
+                  else
+                    echo "Model already present: $model"
+                  fi
+                done
         containers:
           app:
             image:
-              repository: docker.io/ollama/ollama
-              tag: 0.6.5@sha256:96b7667cb536ab69bfd5cc0c2bd1e29602218e076fe6d34f402b786f17b4fde0
+              repository: *repo
+              tag: *tag
             env:
               - name: OLLAMA_HOST
                 value: 0.0.0.0
@@ -68,8 +85,14 @@ spec:
           ollama:
             app:
               - path: *modelPath
+            model-pull:
+              - path: *modelPath
       config:
         enabled: true
         existingClaim: ollama
-        globalMounts:
-          - path: /root/.ollama
+        advancedMounts:
+          ollama:
+            app:
+              - path: /root/.ollama
+            model-pull:
+              - path: /root/.ollama
