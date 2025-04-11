@@ -81,7 +81,7 @@ spec:
               - --include-tag=expired
               - --with-data
         pod:
-          restartPolicy: never
+          restartPolicy: Never
       reannounce:
         containers:
           app:
