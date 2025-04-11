@@ -92,6 +92,6 @@ spec:
     persistence:
       data:
         enabled: true
-        existingClaim: qdrant-data
+        existingClaim: qdrant
         globalMounts:
           - path: /qdrant/storage
