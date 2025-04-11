@@ -94,4 +94,4 @@ spec:
         enabled: true
         existingClaim: qdrant
         globalMounts:
-          - path: /qdrant/
+          - path: /qdrant
