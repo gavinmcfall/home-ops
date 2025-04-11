@@ -110,7 +110,7 @@ spec:
           gethomepage.dev/icon: bazarr.png
           gethomepage.dev/description: Subtitle Downloads
           gethomepage.dev/widget.type: bazarr
-          gethomepage.dev/widget.url: http://bazarr.${SECRET_DOMAIN}/api/system/status
+          gethomepage.dev/widget.url: http://bazarr.${SECRET_DOMAIN}
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_BAZARR_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         className: internal
