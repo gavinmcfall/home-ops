@@ -34,3 +34,43 @@
     url: https://unifi.${SECRET_DOMAIN}
     username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
     password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
+# - Tesla: REQUIRES teslamate-api by tobiasehlert
+#     - Teslamate:
+#         icon: teslamate.png
+#         href: http://teslamate.home-automation.svc.cluster.local:4000
+#         server: Nerdz
+#         container: teslamate
+#         widget:
+#           type: customapi
+#           url: http://teslamate.home-automation.svc.cluster.local:4001/api/v1/cars/1/status
+#           refreshInterval: 60000 # 1min. - in milliseconds, defaults to 10s
+#           method: GET # optional, e.g. POST
+#           headers:
+#             x-authorization: "{{HOMEPAGE_VAR_TESLAMATE_API_TOKEN}}" #must be the same as API_TOKEN
+#           mappings:
+#             - field: #success # needs to be YAML string or object
+#                 data:
+#                   status: odometer
+#               label: Odometer
+#               format: number # optional - defaults to text
+#               suffix: mi
+#             - field: #success # needs to be YAML string or object
+#                 data:
+#                   status:
+#                     climate_details: inside_temp
+#               label: Inside
+#               format: number # optional - defaults to text
+#               suffix: °F
+#             - field: #success # needs to be YAML string or object
+#                 data:
+#                   status:
+#                     battery_details: battery_level
+#               label: Charge
+#               format: percent # optional - defaults to text
+#             - field: #success # needs to be YAML string or object
+#                data:
+#                   status:
+#                     battery_details: est_battery_range
+#               label: Range
+#               format: number # optional - defaults to text
+#               suffix: mi
