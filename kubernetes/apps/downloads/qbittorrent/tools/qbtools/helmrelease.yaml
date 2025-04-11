@@ -44,9 +44,9 @@ spec:
               - --sites
               - --unregistered
             env:
-              QBITTORRENT_HOST: qb.downloads.svc.cluster.local
+              QBITTORRENT_HOST: qbittorrent.downloads.svc.cluster.local
               QBITTORRENT_PORT: 80
-              SABNZBD_HOST: sab.media.svc.cluster.local
+              SABNZBD_HOST: sabnzbd.downloads.svc.cluster.local
               SABNZBD_PORT: 80
               TZ: *timeZone
             envFrom:
