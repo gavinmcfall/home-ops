@@ -25,7 +25,7 @@
         description: Unifi Dashboard
         widget:
           type: unifi
-          url: https://unifi.${SECRET_DOMAIN}
+          url: https://10.90.254.1:443
           username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
           password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
     - Truenas:
