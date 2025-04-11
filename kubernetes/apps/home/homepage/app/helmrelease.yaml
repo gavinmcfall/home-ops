@@ -37,6 +37,7 @@ spec:
             env:
               TZ: ${TIMEZONE}
               HOMEPAGE_ALLOWED_HOSTS: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
+              LOG_LEVEL: debug
             envFrom:
               - secretRef:
                   name: homepage-secret
