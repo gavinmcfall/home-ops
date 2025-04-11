@@ -75,11 +75,11 @@ spec:
     ingress:
       app:
         annotations:
-          gethomepage.dev/enabled: "true"
-          gethomepage.dev/group: AI
-          gethomepage.dev/name: Qdrant
-          gethomepage.dev/icon: qdrant.png
-          gethomepage.dev/description: Vector DB for LLMs
+          # gethomepage.dev/enabled: "true"
+          # gethomepage.dev/group: AI
+          # gethomepage.dev/name: Qdrant
+          # gethomepage.dev/icon: qdrant.png
+          # gethomepage.dev/description: Vector DB for LLMs
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         className: internal
         hosts:
