@@ -19,6 +19,6 @@ spec:
         type: Bearer
         credentials:
           name: qdrant-secret
-          key: QDRANT__SERVICE__METRICS__AUTH__API_KEY
+          key: QDRANT__SERVICE__API_KEY
   targetLabels:
     - app.kubernetes.io/name
