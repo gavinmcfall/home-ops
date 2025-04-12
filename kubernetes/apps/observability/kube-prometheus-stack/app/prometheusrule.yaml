@@ -32,3 +32,17 @@ spec:
           for: 15m
           labels:
             severity: critical
+    - name: qdrant.metrics
+      rules:
+        - record: qdrant:memory_active_bytes
+          expr: memory_active_bytes
+        - record: qdrant:memory_allocated_bytes
+          expr: memory_allocated_bytes
+        - record: qdrant:collections_total
+          expr: collections_total
+        - record: qdrant:collections_vector_total
+          expr: collections_vector_total
+        - record: qdrant:cluster_enabled
+          expr: cluster_enabled
+        - record: qdrant:app_info
+          expr: app_info
