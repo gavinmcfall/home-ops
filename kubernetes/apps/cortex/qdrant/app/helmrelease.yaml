@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -86,14 +87,13 @@ spec:
                   identifier: app
                   port: http
     persistence:
-      storage:
+      data:
         enabled: true
-        name: qdrant-storage
-        globalMounts:
-          - path: /qdrant/storage
-      snapshots:
-        enabled: true
-        name: qdrant-snapshots
-        globalMounts:
-          - path: /qdrant/snapshots
-
+        existingClaim: qdrant
+        advancedMounts:
+          qdrant:
+            app:
+              - path: /qdrant/storage
+                subPath: storage
+              - path: /qdrant/snapshots
+                subPath: snapshots
