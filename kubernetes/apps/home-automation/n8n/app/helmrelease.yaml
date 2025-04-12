@@ -26,7 +26,7 @@ spec:
               tag: 16
             envFrom: &envFrom
               - secretRef:
-                  name: n8n
+                  name: n8n-secret
         containers:
           app:
             image:
