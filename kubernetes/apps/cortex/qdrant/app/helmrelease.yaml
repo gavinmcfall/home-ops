@@ -39,7 +39,7 @@ spec:
               QDRANT__STORAGE__STORAGE_PATH: "/qdrant/storage"
               QDRANT__STORAGE__SNAPSHOT_PATH: "/qdrant/snapshots"
               QDRANT__TELEMETRY__DISABLE: "true"
-              QDRANT__SERVICE__METRICS__AUTH__TARGETS: []
+              QDRANT__SERVICE__METRICS__AUTH__TARGETS: '[]'
             envFrom:
               - secretRef:
                   name: qdrant-secret
