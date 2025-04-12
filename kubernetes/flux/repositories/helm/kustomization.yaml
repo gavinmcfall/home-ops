@@ -27,6 +27,7 @@ resources:
   - ./plane.yaml
   - ./postfinance.yaml
   - ./prometheus-community.yaml
+  - ./qdrant.yaml
   - ./redash.yaml
   - ./rook-ceph-charts.yaml
   - ./stevehipwell.yaml
