@@ -49,7 +49,8 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities:
+                drop: ["ALL"]
             resources:
               requests:
                 cpu: 100m
@@ -75,11 +76,6 @@ spec:
     ingress:
       app:
         annotations:
-          # gethomepage.dev/enabled: "true"
-          # gethomepage.dev/group: AI
-          # gethomepage.dev/name: Qdrant
-          # gethomepage.dev/icon: qdrant.png
-          # gethomepage.dev/description: Vector DB for LLMs
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         className: internal
         hosts:
@@ -92,11 +88,6 @@ spec:
     persistence:
       data:
         enabled: true
+        existingClaim: qdrant
         globalMounts:
-          - path: /qdrant/storage
-      snapshots:
-        enabled: true
-        globalMounts:
-          - path: /qdrant/snapshots
-
-
+          - path: /qdrant
