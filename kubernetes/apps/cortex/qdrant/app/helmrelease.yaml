@@ -36,7 +36,7 @@ spec:
               QDRANT__SERVICE__GRPC_PORT: &grpc-port 6334
               QDRANT__SERVICE__ENABLE_CORS: "false"
               QDRANT__STORAGE__STORAGE_PATH: "/qdrant/storage"
-              QDRANT__STORAGE__SNAPSHOT_PATH: "/qdrant/storage/snapshots"
+              QDRANT__STORAGE__SNAPSHOT_PATH: "/qdrant/snapshots"
               QDRANT__TELEMETRY__DISABLE: "true"
             envFrom:
               - secretRef:
