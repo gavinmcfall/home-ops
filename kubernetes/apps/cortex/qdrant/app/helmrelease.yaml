@@ -89,8 +89,11 @@ spec:
                   identifier: app
                   port: http
     persistence:
-      data:
+      storage:
         enabled: true
-        existingClaim: qdrant
         globalMounts:
-          - path: /qdrant
+          - path: /qdrant/storage
+      snapshots:
+        enabled: true
+        globalMounts:
+          - path: /qdrant/snapshots
