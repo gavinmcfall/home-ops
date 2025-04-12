@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 102,
+  "id": 33,
   "links": [],
   "panels": [
     {
@@ -953,7 +953,13 @@
   "preload": false,
   "refresh": "",
   "schemaVersion": 40,
-  "tags": [],
+  "tags": [
+    "observability",
+    "database",
+    "vector",
+    "cortex",
+    "qdrant"
+  ],
   "templating": {
     "list": []
   },
@@ -965,6 +971,6 @@
   "timezone": "",
   "title": "Qdrant Vector DB Dashboard",
   "uid": "c9906db4-a85a-4b72-96e6-c97e60dae9c9",
-  "version": 6,
+  "version": 1,
   "weekStart": ""
 }
