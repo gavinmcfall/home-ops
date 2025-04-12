@@ -54,6 +54,10 @@ spec:
               ENABLE_RAG_WEB_SEARCH: true
               RAG_WEB_SEARCH_ENGINE: searxng
               SEARXNG_QUERY_URL: http://searxng.home.svc.cluster.local:8080/search?q=<query>
+              VECTOR_DB: qdrant
+              QDRANT_URL: http://qdrant.coretex.svc.cluster.local:6333
+              EMBEDDING_MODEL: bge-small-en #A small-scale English text embedding model developed by BAAI (Beijing Academy of Artificial Intelligence)
+              EMBEDDING_MODEL_TYPE: huggingface
             envFrom: *envFrom
             probes:
               liveness: &probe
