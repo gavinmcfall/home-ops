@@ -5,4 +5,5 @@ resources:
   - ./namespace.yaml
   # Applications
   - ./home-assistant/ks.yaml
+  - ./n8n/ks.yaml
   - ./teslamate/ks.yaml

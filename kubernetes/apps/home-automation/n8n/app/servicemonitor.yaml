@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: n8n
+  namespace: home-automation
+  labels:
+    release: prometheus  # ⚠️ Must match your Prometheus's `serviceMonitorSelector`
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: n8n
+  namespaceSelector:
+    matchNames:
+      - home-automation
+  endpoints:
+    - port: http
+      path: /metrics
+      scheme: http
+      interval: 30s
+  targetLabels:
+    - app.kubernetes.io/name
+
