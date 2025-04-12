@@ -88,9 +88,11 @@ spec:
     persistence:
       storage:
         enabled: true
+        type: pvc
         globalMounts:
           - path: /qdrant/storage
       snapshots:
         enabled: true
+        type: pvc
         globalMounts:
           - path: /qdrant/snapshots
