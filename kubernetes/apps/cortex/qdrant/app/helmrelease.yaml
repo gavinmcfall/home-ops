@@ -47,7 +47,7 @@ spec:
               - name: grpc
                 containerPort: *grpc-port
             command:
-              - /qdrant
+              - /usr/bin/qdrant
             args: []
             securityContext:
               allowPrivilegeEscalation: false
