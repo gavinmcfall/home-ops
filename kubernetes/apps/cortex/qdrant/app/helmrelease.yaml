@@ -46,7 +46,9 @@ spec:
                 containerPort: *http-port
               - name: grpc
                 containerPort: *grpc-port
-            command: []
+            command:
+              - /qdrant
+            args: []
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
