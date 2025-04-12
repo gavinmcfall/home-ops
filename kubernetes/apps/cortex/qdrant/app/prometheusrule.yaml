@@ -1,0 +1,24 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: qdrant
+  namespace: cortex
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: qdrant
+  namespaceSelector:
+    matchNames:
+      - cortex
+  endpoints:
+    - port: http
+      path: /metrics
+      scheme: http
+      interval: 30s
+      authorization:
+        type: Bearer
+        credentials:
+          name: qdrant-secret
+          key: QDRANT__SERVICE__METRICS__AUTH__API_KEY
+  targetLabels:
+    - app.kubernetes.io/name
