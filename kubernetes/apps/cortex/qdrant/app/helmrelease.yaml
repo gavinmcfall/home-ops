@@ -57,6 +57,10 @@ spec:
                 cpu: 100m
               limits:
                 memory: 1Gi
+        pod:
+          annotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "6333"
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
