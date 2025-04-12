@@ -43,7 +43,7 @@ spec:
               N8N_VERSION_NOTIFICATIONS_ENABLED: true
               N8N_DIAGONISTICS_ENABLED: true
               N8N_HIRING_BANNER_ENABLED: false
-              N8N_USER_MANAGEMENT_DISABLED: true
+              N8N_USER_MANAGEMENT_DISABLED: false
               N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
               # Public API
               N8N_PUBLIC_API_DISABLED: true
@@ -63,6 +63,8 @@ spec:
         fsGroupChangePolicy: "OnRootMismatch"
     service:
       app:
+        labels:
+          app.kubernetes.io/name: n8n
         controller: *app
         ports:
           http:
