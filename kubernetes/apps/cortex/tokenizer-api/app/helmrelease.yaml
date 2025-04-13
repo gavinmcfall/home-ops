@@ -1,0 +1,62 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tokenizer-api
+  namespace: cortex
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: ghcr.io/gavinmcfall/tokenizer-api
+              tag: v1.0.0
+            env:
+              TOKENIZER_PATH: /tokenizer/tokenizer.json
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                cpu: 250m
+                memory: 256Mi
+        pod:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 3000
+
+    service:
+      main:
+        ports:
+          http:
+            port: 8000
+
+    persistence:
+      tokenizer:
+        enabled: true
+        type: configMap
+        name: tokenizer-api-config
+        mountPath: /tokenizer
+
+    ingress:
+      main:
+        enabled: false
+
+    serviceMonitor:
+      main:
+        enabled: false
+
+    metrics:
+      enabled: false
