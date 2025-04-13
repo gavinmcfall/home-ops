@@ -21,7 +21,7 @@ spec:
           main:
             image:
               repository: ghcr.io/gavinmcfall/tokenizer-api
-              tag: v1.0.0
+              tag: v1.0.0@sha256:7b62ad3b737b5c16c19f22614d21f1df5220f35119679a5969ee6d1e6cfd4985
             env:
               TOKENIZER_PATH: /tokenizer/tokenizer.json
             resources:
@@ -31,6 +31,9 @@ spec:
               limits:
                 cpu: 250m
                 memory: 256Mi
+            mounts:
+              - name: tokenizer
+                path: /tokenizer
         pod:
           securityContext:
             runAsNonRoot: true
@@ -39,6 +42,7 @@ spec:
 
     service:
       main:
+        controller: main
         ports:
           http:
             port: 8000
@@ -48,15 +52,7 @@ spec:
         enabled: true
         type: configMap
         name: tokenizer-api-config
-        mountPath: /tokenizer
 
     ingress:
       main:
         enabled: false
-
-    serviceMonitor:
-      main:
-        enabled: false
-
-    metrics:
-      enabled: false
