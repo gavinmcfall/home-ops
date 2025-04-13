@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: tokenizer-api
+  name: &app tokenizer-api
   namespace: cortex
 spec:
   interval: 30m
@@ -24,48 +24,24 @@ spec:
       retries: 3
   values:
     controllers:
-      main:
+      tokenizer-api:
+        annotations:
+          reloader.stakater.com/auto: "true"
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/gavinmcfall/tokenizer-api
-              tag: v1.0.0@sha256:7b62ad3b737b5c16c19f22614d21f1df5220f35119679a5969ee6d1e6cfd4985
+              tag: v1.0.0@sha256:1056749cbc6ebca52005360fb150bd331dc563ec6398de5727c3408335f7b36e
             env:
-              - name: TOKENIZER_PATH
-                value: /tokenizer/tokenizer.json
+              TZ: ${TIMEZONE}
             resources:
               requests:
-                cpu: 50m
-                memory: 64Mi
+                cpu: 100m
               limits:
-                cpu: 250m
-                memory: 256Mi
-        pod:
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 568
-            runAsGroup: 568
-
+                memory: 512Mi
     service:
-      main:
-        controller: main
+      app:
+        controller: tokenizer-api
         ports:
           http:
-            port: 8000
-
-    ingress:
-      main:
-        enabled: false
-
-    persistence:
-      tokenizer:
-        enabled: true
-        type: configMap
-        name: tokenizer-api-config
-        globalMounts:
-          - path: /tokenizer
-
-    serviceMonitor:
-      main:
-        enabled: false
-        serviceName: tokenizer-api
+            port: 3000
