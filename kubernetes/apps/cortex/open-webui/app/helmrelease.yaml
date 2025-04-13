@@ -55,7 +55,7 @@ spec:
               RAG_WEB_SEARCH_ENGINE: searxng
               SEARXNG_QUERY_URL: http://searxng.home.svc.cluster.local:8080/search?q=<query>
               VECTOR_DB: qdrant
-              QDRANT_URL: http://qdrant.cortex.svc.cluster.local:6333
+              QDRANT_URI: http://qdrant.cortex.svc.cluster.local:6333
               RAG_EMBEDDING_ENGINE: sentence-transformers
               RAG_EMBEDDING_MODEL: BAAI/bge-small-en-v1.5
             envFrom: *envFrom
