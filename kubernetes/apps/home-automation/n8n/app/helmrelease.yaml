@@ -46,6 +46,7 @@ spec:
               N8N_USER_MANAGEMENT_DISABLED: false
               N8N_AUTH_DISABLED: "false"
               N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
+              N8N_COMMUNITY_PACKAGES_ENABLED: true
               # Public API
               N8N_PUBLIC_API_DISABLED: true
               N8N_PUBLIC_API_SWAGGERUI_DISABLED: true
