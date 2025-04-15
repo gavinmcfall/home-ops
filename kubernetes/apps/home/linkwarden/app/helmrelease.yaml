@@ -38,6 +38,8 @@ spec:
               STORAGE_FOLDER: "config" # Will always end up as /data/STOREAGE_FOLDER so eg /data/config
               HOME: /data/config
               NEXT_PUBLIC_DISABLE_REGISTRATION: "true"
+              NEXT_PUBLIC_CREDENTIALS_ENABLED: "false"
+              
             envFrom: *envFrom
             resources:
               requests:
