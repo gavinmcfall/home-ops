@@ -37,6 +37,7 @@ spec:
               TZ: ${TIMEZONE}
               STORAGE_FOLDER: "config" # Will always end up as /data/STOREAGE_FOLDER so eg /data/config
               HOME: /data/config
+              NEXT_PUBLIC_DISABLE_REGISTRATION: "true"
             envFrom: *envFrom
             resources:
               requests:
