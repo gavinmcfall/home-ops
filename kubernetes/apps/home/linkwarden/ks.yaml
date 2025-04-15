@@ -10,7 +10,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./cluster/apps/home/linkwarden/app
+  path: ./kubernetes/apps/home/linkwarden/app
   prune: true
   sourceRef:
     kind: GitRepository
