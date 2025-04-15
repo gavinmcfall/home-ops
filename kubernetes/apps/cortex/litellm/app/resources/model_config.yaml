@@ -1,0 +1,90 @@
+model_list:
+  # OpenAI
+  - model_name: o3-mini
+    litellm_params:
+      model: openai/o3-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+  - model_name: gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+  # Azure
+  - model_name: azure-gpt-4o-mini
+    litellm_params:
+      model: azure/gpt-4o-mini
+      api_key: os.environ/AZURE_OPENAI_AUSTRALIAEAST_API_KEY
+      api_base: os.environ/AZURE_OPENAI_AUSTRALIAEAST_ENDPOINT
+      api_version: 2024-08-01-preview
+
+  - model_name: azure-gpt-4o
+    litellm_params:
+      model: azure/gpt-4o
+      api_key: os.environ/AZURE_OPENAI_WESTUS_API_KEY
+      api_base: os.environ/AZURE_OPENAI_WESTUS_ENDPOINT
+      api_version: 2024-08-01-preview
+
+  - model_name: azure-o1
+    litellm_params:
+      model: azure/o1
+      api_key: os.environ/AZURE_OPENAI_EASTUS2_API_KEY
+      api_base: os.environ/AZURE_OPENAI_EASTUS2_ENDPOINT
+      api_version: 2024-12-01-preview
+
+  - model_name: azure-o3-mini
+    litellm_params:
+      model: azure/o3-mini
+      api_key: os.environ/AZURE_OPENAI_EASTUS2_API_KEY
+      api_base: os.environ/AZURE_OPENAI_EASTUS2_ENDPOINT
+      api_version: 2024-12-01-preview
+
+  # Anthropic
+  - model_name: claude-3.5-sonnet
+    litellm_params:
+      model: anthropic/claude-3-5-sonnet-20241022
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  # Together.ai
+  - model_name: deepseek-reasoner
+    litellm_params:
+      model: together_ai/deepseek-ai/DeepSeek-R1
+      api_key: os.environ/TOGETHERAI_API_KEY
+
+  - model_name: deepseek-v3
+    litellm_params:
+      model: together_ai/deepseek-ai/DeepSeek-V3
+      api_key: os.environ/TOGETHERAI_API_KEY
+
+  - model_name: flux11pro
+    litellm_params:
+      model: together_ai/black-forest-labs/FLUX.1.1-pro
+      api_key: os.environ/TOGETHERAI_API_KEY
+    model_info:
+      mode: image_generation
+
+    # Google AI Studio
+  - model_name: gemini-2.0-flash
+    litellm_params:
+      model: gemini/gemini-2.0-flash-001
+      api_key: os.environ/GOOGLE_AI_API_KEY
+
+  - model_name: gemini-2.0-flash-lite
+    litellm_params:
+      model: gemini/gemini-2.0-flash-lite-preview-02-05
+      api_key: os.environ/GOOGLE_AI_API_KEY
+
+  - model_name: gemini-2.0-flash-thinking
+    litellm_params:
+      model: gemini/gemini-2.0-flash-thinking-exp-01-21
+      api_key: os.environ/GOOGLE_AI_API_KEY
+
+  - model_name: gemini-2.0-pro
+    litellm_params:
+      model: gemini/gemini-2.0-pro-exp-02-05
+      api_key: os.environ/GOOGLE_AI_API_KEY

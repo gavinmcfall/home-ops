@@ -1,0 +1,50 @@
+include:
+  - model_config.yaml
+
+general_settings:
+  proxy_batch_write_at: 60
+  database_connection_pool_limit: 10
+
+  disable_spend_logs: false
+  disable_error_logs: false
+
+  background_health_checks: false
+  health_check_interval: 300
+
+  store_model_in_db: true
+
+litellm_settings:
+  request_timeout: 600
+  json_logs: false
+  # enable_preview_features: true
+  redact_user_api_key_info: false
+  turn_off_message_logging: false
+  set_verbose: true
+
+  # Caching settings
+  cache: true
+  cache_params:        # set cache params for qdrant
+    type: qdrant        # type of cache to initialize
+
+    # Optional - Qdrant Semantic Cache Settings
+    qdrant_semantic_cache_embedding_model: openai-embedding # the model should be defined on the model_list
+    qdrant_collection_name: test_collection
+    qdrant_quantization_config: binary
+    similarity_threshold: 0.8   # similarity threshold for semantic cache
+
+    # Common Cache settings
+    # Optional - Supported call types for caching
+    supported_call_types: ["acompletion", "atext_completion", "aembedding", "atranscription"]
+                          # /chat/completions, /completions, /embeddings, /audio/transcriptions
+    mode: default_on # if default_off, you need to opt in to caching on a per call basis
+    ttl: 600 # ttl for caching
+
+
+router_settings:
+  fallbacks: [
+    {"groq-llama-4-scout-17b-16e-instruct": ["llama-3.3-70b-versatile", "groq-deepseek-r1-distill-llama-70b", "llama3-70b-8192", "gpt-4o-mini"]},
+    {"llama-3.3-70b-versatile": ["groq-deepseek-r1-distill-llama-70b", "llama3-70b-8192", "gpt-4o-mini"]},
+    {"groq-deepseek-r1-distill-llama-70b": ["llama3-70b-8192", "gpt-4o-mini"]},
+    {"llama3-70b-8192": ["llama3-8b-8192", "gpt-4o-mini"]},
+    {"llama3-8b-8192": ["gpt-4o-mini"]},
+  ]
