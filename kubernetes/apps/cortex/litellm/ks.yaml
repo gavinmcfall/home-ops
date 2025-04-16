@@ -13,7 +13,6 @@ spec:
   dependsOn:
     - name: cloudnative-pg-cluster17
     - name: external-secrets-stores
-      namespace: kube-system
   path: ./kubernetes/main/apps/cortex/litellm/app
   prune: true
   sourceRef:
