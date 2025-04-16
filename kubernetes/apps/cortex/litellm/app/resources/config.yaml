@@ -57,18 +57,20 @@ router:
 
 router_settings:
   fallbacks:
-    vision_openai:
-      - vision_anthropic
-      - vision_gemini
-      - vision_xai
-      - vision_bedrock
-    general_openai:
-      - general_anthropic
-      - general_gemini
-      - general_xai
-    code_fallback_together:
-      - code_fallback_groq
-      - vision_openai  # For code+diagram scenarios
-    code_fallback_groq:
-      - code_fallback_together
-      - general_openai
+    - model: vision_openai
+      fallbacks:
+        - vision_anthropic
+        - vision_gemini
+        - vision_xai
+        - vision_bedrock
+    - model: general_openai
+      fallbacks:
+        - general_anthropic
+        - general_gemini
+        - general_xai
+    - model: code_fallback_together
+      fallbacks:
+        - code_fallback_groq
+    - model: code_fallback_groq
+      fallbacks:
+        - code_fallback_together
