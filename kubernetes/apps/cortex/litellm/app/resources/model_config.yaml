@@ -6,6 +6,7 @@ model_list:
     cost_per_token:
       prompt: 0.00002
     aliases: [embedding_openai]
+    litellm_params: {}
 
   # Vision-capable general chat + education models
   - model_name: gpt-4-turbo
@@ -15,6 +16,7 @@ model_list:
       prompt: 0.01
       completion: 0.03
     aliases: [general_openai, vision_openai]
+    litellm_params: {}
 
   - model_name: claude-3.5-sonnet
     litellm_provider: anthropic
@@ -23,6 +25,7 @@ model_list:
       prompt: 0.003
       completion: 0.015
     aliases: [general_anthropic, vision_anthropic]
+    litellm_params: {}
 
   - model_name: gemini-1.5-pro
     litellm_provider: google
@@ -31,6 +34,7 @@ model_list:
       prompt: 0.00125
       completion: 0.005
     aliases: [general_gemini, vision_gemini]
+    litellm_params: {}
 
   - model_name: grok-1.5
     litellm_provider: xai
@@ -39,6 +43,7 @@ model_list:
       prompt: 0.003
       completion: 0.015
     aliases: [general_xai, vision_xai]
+    litellm_params: {}
 
   - model_name: claude-3-sonnet
     litellm_provider: bedrock
@@ -48,6 +53,7 @@ model_list:
       prompt: 0.003
       completion: 0.015
     aliases: [general_bedrock, vision_bedrock]
+    litellm_params: {}
 
   # Fallback code-only models (non-vision)
   - model_name: deepseek-coder-33b-instruct
@@ -57,6 +63,7 @@ model_list:
       prompt: 0.00025
       completion: 0.0006
     aliases: [code_fallback_together]
+    litellm_params: {}
 
   - model_name: llama3-groq-70b-8192
     litellm_provider: groq
@@ -65,6 +72,7 @@ model_list:
       prompt: 0.00059
       completion: 0.00079
     aliases: [code_fallback_groq]
+    litellm_params: {}
 
 model_groups:
   vision_tasks:
