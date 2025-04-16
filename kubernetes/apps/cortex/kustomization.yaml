@@ -5,7 +5,7 @@ resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
   # Flux-Kustomizations
+  - ./litellm/ks.yaml
   - ./ollama/ks.yaml
   - ./open-webui/ks.yaml
   - ./qdrant/ks.yaml
-  # - ./tokenizer-api/ks.yaml
