@@ -57,26 +57,18 @@ router:
 
 router_settings:
   fallbacks:
-    gpt-4-turbo:
-      - claude-3.5-sonnet
-      - gemini-1.5-pro
-      - grok-1.5
-      - claude-3-sonnet
-    claude-3.5-sonnet:
-      - gemini-1.5-pro
-      - grok-1.5
-      - gpt-4-turbo
-    gemini-1.5-pro:
-      - gpt-4-turbo
-      - claude-3.5-sonnet
-    grok-1.5:
-      - gpt-4-turbo
-      - claude-3.5-sonnet
-    claude-3-sonnet:
-      - gpt-4-turbo
-      - gemini-1.5-pro
-    deepseek-coder-33b-instruct:
-      - llama3-groq-70b-8192
-      - gpt-4-turbo
-    llama3-groq-70b-8192:
-      - gpt-4-turbo
+    vision_openai:
+      - vision_anthropic
+      - vision_gemini
+      - vision_xai
+      - vision_bedrock
+    general_openai:
+      - general_anthropic
+      - general_gemini
+      - general_xai
+    code_fallback_together:
+      - code_fallback_groq
+      - vision_openai  # For code+diagram scenarios
+    code_fallback_groq:
+      - code_fallback_together
+      - general_openai
