@@ -46,6 +46,7 @@ model_list:
     provider: xai
     litellm_params:
       model: xai/grok-1.5
+      api_base: "https://api.x.ai/v1"  # Required for xAI
     api_key: ${XAI_API_KEY}
     cost_per_token:
       input: 0.003
@@ -55,8 +56,8 @@ model_list:
   - model_name: claude-3-sonnet
     provider: bedrock
     litellm_params:
-      model: anthropic.claude-3-sonnet-v1  # Official Bedrock format
-      region_name: us-east-1
+      model: bedrock/anthropic.claude-3-sonnet-v1  # Official Bedrock format
+      region_name: ap-southeast-2
     api_key: ${AWS_BEDROCK_API_KEY}
     cost_per_token:
       input: 0.003
