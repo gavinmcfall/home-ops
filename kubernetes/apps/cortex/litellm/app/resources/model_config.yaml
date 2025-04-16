@@ -56,7 +56,7 @@ model_list:
   - model_name: claude-3-sonnet
     provider: bedrock
     litellm_params:
-      model: bedrock/anthropic.claude-3-sonnet-v1  # Official Bedrock format
+      model: anthropic.claude-3-5-sonnet-20240620-v1:0  # Official Bedrock format
       region_name: ap-southeast-2
     api_key: ${AWS_BEDROCK_API_KEY}
     cost_per_token:
@@ -67,7 +67,7 @@ model_list:
   - model_name: deepseek-coder-33b-instruct
     provider: togetherai  # Updated provider name
     litellm_params:
-      model: deepseek-ai/deepseek-coder-33b-instruct  # Full TogetherAI format
+      model: together_ai/deepseek-ai/deepseek-coder-33b-instruct  # Full TogetherAI format
     api_key: ${TOGETHER_API_KEY}
     cost_per_token:
       input: 0.00025
