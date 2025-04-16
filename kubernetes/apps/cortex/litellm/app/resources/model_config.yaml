@@ -56,7 +56,7 @@ model_list:
   - model_name: claude-3-sonnet
     provider: bedrock
     litellm_params:
-      model: anthropic.claude-3-5-sonnet-20240620-v1:0  # Official Bedrock format
+      model: anthropic.claude-3-sonnet-20240229-v1:0  # Official Bedrock format
       region_name: ap-southeast-2
     api_key: ${AWS_BEDROCK_API_KEY}
     cost_per_token:

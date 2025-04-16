@@ -145,3 +145,9 @@ spec:
             subPath: npm
           - path: /tmp
             subPath: tmp
+            
+    prisma-client:
+      type: emptyDir
+      globalMounts:
+        - path: /usr/local/lib/python3.13/site-packages/prisma
+          subPath: prisma
