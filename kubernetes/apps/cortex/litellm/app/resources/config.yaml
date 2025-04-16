@@ -57,20 +57,16 @@ router:
 
 router_settings:
   fallbacks:
-    - model: vision_openai
-      fallbacks:
+    - vision_openai:  # ✅ Single key
         - vision_anthropic
         - vision_gemini
         - vision_xai
         - vision_bedrock
-    - model: general_openai
-      fallbacks:
+    - general_openai:
         - general_anthropic
         - general_gemini
         - general_xai
-    - model: code_fallback_together
-      fallbacks:
+    - code_fallback_together:
         - code_fallback_groq
-    - model: code_fallback_groq
-      fallbacks:
+    - code_fallback_groq:
         - code_fallback_together
