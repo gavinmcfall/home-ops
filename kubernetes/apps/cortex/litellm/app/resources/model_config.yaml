@@ -1,78 +1,83 @@
 model_list:
-  # Embedding
   - model_name: text-embedding-3-small
     litellm_provider: openai
+    litellm_params:
+      model: text-embedding-3-small
     api_key: ${OPENAI_API_KEY}
     cost_per_token:
       prompt: 0.00002
     aliases: [embedding_openai]
-    litellm_params: {}
 
-  # Vision-capable general chat + education models
   - model_name: gpt-4-turbo
     litellm_provider: openai
+    litellm_params:
+      model: gpt-4-turbo
     api_key: ${OPENAI_API_KEY}
     cost_per_token:
       prompt: 0.01
       completion: 0.03
     aliases: [general_openai, vision_openai]
-    litellm_params: {}
 
   - model_name: claude-3.5-sonnet
     litellm_provider: anthropic
+    litellm_params:
+      model: claude-3.5-sonnet
     api_key: ${ANTHROPIC_API_KEY}
     cost_per_token:
       prompt: 0.003
       completion: 0.015
     aliases: [general_anthropic, vision_anthropic]
-    litellm_params: {}
 
   - model_name: gemini-1.5-pro
     litellm_provider: google
+    litellm_params:
+      model: gemini-1.5-pro
     api_key: ${GOOGLE_API_KEY}
     cost_per_token:
       prompt: 0.00125
       completion: 0.005
     aliases: [general_gemini, vision_gemini]
-    litellm_params: {}
 
   - model_name: grok-1.5
     litellm_provider: xai
+    litellm_params:
+      model: grok-1.5
     api_key: ${XAI_API_KEY}
     cost_per_token:
       prompt: 0.003
       completion: 0.015
     aliases: [general_xai, vision_xai]
-    litellm_params: {}
 
   - model_name: claude-3-sonnet
     litellm_provider: bedrock
+    litellm_params:
+      model: claude-3-sonnet
     api_key: ${AWS_BEDROCK_API_KEY}
     region_name: us-east-1
     cost_per_token:
       prompt: 0.003
       completion: 0.015
     aliases: [general_bedrock, vision_bedrock]
-    litellm_params: {}
 
-  # Fallback code-only models (non-vision)
   - model_name: deepseek-coder-33b-instruct
     litellm_provider: together_ai
+    litellm_params:
+      model: deepseek-coder-33b-instruct
     api_key: ${TOGETHER_API_KEY}
     cost_per_token:
       prompt: 0.00025
       completion: 0.0006
     aliases: [code_fallback_together]
-    litellm_params: {}
 
   - model_name: llama3-groq-70b-8192
     litellm_provider: groq
+    litellm_params:
+      model: llama3-groq-70b-8192
     api_key: ${GROQ_API_KEY}
     cost_per_token:
       prompt: 0.00059
       completion: 0.00079
     aliases: [code_fallback_groq]
-    litellm_params: {}
 
 model_groups:
   vision_tasks:
@@ -85,7 +90,7 @@ model_groups:
   code_pipeline:
     - code_fallback_groq
     - code_fallback_together
-    - vision_openai  # for image+code
+    - vision_openai
     - vision_anthropic
 
   general_tasks:
@@ -94,4 +99,3 @@ model_groups:
     - general_gemini
     - general_bedrock
     - general_xai
-
