@@ -1,5 +1,5 @@
 model_list:
-  - model_name: text-embedding-3-small
+  - model_name: "OpenAI: text-embedding-3-small"
     provider: openai
     litellm_params:
       model: text-embedding-3-small
@@ -9,7 +9,7 @@ model_list:
       input: 0.00002   # Modern cost field name
     aliases: [embedding_openai]
 
-  - model_name: gpt-4-turbo
+  - model_name: "OpenAI: gpt-4-turbo"
     provider: openai
     litellm_params:
       model: gpt-4-turbo
@@ -22,7 +22,7 @@ model_list:
     metadata:
       capabilities: [vision, chat]
 
-  - model_name: claude-3.5-sonnet
+  - model_name: "Anthopic: claude-3.5-sonnet"
     provider: anthropic
     litellm_params:
       model: anthropic/claude-3.5-sonnet-20240620
@@ -32,7 +32,7 @@ model_list:
       output: 0.015
     aliases: [general_anthropic, vision_anthropic]
 
-  - model_name: gemini-1.5-pro
+  - model_name: "Google: gemini-1.5-pro"
     provider: google
     litellm_params:
       model: gemini-1.5-pro
@@ -42,7 +42,7 @@ model_list:
       output: 0.005
     aliases: [general_gemini, vision_gemini]
 
-  - model_name: grok-1.5
+  - model_name: "xAI: grok-1.5"
     provider: xai
     litellm_params:
       model: xai/grok-1.5
@@ -53,7 +53,7 @@ model_list:
       output: 0.015
     aliases: [general_xai, vision_xai]
 
-  - model_name: claude-3-sonnet
+  - model_name: "AWS Bedrock: claude-3-sonnet"
     provider: bedrock
     litellm_params:
       model: anthropic.claude-3-sonnet-20240229-v1:0  # Official Bedrock format
@@ -64,7 +64,7 @@ model_list:
       output: 0.015
     aliases: [general_bedrock, vision_bedrock]
 
-  - model_name: deepseek-coder-33b-instruct
+  - model_name: "TogetherAI: deepseek-coder-33b-instruct"
     provider: togetherai  # Updated provider name
     litellm_params:
       model: together_ai/deepseek-ai/deepseek-coder-33b-instruct  # Full TogetherAI format
@@ -74,7 +74,7 @@ model_list:
       output: 0.0006
     aliases: [code_fallback_together]
 
-  - model_name: llama3-70b-8192
+  - model_name: "Groq: Meta llama3-70b-8192"
     provider: groq
     litellm_params:
       model: groq/llama3-70b-8192  # Correct Groq format
