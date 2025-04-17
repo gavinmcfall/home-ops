@@ -42,10 +42,10 @@ model_list:
       output: 0.005
     aliases: [general_gemini, vision_gemini]
 
-  - model_name: "xAI: grok-1.5"
+  - model_name: "xAI: grok-3-beta"
     provider: xai
     litellm_params:
-      model: xai/grok-1.5
+      model: xai/grok-3-beta
       api_base: "https://api.x.ai/v1"  # Required for xAI
     api_key: ${XAI_API_KEY}
     cost_per_token:
