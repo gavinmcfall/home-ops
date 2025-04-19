@@ -58,8 +58,6 @@ spec:
               - "4000"
               - --config
               - /app/config.yaml
-              - --router_mode
-              - "true"
             probes:
               liveness:
                 enabled: true
