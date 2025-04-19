@@ -57,8 +57,9 @@ spec:
               - --port
               - "4000"
               - --config
-              - --router_mode
               - /app/config.yaml
+              - --router_mode
+              - "true"
             probes:
               liveness:
                 enabled: true
