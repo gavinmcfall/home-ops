@@ -39,7 +39,7 @@ model_list:
     model_info:
       id: text-embedding-3-small
       mode: embedding
-      input_cost_per_token: 0.00002  # USD $0.02 per million tokens (input)
+      input_cost_per_token: 0.00000002  # USD $0.02 per million tokens (input)
       capabilities: [vision, chat]
     aliases: [embedding_openai]
 
@@ -51,23 +51,23 @@ model_list:
     model_info:
       id: gpt-4.1-mini
       mode: completion
-      input_cost_per_token: 0.0032  # USD $3.20 per million tokens (input)
-      output_cost_per_token: 0.0096  # USD $9.60 per million tokens (output)
-      max_tokens: 512000  # Maximum context window: 512,000 tokens
+      input_cost_per_token: 0.0000004  # USD $0.40 per million tokens (input)
+      output_cost_per_token: 0.0000016  # USD $1.60 per million tokens (output)
+      max_tokens: 1047576  # Maximum context window: 1,047,576 tokens
     aliases: [general_openai, vision_openai]
 
   # Anthropic Models
 
-  - model_name: "Anthopic: claude-3.5-sonnet"
+  - model_name: "Anthopic: claude-3.5-haiku"
     provider: anthropic
     litellm_params:
-      model: anthropic/claude-3-5-sonnet-20240620
+      model: anthropic/claude-3-5-haiku-20241022
     api_key: ${ANTHROPIC_API_KEY}
     model_info:
-      id: claude-3.5-sonnet
+      id: claude-3.5-haiku
       mode: completion
-      input_cost_per_token: 0.003  # USD $3.00 per million tokens (input)
-      output_cost_per_token: 0.015  # USD $15.00 per million tokens (output)
+      input_cost_per_token: 0.0000008  # USD $0.80 per million tokens (input)
+      output_cost_per_token: 0.000004  # USD $4.00 per million tokens (output)
       max_tokens: 200000  # Maximum context window: 200,000 tokens
     aliases: [general_anthropic, vision_anthropic]
 
@@ -81,25 +81,25 @@ model_list:
     model_info:
       id: gemini-1.5-pro
       mode: completion
-      input_cost_per_token: 0.00125  # USD $1.25 per million tokens (input)
-      output_cost_per_token: 0.005  # USD $5.00 per million tokens (output)
+      input_cost_per_token: 0.00000125  # USD $1.25 per million tokens (input)
+      output_cost_per_token: 0.00000500  # USD $5.00 per million tokens (output)
       max_tokens: 32768  # Maximum context window: 32,768 tokens
     aliases: [general_gemini, vision_gemini]
 
   # xAI Models
 
-  - model_name: "xAI: grok-3-beta"
+  - model_name: "xAI: grok-3-mini-beta"
     provider: xai
     litellm_params:
-      model: xai/grok-3-beta
+      model: xai/grok-3-mini-beta
       api_base: "https://api.x.ai/v1"  # Required endpoint for xAI
     api_key: ${XAI_API_KEY}
     model_info:
-      id: grok-3-beta
+      id: grok-3-mini-beta
       mode: completion
-      input_cost_per_token: 0.003  # USD $3.00 per million tokens (input)
-      output_cost_per_token: 0.015  # USD $15.00 per million tokens (output)
-      max_tokens: 32000  # Maximum context window: 32,000 tokens
+      input_cost_per_token: 0.0000003  # USD $0.30 per million tokens (input)
+      output_cost_per_token: 0.0000005  # USD $0.50 per million tokens (output)
+      max_tokens: 131072  # Maximum context window: 131,072 tokens
     aliases: [general_xai, vision_xai]
 
   # AWS Bedrock Models
@@ -113,24 +113,24 @@ model_list:
     model_info:
       id: claude-3-sonnet
       mode: completion
-      input_cost_per_token: 0.003  # USD $3.00 per million tokens (input)
-      output_cost_per_token: 0.015  # USD $15.00 per million tokens (output)
+      input_cost_per_token: 0.000003  # USD $3.00 per million tokens (input)
+      output_cost_per_token: 0.000015  # USD $15.00 per million tokens (output)
       max_tokens: 200000  # Maximum context window: 200,000 tokens
     aliases: [general_bedrock, vision_bedrock]
 
   # TogetherAI Models
 
-  - model_name: "TogetherAI: deepseek-coder-33b-instruct"
+  - model_name: "TogetherAI: Qwen2.5-Coder-32B-Instruct"
     provider: togetherai
     litellm_params:
-      model: together_ai/deepseek-ai/deepseek-coder-33b-instruct
+      model: together_ai/Qwen/Qwen2.5-Coder-32B-Instruct
     api_key: ${TOGETHER_API_KEY}
     model_info:
-      id: deepseek-coder-33b-instruct
+      id: Qwen2.5-Coder-32B-Instruct
       mode: completion
-      input_cost_per_token: 0.00025  # USD $0.25 per million tokens (input)
-      output_cost_per_token: 0.0006  # USD $0.60 per million tokens (output)
-      max_tokens: 32768  # Maximum context window: 32,768 tokens
+      input_cost_per_token: 0.0000008  # USD $0.80 per million tokens (input)
+      output_cost_per_token: 0.0000008  # USD $0.80 per million tokens (output)
+      max_tokens: 16384
     aliases: [code_fallback_together]
 
   # Groq Models
@@ -143,8 +143,8 @@ model_list:
     model_info:
       id: llama3-70b-8192
       mode: completion
-      input_cost_per_token: 0.00059  # USD $0.59 per million tokens (input)
-      output_cost_per_token: 0.00079  # USD $0.79 per million tokens (output)
+      input_cost_per_token: 0.00000059  # USD $0.59 per million tokens (input)
+      output_cost_per_token: 0.00000079  # USD $0.79 per million tokens (output)
       max_tokens: 32768  # Maximum context window: 32,768 tokens
     aliases: [code_fallback_groq]
 
