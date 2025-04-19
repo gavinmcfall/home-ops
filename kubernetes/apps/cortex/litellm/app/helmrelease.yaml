@@ -57,6 +57,7 @@ spec:
               - --port
               - "4000"
               - --config
+              - --router_mode
               - /app/config.yaml
             probes:
               liveness:
@@ -145,7 +146,7 @@ spec:
             subPath: npm
           - path: /tmp
             subPath: tmp
-            
+
     prisma-client:
       type: emptyDir
       globalMounts:
