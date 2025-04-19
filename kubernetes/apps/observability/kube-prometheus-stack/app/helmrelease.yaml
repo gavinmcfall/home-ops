@@ -109,6 +109,11 @@ spec:
         enabled: true
       thanosServiceMonitor:
         enabled: true
+        service:
+          labels:
+            app.kubernetes.io/name: thanos
+          selector:
+            app.kubernetes.io/name: thanos
       prometheusSpec:
         podMetadata:
           annotations:
