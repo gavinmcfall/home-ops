@@ -54,7 +54,7 @@ model_list:
       input_cost_per_token: 0.0000004  # USD $0.40 per million tokens (input)
       output_cost_per_token: 0.0000016  # USD $1.60 per million tokens (output)
       max_tokens: 1047576  # Maximum context window: 1,047,576 tokens
-    aliases: [general_openai, vision_openai]
+    aliases: [gpt-4.1, general_openai, vision_openai]
 
   # Anthropic Models
 
