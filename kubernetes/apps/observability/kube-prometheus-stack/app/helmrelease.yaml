@@ -107,12 +107,13 @@ spec:
         pathType: Prefix
       thanosService:
         enabled: true
-        labels:
-          app.kubernetes.io/instance: thanos
-          app.kubernetes.io/name: thanos
-        selector:
-          app.kubernetes.io/instance: thanos
-          app.kubernetes.io/name: thanos
+        service:
+          labels:
+            app.kubernetes.io/instance: thanos
+            app.kubernetes.io/name: thanos
+          selector:
+            app.kubernetes.io/instance: thanos
+            app.kubernetes.io/name: thanos
       thanosServiceMonitor:
         enabled: true
         service:
