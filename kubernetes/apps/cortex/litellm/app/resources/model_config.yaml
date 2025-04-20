@@ -3,14 +3,14 @@ models:
   - id: text-embedding-3-small
     model: openai/text-embedding-3-small
     mode: embedding  # Required for embeddings
-    api_key: ${OPENAI_API_KEY}
+    api_key: "${OPENAI_API_KEY}"
     input_cost_per_token: 0.00000002  # USD $0.02 per million tokens (input)
     capabilities: [vision, chat]
 
   - id: gpt-4.1-mini
     model: openai/gpt-4.1-mini
     mode: completion
-    api_key: ${OPENAI_API_KEY}
+    api_key: "${OPENAI_API_KEY}"
     input_cost_per_token: 0.0000004  # USD $0.40 per million tokens (input)
     output_cost_per_token: 0.0000016  # USD $1.60 per million tokens (output)
     max_tokens: 1047576  # Maximum context window: 1,047,576 tokens
@@ -19,7 +19,7 @@ models:
   - id: claude-3.5-haiku
     model: anthropic/claude-3-5-haiku-20241022
     mode: completion
-    api_key: ${ANTHROPIC_API_KEY}
+    api_key: "${ANTHROPIC_API_KEY}"
     input_cost_per_token: 0.0000008  # USD $0.80 per million tokens (input)
     output_cost_per_token: 0.000004  # USD $4.00 per million tokens (output)
     max_tokens: 200000  # Maximum context window: 200,000 tokens
@@ -28,7 +28,7 @@ models:
   - id: gemini-1.5-pro
     model: google/gemini-1.5-pro
     mode: completion
-    api_key: ${GOOGLE_API_KEY}
+    api_key: "${GOOGLE_API_KEY}"
     input_cost_per_token: 0.00000125  # USD $1.25 per million tokens (input)
     output_cost_per_token: 0.00000500  # USD $5.00 per million tokens (output)
     max_tokens: 32768  # Maximum context window: 32,768 tokens
@@ -38,7 +38,7 @@ models:
     model: xai/grok-3-mini-beta
     api_base: "https://api.x.ai/v1"  # Required endpoint for xAI
     mode: completion
-    api_key: ${XAI_API_KEY}
+    api_key: "${XAI_API_KEY}"
     input_cost_per_token: 0.0000003  # USD $0.30 per million tokens (input)
     output_cost_per_token: 0.0000005  # USD $0.50 per million tokens (output)
     max_tokens: 131072  # Maximum context window: 131,072 tokens
@@ -48,7 +48,7 @@ models:
     model: bedrock/anthropic.claude-3-sonnet-20240229-v1:0
     region_name: ap-southeast-2
     mode: completion
-    api_key: ${AWS_BEDROCK_API_KEY}
+    api_key: "${AWS_BEDROCK_API_KEY}"
     input_cost_per_token: 0.000003  # USD $3.00 per million tokens (input)
     output_cost_per_token: 0.000015  # USD $15.00 per million tokens (output)
     max_tokens: 200000  # Maximum context window: 200,000 tokens
@@ -57,7 +57,7 @@ models:
   - id: Qwen2.5-Coder-32B-Instruct
     model: together_ai/Qwen/Qwen2.5-Coder-32B-Instruct
     mode: completion
-    api_key: ${TOGETHER_API_KEY}
+    api_key: "${TOGETHER_API_KEY}"
     input_cost_per_token: 0.0000008  # USD $0.80 per million tokens (input)
     output_cost_per_token: 0.0000008  # USD $0.80 per million tokens (output)
     max_tokens: 16384
@@ -66,7 +66,7 @@ models:
   - id: llama3-70b-8192
     model: groq/llama3-70b-8192
     mode: completion
-    api_key: ${GROQ_API_KEY}
+    api_key: "${GROQ_API_KEY}"
     input_cost_per_token: 0.00000059  # USD $0.59 per million tokens (input)
     output_cost_per_token: 0.00000079  # USD $0.79 per million tokens (output)
     max_tokens: 32768  # Maximum context window: 32,768 tokens
