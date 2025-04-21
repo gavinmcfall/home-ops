@@ -23,12 +23,85 @@ router_model_list:
       label: "Education Assistant"
       capabilities: ["chat", "reasoning", "tutoring"]
 
-
-
 model_list:
 # Actual Model Definitions
 # Each entry maps to a real provider + model pairing
 # Models may define aliases for routing/fallback via `model_groups`
+
+# Anthropic Models
+
+  - model_name: "Anthopic: claude-3.5-haiku"
+    provider: anthropic
+    litellm_params:
+      model: anthropic/claude-3-5-haiku-20241022
+    api_key: ${ANTHROPIC_API_KEY}
+    model_info:
+      id: claude-3.5-haiku
+      mode: completion
+      input_cost_per_token: 0.0000008  # USD $0.80 per million tokens (input)
+      output_cost_per_token: 0.000004  # USD $4.00 per million tokens (output)
+      max_tokens: 200000  # Maximum context window: 200,000 tokens
+    aliases: [general_anthropic, vision_anthropic]
+
+# AWS Bedrock Models
+
+  - model_name: "AWS Bedrock: claude-3-sonnet"
+    provider: bedrock
+    litellm_params:
+      model: anthropic.claude-3-sonnet-20240229-v1:0
+      region_name: ap-southeast-2
+    api_key: ${AWS_BEDROCK_API_KEY}
+    model_info:
+      id: claude-3-sonnet
+      mode: completion
+      input_cost_per_token: 0.000003  # USD $3.00 per million tokens (input)
+      output_cost_per_token: 0.000015  # USD $15.00 per million tokens (output)
+      max_tokens: 200000  # Maximum context window: 200,000 tokens
+    aliases: [general_bedrock, vision_bedrock]
+
+# ElevelenLabs Models
+
+    # Text to Speech Model
+  - model_name: "ElevenLabs: TTS"
+    provider: elevenlabs
+    litellm_params:
+      model: elevenlabs/eleven_tts
+      mode: text-to-speech
+    api_key: ${ELEVENLABS_API_KEY}
+    model_info:
+      id: elevenlabs-tts
+      mode: text-to-speech
+      input_cost_per_second: 0.0025  # USD $0.15 per minute overage on Creator plan
+
+# Google Models
+
+  - model_name: "Google: gemini-1.5-pro"
+    provider: google
+    litellm_params:
+      model: gemini-1.5-pro
+    api_key: ${GOOGLE_API_KEY}
+    model_info:
+      id: gemini-1.5-pro
+      mode: completion
+      input_cost_per_token: 0.00000125  # USD $1.25 per million tokens (input)
+      output_cost_per_token: 0.00000500  # USD $5.00 per million tokens (output)
+      max_tokens: 32768  # Maximum context window: 32,768 tokens
+    aliases: [general_gemini, vision_gemini]
+
+# Groq Models
+
+  - model_name: "Groq: Meta llama3-70b-8192"
+    provider: groq
+    litellm_params:
+      model: groq/llama3-70b-8192
+    api_key: ${GROQ_API_KEY}
+    model_info:
+      id: llama3-70b-8192
+      mode: completion
+      input_cost_per_token: 0.00000059  # USD $0.59 per million tokens (input)
+      output_cost_per_token: 0.00000079  # USD $0.79 per million tokens (output)
+      max_tokens: 32768  # Maximum context window: 32,768 tokens
+    aliases: [code_fallback_groq]
 
 # Open AI Models
   - model_name: "OpenAI: text-embedding-3-small"
@@ -57,69 +130,19 @@ model_list:
       max_tokens: 1047576  # Maximum context window: 1,047,576 tokens
     aliases: [gpt-4.1, general_openai, vision_openai]
 
-  # Anthropic Models
-
-  - model_name: "Anthopic: claude-3.5-haiku"
-    provider: anthropic
+    # Speech to Text Model
+  - model_name: "OpenAI: Whisper"
+    provider: openai
     litellm_params:
-      model: anthropic/claude-3-5-haiku-20241022
-    api_key: ${ANTHROPIC_API_KEY}
+      model: whisper-1
+      mode: audio_transcription
+    api_key: ${OPENAI_API_KEY}
     model_info:
-      id: claude-3.5-haiku
-      mode: completion
-      input_cost_per_token: 0.0000008  # USD $0.80 per million tokens (input)
-      output_cost_per_token: 0.000004  # USD $4.00 per million tokens (output)
-      max_tokens: 200000  # Maximum context window: 200,000 tokens
-    aliases: [general_anthropic, vision_anthropic]
+      id: whisper-1
+      mode: audio_transcription
+      input_cost_per_second: 0.0001  # USD $0.006 per minute (OpenAI Whisper)
 
-  # Google Models
-
-  - model_name: "Google: gemini-1.5-pro"
-    provider: google
-    litellm_params:
-      model: gemini-1.5-pro
-    api_key: ${GOOGLE_API_KEY}
-    model_info:
-      id: gemini-1.5-pro
-      mode: completion
-      input_cost_per_token: 0.00000125  # USD $1.25 per million tokens (input)
-      output_cost_per_token: 0.00000500  # USD $5.00 per million tokens (output)
-      max_tokens: 32768  # Maximum context window: 32,768 tokens
-    aliases: [general_gemini, vision_gemini]
-
-  # xAI Models
-
-  - model_name: "xAI: grok-3-mini-beta"
-    provider: xai
-    litellm_params:
-      model: xai/grok-3-mini-beta
-      api_base: "https://api.x.ai/v1"  # Required endpoint for xAI
-    api_key: ${XAI_API_KEY}
-    model_info:
-      id: grok-3-mini-beta
-      mode: completion
-      input_cost_per_token: 0.0000003  # USD $0.30 per million tokens (input)
-      output_cost_per_token: 0.0000005  # USD $0.50 per million tokens (output)
-      max_tokens: 131072  # Maximum context window: 131,072 tokens
-    aliases: [general_xai, vision_xai]
-
-  # AWS Bedrock Models
-
-  - model_name: "AWS Bedrock: claude-3-sonnet"
-    provider: bedrock
-    litellm_params:
-      model: anthropic.claude-3-sonnet-20240229-v1:0
-      region_name: ap-southeast-2
-    api_key: ${AWS_BEDROCK_API_KEY}
-    model_info:
-      id: claude-3-sonnet
-      mode: completion
-      input_cost_per_token: 0.000003  # USD $3.00 per million tokens (input)
-      output_cost_per_token: 0.000015  # USD $15.00 per million tokens (output)
-      max_tokens: 200000  # Maximum context window: 200,000 tokens
-    aliases: [general_bedrock, vision_bedrock]
-
-  # TogetherAI Models
+# TogetherAI Models
 
   - model_name: "TogetherAI: Qwen2.5-Coder-32B-Instruct"
     provider: togetherai
@@ -134,20 +157,21 @@ model_list:
       max_tokens: 16384
     aliases: [code_fallback_together]
 
-  # Groq Models
+# xAI Models
 
-  - model_name: "Groq: Meta llama3-70b-8192"
-    provider: groq
+  - model_name: "xAI: grok-3-mini-beta"
+    provider: xai
     litellm_params:
-      model: groq/llama3-70b-8192
-    api_key: ${GROQ_API_KEY}
+      model: xai/grok-3-mini-beta
+      api_base: "https://api.x.ai/v1"  # Required endpoint for xAI
+    api_key: ${XAI_API_KEY}
     model_info:
-      id: llama3-70b-8192
+      id: grok-3-mini-beta
       mode: completion
-      input_cost_per_token: 0.00000059  # USD $0.59 per million tokens (input)
-      output_cost_per_token: 0.00000079  # USD $0.79 per million tokens (output)
-      max_tokens: 32768  # Maximum context window: 32,768 tokens
-    aliases: [code_fallback_groq]
+      input_cost_per_token: 0.0000003  # USD $0.30 per million tokens (input)
+      output_cost_per_token: 0.0000005  # USD $0.50 per million tokens (output)
+      max_tokens: 131072  # Maximum context window: 131,072 tokens
+    aliases: [general_xai, vision_xai]
 
 
 # Fallback Groups
