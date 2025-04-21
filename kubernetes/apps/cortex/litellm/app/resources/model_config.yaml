@@ -63,9 +63,9 @@ model_list:
 
     # Text to Speech Model
   - model_name: "ElevenLabs: TTS"
-    provider: openai  # Required fallback
+    provider: openai  # Placeholder to avoid crashing
     litellm_params:
-      model: elevenlabs-tts
+      model: text-to-speech
       mode: text-to-speech
       api_base: "https://api.elevenlabs.io/v1"
       headers:
