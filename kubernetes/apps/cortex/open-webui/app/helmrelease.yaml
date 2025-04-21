@@ -58,6 +58,7 @@ spec:
               QDRANT_URI: http://qdrant.cortex.svc.cluster.local:6333
               RAG_EMBEDDING_ENGINE: sentence-transformers
               RAG_EMBEDDING_MODEL: BAAI/bge-small-en-v1.5
+              CACHE_ENABLED: "false"
             envFrom: *envFrom
             probes:
               liveness: &probe
