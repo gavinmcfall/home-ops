@@ -116,6 +116,20 @@ model_list:
       max_tokens: 1047576  # Maximum context window: 1,047,576 tokens
     aliases: [gpt-4.1, general_openai, vision_openai]
 
+  - model_name: "OpenAI: gpt-4o"
+    provider: openai
+    litellm_params:
+      model: gpt-4o
+    api_key: ${OPENAI_API_KEY}
+    model_info:
+      id: gpt-4o
+      mode: completion
+      input_cost_per_token: 0.0000005   # USD $0.50 per million tokens (input)
+      output_cost_per_token: 0.0000015  # USD $1.50 per million tokens (output)
+      max_tokens: 128000
+    aliases: [general_openai_4o, vision_openai_4o, education_4o]
+
+
 # TogetherAI Models
 
   - model_name: "TogetherAI: Qwen2.5-Coder-32B-Instruct"
@@ -158,6 +172,7 @@ model_groups:
     - code_fallback_together        # Big context + strong code skills
 
   general_tasks:
+    - general_openai_4o              # GPT-4o – multilingual, expressive
     - general_openai                # GPT-4.1 Mini – strong balance of capability and cost
     - general_anthropic             # Claude 3.5 – ideal for thoughtful reasoning and tone
     - general_gemini                # Gemini – strong reasoning and multi-modal fallback
@@ -165,6 +180,7 @@ model_groups:
     - general_xai                   # Grok 3 – experimental fallback
 
   vision_tasks:
+    - vision_openai_4o              # GPT-4o – best visual model for accuracy
     - vision_openai                   # GPT-4.1 Mini – vision-capable fallback
     - vision_anthropic              # Claude 3.5 – vision-capable fallback
     - vision_gemini                 # Gemini – multimodal assistant
@@ -172,6 +188,7 @@ model_groups:
     - vision_bedrock                # Claude 3.0 (Bedrock) – vision fallback
 
   education_pipeline:
+    - education_4o                  # GPT-4o – ideal for tutoring with language diversity
     - general_openai                # GPT-4.1 Mini – ideal for tutoring
     - general_anthropic             # Claude 3.5 – empathetic and capable in tutoring
     - general_gemini                # Gemini – logical fallback
