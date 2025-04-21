@@ -33,7 +33,7 @@ litellm_settings:
     qdrant_semantic_cache_embedding_model: text-embedding-3-small # the model should be defined on the model_list
     qdrant_collection_name: litellm_cache
     qdrant_quantization_config: binary
-    similarity_threshold: 0.8   # similarity threshold for semantic cache
+    similarity_threshold: 0.98   # similarity threshold for semantic cache
 
     # Common Cache settings
     # Optional - Supported call types for caching
