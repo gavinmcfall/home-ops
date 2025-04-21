@@ -59,22 +59,6 @@ model_list:
       max_tokens: 200000  # Maximum context window: 200,000 tokens
     aliases: [general_bedrock, vision_bedrock]
 
-# ElevelenLabs Models
-
-    # Text to Speech Model
-  - model_name: "ElevenLabs: TTS"
-    provider: openai  # Placeholder to avoid crashing
-    litellm_params:
-      model: text-to-speech
-      mode: text-to-speech
-      api_base: "https://api.elevenlabs.io/v1"
-      headers:
-        xi-api-key: ${ELEVENLABS_API_KEY}
-    model_info:
-      id: elevenlabs-tts
-      mode: text-to-speech
-      input_cost_per_second: 0.0025  # USD $0.15 per minute overage on Creator plan
-
 # Google Models
 
   - model_name: "Google: gemini-1.5-pro"
@@ -131,18 +115,6 @@ model_list:
       output_cost_per_token: 0.0000016  # USD $1.60 per million tokens (output)
       max_tokens: 1047576  # Maximum context window: 1,047,576 tokens
     aliases: [gpt-4.1, general_openai, vision_openai]
-
-    # Speech to Text Model
-  - model_name: "OpenAI: Whisper"
-    provider: openai
-    litellm_params:
-      model: whisper-1
-      mode: audio_transcription
-    api_key: ${OPENAI_API_KEY}
-    model_info:
-      id: whisper-1
-      mode: audio_transcription
-      input_cost_per_second: 0.0001  # USD $0.006 per minute (OpenAI Whisper)
 
 # TogetherAI Models
 
