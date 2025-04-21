@@ -63,11 +63,13 @@ model_list:
 
     # Text to Speech Model
   - model_name: "ElevenLabs: TTS"
-    provider: elevenlabs
+    provider: openai  # Required fallback
     litellm_params:
-      model: elevenlabs/eleven_tts
+      model: elevenlabs-tts
       mode: text-to-speech
-    api_key: ${ELEVENLABS_API_KEY}
+      api_base: "https://api.elevenlabs.io/v1"
+      headers:
+        xi-api-key: ${ELEVENLABS_API_KEY}
     model_info:
       id: elevenlabs-tts
       mode: text-to-speech
