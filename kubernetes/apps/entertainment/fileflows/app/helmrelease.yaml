@@ -62,6 +62,7 @@ spec:
         ports:
           http:
             port: 5000
+
       devices:
         fileflows:
           controller: fileflows
