@@ -62,8 +62,10 @@ spec:
         ports:
           http:
             port: 5000
-        devices:
-          /dev/dri: /dev/dri
+    devices:
+      controller: fileflows
+      devices:
+        /dev/dri: /dev/dri
 
     ingress:
       app:
