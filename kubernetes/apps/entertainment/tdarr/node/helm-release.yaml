@@ -108,7 +108,7 @@ spec:
         type: custom
         volumeSpec:
           nfs:
-            path: mnt/storage0/media/Library
+            path: /mnt/storage0/media/Library
             server: citadel.internal
         globalMounts:
           - path: /media/Library
@@ -117,6 +117,6 @@ spec:
         enabled: true
         type: nfs
         server: citadel.internal
-        path:  mnt/storage0/media/cache
+        path:  /mnt/storage0/media/cache
         globalMounts:
           - path: /cache
