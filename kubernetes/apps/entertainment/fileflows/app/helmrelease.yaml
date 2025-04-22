@@ -64,7 +64,9 @@ spec:
             port: 5000
       devices:
         fileflows:
-          /dev/dri: /dev/dri
+          controller: fileflows
+          devices:
+            /dev/dri: /dev/dri
     ingress:
       app:
         annotations:
