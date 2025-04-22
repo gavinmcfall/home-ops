@@ -33,13 +33,15 @@ spec:
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 100
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 44 # Required for Intel iGPU on Ubuntu base containers like Tdarr
           - 10000
+          # Citadel Groups
+          - 568
         seccompProfile: { type: RuntimeDefault }
     controllers:
       tdarr-node:
@@ -54,8 +56,8 @@ spec:
               pullPolicy: IfNotPresent
             env:
               TZ: "${TZ}"
-              PUID: "568"
-              PGID: "568"
+              # PUID: "568"
+              # PGID: "568"
               serverIP: tdarr.entertainment.svc.cluster.local
               serverPort: &server-port 8266
               ffmpegPath: "/usr/local/bin/ffmpeg"
