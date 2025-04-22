@@ -63,7 +63,7 @@ spec:
           http:
             port: 5000
       devices:
-        - "/dev/dri:/dev/dri"
+        "/dev/dri:/dev/dri"
     ingress:
       app:
         annotations:
