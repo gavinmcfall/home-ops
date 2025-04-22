@@ -133,6 +133,6 @@ spec:
         enabled: true
         type: nfs
         server: citadel.internal
-        path:  /mnt/storage0/media/cache
+        path:  /mnt/storage0/cache
         globalMounts:
           - path: /cache
