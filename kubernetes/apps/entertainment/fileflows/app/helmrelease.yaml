@@ -90,7 +90,7 @@ spec:
         globalMounts:
           - path: /temp
       logs:
-        existingClaim: fileflows-logs
+        existingClaim: fileflows
         globalMounts:
           - path: /app/Logs
       media:
