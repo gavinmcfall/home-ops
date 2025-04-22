@@ -93,12 +93,8 @@ spec:
         globalMounts:
           - path: /app/Logs
       media:
-        enabled: true
-        type: custom
-        volumeSpec:
-          nfs:
-            path: /mnt/storage0/media/Library
-            server: citadel.internal
+        type: nfs
+        server: 10.90.1.69
+        path: /mnt/storage0/media
         globalMounts:
-          - path: /media/Library
-            readOnly: false
+          - path: /media
