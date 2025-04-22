@@ -1,0 +1,136 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: tdarr
+  namespace: entertainment
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  dependsOn:
+    - name: node-feature-discovery
+      namespace: kube-system
+  values:
+    controllers:
+      main:
+        type: deployment
+        containers:
+          main:
+            image:
+              repository: ghcr.io/haveagitgat/tdarr_acc
+              tag: 2.40.01@sha256:4a9a20b71752eb6f770aba30247b1403e4c9ed2602453ffdd073e9fae25b4dfd
+              pullPolicy: IfNotPresent
+            env:
+              webUIPort: &web-port 8265
+              serverIP: 0.0.0.0
+              serverPort: &server-port 8266
+              TZ: ${TZ}
+              ffmpegPath: "/usr/local/bin/ffmpeg"
+              PGID: 65537
+              TDARR__PORT: *web-port
+              TDARR_APPLICATION_URL: &host tdarr.${SECRET_DOMAIN}
+              TDARR_INSTANCE_NAME: Tdarr
+            securityContext:
+              capabilities:
+                add:
+                  - CHOWN
+            ports:
+              - name: http
+                containerPort: *web-port
+              - name: server
+                containerPort: *server-port
+            resources:
+              requests:
+                cpu: 10m
+                memory: 250Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups:
+          - 44 # Required for Intel iGPU on Ubuntu base containers like Tdarr
+          - 10000
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      main:
+        controller: main
+        ports:
+          http:
+            port: *web-port
+      service:
+        controller: main
+        ports:
+          http:
+            enabled: true
+            protocol: TCP
+            port: *server-port
+    ingress:
+      main:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        className: internal
+        hosts:
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths: &paths
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - plex
+              topologyKey: kubernetes.io/hostname
+              namespaces:
+                - entertainment
+    persistence:
+      tdarr:
+        enabled: true
+        existingClaim: tdarr
+        globalMounts:
+          - path: /app/server
+          - path: /app/configs
+      media:
+        enabled: true
+        type: custom
+        volumeSpec:
+          nfs:
+            path: mnt/storage0/media/Library
+            server: citadel.internal
+        globalMounts:
+          - path: /media/Library
+            readOnly: false
+      cache:
+        enabled: true
+        type: nfs
+        server: citadel.internal
+        path:  mnt/storage0/media/cache
+        globalMounts:
+          - path: /cache
