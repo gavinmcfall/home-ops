@@ -121,8 +121,11 @@ spec:
         existingClaim: tdarr
         globalMounts:
           - path: /app/server
+            readOnly: false
           - path: /app/configs
-          - path: /app/Tdarr_Node
+            readOnly: false
+          - path: /app/Tdarr_Server
+            readOnly: false
       media:
         enabled: true
         type: custom
