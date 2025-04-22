@@ -67,6 +67,7 @@ spec:
           controller: fileflows
           devices:
             /dev/dri: /dev/dri
+
     ingress:
       app:
         annotations:
