@@ -43,7 +43,7 @@ spec:
       app.kubernetes.io/name: *app2
   dependsOn:
     - name: external-secrets-stores
-  path: ./kubernetes/apps/entertainment/tdarr-node/app
+  path: ./kubernetes/apps/entertainment/tdarr/node
   prune: true
   sourceRef:
     kind: GitRepository
