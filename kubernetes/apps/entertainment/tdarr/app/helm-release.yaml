@@ -1,6 +1,6 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: tdarr
@@ -20,10 +20,10 @@ spec:
       namespace: kube-system
   values:
     controllers:
-      main:
+      tdarr:
         type: deployment
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/haveagitgat/tdarr_acc
               tag: 2.40.01@sha256:4a9a20b71752eb6f770aba30247b1403e4c9ed2602453ffdd073e9fae25b4dfd
@@ -36,7 +36,7 @@ spec:
               ffmpegPath: "/usr/local/bin/ffmpeg"
               PGID: 65537
               TDARR__PORT: *web-port
-              TDARR_APPLICATION_URL: &host tdarr.${SECRET_DOMAIN}
+              TDARR_APPLICATION_URL: tdarr.${SECRET_DOMAIN}
               TDARR_INSTANCE_NAME: Tdarr
             securityContext:
               capabilities:
@@ -63,20 +63,20 @@ spec:
           - 10000
         seccompProfile: { type: RuntimeDefault }
     service:
-      main:
-        controller: main
+      app:
+        controller: tdarr
         ports:
           http:
             port: *web-port
       service:
-        controller: main
+        controller: tdarr
         ports:
           http:
             enabled: true
             protocol: TCP
             port: *server-port
     ingress:
-      main:
+      app:
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         className: internal
