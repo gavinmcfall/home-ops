@@ -105,6 +105,13 @@ spec:
             port: *server-port
 
     persistence:
+      tdarr-node:
+        enabled: true
+        existingClaim: tdarr-node
+        globalMounts:
+          - path: /app/server
+          - path: /app/configs
+          - path: /app/Tdarr_Node
       media:
         enabled: true
         type: custom

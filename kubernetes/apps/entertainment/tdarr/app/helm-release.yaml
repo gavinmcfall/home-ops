@@ -122,6 +122,7 @@ spec:
         globalMounts:
           - path: /app/server
           - path: /app/configs
+          - path: /app/Tdarr_Node
       media:
         enabled: true
         type: custom
