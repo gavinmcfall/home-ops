@@ -42,10 +42,12 @@ spec:
           - 10000
         seccompProfile: { type: RuntimeDefault }
     controllers:
-      main:
+      tdarr-node:
+        annotations:
+          reloader.stakater.com/auto: "true"
         type: deployment
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/haveagitgat/tdarr_node_acc
               tag: 2.40.01@sha256:ac6d8451148b311d99be1e0e3978bc866009ee412f9644f521374a5dd7f3c4c5
@@ -93,9 +95,9 @@ spec:
             topologyKey: "kubernetes.io/hostname"
 
     service:
-      main:
+      app:
         enabled: false
-        controller: main
+        controller: tdarr-node
         ports:
           http:
             port: *server-port
