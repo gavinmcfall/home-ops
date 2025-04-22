@@ -55,7 +55,7 @@ spec:
                 memory: 250Mi
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: true
+        # runAsNonRoot: true
         runAsUser: 0
         runAsGroup: 0
         fsGroup: 100
