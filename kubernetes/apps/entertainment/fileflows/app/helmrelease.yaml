@@ -31,11 +31,11 @@ spec:
       fileflows:
         annotations:
           reloader.stakater.com/auto: "true"
-      pod:
-        extraVolumes:
-          - name: dri
-            hostPath:
-              path: /dev/dri
+        pod:
+          extraVolumes:
+            - name: dri
+              hostPath:
+                path: /dev/dri
         containers:
           app:
             image:
