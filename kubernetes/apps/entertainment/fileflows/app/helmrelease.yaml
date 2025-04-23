@@ -86,9 +86,9 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /temp
-      # media:
-      #   type: nfs
-      #   server: 10.90.1.69
-      #   path: /mnt/storage0/media
-      #   globalMounts:
-      #     - path: /media
+      media:
+        type: nfs
+        server: 10.90.1.69
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /media
