@@ -36,9 +36,6 @@ spec:
             - name: dri
               hostPath:
                 path: /dev/dri
-          extraVolumeMounts:
-            - name: dri
-              mountPath: /dev/dri
         containers:
           app:
             image:
@@ -58,6 +55,9 @@ spec:
               allowPrivilegeEscalation: true
               readOnlyRootFilesystem: false
               seccompProfile: { type: RuntimeDefault }
+            extraVolumeMounts:
+              - name: dri
+                mountPath: /dev/dri
     service:
       app:
         controller: *app
