@@ -86,6 +86,14 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /temp
+      dockermods:
+        type: emptyDir
+        globalMounts:
+          - path: /app/DockerMods
+      manually-added:
+        type: emptyDir
+        globalMounts:
+          - path: /app/ManuallyAdded
       media:
         type: nfs
         server: 10.90.1.69
