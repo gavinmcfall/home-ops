@@ -29,11 +29,6 @@ spec:
   values:
     controllers:
       fileflows:
-        pod:
-          securityContext:
-            allowPrivilegeEscalation: true
-            readOnlyRootFilesystem: false
-            seccompProfile: { type: RuntimeDefault }
         containers:
           app:
             image:
@@ -90,9 +85,9 @@ spec:
         existingClaim: fileflows
         globalMounts:
           - path: /app/Logs
-      media:
-        type: nfs
-        server: 10.90.1.69
-        path: /mnt/storage0/media
-        globalMounts:
-          - path: /media
+      # media:
+      #   type: nfs
+      #   server: 10.90.1.69
+      #   path: /mnt/storage0/media
+      #   globalMounts:
+      #     - path: /media
