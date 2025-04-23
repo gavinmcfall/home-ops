@@ -50,6 +50,7 @@ spec:
               allowPrivilegeEscalation: true
               readOnlyRootFilesystem: false
               seccompProfile: { type: RuntimeDefault }
+              supplementalGroups: [44, 105, 10000]
     service:
       app:
         controller: *app
