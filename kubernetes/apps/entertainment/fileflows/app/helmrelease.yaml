@@ -52,11 +52,6 @@ spec:
               seccompProfile: { type: RuntimeDefault }
     defaultPodOptions:
       securityContext:
-        runAsUser: 568
-        runAsGroup: 568
-        runAsNonRoot: false
-        fsGroup: 568
-        fsGroupChangePolicy: Always
         supplementalGroups: [44, 105, 10000]
     service:
       app:
