@@ -75,18 +75,18 @@ spec:
                   port: http
 
     persistence:
-      data:
+      config:
         existingClaim: *app
         globalMounts:
           - path: /app/Data
+            subPath: Data
+          - path: /app/Logs
+            subPath: logs
       tmp:
         type: emptyDir
         globalMounts:
           - path: /temp
-      logs:
-        existingClaim: *app
-        globalMounts:
-          - path: /app/Logs
+
       # media:
       #   type: nfs
       #   server: 10.90.1.69
