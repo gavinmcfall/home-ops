@@ -78,18 +78,14 @@ spec:
             subPath: Data
           - path: /app/Logs
             subPath: logs
+          - path: /app/DockerMods
+            subPath: DockerMods
+          - path: /app/ManuallyAdded
+            subPath: ManuallyAdded
       tmp:
         type: emptyDir
         globalMounts:
           - path: /temp
-      dockermods:
-        type: emptyDir
-        globalMounts:
-          - path: /app/DockerMods
-      manually-added:
-        type: emptyDir
-        globalMounts:
-          - path: /app/ManuallyAdded
       dri:
         hostPath: /dev/dri
         type: hostPath
