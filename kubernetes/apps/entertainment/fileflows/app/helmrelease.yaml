@@ -31,7 +31,8 @@ spec:
       fileflows:
         annotations:
           reloader.stakater.com/auto: "true"
-        volumes:
+      pod:
+        extraVolumes:
           - name: dri
             hostPath:
               path: /dev/dri
@@ -44,7 +45,7 @@ spec:
               TZ: ${TIMEZONE}
               PUID: 568
               PGID: 568
-            volumeMounts:
+            extraVolumeMounts:
               - name: dri
                 mountPath: /dev/dri
             resources:
