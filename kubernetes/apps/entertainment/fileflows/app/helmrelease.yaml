@@ -54,7 +54,7 @@ spec:
       securityContext:
         runAsUser: 568
         runAsGroup: 568
-        runAsNonRoot: true
+        runAsNonRoot: false
         fsGroup: 568
         fsGroupChangePolicy: Always
         supplementalGroups: [44, 105, 10000]
