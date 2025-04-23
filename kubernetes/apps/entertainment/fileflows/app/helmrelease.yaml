@@ -31,6 +31,14 @@ spec:
       fileflows:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          extraVolumes:
+            - name: dri
+              hostPath:
+                path: /dev/dri
+          extraVolumeMounts:
+            - name: dri
+              mountPath: /dev/dri
         containers:
           app:
             image:
@@ -56,10 +64,6 @@ spec:
         ports:
           http:
             port: 5000
-    devices:
-      controller: fileflows
-      devices:
-        /dev/dri: /dev/dri
 
     ingress:
       app:
