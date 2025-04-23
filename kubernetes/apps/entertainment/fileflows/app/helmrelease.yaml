@@ -27,11 +27,11 @@ spec:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
-    global:
-    extraVolumes:
-      - name: dri
-        hostPath:
-          path: /dev/dri
+    pod:
+      extraVolumes:
+        - name: dri
+          hostPath:
+            path: /dev/dri
     controllers:
       fileflows:
         annotations:
