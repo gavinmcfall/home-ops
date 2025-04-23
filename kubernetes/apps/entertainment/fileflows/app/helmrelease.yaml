@@ -50,7 +50,14 @@ spec:
               allowPrivilegeEscalation: true
               readOnlyRootFilesystem: false
               seccompProfile: { type: RuntimeDefault }
-              supplementalGroups: [44, 105, 10000]
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        runAsNonRoot: true
+        fsGroup: 568
+        fsGroupChangePolicy: Always
+        supplementalGroups: [44, 105, 10000]
     service:
       app:
         controller: *app
