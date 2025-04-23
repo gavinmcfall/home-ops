@@ -30,6 +30,10 @@ spec:
     controllers:
       fileflows:
         pod:
+          securityContext:
+            allowPrivilegeEscalation: true
+            readOnlyRootFilesystem: false
+            seccompProfile: { type: RuntimeDefault }
         containers:
           app:
             image:
@@ -46,19 +50,19 @@ spec:
               limits:
                 memory: 512M
             securityContext:
-              allowPrivilegeEscalation: true
-              readOnlyRootFilesystem: false
-              seccompProfile: { type: RuntimeDefault }
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
     service:
       app:
         controller: fileflows
         ports:
           http:
             port: 5000
-    devices:
-      controller: fileflows
-      devices:
-        /dev/dri: /dev/dri
+    # devices:
+    #   controller: fileflows
+    #   devices:
+    #     /dev/dri: /dev/dri
 
     ingress:
       app:
