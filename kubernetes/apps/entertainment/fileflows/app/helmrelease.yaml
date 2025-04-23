@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -31,11 +31,10 @@ spec:
       fileflows:
         annotations:
           reloader.stakater.com/auto: "true"
-        pod:
-          extraVolumes:
-            - name: dri
-              hostPath:
-                path: /dev/dri
+      volumes:
+        dri:
+          type: hostPath
+          hostPath: /dev/dri
         containers:
           app:
             image:
@@ -55,8 +54,8 @@ spec:
               allowPrivilegeEscalation: true
               readOnlyRootFilesystem: false
               seccompProfile: { type: RuntimeDefault }
-            extraVolumeMounts:
-              - name: dri
+            volumeMounts:
+              dri:
                 mountPath: /dev/dri
     service:
       app:
