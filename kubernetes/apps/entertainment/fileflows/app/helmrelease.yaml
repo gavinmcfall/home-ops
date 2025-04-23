@@ -34,8 +34,8 @@ spec:
         containers:
           app:
             image:
-              repository: alpine #revenz/fileflows
-              tag: latest #25.04:sha256:6f87a6468a888e0bc15e45b5c92d87f1bbc43caaf93b8b2c8610865d23d63731
+              repository: revenz/fileflows
+              tag: 25.04:sha256:6f87a6468a888e0bc15e45b5c92d87f1bbc43caaf93b8b2c8610865d23d63731
             env:
               TZ: ${TIMEZONE}
               PUID: 568
