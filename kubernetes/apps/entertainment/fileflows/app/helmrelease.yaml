@@ -27,15 +27,15 @@ spec:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
-    pod:
-      extraVolumes:
-        - name: dri
-          hostPath:
-            path: /dev/dri
     controllers:
       fileflows:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          extraVolumes:
+            - name: dri
+              hostPath:
+                path: /dev/dri
         containers:
           app:
             image:
