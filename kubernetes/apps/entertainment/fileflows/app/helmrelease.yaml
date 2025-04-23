@@ -31,10 +31,10 @@ spec:
       fileflows:
         annotations:
           reloader.stakater.com/auto: "true"
-      volumes:
-        dri:
-          type: hostPath
-          hostPath: /dev/dri
+        volumes:
+          - name: dri
+            hostPath:
+              path: /dev/dri
         containers:
           app:
             image:
@@ -44,6 +44,9 @@ spec:
               TZ: ${TIMEZONE}
               PUID: 568
               PGID: 568
+            volumeMounts:
+              - name: dri
+                mountPath: /dev/dri
             resources:
               requests:
                 cpu: 25m
@@ -54,9 +57,6 @@ spec:
               allowPrivilegeEscalation: true
               readOnlyRootFilesystem: false
               seccompProfile: { type: RuntimeDefault }
-            volumeMounts:
-              dri:
-                mountPath: /dev/dri
     service:
       app:
         controller: *app
