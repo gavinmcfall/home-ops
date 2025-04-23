@@ -29,6 +29,8 @@ spec:
   values:
     controllers:
       fileflows:
+        annotations:
+          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
@@ -50,7 +52,7 @@ spec:
               capabilities: { drop: ["ALL"] }
     service:
       app:
-        controller: fileflows
+        controller: *app
         ports:
           http:
             port: 5000
@@ -61,9 +63,9 @@ spec:
 
     ingress:
       app:
+        className: internal
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
         hosts:
           - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
             paths:
@@ -82,7 +84,7 @@ spec:
         globalMounts:
           - path: /temp
       logs:
-        existingClaim: fileflows
+        existingClaim: *app
         globalMounts:
           - path: /app/Logs
       # media:
