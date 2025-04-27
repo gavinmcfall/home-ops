@@ -106,8 +106,8 @@ spec:
             readOnly: false
           - path: /app/configs
             readOnly: false
-          - path: /app/Tdarr_Node
-            readOnly: false
+          # - path: /app/Tdarr_Node
+          #   readOnly: false
       media:
         enabled: true
         type: custom
