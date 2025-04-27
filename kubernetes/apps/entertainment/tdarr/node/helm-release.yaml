@@ -67,6 +67,8 @@ spec:
               TZ: "${TZ}"
               PUID: "568"
               PGID: "568"
+              LIBVA_DRIVER_NAME: "iHD"
+              LIBVA_DRIVERS_PATH: "/usr/lib/x86_64-linux-gnu/dri"
               serverIP: tdarr-service.entertainment.svc.cluster.local
               serverPort: &server-port 8266
               ffmpegPath: "/usr/local/bin/ffmpeg"
