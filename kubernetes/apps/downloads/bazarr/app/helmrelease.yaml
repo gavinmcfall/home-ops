@@ -85,6 +85,26 @@ spec:
               limits:
                 memory: 128Mi
             securityContext: *securityContext
+          metrics:
+            dependsOn: app
+            image:
+              repository: ghcr.io/onedr0p/exportarr
+              tag: v2.2.0@sha256:320b0ea7399f4b9af4741dcdddd7d40c05c36b0359679305d8a54df4e97065df
+            env:
+              PORT: &metricsPort 9707
+              URL: "http://{{ .Release.Name }}.{{ .Release.Namespace }}.${CLUSTER_DOMAIN}:6767"
+              APIKEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: bazarr-secret
+                    key: BAZARR__API_KEY
+            args: ["bazarr"]
+            resources:
+              requests:
+                cpu: 10m
+                memory: 294Mi
+              limits:
+                memory: 319Mi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
