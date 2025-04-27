@@ -51,7 +51,10 @@ spec:
               - /bin/sh
               - -c
               - |
-                chgrp video /dev/dri/card0 && chmod 660 /dev/dri/card0
+                chgrp video /dev/dri/card0
+                chgrp video /dev/dri/renderD128
+                chmod 660 /dev/dri/card0
+                chmod 660 /dev/dri/renderD128
             securityContext:
               privileged: true
         containers:
