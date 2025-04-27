@@ -34,10 +34,10 @@ spec:
               webUIPort: &web-port 8265
               serverIP: 0.0.0.0
               serverPort: &server-port 8266
-              TZ: ${TIMEZONE}
+              TZ: ${TZ}
               ffmpegPath: "/usr/local/bin/ffmpeg"
-              PUID: "568"
-              PGID: "568"
+              # PUID: "568"
+              # PGID: "568"
               TDARR__PORT: *web-port
               TDARR_APPLICATION_URL: tdarr.${SECRET_DOMAIN}
               TDARR_INSTANCE_NAME: Tdarr
@@ -56,9 +56,14 @@ spec:
                 memory: 250Mi
     defaultPodOptions:
       securityContext:
+        # runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 44 # Required for Intel iGPU on Ubuntu base containers like Tdarr
+        seccompProfile: { type: RuntimeDefault }
     service:
       app:
         controller: tdarr
