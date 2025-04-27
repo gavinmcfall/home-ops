@@ -83,6 +83,8 @@ spec:
               requests:
                 cpu: 10m
                 memory: 250Mi
+              limits:
+                gpu.intel.com/i915: 1
             securityContext:
               capabilities:
                 add:
