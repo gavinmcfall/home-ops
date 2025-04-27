@@ -46,6 +46,7 @@ spec:
                 memory: 128M
               limits:
                 memory: 512M
+                gpu.intel.com/i915: 1
             securityContext:
               allowPrivilegeEscalation: true
               readOnlyRootFilesystem: false
@@ -59,7 +60,6 @@ spec:
         ports:
           http:
             port: 5000
-
     ingress:
       app:
         className: internal
@@ -72,7 +72,6 @@ spec:
                 service:
                   identifier: app
                   port: http
-
     persistence:
       config:
         existingClaim: *app
