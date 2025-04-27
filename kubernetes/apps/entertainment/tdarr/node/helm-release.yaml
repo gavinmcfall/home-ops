@@ -43,6 +43,19 @@ spec:
         type: deployment
         replicas: 2
         containers:
+        initContainers:
+          fix-dri-perms:
+            image:
+              repository: docker.io/library/busybox
+              tag: 1.37@sha256:37f7b378a29ceb4c551b1b5582e27747b855bbfaa73fa11914fe0df028dc581f
+            command:
+              - /bin/sh
+              - -c
+              - |
+                chgrp video /dev/dri/card0 && chmod 660 /dev/dri/card0
+            securityContext:
+              privileged: true
+
           app:
             image:
               repository: ghcr.io/haveagitgat/tdarr_node_acc
