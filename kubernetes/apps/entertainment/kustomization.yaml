@@ -14,5 +14,5 @@ resources:
   - ./pasta/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
-  # - ./tdarr/ks.yaml
+  - ./tdarr/ks.yaml
   - ./wizarr/ks.yaml
