@@ -117,8 +117,6 @@ spec:
             readOnly: false
           - path: /app/configs
             readOnly: false
-          # - path: /app/Tdarr_Server
-          #   readOnly: false
       media:
         enabled: true
         type: custom
@@ -136,3 +134,6 @@ spec:
         path:  /mnt/storage0/cache
         globalMounts:
           - path: /cache
+      dri:
+        type: hostPath
+        hostPath: /dev/dri
