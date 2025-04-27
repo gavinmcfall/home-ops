@@ -156,6 +156,14 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/postgres
+          - name: video
+            orgId: 1
+            folder: Video
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/video
           - name: "teslamate"
             orgId: 1
             folder: Teslamate
@@ -370,6 +378,12 @@ spec:
           datasource: Prometheus
         nginx-request-handling-performance:
           url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
+          datasource: Prometheus
+
+      video:
+        tdarr:
+          gnetId: 20388
+          revision: 3
           datasource: Prometheus
 
       teslamate:
