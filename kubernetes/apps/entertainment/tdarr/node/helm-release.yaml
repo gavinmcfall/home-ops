@@ -32,16 +32,9 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 100
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 44 # Required for Intel iGPU on Ubuntu base containers like Tdarr
-          - 10000
-          # Citadel Groups
-          - 568
         seccompProfile: { type: RuntimeDefault }
     controllers:
       tdarr-node:
