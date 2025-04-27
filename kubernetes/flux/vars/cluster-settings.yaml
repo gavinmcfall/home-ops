@@ -22,6 +22,7 @@ data:
   # K8s
   CLUSTER_POD_CIDR: 10.69.0.0/16
   CLUSTER_SERVICE_CIDR: 10.96.0.0/16
+  CLUSTER_DOMAIN: svc.cluster.local
 
   #Netowrking
   LOCAL_CIDR: 10.90.0.0/16
