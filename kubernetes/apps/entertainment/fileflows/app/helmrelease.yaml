@@ -135,7 +135,7 @@ spec:
         fsGroupChangePolicy: Always
         runAsNonRoot: false
         seccompProfile: { type: RuntimeDefault }
-        supplementalGroups: [44]
+        supplementalGroups: [44, 28]
 
     persistence:
       config:
