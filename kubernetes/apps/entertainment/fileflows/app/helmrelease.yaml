@@ -79,7 +79,7 @@ spec:
               ServerUrl: http://fileflows-server:5000
 
     ingress:
-      app:
+      server:
         className: internal
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
@@ -88,7 +88,7 @@ spec:
             paths:
               - path: /
                 service:
-                  identifier: app
+                  identifier: server
                   port: http
 
     service:
