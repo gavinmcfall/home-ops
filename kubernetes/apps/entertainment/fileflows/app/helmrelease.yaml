@@ -45,10 +45,7 @@ spec:
                 cp /usr/lib/x86_64-linux-gnu/dri/* /usr/lib/x86_64-linux-gnu/dri/
             securityContext:
               readOnlyRootFilesystem: false
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
+              allowPrivilegeEscalation: true
               seccompProfile:
                 type: RuntimeDefault
         pod:
