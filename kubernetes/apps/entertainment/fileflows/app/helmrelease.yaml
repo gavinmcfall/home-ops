@@ -31,6 +31,8 @@ spec:
       server:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          hostname: &name ff-server
         containers:
           *name : &container
             image:
@@ -174,7 +176,13 @@ spec:
         type: hostPath
       media:
         type: nfs
-        server: 10.90.1.69
+        server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
           - path: /media
+      cache:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/cache
+        globalMounts:
+          - path: /cache
