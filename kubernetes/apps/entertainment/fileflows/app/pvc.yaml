@@ -4,7 +4,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: fileflows-logs
 spec:
-  storageClassName: ceph-block
+  storageClassName: ${CLUSTER_STORAGE_FILESYSTEM}
   resources:
     requests:
       storage: 10Gi
@@ -16,7 +16,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: fileflows-common
 spec:
-  storageClassName: ceph-block
+  storageClassName: ${CLUSTER_STORAGE_FILESYSTEM}
   resources:
     requests:
       storage: 10Gi
@@ -28,7 +28,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: fileflows-manually-added
 spec:
-  storageClassName: ceph-block
+  storageClassName: ${CLUSTER_STORAGE_FILESYSTEM}
   resources:
     requests:
       storage: 10Gi
