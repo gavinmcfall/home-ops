@@ -66,7 +66,7 @@ spec:
               capabilities: { drop: ["ALL"] }
       node:
         pod:
-          hostname: &name ff-kube-bonds
+          hostname: &name ff-node
         containers:
           *name :
             <<: *container
@@ -124,7 +124,7 @@ spec:
         type: emptyDir
         advancedMounts:
           node:
-            ff-kube-bonds:
+            ff-node:
               - path: /app/Data
       logs:
         enabled: true
@@ -135,9 +135,9 @@ spec:
               - path: /app/Logs
                 subPath: ff-server
           node:
-            ff-kube-bonds:
+            ff-node:
               - path: /app/Logs
-                subPath: ff-kube-bonds
+                subPath: ff-node
       manually-added:
         existingClaim: fileflows-manually-added
         globalMounts:
