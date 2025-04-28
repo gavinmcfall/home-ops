@@ -42,8 +42,7 @@ spec:
               - >
                 mkdir -p /var/lib/apt/lists/partial &&
                 apt-get update &&
-                apt-get install -y --no-install-recommends intel-media-va-driver-non-free vainfo &&
-                cp /usr/lib/x86_64-linux-gnu/dri/* /usr/lib/x86_64-linux-gnu/dri/
+                apt-get install -y --no-install-recommends intel-media-va-driver-non-free vainfo
             securityContext:
               runAsUser: 0
               runAsGroup: 0
@@ -133,7 +132,7 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: Always
-        runAsNonRoot: true
+        runAsNonRoot: false
         seccompProfile: { type: RuntimeDefault }
         supplementalGroups: [44]
 
