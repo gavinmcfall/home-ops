@@ -34,7 +34,7 @@ spec:
         initContainers:
           install-vaapi-drivers:
             image:
-              repository: ubuntu:24.04
+              repository: ubuntu
               tag: 24.04
             command:
               - /bin/bash
