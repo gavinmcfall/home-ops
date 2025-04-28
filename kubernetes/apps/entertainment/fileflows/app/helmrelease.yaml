@@ -31,26 +31,13 @@ spec:
       server:
         annotations:
           reloader.stakater.com/auto: "true"
-        initContainers:
-          install-vaapi-drivers:
-            image:
-              repository: ubuntu
-              tag: 24.04
-            command:
-              - /bin/bash
-              - -c
-              - |
-                apt-get update && \
-                apt-get install -y --no-install-recommends intel-media-va-driver-non-free && \
-                cp /usr/lib/x86_64-linux-gnu/dri/* /mnt/dri/
-
         pod:
           hostname: &name ff-server
         containers:
           *name : &container
             image:
               repository: ghcr.io/ant385525/fileflows
-              tag: 25.4.6.5339@sha256:7de2ccc6c865a010a9add61a793f3f6831dbb2cec90637c9fdcc2a4650ac35ee
+              tag: 25.4.6.5339@sha256:3d16dd49e6ad2ce3ecf0215b6b6347e330204ed838e2c6652a3e5d135b39c4ec
             env:
               TZ: ${TIMEZONE}
               PORT: &port 5000
@@ -199,7 +186,3 @@ spec:
         path: /mnt/storage0/cache
         globalMounts:
           - path: /cache
-      vaapi-drivers:
-        type: emptyDir
-        globalMounts:
-          - path: /usr/lib/x86_64-linux-gnu/dri
