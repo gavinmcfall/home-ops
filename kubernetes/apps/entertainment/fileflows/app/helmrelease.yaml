@@ -31,6 +31,19 @@ spec:
       server:
         annotations:
           reloader.stakater.com/auto: "true"
+        initContainers:
+          install-vaapi-drivers:
+            image:
+              repository: ubuntu:24.04
+              tag: 24.04
+            command:
+              - /bin/bash
+              - -c
+              - |
+                apt-get update && \
+                apt-get install -y --no-install-recommends intel-media-va-driver-non-free && \
+                cp /usr/lib/x86_64-linux-gnu/dri/* /mnt/dri/
+
         pod:
           hostname: &name ff-server
         containers:
@@ -186,3 +199,7 @@ spec:
         path: /mnt/storage0/cache
         globalMounts:
           - path: /cache
+      vaapi-drivers:
+        type: emptyDir
+        globalMounts:
+          - path: /usr/lib/x86_64-linux-gnu/dri
