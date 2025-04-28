@@ -31,33 +31,32 @@ spec:
       server:
         annotations:
           reloader.stakater.com/auto: "true"
-        initContainers:
-          install-vaapi-drivers:
-            image:
-              repository: ubuntu
-              tag: "24.04"
-            command:
-              - /bin/bash
-              - -c
-              - >
-                mkdir -p /var/lib/apt/lists/partial &&
-                apt-get update &&
-                apt-get install -y --no-install-recommends intel-media-va-driver-non-free libdrm2 vainfo
-            securityContext:
-              privileged: true
-              capabilities:
-                drop:
-                  - ALL
-              seccompProfile:
-                type: RuntimeDefault
-
+        # initContainers:
+        #   install-vaapi-drivers:
+        #     image:
+        #       repository: ubuntu
+        #       tag: "24.04"
+        #     command:
+        #       - /bin/bash
+        #       - -c
+        #       - >
+        #         mkdir -p /var/lib/apt/lists/partial &&
+        #         apt-get update &&
+        #         apt-get install -y --no-install-recommends intel-media-va-driver-non-free libdrm2 vainfo
+        #     securityContext:
+        #       privileged: true
+        #       capabilities:
+        #         drop:
+        #           - ALL
+        #       seccompProfile:
+        #         type: RuntimeDefault
         pod:
           hostname: &name ff-server
         containers:
           *name : &container
             image:
               repository: ghcr.io/ant385525/fileflows
-              tag: 25.4.6.5339@sha256:3d16dd49e6ad2ce3ecf0215b6b6347e330204ed838e2c6652a3e5d135b39c4ec
+              tag: 25.4.6.5339@sha256:957ce19e1e7d486b728f6139281d846e529921bc9ebbebe816a43c16ce428b96
             env:
               TZ: ${TIMEZONE}
               PORT: &port 5000
