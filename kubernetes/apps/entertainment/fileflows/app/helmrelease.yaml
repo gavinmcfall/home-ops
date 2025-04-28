@@ -43,6 +43,14 @@ spec:
                 apt-get update &&
                 apt-get install -y --no-install-recommends intel-media-va-driver-non-free vainfo &&
                 cp /usr/lib/x86_64-linux-gnu/dri/* /usr/lib/x86_64-linux-gnu/dri/
+            securityContext:
+              readOnlyRootFilesystem: false
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              seccompProfile:
+                type: RuntimeDefault
         pod:
           hostname: &name ff-server
         containers:
