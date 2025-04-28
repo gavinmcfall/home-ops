@@ -45,8 +45,10 @@ spec:
                 apt-get install -y --no-install-recommends intel-media-va-driver-non-free vainfo &&
                 cp /usr/lib/x86_64-linux-gnu/dri/* /usr/lib/x86_64-linux-gnu/dri/
             securityContext:
+              runAsUser: 0
+              runAsGroup: 0
               readOnlyRootFilesystem: false
-              allowPrivilegeEscalation: false
+              allowPrivilegeEscalation: true
               capabilities:
                 drop:
                   - ALL
