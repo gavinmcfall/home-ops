@@ -28,38 +28,54 @@ spec:
       namespace: rook-ceph
   values:
     controllers:
-      fileflows:
+      server:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          app:
+          *name : &container
             image:
-              repository: docker.io/revenz/fileflows
-              tag: 25.04@sha256:6f87a6468a888e0bc15e45b5c92d87f1bbc43caaf93b8b2c8610865d23d63731
+              repository: ghcr.io/ant385525/fileflows
+              tag: 25.4.6.5339@sha256:7de2ccc6c865a010a9add61a793f3f6831dbb2cec90637c9fdcc2a4650ac35ee
             env:
               TZ: ${TIMEZONE}
-              PUID: 568
-              PGID: 568
+              PORT: &port 5000
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/status
+                    port: *port
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+                  failureThreshold: 5
+              readiness: *probes
             resources:
               requests:
                 cpu: 25m
                 memory: 128M
               limits:
-                memory: 512M
+                memory: 12Gi
                 gpu.intel.com/i915: 1
             securityContext:
-              allowPrivilegeEscalation: true
-              readOnlyRootFilesystem: false
-              seccompProfile: { type: RuntimeDefault }
-    defaultPodOptions:
-      securityContext:
-        supplementalGroups: [44, 105, 10000]
-    service:
-      app:
-        controller: *app
-        ports:
-          http:
-            port: 5000
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+      node:
+        pod:
+          hostname: &name ff-kube-bonds
+        containers:
+          *name :
+            <<: *container
+            probes:
+              liveness: &probes
+                enabled: false
+              readiness: *probes
+            env:
+              FFNODE: 1
+              ServerUrl: http://fileflows-server:5000
+
     ingress:
       app:
         className: internal
@@ -72,22 +88,87 @@ spec:
                 service:
                   identifier: app
                   port: http
+
+    service:
+      server:
+        controller: server
+        ports:
+          http:
+            port: *port
+      kube-bonds:
+        controller: node
+        ports:
+          http:
+            port: *port
+
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
+        seccompProfile: { type: RuntimeDefault }
+        supplementalGroups: [44]
+
     persistence:
       config:
         existingClaim: *app
+        advancedMounts:
+          server:
+            ff-server:
+              - path: /app/Data
+      node-data:
+        type: emptyDir
+        advancedMounts:
+          node:
+            ff-kube-bonds:
+              - path: /app/Data
+      logs:
+        enabled: true
+        existingClaim: fileflows-logs
+        advancedMounts:
+          server:
+            ff-server:
+              - path: /app/Logs
+                subPath: ff-server
+          node:
+            ff-kube-bonds:
+              - path: /app/Logs
+                subPath: ff-kube-bonds
+      manually-added:
+        existingClaim: fileflows-manually-added
         globalMounts:
-          - path: /app/Data
-            subPath: Data
-          - path: /app/Logs
-            subPath: logs
-          - path: /app/DockerMods
-            subPath: DockerMods
           - path: /app/ManuallyAdded
-            subPath: ManuallyAdded
-      tmp:
+      temp:
+        enabled: true
         type: emptyDir
         globalMounts:
           - path: /temp
+            subPath: temp
+          # Mutex
+          - path: /tmp
+            subPath: tmp
+      common:
+        type: emptyDir
+        globalMounts:
+          - path: /app/common
+      dockermods:
+        type: emptyDir
+        globalMounts:
+          - path: /app/DockerMods
+      plugins:
+        type: emptyDir
+        globalMounts:
+          - path: /app/Plugins
+      templates:
+        type: emptyDir
+        globalMounts:
+          - path: /app/Templates
+      i18n:
+        type: emptyDir
+        globalMounts:
+          - path: /app/Server/wwwroot/i18n
       dri:
         hostPath: /dev/dri
         type: hostPath
