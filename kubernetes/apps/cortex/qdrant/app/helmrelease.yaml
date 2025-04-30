@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: qdrant/qdrant
-              tag: v1.13.6@sha256:bd67306b6cc77c98122cada2321eb60b20d00b19d26cb61c86681e7bd5951498
+              tag: v1.14.0@sha256:f21bbaf111837592b70f4d727c62cf6d6525b5374b1193e9faeac26a953702a8
             env:
               QDRANT__SERVICE__HTTP_PORT: &http-port 6333
               QDRANT__SERVICE__GRPC_PORT: &grpc-port 6334
