@@ -28,8 +28,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/buroa/irqbalance
-              tag: 1.9.4@sha256:f6d487e66a2ce0b651d0d7da291ce54c325ed79b34ffad5baef1123160323be6
+              repository: ghcr.io/home-operations/irqbalance
+              tag: 1.9.4@sha256:d3c5a0221dc688593e78b14e10beb971d9717cc9381d4b1e065b8982f424fadb
             env:
               IRQBALANCE_BANNED_CPULIST: 12-19 # 12-19 are E-cores
               # See: https://gist.github.com/gavinmcfall/ea6cb1233d3a300e9f44caf65a32d519
