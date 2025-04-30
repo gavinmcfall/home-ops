@@ -21,6 +21,7 @@ litellm_settings:
   redact_user_api_key_info: true
   turn_off_message_logging: false
   set_verbose: true
+  drop_params: true
 
   # Caching settings
   cache: true
