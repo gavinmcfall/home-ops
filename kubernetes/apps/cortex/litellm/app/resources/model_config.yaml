@@ -80,6 +80,7 @@ model_list:
     provider: groq
     litellm_params:
       model: groq/llama3-70b-8192
+      drop_params: true
     api_key: ${GROQ_API_KEY}
     model_info:
       id: llama3-70b-8192
