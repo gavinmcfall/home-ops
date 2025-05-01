@@ -67,6 +67,7 @@ spec:
       cpuLimit: 500m
       memoryLimit: 1000Mi
       pullPolicy: Always
+      assign_cluster_ip: true
 
     admin:
       replicas: 1
