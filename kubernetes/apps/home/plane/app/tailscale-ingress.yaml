@@ -1,22 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: plane
+  name: plane-tailscale
+  namespace: home
   annotations:
-    external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+    kubernetes.io/ingress.class: tailscale
+    external-dns.alpha.kubernetes.io/target: ts.${SECRET_DOMAIN}
 spec:
-  ingressClassName: tailscale
   rules:
-    - host: plane
+    - host: plane.ts.${SECRET_DOMAIN}
       http:
         paths:
           - path: /
-            pathType: ImplementationSpecific
+            pathType: Prefix
             backend:
               service:
-                name: plane
+                name: plane-web-wl
                 port:
-                  number: 80
+                  number: 8000
   tls:
     - hosts:
-        - plane
+        - plane.ts.${SECRET_DOMAIN}
