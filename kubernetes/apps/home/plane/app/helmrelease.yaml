@@ -1,19 +1,20 @@
+# helm repo add plane https://helm.plane.so/
+# helm show values makeplane/plane-ce > values.yaml
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: plane
-  namespace: tools
+  namespace: home
 spec:
   interval: 30m
   chart:
     spec:
-      chart: app-template
-      version: 3.7.3
+      chart: plane-ce
+      version: 1.8.0
       sourceRef:
         kind: HelmRepository
-        name: bjw-s
+        name: makeplane
         namespace: flux-system
   install:
     remediation:
@@ -24,123 +25,89 @@ spec:
       strategy: rollback
       retries: 3
   values:
-    controllers:
-      plane:
-        annotations:
-          reloader.stakater.com/auto: "true"
-        initContainers:
-          init-db:
-            image:
-              repository: ghcr.io/home-operations/postgres-init
-              tag: 17.4.0@sha256:a9f405688344a8a6f718e2c344438342ad21540986aeb5ab5fa781831eb2c597
-            envFrom: &envFrom
-              - secretRef:
-                  name: plane-secret
-        containers:
-          api:
-            image:
-              repository: &backendRepo artifacts.plane.so/makeplane/plane-backend
-              tag: &backendTag v0.26.0@sha256:5de2f696f8f5d0294bc4a266f5d63b593358644ee7540eaa686669c3e0a424d2
-            args: ["plane.wsgi:application", "--bind", "0.0.0.0:8000"]
-            envFrom: *envFrom
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 1Gi
-          worker:
-            image:
-              repository: *backendRepo
-              tag: *backendTag
-            envFrom: *envFrom
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 1Gi
-          beatworker:
-            image:
-              repository: *backendRepo
-              tag: *backendTag
-            envFrom: *envFrom
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 1Gi
-          web:
-            image:
-              repository: artifacts.plane.so/makeplane/plane-frontend
-              tag: v0.26.0@sha256:18dfa5590d6d80c9d5288c68bb1721611da28816da29df004d939ec36831270c
-            envFrom: *envFrom
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 1Gi
-          admin:
-            image:
-              repository: artifacts.plane.so/makeplane/plane-admin
-              tag: v0.26.0@sha256:88468c2b5f8f189c1f6029405b72063a79cf0fc112ecbd8bed1fb04c89044bfb
-            envFrom: *envFrom
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 1Gi
-          space:
-            image:
-              repository: artifacts.plane.so/makeplane/plane-space
-              tag: v0.26.0@sha256:1c3b9e822a122e8f02491f66807189a35a6f4cb1fada0640dc672ce34706017f
-            envFrom: *envFrom
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 1Gi
-          live:
-            image:
-              repository: artifacts.plane.so/makeplane/plane-live
-              tag: v0.26.0@sha256:ec44d0c9426bf022dc96f14edf97ae18cfcfdfe5410e5a306a0a497c5bbcebdc
-            envFrom: *envFrom
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 1Gi
-          rabbitmq:
-            image:
-              repository: rabbitmq
-              tag: 4.1.0-management-alpine@sha256:34488e5790ffdc619009e64df775da3fa8478bc60c9aa9ce77f4197f5f118ec5
-            envFrom: *envFrom
-            resources:
-              requests:
-                cpu: 50m
-              limits:
-                memory: 512Mi
-    service:
-      plane:
-        controller: plane
-        ports:
-          http:
-            port: 80
+    planeVersion: 1.8.0
+
     ingress:
-      plane:
-        className: internal
-        annotations:
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: plane
-                  port: http
-    persistence:
-      rabbitmq-data:
-        accessMode: ReadWriteOnce
-        size: 100Mi
-        storageClass: ceph-block
-        globalMounts:
-          - path: /var/lib/rabbitmq
-            readOnly: false
+      enabled: true
+      ingressClass: internal
+      appHost: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+      ingress_annotations:
+        external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/group: Tools
+        gethomepage.dev/name: Plane
+        gethomepage.dev/icon: plane.png
+
+    external_secrets:
+      rabbitmq_existingSecret: plane-secret
+      pgdb_existingSecret: plane-secret
+      doc_store_existingSecret: plane-secret
+      app_env_existingSecret: plane-secret
+      live_env_existingSecret: plane-secret
+
+    api:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    worker:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    beatworker:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    web:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    admin:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    live:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    space:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    rabbitmq:
+      local_setup: true
+      image: rabbitmq:4.1.0-management-alpine
+      pullPolicy: IfNotPresent
+      servicePort: 5672
+      managementPort: 15672
+      storageClass: ceph-block
+      volumeSize: 100Mi
+
+    env:
+      CORS_ALLOWED_ORIGINS: "https://plane.${SECRET_DOMAIN}"
+      DEFAULT_CLUSTER_DOMAIN: cluster.local
+      API_KEY_RATE_LIMIT: "60/minute"
+      DOCSTORE_BUCKET: "uploads"
+      DOC_UPLOAD_SIZE_LIMIT: "157286400"
+
+    redis:
+      local_setup: false
+
+    postgres:
+      local_setup: false
+
+    minio:
+      local_setup: false
