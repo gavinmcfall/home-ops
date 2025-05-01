@@ -24,7 +24,7 @@ resources:
   - ./node-feature-discovery.yaml
   - ./openebs.yaml
   - ./piraeus-charts.yaml
-  - ./plane.yaml
+  - ./makeplane.yaml
   - ./postfinance.yaml
   - ./prometheus-community.yaml
   - ./qdrant.yaml
