@@ -32,8 +32,8 @@ spec:
       appHost: "plane.${SECRET_DOMAIN}"
       ingress_annotations:
         external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        nginx.ingress.kubernetes.io/auth-url: "https://plane.${SECRET_DOMAIN}/oauth2/auth"
-        nginx.ingress.kubernetes.io/auth-signin: "https://plane.${SECRET_DOMAIN}/oauth2/start?rd=https://$host$request_uri"
+        nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/auth"
+        nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/start?rd=$scheme://$host$request_uri"
 
     external_secrets:
       rabbitmq_existingSecret: plane-secret
