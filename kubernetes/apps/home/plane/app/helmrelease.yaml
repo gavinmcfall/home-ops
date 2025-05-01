@@ -24,7 +24,7 @@ spec:
       strategy: rollback
       retries: 3
   values:
-    planeVersion: 0.26.0
+    planeVersion: v0.26.0
 
     ingress:
       enabled: true
