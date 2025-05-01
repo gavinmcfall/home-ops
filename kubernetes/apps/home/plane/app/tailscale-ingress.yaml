@@ -3,7 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: plane
-  namespace: observability
+  namespace: home
 spec:
   ingressClassName: tailscale
   rules:
