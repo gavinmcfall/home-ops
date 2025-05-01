@@ -28,10 +28,10 @@ spec:
 
     ingress:
       enabled: true
-      ingressClass: internal
+      ingressClass: external
       appHost: "plane.${SECRET_DOMAIN}"
       ingress_annotations:
-        external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         nginx.ingress.kubernetes.io/auth-url: "https://plane.${SECRET_DOMAIN}/oauth2/auth"
         nginx.ingress.kubernetes.io/auth-signin: "https://plane.${SECRET_DOMAIN}/oauth2/start?rd=https://$host$request_uri"
 
