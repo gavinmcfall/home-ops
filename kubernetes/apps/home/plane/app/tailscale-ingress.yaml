@@ -3,21 +3,28 @@ kind: Ingress
 metadata:
   name: plane-tailscale
   namespace: home
+  labels:
+    app.kubernetes.io/name: plane
+    app.kubernetes.io/instance: plane
+    app.kubernetes.io/managed-by: Helm
+    helm.toolkit.fluxcd.io/name: plane
+    helm.toolkit.fluxcd.io/namespace: home
   annotations:
-    kubernetes.io/ingress.class: tailscale
-    external-dns.alpha.kubernetes.io/target: ts.${SECRET_DOMAIN}
+    meta.helm.sh/release-name: plane
+    meta.helm.sh/release-namespace: home
 spec:
+  ingressClassName: tailscale
   rules:
-    - host: plane.ts.${SECRET_DOMAIN}
+    - host: plane
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: plane-web-wl
+                name: plane-web
                 port:
                   number: 8000
   tls:
     - hosts:
-        - plane.ts.${SECRET_DOMAIN}
+        - plane
