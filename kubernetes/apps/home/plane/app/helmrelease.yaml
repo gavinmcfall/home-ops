@@ -29,7 +29,7 @@ spec:
     ingress:
       enabled: true
       ingressClass: internal
-      appHost: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+      appHost: "plane.${SECRET_DOMAIN}"
       ingress_annotations:
         external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         gethomepage.dev/enabled: "true"
