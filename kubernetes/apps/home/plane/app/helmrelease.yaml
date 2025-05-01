@@ -49,18 +49,21 @@ spec:
       cpuLimit: 500m
       memoryLimit: 1000Mi
       pullPolicy: Always
+      assign_cluster_ip: true
 
     worker:
       replicas: 1
       cpuLimit: 500m
       memoryLimit: 4000Mi
       pullPolicy: Always
+      assign_cluster_ip: true
 
     beatworker:
       replicas: 1
       cpuLimit: 500m
       memoryLimit: 1000Mi
       pullPolicy: Always
+      assign_cluster_ip: true
 
     web:
       replicas: 1
@@ -74,18 +77,21 @@ spec:
       cpuLimit: 500m
       memoryLimit: 1000Mi
       pullPolicy: Always
+      assign_cluster_ip: true
 
     live:
       replicas: 1
       cpuLimit: 500m
       memoryLimit: 1000Mi
       pullPolicy: Always
+      assign_cluster_ip: true
 
     space:
       replicas: 1
       cpuLimit: 500m
       memoryLimit: 1000Mi
       pullPolicy: Always
+      assign_cluster_ip: true
 
     rabbitmq:
       local_setup: true
@@ -95,6 +101,7 @@ spec:
       managementPort: 15672
       storageClass: ceph-block
       volumeSize: 100Mi
+      assign_cluster_ip: true
 
     env:
       CORS_ALLOWED_ORIGINS: "https://plane.${SECRET_DOMAIN}"
