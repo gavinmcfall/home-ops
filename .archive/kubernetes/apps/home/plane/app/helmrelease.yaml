@@ -1,5 +1,6 @@
+# helm repo add plane https://helm.plane.so/
+# helm show values makeplane/plane-ce > values.yaml
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/helm.toolkit.fluxcd.io/helmrelease_v2beta1.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -9,10 +10,10 @@ spec:
   chart:
     spec:
       chart: plane-ce
-      version: 1.1.0
+      version: 1.1.1
       sourceRef:
         kind: HelmRepository
-        name: plane
+        name: makeplane
         namespace: flux-system
   install:
     remediation:
@@ -20,25 +21,86 @@ spec:
   upgrade:
     cleanupOnFail: true
     remediation:
+      strategy: rollback
       retries: 3
-  uninstall:
-    keepHistory: false
   values:
-    planeVersion: stable
+    planeVersion: v0.26.0
 
     ingress:
       enabled: true
-      appHost: "plane.nerdz.cloud"
-      ingressClass: "external"
+      ingressClass: internal
+      appHost: "plane.${SECRET_DOMAIN}"
       ingress_annotations:
-        nginx.ingress.kubernetes.io/proxy-body-size: "5m"
-        external-dns.alpha.kubernetes.io/target: "external.nerdz.cloud"
+        external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         gethomepage.dev/enabled: "true"
-        gethomepage.dev/group: "Productivity"
-        gethomepage.dev/name: "Plane"
-        gethomepage.dev/app: "plane-web"
-        gethomepage.dev/icon: "https://plane-marketing.s3.ap-south-1.amazonaws.com/plane-readme/plane_logo_.webp"
-        gethomepage.dev/description: "Project Management"
+        gethomepage.dev/group: Tools
+        gethomepage.dev/name: Plane
+        gethomepage.dev/icon: plane.png
+
+    external_secrets:
+      rabbitmq_existingSecret: plane-secret
+      pgdb_existingSecret: plane-secret
+      doc_store_existingSecret: plane-secret
+      app_env_existingSecret: plane-secret
+      live_env_existingSecret: plane-secret
+
+    api:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    worker:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 4000Mi
+      pullPolicy: Always
+
+    beatworker:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    web:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    admin:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    live:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    space:
+      replicas: 1
+      cpuLimit: 500m
+      memoryLimit: 1000Mi
+      pullPolicy: Always
+
+    rabbitmq:
+      local_setup: true
+      image: rabbitmq:4.1.0-management-alpine
+      pullPolicy: IfNotPresent
+      servicePort: 5672
+      managementPort: 15672
+      storageClass: ceph-block
+      volumeSize: 100Mi
+
+    env:
+      CORS_ALLOWED_ORIGINS: "https://plane.${SECRET_DOMAIN}"
+      DEFAULT_CLUSTER_DOMAIN: cluster.local
+      API_KEY_RATE_LIMIT: "60/minute"
+      DOCSTORE_BUCKET: "uploads"
+      DOC_UPLOAD_SIZE_LIMIT: "157286400"
 
     redis:
       local_setup: false
@@ -48,72 +110,3 @@ spec:
 
     minio:
       local_setup: false
-
-    web:
-      replicas: 1
-      memoryLimit: 1000Mi
-      cpuLimit: 500m
-      image: makeplane/plane-frontend
-      pullPolicy: IfNotPresent
-      assign_cluster_ip: true
-
-    space:
-      replicas: 1
-      memoryLimit: 1000Mi
-      cpuLimit: 500m
-      image: makeplane/plane-space
-      pullPolicy: IfNotPresent
-      assign_cluster_ip: true
-
-    admin:
-      replicas: 1
-      memoryLimit: 1000Mi
-      cpuLimit: 500m
-      image: makeplane/plane-admin
-      pullPolicy: IfNotPresent
-      assign_cluster_ip: true
-
-    api:
-      replicas: 1
-      memoryLimit: 1000Mi
-      cpuLimit: 500m
-      image: makeplane/plane-backend
-      pullPolicy: IfNotPresent
-      assign_cluster_ip: false
-
-    worker:
-      replicas: 1
-      memoryLimit: 1000Mi
-      cpuLimit: 500m
-      image: makeplane/plane-backend
-      pullPolicy: IfNotPresent
-
-    beatworker:
-      replicas: 1
-      memoryLimit: 1000Mi
-      cpuLimit: 500m
-      image: makeplane/plane-backend
-      pullPolicy: IfNotPresent
-
-    env:
-      pgdb_username: "$(PLANE_POSTGRES_USER)"
-      pgdb_password: "$(PLANE_POSTGRES_PASSWORD)"
-      pgdb_name: "$(PLANE_POSTGRES_DB)"
-      pgdb_remote_url: "$(PLANE_POSTGRES_CONNECTION_STRING)"
-
-      remote_redis_url: "$(PLANE_REDIS_CONNECTION_STRING)"
-
-      docstore_bucket: "uploads"
-      doc_upload_size_limit: "5242880" # 5MB
-
-      aws_access_key: "$(PLANE_MINIO_ACCESS_KEY)"
-      aws_secret_access_key: "$(PLANE_MINIO_SECRET_KEY)"
-      aws_s3_endpoint_url: "$(PLANE_MINIO_CONNECTION_STRING)"
-
-      secret_key: "$(PLANE_SECRET_KEY)"
-
-      sentry_dsn: ""
-      sentry_environment: ""
-
-      cors_allowed_origins: ""
-      default_cluster_domain: cluster.local

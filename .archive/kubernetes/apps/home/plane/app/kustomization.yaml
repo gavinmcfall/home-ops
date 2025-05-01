@@ -5,3 +5,6 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+  - ./tailscale-ingress.yaml
+  - ../../../../templates/volsync
+  - ../../../../templates/gatus/guarded
