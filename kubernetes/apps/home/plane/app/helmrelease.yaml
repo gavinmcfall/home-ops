@@ -32,10 +32,8 @@ spec:
       appHost: "plane.${SECRET_DOMAIN}"
       ingress_annotations:
         external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        gethomepage.dev/enabled: "true"
-        gethomepage.dev/group: Tools
-        gethomepage.dev/name: Plane
-        gethomepage.dev/icon: plane.png
+        nginx.ingress.kubernetes.io/auth-url: "https://plane.${SECRET_DOMAIN}/oauth2/auth"
+        nginx.ingress.kubernetes.io/auth-signin: "https://plane.${SECRET_DOMAIN}/oauth2/start?rd=https://$host$request_uri"
 
     external_secrets:
       rabbitmq_existingSecret: plane-secret
