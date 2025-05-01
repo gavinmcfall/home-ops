@@ -41,6 +41,7 @@ spec:
             image:
               repository: &backendRepo artifacts.plane.so/makeplane/plane-backend
               tag: &backendTag v0.26.0@sha256:5de2f696f8f5d0294bc4a266f5d63b593358644ee7540eaa686669c3e0a424d2
+            args: ["sleep", "999999"]
             envFrom: *envFrom
             resources:
               requests:
