@@ -61,6 +61,9 @@ spec:
               OAUTH2_PROXY_SILENCE_PING_LOGGING: "true" #disable logging of requests to ping & ready endpoints
               OAUTH2_PROXY_SESSION_STORE_TYPE: redis #Session data storage backend; redis or cookie
               OAUTH2_PROXY_REDIS_CONNECTION_URL: redis://dragonfly.database.svc.cluster.local:6379
+              OAUTH2_PROXY_SKIP_AUTH_ROUTES: |
+                ^/api
+
 
             probes:
               liveness:

@@ -34,10 +34,7 @@ spec:
         external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/auth"
         nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/start?rd=$scheme://$host$request_uri"
-        nginx.ingress.kubernetes.io/auth-snippet: |
-          if ( $request_uri = "/api" ) {
-              return 200;
-          }
+
 
     external_secrets:
       rabbitmq_existingSecret: plane-secret
