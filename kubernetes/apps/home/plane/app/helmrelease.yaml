@@ -34,6 +34,16 @@ spec:
         external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/auth"
         nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/start?rd=$scheme://$host$request_uri"
+        nginx.ingress.kubernetes.io/configuration-snippet: |
+          # Skip OAuth2 for /api
+          if ($request_uri ~* "^/api/") {
+            set $skip_auth 1;
+          }
+        nginx.ingress.kubernetes.io/auth-snippet: |
+          # Only apply auth if not skipped
+          if ($skip_auth = 1) {
+            return 200;
+          }
 
     external_secrets:
       rabbitmq_existingSecret: plane-secret
