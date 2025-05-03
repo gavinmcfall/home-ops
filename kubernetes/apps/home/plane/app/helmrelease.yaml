@@ -34,15 +34,17 @@ spec:
         external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/auth"
         nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/start?rd=$scheme://$host$request_uri"
-        nginx.ingress.kubernetes.io/auth-snippet: |
-          set $skip_auth 0;
+        nginx.ingress.kubernetes.io/configuration-snippet: |
+          set $skip_auth "0";
           if ($request_uri ~* "^/api") {
-            set $skip_auth 1;
+            set $skip_auth "1";
           }
           if ($request_uri ~* "^/auth") {
-            set $skip_auth 1;
+            set $skip_auth "1";
           }
-          if ($skip_auth = 1) {
+
+        nginx.ingress.kubernetes.io/auth-snippet: |
+          if ($skip_auth = "1") {
             return 200;
           }
 
