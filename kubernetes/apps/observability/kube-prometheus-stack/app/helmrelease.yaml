@@ -114,6 +114,7 @@ spec:
           annotations:
             secret.reloader.stakater.com/reload: &secret thanos-objstore-config
         scrapeInterval: 1m # Must match interval in Grafana Helm chart
+        logLevel: debug
         ruleSelectorNilUsesHelmValues: false
         serviceMonitorSelectorNilUsesHelmValues: false
         podMonitorSelectorNilUsesHelmValues: false
@@ -129,9 +130,10 @@ spec:
         retentionSize: 70GB
         resources:
           requests:
-            cpu: 100m
+            cpu: 300m
+            memory: 2Gi
           limits:
-            memory: 1500Mi
+            memory: 4Gi
         storageSpec:
           volumeClaimTemplate:
             spec:
