@@ -44,9 +44,6 @@ spec:
       bdev_enable_discard = true
       bdev_async_discard = true
       osd_class_update_on_start = false
-      mds_trim_max_segments = 500
-      mds_trim_delay = 30
-      mds_cache_trim_threshold = 10485760
     cephClusterSpec:
       crashCollector:
         disable: false
