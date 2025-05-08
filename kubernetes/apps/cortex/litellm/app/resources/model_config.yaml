@@ -45,26 +45,64 @@ model_list:
 
 # AWS Bedrock Models
 
-  - model_name: "AWS Bedrock: claude-3-sonnet"
+  - model_name: "AWS Bedrock: Claude 3.5 Sonnet"
     provider: bedrock
     litellm_params:
-      model: anthropic.claude-3-sonnet-20240229-v1:0
+      model: bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0
       region_name: ap-southeast-2
-    api_key: ${AWS_BEDROCK_API_KEY}
     model_info:
-      id: claude-3-sonnet
+      id: anthropic.claude-3-5-sonnet-20241022-v2:0
       mode: completion
       input_cost_per_token: 0.000003  # USD $3.00 per million tokens (input)
       output_cost_per_token: 0.000015  # USD $15.00 per million tokens (output)
       max_tokens: 200000  # Maximum context window: 200,000 tokens
+    aliases: [general_bedrock2, vision_bedrock3]
+
+  - model_name: "AWS Bedrock: Claude 3.7 Sonnet"
+    provider: bedrock
+    litellm_params:
+      model: bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0
+      region_name: ap-southeast-2
+    model_info:
+      id: anthropic.claude-3-7-sonnet-20250219-v1:0
+      mode: completion
+      input_cost_per_token: 0.000003  # USD $3.00 per million tokens (input)
+      output_cost_per_token: 0.000015  # USD $15.00 per million tokens (output)
+      max_tokens: 200000  # Maximum context window: 200,000 tokens
+    aliases: [general_bedrock3, vision_bedrock2]
+
+  - model_name: "AWS Bedrock: Claude 3 Haiku"
+    provider: bedrock
+    litellm_params:
+      model: bedrock/anthropic.claude-3-haiku-20240307-v1:0
+      region_name: ap-southeast-2
+    model_info:
+      id: anthropic.claude-3-haiku-20240307-v1:0
+      mode: completion
+      input_cost_per_token: 0.0000008  # USD $0.80 per million tokens (input)
+      output_cost_per_token: 0.000004  # USD $4.00 per million tokens (output)
+      max_tokens: 200000  # Maximum context window: 200,000 tokens
     aliases: [general_bedrock, vision_bedrock]
+
+  - model_name: "AWS Bedrock: Meta llama3.2 90B "
+    provider: bedrock
+    litellm_params:
+      model: bedrock/meta.llama3-2-90b-instruct-v1:0
+      region_name: ap-southeast-2
+    model_info:
+      id: meta.llama3-2-90b-instruct-v1:0
+      mode: completion
+      input_cost_per_token: 0.00000072  # USD $0.72 per million tokens (input)
+      output_cost_per_token: 0.00000072  # USD $0.72 per million tokens (output)
+      max_tokens: 200000  # Maximum context window: 200,000 tokens
+    aliases: [general_bedrock4, vision_bedrock4]
 
 # Google Models
 
   - model_name: "Google: gemini-1.5-pro"
     provider: google
     litellm_params:
-      model: gemini-1.5-pro
+      model: gemini/gemini-1.5-pro
     api_key: ${GOOGLE_API_KEY}
     model_info:
       id: gemini-1.5-pro
@@ -94,7 +132,7 @@ model_list:
   - model_name: "OpenAI: text-embedding-3-small"
     provider: openai
     litellm_params:
-      model: text-embedding-3-small
+      model: openai/text-embedding-3-small
       mode: embedding  # Required for embeddings
     api_key: ${OPENAI_API_KEY}
     model_info:
@@ -107,7 +145,7 @@ model_list:
   - model_name: "OpenAI: gpt-4.1-mini"
     provider: openai
     litellm_params:
-      model: gpt-4.1-mini
+      model: openai/gpt-4.1-mini
     api_key: ${OPENAI_API_KEY}
     model_info:
       id: gpt-4.1-mini
@@ -120,7 +158,7 @@ model_list:
   - model_name: "OpenAI: gpt-4o"
     provider: openai
     litellm_params:
-      model: gpt-4o
+      model: openai/gpt-4o
     api_key: ${OPENAI_API_KEY}
     model_info:
       id: gpt-4o
@@ -177,7 +215,10 @@ model_groups:
     - general_openai                # GPT-4.1 Mini – strong balance of capability and cost
     - general_anthropic             # Claude 3.5 – ideal for thoughtful reasoning and tone
     - general_gemini                # Gemini – strong reasoning and multi-modal fallback
-    - general_bedrock               # Claude 3.0 (Bedrock) – secondary fallback
+    - general_bedrock               # Claude 3.0 Haiku (Bedrock) – secondary fallback
+    - general_bedrock2              # Claude 3.5 Sonnet (Bedrock) – secondary fallback
+    - general_bedrock3              # Claude 3.7 Sonnet (Bedrock) – secondary fallback
+    - general_bedrock4              # Meta llama3.2 90B (Bedrock) – secondary fallback
     - general_xai                   # Grok 3 – experimental fallback
 
   vision_tasks:
@@ -186,7 +227,10 @@ model_groups:
     - vision_anthropic              # Claude 3.5 – vision-capable fallback
     - vision_gemini                 # Gemini – multimodal assistant
     - vision_xai                    # Grok 3 – visual reasoning backup
-    - vision_bedrock                # Claude 3.0 (Bedrock) – vision fallback
+    - vision_bedrock                # Claude 3.0 Haiku (Bedrock) – vision fallback
+    - vision_bedrock2               # Claude 3.5 Sonnet (Bedrock) – vision fallback
+    - vision_bedrock3               # Claude 3.7 Sonnet (Bedrock) – vision fallback
+    - vision_bedrock4               # Meta llama3.2 90B (Bedrock) – vision fallback
 
   education_pipeline:
     - education_4o                  # GPT-4o – ideal for tutoring with language diversity
@@ -194,4 +238,7 @@ model_groups:
     - general_anthropic             # Claude 3.5 – empathetic and capable in tutoring
     - general_gemini                # Gemini – logical fallback
     - general_bedrock               # Claude 3.0 (Bedrock) – stable backup
+    - general_bedrock2              # Claude 3.5 Sonnet (Bedrock) – stable backup
+    - general_bedrock3              # Claude 3.7 Sonnet (Bedrock) – stable backup
+    - general_bedrock4              # Meta llama3.2 90B (Bedrock) – stable backup
     - general_xai                   # Grok 3 – fallback if others fail
