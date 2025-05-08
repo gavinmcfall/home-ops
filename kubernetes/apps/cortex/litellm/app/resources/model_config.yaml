@@ -112,6 +112,19 @@ model_list:
       max_tokens: 32768  # Maximum context window: 32,768 tokens
     aliases: [general_gemini, vision_gemini]
 
+  - model_name: "Google: Gemini 2.5 Pro Preview 05-06"
+    provider: google
+    litellm_params:
+      model: gemini/gemini-2.5-pro-preview-05-06
+    api_key: ${GOOGLE_API_KEY}
+    model_info:
+      id: gemini-2.5-pro-preview-05-06
+      mode: completion
+      input_cost_per_token: 0.00000250  # USD $2.50 per million tokens (input)
+      output_cost_per_token: 0.00000500  # USD $5.00 per million tokens (output)
+      max_tokens: 1048576  # Maximum context window: 1,048,576 tokens
+    aliases: [experimental]
+
 # Groq Models
 
   - model_name: "Groq: Meta llama3-70b-8192"
