@@ -36,7 +36,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/qbittorrent
-              tag: 5.1.0@sha256:d28de21b80e231578b600ce47335733df55ca2058e75361becfb1b252569f0c8
+              tag: 5.1.0@sha256:fe26058628e9eb57b542204b76443b7304ed8820151d51b5c285e1828ca175a0
             env:
               TZ: ${TIMEZONE}
               QBT_WEBUI_PORT: &port 80
