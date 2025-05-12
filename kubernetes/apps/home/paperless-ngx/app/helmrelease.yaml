@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app paperless-ngx
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+      strategy: rollback
+  values:
+    controllers:
+      paperless-ngx:
+        annotations:
+          reloader.stakater.com/auto: 'true'
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17.4.0@sha256:a9f405688344a8a6f718e2c344438342ad21540986aeb5ab5fa781831eb2c597
+              pullPolicy: IfNotPresent
+            envFrom: &envFrom
+              - secretRef:
+                  name: paperless-secret
+        containers:
+          gotenburg:
+            image:
+              repository: thecodingmachine/gotenberg
+              tag: 8.20.1
+              pullPolicy: IfNotPresent
+            env:
+              - {name: DISABLE_GOOGLE_CHROME, value: '1'}
+          redis:
+            image:
+              repository: public.ecr.aws/docker/library/redis
+              tag: 8.0.0
+              pullPolicy: IfNotPresent
+          tika:
+            image:
+              repository: ghcr.io/paperless-ngx/tika
+              tag: 2.9.1-full
+              pullPolicy: IfNotPresent
+          app:
+            image:
+              repository: ghcr.io/paperless-ngx/paperless-ngx
+              tag: 2.15.3
+            envFrom: *envFrom
+            env:
+              USERMAP_UID: 568
+              USERMAP_GID: 568
+              PAPERLESS_TIME_ZONE: ${TIMEZONE}
+              PAPERLESS_PORT: &port 80
+              PAPERLESS_TASK_WORKERS: 2
+              PAPERLESS_TIKA_ENABLED: 1
+              PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://localhost:3000
+              PAPERLESS_TIKA_ENDPOINT: http://localhost:9998
+              PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
+              PAPERLESS_ALLOWED_HOSTS: paperless.${SECRET_DOMAIN}
+              PAPERLESS_CSRF_TRUSTED_ORIGINS: paperless.${SECRET_DOMAIN}
+              PAPERLESS_CORS_ALLOWED_HOSTS: https://paperless.${SECRET_DOMAIN}
+              PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT: "2" #HTML, then text
+              PAPERLESS_ENABLE_HTTP_REMOTE_USER: 'true'
+              PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: HTTP_REMOTE_USER
+              PAPERLESS_CONSUMPTION_DIR: /documents/consume
+              PAPERLESS_DATA_DIR: /documents/data
+              PAPERLESS_MEDIA_ROOT: /documents/media
+              PAPERLESS_EXPORT_DIR: /documents/export
+              PAPERLESS_CONSUMER_POLLING: 60
+              PAPERLESS_CONSUMER_IGNORE_PATTERNS: '[".DS_STORE/*", "._*", ".stfolder/*", "@eaDir/*"]'
+              PAPERLESS_TRUSTED_PROXIES: 10.42.0.0/16
+              PAPERLESS_CONSUMER_DELETE_DUPLICATES: true
+              PAPERLESS_CONSUMER_RECURSIVE: true
+              PAPERLESS_OCR_LANGUAGE: eng
+              PAPERLESS_EMPTY_TRASH_DIR: /documents/trash
+              PAPERLESS_EMPTY_TRASH_DELAY: 30
+              PAPERLESS_AUDIT_LOG_ENABLED: "true"
+              PAPERLESS_FILENAME_FORMAT: '{{ created_year }}/{{ correspondent }}/{{ title }}'
+
+            resources:
+              requests:
+                cpu: 35m
+                memory: 926Mi
+              limits:
+                memory: 2Gi
+    service:
+      app:
+        controller: paperless-ngx
+        ports:
+          http:
+            port: *port
+    ingress:
+      app:
+        enabled: true
+        className: internal
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hosts:
+          - host: &host paperless.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+    persistence:
+      config:
+        enabled: true
+        existingClaim: paperless-ngx
+        globalMounts:
+          - path: /data
+      media:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/documents
+        globalMounts:
+          - path: /documents
