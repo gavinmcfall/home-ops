@@ -19,6 +19,7 @@ resources:
   - ./itzg.yaml
   - ./jetstack.yaml
   - ./k8s-gateway.yaml
+  - ./makeplane.yaml
   - ./metrics-server.yaml
   - ./nextcloud.yaml
   - ./node-feature-discovery.yaml
