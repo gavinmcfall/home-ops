@@ -12,7 +12,7 @@ spec:
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
     - name: cluster-apps-volsync
-  path: ./kubernetes/apps/home/paperless-ngx/app
+  path: ./kubernetes/apps/home/paperless/app
   prune: true
   sourceRef:
     kind: GitRepository
