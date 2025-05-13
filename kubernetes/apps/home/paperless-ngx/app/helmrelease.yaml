@@ -75,22 +75,6 @@ spec:
               PAPERLESS_ENABLE_HTTP_REMOTE_USER_API: "false"
               PAPERLESS_DISABLE_REGULAR_LOGIN: "false"
               PAPERLESS_REDIRECT_LOGIN_TO_SSO: "false"
-              PAPERLESS_SOCIALACCOUNT_PROVIDERS: |
-                {
-                  "openid_connect": {
-                    "APPS": [
-                      {
-                        "provider_id": "pocketid",
-                        "name": "PocketID SSO",
-                        "client_id": "${PAPERLESS_OIDC_CLIENT_ID}", # secret from PocketID
-                        "secret": "${PAPERLESS_OIDC_CLIENT_SECRET}",
-                        "settings": {
-                          "server_url": "https://pocketid.${SECRET_DOMAIN}/.well-known/openid-configuration"
-                        }
-                      }
-                    ]
-                  }
-                }
 
               PAPERLESS_TASK_WORKERS: 2
               PAPERLESS_TIKA_ENABLED: 1
@@ -112,7 +96,7 @@ spec:
               PAPERLESS_TRUSTED_PROXIES: 10.42.0.0/16
 
               PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT: "2"   # HTML, then text
-              PAPERLESS_FILENAME_FORMAT: '{{ created_year }}/{{ correspondent }}/{{ title }}'
+              PAPERLESS_FILENAME_FORMAT: "{{ `{{ created_year }}/{{ document_type }}/{{ created_year }}-{{ created_month }}-{{ created_day }}_{correspondent}_{{ title }}` }}"
 
               PAPERLESS_EMPTY_TRASH_DELAY: 30
               PAPERLESS_AUDIT_LOG_ENABLED: "true"
