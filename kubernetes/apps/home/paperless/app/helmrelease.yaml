@@ -58,7 +58,7 @@ spec:
               USERMAP_UID: 568
               USERMAP_GID: 568
               PAPERLESS_TIME_ZONE: ${TIMEZONE}
-              PAPERLESS_APPS: "allauth.socialaccount.providers.openid_connect"
+              PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
 
               PAPERLESS_PORT: &port 80
               PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
@@ -66,6 +66,8 @@ spec:
               PAPERLESS_CSRF_TRUSTED_ORIGINS: https://paperless.${SECRET_DOMAIN}
               PAPERLESS_CORS_ALLOWED_HOSTS: https://paperless.${SECRET_DOMAIN}
               PAPERLESS_ENABLE_HTTP_REMOTE_USER: 'true'
+              PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
+              PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS: "true"
               PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: HTTP_REMOTE_USER
               PAPERLESS_ENABLE_HTTP_REMOTE_USER_API: "false"
               PAPERLESS_DISABLE_REGULAR_LOGIN: "false"
