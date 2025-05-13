@@ -10,8 +10,8 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: rook-ceph-cluster
-    - name: volsync
+    - name: cluster-apps-rook-ceph-cluster
+    - name: cluster-apps-volsync
   path: ./kubernetes/apps/home/paperless-ngx/app
   prune: true
   sourceRef:
