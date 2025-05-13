@@ -142,10 +142,6 @@ spec:
         existingClaim: paperless-ngx
         globalMounts:
           - path: /data
-      tmp-scratch:
-        enabled: true
-        existingClaim: paperless-ngx-tmp
-        globalMounts:
           - path: /convert-tmp
       documents:
         type: nfs
