@@ -24,7 +24,7 @@ spec:
       strategy: rollback
   values:
     controllers:
-      paperless-ngx:
+      paperless:
         annotations:
           reloader.stakater.com/auto: 'true'
         initContainers:
