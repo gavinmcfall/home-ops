@@ -40,7 +40,7 @@ spec:
               tag: v0.18.0@sha256:505cb73ee7c64c2ade047ed0a62b56315764337d5349d9dd3e627d9fe095223b
             env:
               #App
-              PAPERLESS_BASE_URL: "http://paperless.home.svc.cluster.local:8000"
+              PAPERLESS_BASE_URL: "http://paperless.home.svc.cluster.local:8000" #needs quoting or YAML munges the port
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
               LOG_LEVEL: "debug"
               #LLM Config
