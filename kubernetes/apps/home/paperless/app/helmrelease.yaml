@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app paperless-ngx
+  name: &app paperless
 spec:
   interval: 15m
   chart:
@@ -112,7 +112,7 @@ spec:
                 memory: 2Gi
     service:
       app:
-        controller: paperless-ngx
+        controller: *app
         ports:
           http:
             port: *port
