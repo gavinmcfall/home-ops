@@ -23,6 +23,9 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  dependsOn:
+    - name: paperless
+      namespace: home
   uninstall:
     keepHistory: false
   values:
@@ -36,14 +39,22 @@ spec:
               repository: icereed/paperless-gpt
               tag: v0.18.0@sha256:505cb73ee7c64c2ade047ed0a62b56315764337d5349d9dd3e627d9fe095223b
             env:
+              #App
               PAPERLESS_BASE_URL: http://paperless.home.svc.cluster.local
-              LLM_PROVIDER: openai
-              OPENAI_BASE_URL: http://litellm.cortex.svc.cluster.local:4000
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
-              LLM_MODEL: "OpenAI: gpt-4o" # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
-              VISION_LLM_PROVIDER: openai
-              VISION_LLM_MODEL: "OpenAI: gpt-4o"
               LOG_LEVEL: "debug"
+              #LLM Config
+              LLM_PROVIDER: openai
+              LLM_MODEL: "OpenAI: gpt-4o" # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
+              OPENAI_BASE_URL: http://litellm.cortex.svc.cluster.local:4000
+              #OCR Config
+              VISION_LLM_PROVIDER: google_docai
+              CREATE_LOCAL_HOCR: "true" # Optional, for hOCR generation
+              LOCAL_HOCR_PATH: "/app/hocr" # Optional, default path
+              CREATE_LOCAL_PDF: "true" # Optional, for applying OCR to PDF
+              LOCAL_PDF_PATH: "/app/pdf" # Optional, default path
+              OCR_LIMIT_PAGES: "0" # No Limit
+
             envFrom:
               - secretRef:
                   name: paperless-secret
@@ -77,4 +88,13 @@ spec:
         enabled: true
         existingClaim: paperless-gpt
         globalMounts:
-          - path: /app/prompt
+          - path: /app/prompts
+          - path: /app/hocr
+          - path: /app/pdf
+      creds:
+        type: secret
+        name: paperless-secret
+        globalMounts:
+          - path: /app/gdocai-credentials.json
+            subPath: gdocai-credentials.json
+            readOnly: true
