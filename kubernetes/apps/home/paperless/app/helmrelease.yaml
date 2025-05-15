@@ -60,7 +60,7 @@ spec:
               PAPERLESS_TIME_ZONE: ${TIMEZONE}
               PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
 
-              PAPERLESS_PORT: &port 80
+              PAPERLESS_PORT: &port 8000
               PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
               PAPERLESS_ALLOWED_HOSTS: ".home.svc.cluster.local, .${SECRET_DOMAIN}"
               PAPERLESS_CSRF_TRUSTED_ORIGINS: "https://*.home.svc.cluster.local, https://*.${SECRET_DOMAIN}"
