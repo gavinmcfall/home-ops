@@ -48,13 +48,12 @@ spec:
               LLM_MODEL: "OpenAI: gpt-4o" # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
               OPENAI_BASE_URL: http://litellm.cortex.svc.cluster.local:4000
               #OCR Config
-              VISION_LLM_PROVIDER: google_docai
+              OCR_PROVIDER: 'google_docai'
               CREATE_LOCAL_HOCR: "true" # Optional, for hOCR generation
               LOCAL_HOCR_PATH: "/app/hocr" # Optional, default path
               CREATE_LOCAL_PDF: "true" # Optional, for applying OCR to PDF
               LOCAL_PDF_PATH: "/app/pdf" # Optional, default path
               OCR_LIMIT_PAGES: "0" # No Limit
-
             envFrom:
               - secretRef:
                   name: paperless-secret
