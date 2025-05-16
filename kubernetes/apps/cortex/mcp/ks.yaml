@@ -10,7 +10,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/cortex/mcp/github-mcp/app
+  path: ./kubernetes/apps/cortex/mcp/github-mcp
   prune: true
   sourceRef:
     kind: GitRepository
