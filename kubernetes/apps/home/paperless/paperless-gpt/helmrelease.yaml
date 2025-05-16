@@ -90,7 +90,7 @@ spec:
           - path: /app/pdf
       creds:
         type: secret
-        name: paperless-gptsecret
+        name: paperless-gpt-secret
         globalMounts:
           - path: /app/gdocai-credentials.json
             subPath: gdocai-credentials.json
