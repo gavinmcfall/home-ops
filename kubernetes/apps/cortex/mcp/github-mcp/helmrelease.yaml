@@ -32,7 +32,7 @@ spec:
           app:
             image:
               repository: ghcr.io/github/github-mcp-server
-              tag: 0.3.0@sha256:7b3f231fc25610bfd9fd662d457e21eb14bea18d49c1a2bfa446136151864701
+              tag: sha-22d080b@sha256:1c95a41c3f4bcd9f592c30b6f91b68a07cd76b5c5cd126f12d4110cea8cbe115
               pullPolicy: IfNotPresent
             stdin: true
             tty: true
