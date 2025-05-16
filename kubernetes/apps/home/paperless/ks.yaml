@@ -37,7 +37,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: paperless-ngx
+    - name: paperless
   path: ./kubernetes/apps/home/paperless/paperless-gpt
   prune: true
   sourceRef:
@@ -63,7 +63,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: paperless-ngx
+    - name: paperless
   path: ./kubernetes/apps/home/paperless/paperless-ai
   prune: true
   sourceRef:
