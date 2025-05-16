@@ -135,7 +135,7 @@ spec:
       home:
         type: emptyDir
         globalMounts:
-          - path: /home/node/.pm2
+          - path: /.pm2
       logs:
         type: emptyDir
         globalMounts:
