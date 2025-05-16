@@ -34,31 +34,13 @@ spec:
               repository: ghcr.io/github/github-mcp-server
               tag: 0.3.0@sha256:7b3f231fc25610bfd9fd662d457e21eb14bea18d49c1a2bfa446136151864701
               pullPolicy: IfNotPresent
-            command: ["/github-mcp-server"]
+            stdin: true
+            tty: true
             env:
               GITHUB_TOOLSETS: "all"
             envFrom:
               - secretRef:
                   name: github-mcp-secret
-            # probes:
-            #   liveness: &probes
-            #     enabled: true
-            #     custom: true
-            #     spec:
-            #       httpGet:
-            #         path: /
-            #         port: &port 8000
-            #       initialDelaySeconds: 0
-            #       periodSeconds: 10
-            #       timeoutSeconds: 1
-            #       failureThreshold: 3
-            #   readiness: *probes
-
-            # securityContext:
-            #   allowPrivilegeEscalation: false
-            #   readOnlyRootFilesystem: true
-            #   capabilities:
-            #     drop: ["ALL"]
             resources:
               requests:
                 cpu: 50m
