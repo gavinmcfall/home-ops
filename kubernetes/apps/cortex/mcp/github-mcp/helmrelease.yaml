@@ -37,7 +37,7 @@ spec:
             stdin: true
             tty: true
             env:
-              GITHUB_TOOLSETS: "all"
+              GITHUB_TOOLSETS: "repos,issues,pull_requests,code_security,experiments"
             envFrom:
               - secretRef:
                   name: github-mcp-secret
