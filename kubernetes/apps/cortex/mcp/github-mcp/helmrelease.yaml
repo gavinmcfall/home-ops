@@ -31,8 +31,10 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/github/github-mcp-server
-              tag: sha-22d080b@sha256:1c95a41c3f4bcd9f592c30b6f91b68a07cd76b5c5cd126f12d4110cea8cbe115
+              #repository: ghcr.io/github/github-mcp-server
+              #tag: sha-22d080b@sha256:1c95a41c3f4bcd9f592c30b6f91b68a07cd76b5c5cd126f12d4110cea8cbe115
+              repository: ghcr.io/gavinmcfall/github-mcp-server
+              tag: patched@sha256:0598f2a17f6eba572a345281d1915d7d451ec6bb6565bde628574185bd37a698
               pullPolicy: IfNotPresent
             stdin: true
             tty: true
