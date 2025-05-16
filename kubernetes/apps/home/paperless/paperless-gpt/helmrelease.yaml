@@ -56,14 +56,13 @@ spec:
               OCR_LIMIT_PAGES: "0" # No Limit
             envFrom:
               - secretRef:
-                  name: paperless-secret
+                  name: paperless-gpt-secret
     service:
       app:
         controller: paperless-gpt
         ports:
           http:
             port: 8080
-
     ingress:
       app:
         enabled: true
@@ -81,7 +80,6 @@ spec:
         tls:
           - hosts:
               - *host
-
     persistence:
       paperless-gpt-app:
         enabled: true
@@ -92,7 +90,7 @@ spec:
           - path: /app/pdf
       creds:
         type: secret
-        name: paperless-secret
+        name: paperless-gptsecret
         globalMounts:
           - path: /app/gdocai-credentials.json
             subPath: gdocai-credentials.json
