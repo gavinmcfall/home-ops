@@ -32,7 +32,7 @@ spec:
           app:
             image:
               repository: ghcr.io/github/github-mcp-server
-              tag: nightly@sha256:1c95a41c3f4bcd9f592c30b6f91b68a07cd76b5c5cd126f12d4110cea8cbe115
+              tag: nightly@sha256:8dda538b5a759f9e79673b2fa8d72f84a597063ffa62879fb1ab03228f19625c
               pullPolicy: IfNotPresent
             stdin: true
             tty: true
