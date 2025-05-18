@@ -54,10 +54,15 @@ spec:
               tag: v2.7.0@sha256:d8a6c51f069635297ebd9f0968b8eb8374b2f0cae7cc64c84af76e71cec1f37e
               pullPolicy: IfNotPresent
             args:
-              - "--sse-port=8000"
+              - "--stdio"
               - "--stdio-command=/github-mcp-server stdio"
               - "--stdio-env=GITHUB_TOKEN"
               - "--stdio-env=GITHUB_TOOLSETS"
+              - "--sse-port=8000"
+              - "--ssePath=/sse"
+              - "--messagePath=/message"
+              - "--cors"
+              - "--logLevel=info"
             ports:
               - name: http
                 containerPort: 8000
