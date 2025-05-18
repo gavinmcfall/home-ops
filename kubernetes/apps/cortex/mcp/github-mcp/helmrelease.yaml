@@ -50,8 +50,8 @@ spec:
                 memory: 512Mi
           proxy:
             image:
-              repository: parfenyuk/mcp-proxy
-              tag: latest
+              repository: ghcr.io/parfenyuk/mcp-proxy
+              tag: v0.6.0@sha256:369ca5d748f731a2d0c71c9040bc64698be3b7f4f0085a5a2e1006a091d79bf0
               pullPolicy: IfNotPresent
             env:
               MCP_PROXY_LISTEN_ADDR: "0.0.0.0:8000"
