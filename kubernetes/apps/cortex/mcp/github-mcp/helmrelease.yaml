@@ -55,7 +55,7 @@ spec:
               pullPolicy: IfNotPresent
             args:
               - "--stdio"                             # enable stdio→SSE mode
-              - "/github-mcp-server stdio"            # positional: the exact stdio launch command
+              - "/server/github-mcp-server stdio"     # positional: the exact stdio launch command
               - "--port=8000"                         # SSE server listens on port 8000
               - "--ssePath=/sse"                      # SSE subscription endpoint
               - "--messagePath=/message"              # JSON-RPC POST endpoint
