@@ -34,6 +34,8 @@ spec:
               repository: mcp/github-mcp-server
               tag: latest
               pullPolicy: IfNotPresent
+            stdin: true
+            tty: true
             env:
               GITHUB_TOOLSETS: "repos,issues,pull_requests,code_security,experiments"
             envFrom:
