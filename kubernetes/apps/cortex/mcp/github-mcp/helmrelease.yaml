@@ -34,6 +34,8 @@ spec:
               repository: ghcr.io/github/github-mcp-server
               tag: nightly@sha256:1c95a41c3f4bcd9f592c30b6f91b68a07cd76b5c5cd126f12d4110cea8cbe115
               pullPolicy: IfNotPresent
+            stdin: true
+            tty: true
             args:
               - http
               - --listen=0.0.0.0:8000
