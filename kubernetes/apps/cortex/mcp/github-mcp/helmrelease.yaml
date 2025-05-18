@@ -36,10 +36,13 @@ spec:
               pullPolicy: IfNotPresent
             stdin: true
             tty: false
+            command:
+              - "./github-mcp-server"
+            # pass the HTTP sub-command and flags
             args:
-              - http
-              - --host=0.0.0.0
-              - --port=8000
+              - "http"
+              - "--host=0.0.0.0"
+              - "--port=8000"
             env:
               GITHUB_TOOLSETS: "repos,issues,pull_requests,code_security,experiments"
             envFrom:
