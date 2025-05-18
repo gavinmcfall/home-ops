@@ -35,14 +35,7 @@ spec:
               tag: nightly@sha256:1c95a41c3f4bcd9f592c30b6f91b68a07cd76b5c5cd126f12d4110cea8cbe115
               pullPolicy: IfNotPresent
             stdin: true
-            tty: false
-            command:
-              - "./github-mcp-server"
-            # pass the HTTP sub-command and flags
-            args:
-              - "http"
-              - "--host=0.0.0.0"
-              - "--port=8000"
+            tty: true
             env:
               GITHUB_TOOLSETS: "repos,issues,pull_requests,code_security,experiments"
             envFrom:
