@@ -36,9 +36,6 @@ spec:
               pullPolicy: IfNotPresent
             stdin: true
             tty: true
-            args:
-              - http
-              - --listen=0.0.0.0:8000
             env:
               GITHUB_TOOLSETS: "repos,issues,pull_requests,code_security,experiments"
             envFrom:
