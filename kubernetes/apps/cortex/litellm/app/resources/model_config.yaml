@@ -97,6 +97,20 @@ model_list:
       max_tokens: 200000  # Maximum context window: 200,000 tokens
     aliases: [general_bedrock4, vision_bedrock4]
 
+  # 🖼️ IMAGE ‑ Nova Canvas
+  - model_name: Bedrock · Nova Canvas (Image)
+    provider: bedrock
+    litellm_params:
+      model: bedrock/amazon.nova-canvas-v1:0
+      region_name: us-east-1
+    model_info:
+      id: amazon.nova-canvas-v1:0
+      mode: image_generation
+    # AWS on‑demand price: $0.018 per image generated
+    output_cost_per_image: 0.018
+    input_cost_per_pixel: 0              # prompt is free
+    max_tokens:
+
 # Google Models
 
   - model_name: "Google: gemini-1.5-pro"
