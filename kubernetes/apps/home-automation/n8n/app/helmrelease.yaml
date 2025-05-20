@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -48,15 +48,15 @@ spec:
               N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
               N8N_COMMUNITY_PACKAGES_ENABLED: true
               # Public API
-              N8N_PUBLIC_API_DISABLED: true
+              N8N_PUBLIC_API_DISABLED: false
               N8N_PUBLIC_API_SWAGGERUI_DISABLED: true
               NODE_FUNCTION_ALLOW_BUILTIN: "*"
+              NODE_FUNCTION_ALLOW_EXTERNAL: tweetnacl
               N8N_METRICS: true
               DB_TYPE: postgresdb
               DB_POSTGRESDB_PORT: 5432
               N8N_USER_FOLDER: /home/n8n/app
               # External Packages
-              NODE_FUNCTION_ALLOW_EXTERNAL: databricks/sql, tweetnacl
             envFrom: *envFrom
     defaultPodOptions:
       securityContext:
