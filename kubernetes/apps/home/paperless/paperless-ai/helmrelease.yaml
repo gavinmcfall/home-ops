@@ -84,6 +84,7 @@ spec:
         globalMounts:
           - path: /app/data
           - path: /app/OPENAPI
+          - path: /app/node_modules
       cache:
         type: emptyDir
         globalMounts:
@@ -105,7 +106,3 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /nltk_data
-      modules:
-        type: emptyDir
-        globalMounts:
-          - path: /app/node_modules
