@@ -88,6 +88,7 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /app/public/images
+          - path: /.cache
       home:
         type: emptyDir
         globalMounts:
