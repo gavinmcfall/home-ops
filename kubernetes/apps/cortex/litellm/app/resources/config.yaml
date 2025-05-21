@@ -24,7 +24,7 @@ litellm_settings:
   drop_params: true
 
   # Caching settings
-  cache: true
+  cache: false
   cache_params:
     type: qdrant-semantic        # redis, s3, redis-semantic, qdrant-semantic, disk, () not specificed = In memory
 
