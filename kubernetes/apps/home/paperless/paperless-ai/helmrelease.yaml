@@ -108,4 +108,4 @@ spec:
       modules:
         type: emptyDir
         globalMounts:
-          -path: /app/node_modules
+          - path: /app/node_modules
