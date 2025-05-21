@@ -25,60 +25,6 @@ spec:
               tag: 3.0.3@sha256:ff646db64e0844c34cb38c8c4c2f935fe42ffe5c683bccc4249ca6b9d1e9ac39
             env:
               TZ: ${TIMEZONE}
-              # ACTIVATE_TAGGING: "yes"
-              # ACTIVATE_TITLE: "yes"
-              # ACTIVATE_CORRESPONDENTS: "yes"
-              # ACTIVATE_DOCUMENT_TYPE: "yes"
-              # ACTIVATE_CUSTOM_FIELDS: "no"
-              # DISABLE_AUTOMATIC_PROCESSING: "no"
-              # PROCESS_PREDEFINED_DOCUMENTS: "no"
-              # ADD_AI_PROCESSED_TAG: "yes"
-              # AI_PROCESSED_TAG_NAME: "ai-processed"
-              # USE_PROMPT_TAGS: "no"
-              # SCAN_INTERVAL: "*/30 * * * *"
-              # TAGS: AI
-              # USE_EXISTING_DATA: "yes"
-              # #LLM Config
-              # CUSTOM_BASE_URL: https://litellm.cortex.svc.cluster.local:4000
-              # CUSTOM_MODEL: "OpenAI: gpt-4o"
-              # AI_PROVIDER: custom
-              # OPENAI_MODEL: gpt-4o
-              # PAPERLESS_API_URL: http://paperless.home.svc.cluster.local:8000/api
-              # SYSTEM_PROMPT: |
-              #   You are a highly specialized AI assistant for document analysis, tasked with extracting and structuring critical information for digital archiving. Your core function is to provide accurate, concise, and consistently formatted JSON output for every document. Adhere meticulously to the following rules and data extraction logic:
-
-              #   I. Core Information Extraction (Required for every document unless otherwise specified):
-
-              #       title: Create a concise, meaningful, and human-readable title that identifies the document's primary subject.
-              #           Rules: NO ADDRESSES or overly long strings. Contains the most important identification features (e.g., "Invoice #1234", "Contract - John Doe"). For invoices/orders, always include the invoice/order number if available.
-
-              #       correspondent: Identify the primary sender or issuing institution of the document.
-              #           Rules: Generate the shortest possible, recognizable form of the company or institution name (e.g., "Amazon" instead of "Amazon EU SARL, German branch"; "Vodafone" instead of "Vodafone NZ Limited"). Do not include addresses or contact details in this field.
-
-              #       receiver: Identify the primary recipient or entity to whom the document is addressed.
-              #           Rules: This is typically your client's name or business if applicable. If the document is self-addressed or no clear receiver is stated (e.g., a generic terms & conditions document), leave this field as an empty string.
-
-              #       summary: Provide a factual and succinct summary (1-3 sentences) capturing the document's core purpose, main parties involved, and any critical dates, monetary values, or key topics.
-
-              #       tags: Generate a list of relevant thematic tags to facilitate search and organization.
-              #           Rules: Maximum 4 tags per document; fewer if sufficient (at least 1). Prioritize relevance: Use only the most important information for tag creation. Avoid: Overly generic tags (e.g., "document", "paper") or overly specific tags that are unlikely to be useful for broader search.
-              #           Categories to consider: content_type (e.g., invoice, receipt, contract, bank-statement, medical, payslip, tax-statement, utility-bill, correspondence). contextual_subject (e.g., groceries, insurance, vehicle, mortgage, telecom, healthcare, education, travel). entity_names (e.g., ASB Bank, NZTA, IR, John Doe).
-
-              #       document_date: Extract the single most relevant date for the document.
-              #           Rules: Prefer the main relevant date such as an invoice date, statement period end date, issue date, or agreement date. Do NOT use: Due dates, scan dates, file creation dates, or last modified dates, unless no other relevant date is present.
-              #           Format: YYYY-MM-DD (e.g., 2024-05-16).
-
-              #       document_type: Determine a precise, high-level classification for the document.
-              #           Rules: Select a type that broadly yet accurately categorizes the document's nature. Examples: Invoice, Contract, Bank Statement, Receipt, Medical Record, Payslip, Utility Bill, Agreement, Correspondence, Information.
-
-              #       total_amount: Detect and extract the primary monetary value from the document.
-              #           Rules: Prefer the total amount due or paid (gross amount). If only net or subtotal is available, use that. If multiple distinct amounts are present (e.g., net, tax, total), always prioritize the overall total.
-              #           Format: [ISO 4217 Currency Code] [Amount] (e.g., NZD 123.45, USD 500.00). If no monetary value is present or relevant to the document's core purpose, leave this field as an empty string.
-
-              #       language: Determine the primary language of the document.
-              #           Rules: Use ISO 639-1 language codes (e.g., en for English, de for German, mi for Māori, fr for French). If the language cannot be clearly determined, use und (undetermined).
-
-              #       notes: Provide any additional observations or specific processing remarks made by the AI. This field is for internal AI comments.
             envFrom:
               - secretRef:
                   name: paperless-ai-secret
@@ -113,7 +59,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hosts:
           - host: &host paperless-ai.${SECRET_DOMAIN}
-            paths:
+            paths: &paths
               - path: /
                 pathType: Prefix
                 service:
@@ -122,6 +68,15 @@ spec:
         tls:
           - hosts:
               - *host
+      tailscale:
+        enabled: true
+        className: tailscale
+        hosts:
+          - host: &app "{{ .Release.Name }}"
+            paths: *paths
+        tls:
+          - hosts:
+              - *app
     persistence:
       config:
         enabled: true
