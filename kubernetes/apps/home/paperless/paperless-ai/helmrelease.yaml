@@ -84,7 +84,6 @@ spec:
         globalMounts:
           - path: /app/data
           - path: /app/OPENAPI
-          - path: /app/node_modules
       cache:
         type: emptyDir
         globalMounts:
