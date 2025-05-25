@@ -204,7 +204,7 @@ model_list:
       id: whisper-1
       mode: completion
       input_cost_per_token: 0.000000006   # USD $0.006 per million tokens (input)
-    aliases: [general_openai_4o, vision_openai_4o, education_4o]
+    aliases: [general_openai_4o, vision_openai_4o, education_4o, whisper-1]
 
 
 # TogetherAI Models
