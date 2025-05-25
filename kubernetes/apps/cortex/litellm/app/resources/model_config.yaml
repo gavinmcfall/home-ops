@@ -195,6 +195,17 @@ model_list:
       max_tokens: 128000
     aliases: [general_openai_4o, vision_openai_4o, education_4o]
 
+  - model_name: "OpenAI: Whisper-1"
+    provider: openai
+    litellm_params:
+      model: openai/whisper-1
+    api_key: ${OPENAI_API_KEY}
+    model_info:
+      id: whisper-1
+      mode: completion
+      input_cost_per_token: 0.000000006   # USD $0.006 per million tokens (input)
+    aliases: [general_openai_4o, vision_openai_4o, education_4o]
+
 
 # TogetherAI Models
 
