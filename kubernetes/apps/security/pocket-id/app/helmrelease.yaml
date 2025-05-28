@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: ghcr.io/pocket-id/pocket-id
-              tag: v0.51.0@sha256:bb3a94aa927f0ded39b8dc209a103304e1a74ac003133167c5f6f16bb01ce112
+              tag: v1.1.0@sha256:eaf427326c36e3e7ea2d8b6997e0cee904c935cff6b626e5edda4ded9500dbc4
             command: ["/bin/sh", "/app/scripts/docker/entrypoint.sh"]
             env:
               DB_PROVIDER: postgres
