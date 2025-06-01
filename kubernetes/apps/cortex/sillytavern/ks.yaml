@@ -13,7 +13,7 @@ spec:
   dependsOn:
     - name: cluster-apps-volsync
     - name: cluster-apps-rook-ceph-cluster
-  path: ./kubernetes/apps/cortex/sillytaverns/app
+  path: ./kubernetes/apps/cortex/sillytavern/app
   prune: true
   sourceRef:
     kind: GitRepository
