@@ -69,7 +69,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         className: internal
         hosts:
-          - host: tavern.${SECRET_DOMAIN}"
+          - host: tavern.${SECRET_DOMAIN}
             paths:
               - path: /
                 service:
