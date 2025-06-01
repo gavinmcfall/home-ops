@@ -28,7 +28,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      sillytavern:
+      app:
         type: deployment
         replicas: 1
         containers:
@@ -56,7 +56,7 @@ spec:
                   periodSeconds: 1
                   failureThreshold: 600
     service:
-      sillytavern:
+      app:
         controller: *app
         ports:
           http:
