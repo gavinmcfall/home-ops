@@ -4,9 +4,9 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app sillytavern
-  namespace: default
+  namespace: cortex
 spec:
-  interval: 1h
+  interval: 30m
   chart:
     spec:
       chart: app-template
@@ -28,11 +28,11 @@ spec:
     keepHistory: false
   values:
     controllers:
-      silltavern:
+      sillytavern:
         type: deployment
         replicas: 1
         containers:
-          main:
+          app:
             image: &img
               repository: ghcr.io/sillytavern/sillytavern
               tag: 1.13.0@sha256:2f427b0062908ebe34410f80e1eec7d8c78156f96250274e62efefe9c5d69ae2
