@@ -10,3 +10,4 @@ resources:
   - ./ollama/ks.yaml
   - ./open-webui/ks.yaml
   - ./qdrant/ks.yaml
+  - ./sillytavern/ks.yaml
