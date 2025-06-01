@@ -28,7 +28,7 @@ spec:
     keepHistory: false
   values:
     controllers:
-      app:
+      silltavern:
         type: deployment
         replicas: 1
         containers:
