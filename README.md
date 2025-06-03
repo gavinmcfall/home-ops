@@ -96,7 +96,7 @@ This is a high level diagram of how my kubernetes infrastructure is setup
 
 | Device                  | Count | OS Disk Size              | Ram   | Operating System | Purpose                                   |
 | ----------------------- | ----- | ------------------------- | ----- | ---------------- | ----------------------------------------- |
-| Dell Poweredge R730     | 1     | 2x 2TB Raid1 ZFS          | 128GB | Proxmox          | Virtualization Host                       |
+| Dell Poweredge R730     | 1     | 2x 2TB Raid1 ZFS8x 20TB (4x Mirror'd vdevs)         | 128GB | Proxmox          | Virtualization Host                       |
 | Minisform MS-01         | 3     | 1x 1TB M.2 + 1x1.98TB U.2 | 96GB  | TalosIS          | Kubernetes Nodes                          |
 | Unifi Dream Machine Pro | 1     | -                         | -     | -                | Router / FW DHCP Main Lan                 |
 | Unifi US 24 250w PoE    | 1     | -                         | -     | -                | PoE for APs etc (1Gbe)                    |
