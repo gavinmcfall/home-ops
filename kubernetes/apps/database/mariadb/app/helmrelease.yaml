@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://cluster-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app mariadb
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: mariadb
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    auth:
+      usePasswordFiles: false
+      existingSecret: mariadb-secret
+    metrics:
+      enabled: true
+      resourcesPreset: small
+      serviceMonitor:
+        enabled: true
+    primary:
+      resourcesPreset: small
+      persistence:
+        enabled: true
+        existingClaim: *app
+    initdbScripts:
+      create-pterodactyl.sql: |
+        CREATE DATABASE IF NOT EXISTS panel;
+        CREATE USER IF NOT EXISTS 'pterodactyl'@'%' IDENTIFIED BY '${PTERODACTYL_MARIADB_PASSWORD}';
+        GRANT ALL PRIVILEGES ON panel.* to 'pterodactyl'@'%';
+      create-bookstack.sql: |
+        CREATE DATABASE IF NOT EXISTS bookstackapp;
+        CREATE USER IF NOT EXISTS 'bookstack'@'%' IDENTIFIED BY '${BOOKSTACK_MARIADB_PASSWORD}';
+        GRANT ALL PRIVILEGES ON bookstackapp.* to 'bookstack'@'%';
