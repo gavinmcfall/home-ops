@@ -11,10 +11,8 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
-    - name: volsync
-      namespace: volsync-system
+    - name: cluster-apps-volsync
+    - name: cluster-apps-rook-ceph-cluster
   path: ./kubernetes/apps/database/mariadb/app
   prune: true
   sourceRef:
