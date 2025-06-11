@@ -7,7 +7,7 @@ resources:
   # Flux-Kustomizations
   - ./litellm/ks.yaml
   - ./mcp/ks.yaml
-  - ./ollama/ks.yaml
+  # - ./ollama/ks.yaml
   - ./open-webui/ks.yaml
   - ./qdrant/ks.yaml
   - ./sillytavern/ks.yaml
