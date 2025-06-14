@@ -11,5 +11,5 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 20.5.6
+    tag: 20.5.9
   url: oci://registry-1.docker.io/bitnamicharts/mariadb
