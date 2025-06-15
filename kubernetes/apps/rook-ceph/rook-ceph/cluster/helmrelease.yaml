@@ -44,7 +44,19 @@ spec:
       bdev_enable_discard = true
       bdev_async_discard = true
       osd_class_update_on_start = false
+      # Force more aggressive space reclamation
+      bluestore_prefer_deferred_size = 0
+      bluestore_deferred_batch_ops = 16
+      bluestore_deferred_batch_ops_per_txn = 32
+      # Samsung NVMe specific tweaks
+      bluestore_min_alloc_size = 4096
+      bluestore_compression_algorithm = none
+      # Force trim operations
+      bdev_flock_retry = 3
     cephClusterSpec:
+      cephVersion:
+        image: quay.io/ceph/ceph:v18.2.4
+        allowUnsupported: false
       crashCollector:
         disable: false
       csi:
