@@ -7,4 +7,4 @@ resources:
   - ./namespace.yaml
   # Flux-Kustomizations
   # - ./authentik/ks.yaml
-  # - ./pocket-id/ks.yaml
+  - ./pocket-id/ks.yaml
