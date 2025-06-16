@@ -27,3 +27,4 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 1Gi
       VOLSYNC_CLAIM: *app
+      VOLSYNC_RESTORE_OPTIONS: '["--no-ownership"]'
