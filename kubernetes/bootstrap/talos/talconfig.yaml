@@ -1,9 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
 # renovate: datasource=docker depName=ghcr.io/siderolabs/installer
-talosVersion: v1.8.4
+talosVersion: v1.10.4
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
-kubernetesVersion: v1.31.3
+kubernetesVersion: v1.33.1
 
 clusterName: "home-kubernetes"
 endpoint: https://10.90.3.100:6443
@@ -25,7 +25,7 @@ nodes:
     ipAddress: "10.90.3.101"
     installDiskSelector:
       serial: "S73VNU0X303066H"
-    talosImageURL: factory.talos.dev/installer/9815c9b5e00515fccee82e1a367d6b47a4e906ab8fa3256e7721c6a33f274060
+    talosImageURL: factory.talos.dev/metal-installer/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992:v1.10.4
     controlPlane: true
     networkInterfaces:
       - interface: bond0
@@ -82,7 +82,7 @@ nodes:
     ipAddress: "10.90.3.102"
     installDiskSelector:
       serial: "S73VNU0X303413H"
-    talosImageURL: factory.talos.dev/installer/9815c9b5e00515fccee82e1a367d6b47a4e906ab8fa3256e7721c6a33f274060
+    talosImageURL: factory.talos.dev/metal-installer/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992:v1.10.4
     controlPlane: true
     networkInterfaces:
       - interface: bond0
@@ -139,7 +139,7 @@ nodes:
     ipAddress: "10.90.3.103"
     installDiskSelector:
       serial: "S73VNU0X303400H"
-    talosImageURL: factory.talos.dev/installer/9815c9b5e00515fccee82e1a367d6b47a4e906ab8fa3256e7721c6a33f274060
+    talosImageURL: factory.talos.dev/metal-installer/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992:v1.10.4
     controlPlane: true
     networkInterfaces:
       - interface: bond0
@@ -192,7 +192,6 @@ nodes:
             metric: 2048
 # Global patches
 patches:
-  - "@./patches/global/cluster-discovery.yaml"
   - "@./patches/global/containerd.yaml"
   - "@./patches/global/disable-search-domain.yaml"
   - "@./patches/global/hostdns.yaml"
@@ -201,7 +200,6 @@ patches:
   - "@./patches/global/openebs-local.yaml"
   - "@./patches/global/sysctl.yaml"
   - "@./patches/global/thunderbolt.yaml"
-  - "@./patches/global/kernel.yaml"
 
 # Controller patches
 controlPlane:
