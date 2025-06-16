@@ -25,7 +25,7 @@ nodes:
     ipAddress: "10.90.3.101"
     installDiskSelector:
       serial: "S73VNU0X303066H"
-    talosImageURL: factory.talos.dev/metal-installer/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992:v1.10.4
+    talosImageURL: factory.talos.dev/metal-installer/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992
     controlPlane: true
     networkInterfaces:
       - interface: bond0
@@ -82,7 +82,7 @@ nodes:
     ipAddress: "10.90.3.102"
     installDiskSelector:
       serial: "S73VNU0X303413H"
-    talosImageURL: factory.talos.dev/metal-installer/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992:v1.10.4
+    talosImageURL: factory.talos.dev/metal-installer/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992
     controlPlane: true
     networkInterfaces:
       - interface: bond0
@@ -139,7 +139,7 @@ nodes:
     ipAddress: "10.90.3.103"
     installDiskSelector:
       serial: "S73VNU0X303400H"
-    talosImageURL: factory.talos.dev/metal-installer/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992:v1.10.4
+    talosImageURL: factory.talos.dev/metal-installer/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992
     controlPlane: true
     networkInterfaces:
       - interface: bond0
