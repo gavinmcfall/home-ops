@@ -39,7 +39,7 @@ spec:
               TZ: ${TIMEZONE}
               PUID: 568
               PGID: 568
-              AUTH_METHOD: "standard"
+              AUTH_METHOD: "oidc"
               AUTH_AUTO_INITIATE: "false"  # Keep false to show login options
             envFrom:
               - secretRef:
