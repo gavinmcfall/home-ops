@@ -22,7 +22,7 @@ spec:
           app:
             image:
               repository: docker.io/clusterzx/paperless-ai
-              tag: latest@sha256:33f1f9b63fe2ff590a903ecfde0d3f4d977f9918c5483470fad617479e2147a4
+              tag: latest@sha256:25e1c501891e2d409f1df92e64e4e20b379a0197b7cd35cf98b49184d9da6814
             env:
               TZ: ${TIMEZONE}
             envFrom:
