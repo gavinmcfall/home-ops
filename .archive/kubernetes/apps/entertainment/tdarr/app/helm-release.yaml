@@ -28,7 +28,7 @@ spec:
           app:
             image:
               repository: ghcr.io/haveagitgat/tdarr_acc
-              tag: 2.46.01@sha256:9736245982f57678ca83fa3d71175a28fb7a7d597b63b69f30fdb8634b27d64b
+              tag: 2.46.01@sha256:235e6b6f970356e437bb362ebaa02a3f38d3a37555dadc95a4c44920c48dcea8
               pullPolicy: IfNotPresent
             env:
               webUIPort: &web-port 8265
