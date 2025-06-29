@@ -37,7 +37,7 @@ spec:
           app:
             image:
               repository: icereed/paperless-gpt
-              tag: v0.18.0@sha256:505cb73ee7c64c2ade047ed0a62b56315764337d5349d9dd3e627d9fe095223b
+              tag: v0.21.0@sha256:9c7e35abce4a87a9cf43dcd49db6cdc5915379f5376b06a1e983e9f60357e25a
             env:
               #App
               PAPERLESS_BASE_URL: "http://paperless.home.svc.cluster.local:8000" #needs quoting or YAML munges the port
