@@ -41,7 +41,7 @@ spec:
           app:
             image:
               repository: syncthing/syncthing
-              tag: 1.29.5@sha256:1914deddb3be7808579f3ce0eb4a1c493daa2f01e8953c2d73ba52ee2b1b418a
+              tag: 1.30.0@sha256:74eeedb08d4912763055594f8bd98bfc039f3bc504b6cd2c2adc8294111c1251
             env:
               PUID: "568"
               PGID: "568"
