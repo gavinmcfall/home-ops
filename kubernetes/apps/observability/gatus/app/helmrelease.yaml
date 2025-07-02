@@ -57,7 +57,7 @@ spec:
           app:
             image:
               repository: ghcr.io/twin/gatus
-              tag: v5.17.0@sha256:a8c53f9e9f1a3876cd00e44a42c80fc984e118d5ba0bdbaf08980cb627d61512
+              tag: v5.19.0@sha256:12362572b78c1bb6f234248de33392a393f7e604d94779e3086ec2dbba1bedf3
             env:
               TZ: ${TIMEZONE}
               GATUS_CONFIG_PATH: /config
