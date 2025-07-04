@@ -56,7 +56,7 @@ spec:
           *name : &container
             image:
               repository: ghcr.io/ant385525/fileflows
-              tag: 25.4.9.5355@sha256:f5d367af156b6674b6bca17525ecfa3816251ea25b13f0669ef050c7916e1fdf
+              tag: 25.7.1.5604@sha256:09d8eac277d9eeae38da80873b1d9bd072ee99c1d124c90c468114b922121483
             env:
               TZ: ${TIMEZONE}
               PORT: &port 5000
