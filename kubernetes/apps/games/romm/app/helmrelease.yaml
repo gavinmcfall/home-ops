@@ -53,6 +53,10 @@ spec:
               ENABLE_RESCAN_ON_FILESYSTEM_CHANGE: "true"
               RESCAN_ON_FILESYSTEM_CHANGE_DELAY: 5
               DISABLE_USERPASS_LOGIN: false
+              HASHEOUS_API_ENABLED: true
+              PLAYMATCH_API_ENABLED: true
+              ENABLE_SCHEDULED_UPDATE_LAUNCHBOX_METADATA: "true" #chron set to 5m by default
+              LAUNCHBOX_API_ENABLED: "true"
               TZ: ${TIMEZONE}
             envFrom: *envFrom
             probes:
