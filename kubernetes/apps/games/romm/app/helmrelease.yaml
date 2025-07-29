@@ -41,7 +41,7 @@ spec:
           app:
             image:
               repository: ghcr.io/rommapp/romm
-              tag: 3.10.3@sha256:f28660570b57a7032bc752724bebbc86828916211356b1d6110e03b139b807cf
+              tag: 4.0.1@sha256:2f31f792885cd0fc839a590b9645ada846106d4893e5de0be68dc6580b11b5f9
             env:
               ROMM_DB_DRIVER: postgresql
               ROMM_BASE_PATH: /romm
