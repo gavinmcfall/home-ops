@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: openebs-dir-creator
+  namespace: openebs-system
+spec:
+  selector:
+    matchLabels:
+      name: openebs-dir-creator
+  template:
+    metadata:
+      labels:
+        name: openebs-dir-creator
+    spec:
+      hostPID: true
+      containers:
+      - name: dir-creator
+        image: alpine:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Creating OpenEBS directories..."
+          mkdir -p /host/var/local/openebs/localpv-hostpath/loki
+          mkdir -p /host/var/local/openebs/localpv-hostpath/minio
+          chmod 755 /host/var/local/openebs/localpv-hostpath
+          chmod 755 /host/var/local/openebs/localpv-hostpath/loki
+          chmod 755 /host/var/local/openebs/localpv-hostpath/minio
+          echo "Directories created successfully"
+          echo "Sleeping to keep container running..."
+          sleep 3600
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: host-root
+          mountPath: /host
+      volumes:
+      - name: host-root
+        hostPath:
+          path: /
+      tolerations:
+      - operator: Exists

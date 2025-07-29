@@ -11,6 +11,7 @@ DONT_TOUCH = [
     "minecraft",
     "ghcr.io/immich-app/immich-server",
     "ghcr.io/immich-app/immich-machine-learning",
+    "ingress-nginx"
 ]
 
 # Debug toggle
