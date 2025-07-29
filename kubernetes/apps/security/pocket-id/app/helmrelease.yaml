@@ -38,9 +38,8 @@ spec:
           app:
             image:
               repository: ghcr.io/pocket-id/pocket-id
-              tag: v1.6.4@sha256:da768baa319f23d6815d048d0d49ce4aacd9eea15ad46d48a5c01ca15fbde392
-            #command: ["/bin/sh", "/app/scripts/docker/entrypoint.sh"]
-            command: ["/bin/sh", "/app/docker/entrypoint.sh"]
+              tag: v0.53.0@sha256:7224174546de6a378fb705f763d11b604e3031b62efdc707cf1757b1b09705f5
+            command: ["/bin/sh", "/app/scripts/docker/entrypoint.sh"]
             env:
               DB_PROVIDER: postgres
               PUID: 568
