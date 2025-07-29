@@ -32,7 +32,7 @@ spec:
           app:
             image:
               repository: ghcr.io/linkwarden/linkwarden
-              tag: v2.10.0@sha256:44b845a559736a9b0e26d761072c847dd452c54dbe3fde7b417c76ef948abc68
+              tag: v2.11.5@sha256:4d0d1261f6cefcd5752708f357b3aa355da3432fb4a023672890c8707217f914
             env:
               TZ: ${TIMEZONE}
               STORAGE_FOLDER: "config" # Will always end up as /data/STOREAGE_FOLDER so eg /data/config
