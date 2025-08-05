@@ -14,7 +14,7 @@ resources:
   - ./prometheus-operator-crds/ks.yaml
   - ./promtail/ks.yaml
   - ./redisinsight/ks.yaml
-  - ./thanos/ks.yaml
+  # - ./thanos/ks.yaml
   # - ./unpoller/ks.yaml
 
   # Exporters
