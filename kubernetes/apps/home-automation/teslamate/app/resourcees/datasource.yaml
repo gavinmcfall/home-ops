@@ -1,0 +1,21 @@
+---
+apiVersion: 1
+
+datasources:
+  - name: TeslaMate
+    type: postgres
+    uid: teslamate
+    access: proxy
+    url: postgres17-rw.database.svc.cluster.local
+    user: {{ .postgres_user }}
+    jsonData:
+      database: teslamate
+      sslmode: "disable"
+      maxOpenConns: 100
+      maxIdleConns: 100
+      maxIdleConnsAuto: true
+      connMaxLifetime: 14400
+      postgresVersion: 1600
+      timescaledb: false
+    secureJsonData:
+      password: "{{ .postgres_pass }}"

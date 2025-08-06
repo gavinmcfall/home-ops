@@ -5,3 +5,9 @@ resources:
   - externalsecret.yaml
   - helmrelease.yaml
   - ../../../../templates/gatus/guarded
+configMapGenerator:
+  - name: teslamate-datasource-tpl
+    files:
+      - ./resources/datasource.yaml
+generatorOptions:
+  disableNameSuffixHash: true
