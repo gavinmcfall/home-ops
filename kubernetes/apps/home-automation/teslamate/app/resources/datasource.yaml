@@ -7,7 +7,7 @@ datasources:
     uid: teslamate
     access: proxy
     url: postgres17-rw.database.svc.cluster.local
-    user: {{ .postgres_user }}
+    user: {{ .TESLAMATE_POSTGRES_USER }}
     jsonData:
       database: teslamate
       sslmode: "disable"
@@ -18,4 +18,4 @@ datasources:
       postgresVersion: 1600
       timescaledb: false
     secureJsonData:
-      password: "{{ .postgres_pass }}"
+      password: "{{ .TESLAMATE_POSTGRES_PASS }}"
