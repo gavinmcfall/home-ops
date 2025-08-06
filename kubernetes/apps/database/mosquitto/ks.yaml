@@ -4,16 +4,15 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app mosquitto
-  namespace: &namespace default
+  namespace: &namespace databse
 spec:
   targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: onepassword-store
-      namespace: external-secrets
-  path: ./kubernetes/apps/default/mosquitto/app
+    - name: external-secret-stores
+  path: ./kubernetes/apps/databse/mosquitto/app
   prune: true
   sourceRef:
     kind: GitRepository
