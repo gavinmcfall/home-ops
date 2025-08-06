@@ -8,6 +8,6 @@ resources:
   # Flux-Kustomizations
   - ./cloudnative-pg/ks.yaml
   - ./dragonfly/ks.yaml
-  - ./emqx/ks.yaml
+  # - ./emqx/ks.yaml
   - ./mosquitto/ks.yaml
   - ./mariadb/ks.yaml
