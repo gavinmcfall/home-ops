@@ -33,6 +33,11 @@ spec:
       GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: natel-discrete-panel,pr0ps-trackmap-panel,panodata-map-panel
       GF_SECURITY_ANGULAR_SUPPORT_ENABLED: true
       GF_SERVER_ROOT_URL: https://grafana.${SECRET_DOMAIN}
+      TESLAMATE_DB_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: grafana-admin-secret
+            key: TESLAMATE_DB_PASSWORD
     grafana.ini:
       analytics:
         check_for_updates: false
