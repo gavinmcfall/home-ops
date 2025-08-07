@@ -79,11 +79,10 @@ spec:
               ]
             securityContext:  # ADD THIS
               allowPrivilegeEscalation: true
-              readOnlyRootFilesystem: false  # Allow writes for code-server
-              runAsUser: 0                      # Run as root for fixuid
-              runAsGroup: 0
-              capabilities:
-                add: ["SETUID", "SETGID"]
+              readOnlyRootFilesystem: false
+              runAsUser: 568
+              runAsGroup: 568
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
