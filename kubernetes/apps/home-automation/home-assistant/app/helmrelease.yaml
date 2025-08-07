@@ -155,7 +155,7 @@ spec:
         type: secret
         name: home-assistant-secret
         globalMounts:
-          - path: /config/tesla_fleet.key
+          - path: /config/keys/tesla_fleet.key  # Changed: added 'keys/' subdirectory
             subPath: tesla_fleet_key
             readOnly: true
           - path: /config/www/.well-known/appspecific/com.tesla.3p.public-key.pem
