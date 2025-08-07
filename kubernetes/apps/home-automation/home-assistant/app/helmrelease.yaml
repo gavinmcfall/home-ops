@@ -110,7 +110,7 @@ spec:
                 service:
                   identifier: app
                   port: http
-      tesla-key:  # NEW separate ingress for Tesla key
+      tesla-key:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           nginx.ingress.kubernetes.io/server-snippet: |
@@ -146,6 +146,10 @@ spec:
         existingClaim: home-assistant
         globalMounts:
           - path: /config
+      storage:
+        type: emptyDir
+        globalMounts:
+          - path: /config/.storage
       logs:
         type: emptyDir
         globalMounts:
