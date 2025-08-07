@@ -53,9 +53,7 @@ spec:
               - secretRef:
                   name: home-assistant-secret
             securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              runAsUser: 0  # Root access for cleanup
             resources:
               requests:
                 cpu: 10m
@@ -77,6 +75,8 @@ spec:
                 "12321",
                 "/config",
               ]
+            securityContext:
+              runAsUser: 0  # Root access for cleanup
             resources:
               requests:
                 cpu: 10m
@@ -84,12 +84,11 @@ spec:
                 memory: 512Mi
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
+        runAsNonRoot: false  # Allow root
+        runAsUser: 0         # Run as root
+        runAsGroup: 0        # Run as root group
+        fsGroup: 568         # Keep fsGroup for volume permissions
         fsGroupChangePolicy: OnRootMismatch
-        seccompProfile: {type: RuntimeDefault}
     service:
       app:
         controller: home-assistant
@@ -110,7 +109,7 @@ spec:
                 service:
                   identifier: app
                   port: http
-      tesla-key:
+      tesla-key:  # NEW separate ingress for Tesla key
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           nginx.ingress.kubernetes.io/server-snippet: |
@@ -146,10 +145,6 @@ spec:
         existingClaim: home-assistant
         globalMounts:
           - path: /config
-      storage:
-        type: emptyDir
-        globalMounts:
-          - path: /config/.storage
       logs:
         type: emptyDir
         globalMounts:
