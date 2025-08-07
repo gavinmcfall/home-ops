@@ -158,10 +158,3 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
-      tesla-keys:
-        type: secret
-        name: home-assistant-secret
-        globalMounts:
-          - path: /config/keys/tesla_fleet.key
-            subPath: tesla_fleet_key
-            readOnly: true
