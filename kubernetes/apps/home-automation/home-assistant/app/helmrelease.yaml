@@ -77,10 +77,6 @@ spec:
                 "12321",
                 "/config",
               ]
-            securityContext:  # ADD THIS
-              allowPrivilegeEscalation: true
-              readOnlyRootFilesystem: false  # Allow writes for code-server
-              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
