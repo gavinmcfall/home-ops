@@ -79,9 +79,7 @@ spec:
               ]
             securityContext:  # ADD THIS
               allowPrivilegeEscalation: true
-              readOnlyRootFilesystem: false
-              runAsUser: 568
-              runAsGroup: 568
+              readOnlyRootFilesystem: false  # Allow writes for code-server
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
