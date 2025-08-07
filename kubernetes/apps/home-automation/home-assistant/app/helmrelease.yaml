@@ -113,7 +113,14 @@ spec:
       tesla-key:  # NEW separate ingress for Tesla key
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-          nginx.ingress.kubernetes.io/rewrite-target: /local/.well-known/appspecific/com.tesla.3p.public-key.pem
+          nginx.ingress.kubernetes.io/server-snippet: |
+            location = /.well-known/appspecific/com.tesla.3p.public-key.pem {
+              return 200 "-----BEGIN PUBLIC KEY-----
+            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEMlj2zyHUptFNJWuE11vfkaEhV8lG
+            q31op/Glpzt0jQWINCMzRCCcL8d0Vo+uvOEv2Peg2K+SfUMl5HWEbDsDpg==
+            -----END PUBLIC KEY-----";
+              add_header Content-Type application/x-pem-file;
+            }
         className: external
         hosts:
           - host: hass.${SECRET_DOMAIN}
@@ -155,9 +162,6 @@ spec:
         type: secret
         name: home-assistant-secret
         globalMounts:
-          - path: /config/keys/tesla_fleet.key  # Changed: added 'keys/' subdirectory
+          - path: /config/keys/tesla_fleet.key
             subPath: tesla_fleet_key
-            readOnly: true
-          - path: /config/www/.well-known/appspecific/com.tesla.3p.public-key.pem
-            subPath: tesla_public_key
             readOnly: true
