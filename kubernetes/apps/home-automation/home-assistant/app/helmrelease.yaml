@@ -102,10 +102,6 @@ spec:
       app:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-          nginx.ingress.kubernetes.io/server-snippet: |
-            location = /.well-known/appspecific/com.tesla.3p.public-key.pem {
-              return 301 /local/.well-known/appspecific/com.tesla.3p.public-key.pem;
-            }
         className: external
         hosts:
           - host: hass.${SECRET_DOMAIN}
@@ -114,6 +110,19 @@ spec:
                 service:
                   identifier: app
                   port: http
+    tesla-key:  # NEW separate ingress for Tesla key
+      annotations:
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        nginx.ingress.kubernetes.io/rewrite-target: /local/.well-known/appspecific/com.tesla.3p.public-key.pem
+      className: external
+      hosts:
+        - host: hass.${SECRET_DOMAIN}
+          paths:
+            - path: /.well-known/appspecific/com.tesla.3p.public-key.pem
+              pathType: Exact
+              service:
+                identifier: app
+                port: http
       code-server:
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
