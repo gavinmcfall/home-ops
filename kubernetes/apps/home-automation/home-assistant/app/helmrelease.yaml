@@ -65,26 +65,18 @@ spec:
             image:
               repository: ghcr.io/coder/code-server
               tag: 4.102.2@sha256:8c2aaafb74a2978f48d193135eb3ea6fc0e24563dd59c028b9f1808cefd0fa33
-            env:
-              HOME: /config
-              XDG_CONFIG_HOME: /config/.config
-              XDG_DATA_HOME: /config/.local/share
-              XDG_CACHE_HOME: /config/.cache
-            command: ["/bin/bash"]
             args:
-              - -c
-              - |
-                exec dumb-init /usr/bin/code-server \
-                  --bind-addr 0.0.0.0:12321 \
-                  --auth none \
-                  --user-data-dir /config/.vscode \
-                  --extensions-dir /config/.vscode \
-                  --disable-telemetry \
-                  /config
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false  # Allow code-server to write
-              capabilities: {drop: ["ALL"]}
+              [
+                "--auth",
+                "none",
+                "--user-data-dir",
+                "/config/.vscode",
+                "--extensions-dir",
+                "/config/.vscode",
+                "--port",
+                "12321",
+                "/config",
+              ]
             resources:
               requests:
                 cpu: 10m
