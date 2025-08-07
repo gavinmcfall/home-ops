@@ -65,6 +65,11 @@ spec:
             image:
               repository: ghcr.io/coder/code-server
               tag: 4.102.2@sha256:8c2aaafb74a2978f48d193135eb3ea6fc0e24563dd59c028b9f1808cefd0fa33
+            env:
+              - name: DOCKER_USER
+                value: "coder"
+              - name: FIXUID_DISABLE
+                value: "1"
             args:
               [
                 "--auth",
