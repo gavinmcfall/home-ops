@@ -54,7 +54,7 @@ spec:
                   name: home-assistant-secret
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
+              readOnlyRootFilesystem: false  # Allow HA to write
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
@@ -65,6 +65,7 @@ spec:
             image:
               repository: ghcr.io/coder/code-server
               tag: 4.102.2@sha256:8c2aaafb74a2978f48d193135eb3ea6fc0e24563dd59c028b9f1808cefd0fa33
+            command: []
             args:
               [
                 "--auth",
@@ -77,6 +78,11 @@ spec:
                 "12321",
                 "/config",
               ]
+            env: []
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false  # Allow code-server to write
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
@@ -84,7 +90,7 @@ spec:
                 memory: 512Mi
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: false
+        runAsNonRoot: true  # Changed back to true for security
         runAsUser: 568
         runAsGroup: 568
         fsGroup: 568
