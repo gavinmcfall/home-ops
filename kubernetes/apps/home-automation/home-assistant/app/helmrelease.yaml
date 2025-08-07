@@ -104,8 +104,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           nginx.ingress.kubernetes.io/server-snippet: |
             location = /.well-known/appspecific/com.tesla.3p.public-key.pem {
-              root /;
-              add_header Content-Type application/x-pem-file;
+              return 301 /local/.well-known/appspecific/com.tesla.3p.public-key.pem;
             }
         className: external
         hosts:
@@ -150,6 +149,6 @@ spec:
           - path: /config/tesla_fleet.key
             subPath: tesla_fleet_key
             readOnly: true
-          - path: /.well-known/appspecific/com.tesla.3p.public-key.pem
+          - path: /config/www/.well-known/appspecific/com.tesla.3p.public-key.pem
             subPath: tesla_public_key
             readOnly: true
