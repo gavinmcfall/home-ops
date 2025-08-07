@@ -54,7 +54,7 @@ spec:
                   name: home-assistant-secret
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
+              readOnlyRootFilesystem: true
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
@@ -77,6 +77,10 @@ spec:
                 "12321",
                 "/config",
               ]
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
