@@ -1,0 +1,121 @@
+---
+# llm-d server configuration
+server:
+  host: 0.0.0.0
+  port: 8080
+  worker_port: 8081
+  cors:
+    enabled: true
+    origins:
+      - "http://litellm.cortex.svc.cluster.local:4000"
+      - "http://open-webui.cortex.svc.cluster.local:8080"
+      - "https://chat.${SECRET_DOMAIN}"
+
+# Worker configuration
+workers:
+  # Maximum number of concurrent workers
+  max_workers: 10
+  # Timeout for worker health checks (seconds)
+  health_check_timeout: 30
+  # Interval between health checks (seconds)
+  health_check_interval: 60
+  # Maximum idle time before worker shutdown (seconds)
+  max_idle_time: 600
+  # Worker authentication
+  require_token: true
+
+# Model configuration
+models:
+  # Supported model architectures
+  supported:
+    - llama
+    - mistral
+    - qwen
+    - phi
+    - gemma
+    - starcoder
+    - deepseek
+    - yi
+    - mixtral
+
+  # Model routing rules
+  routing:
+    - pattern: ".*llama.*"
+      prefer_workers: ["high-memory"]
+    - pattern: ".*mistral.*"
+      prefer_workers: ["standard"]
+    - pattern: ".*code.*"
+      prefer_workers: ["high-compute"]
+    - pattern: ".*mixtral.*"
+      prefer_workers: ["high-memory", "high-compute"]
+
+# Queue configuration
+queue:
+  type: redis
+  redis:
+    host: dragonfly.database.svc.cluster.local
+    port: 6379
+    db: 0
+    max_connections: 50
+
+  # Request queue settings
+  request:
+    max_queue_size: 1000
+    timeout: 300
+    priority_levels: 3
+
+# Load balancing
+load_balancer:
+  algorithm: weighted_round_robin
+  health_check:
+    enabled: true
+    threshold: 0.8
+  metrics:
+    - gpu_utilization
+    - memory_usage
+    - queue_length
+    - response_time
+
+# Monitoring
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+    port: 9090
+  logging:
+    level: info
+    format: json
+
+# Security
+security:
+  authentication:
+    enabled: true
+    type: token
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+    burst: 20
+  allowed_ips: []  # Empty means allow all
+
+# Model presets
+model_presets:
+  llama-3.2-70b:
+    context_length: 128000
+    default_max_tokens: 4096
+    temperature: 0.7
+    top_p: 0.9
+  mistral-22b:
+    context_length: 65536
+    default_max_tokens: 2048
+    temperature: 0.7
+    top_p: 0.95
+  deepseek-coder-33b:
+    context_length: 16384
+    default_max_tokens: 4096
+    temperature: 0.1
+    top_p: 0.95
+  qwen-2.5-72b:
+    context_length: 128000
+    default_max_tokens: 4096
+    temperature: 0.7
+    top_p: 0.9

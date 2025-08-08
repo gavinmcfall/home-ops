@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-d-workers
+  namespace: cortex
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "llm-d"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.90.3.220  # Assign a specific IP for workers to connect
+  ports:
+    - name: coordinator
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app.kubernetes.io/name: llm-d
+---
+# Additional service for external worker connections
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-d-external
+  namespace: cortex
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: llm-d-workers.${SECRET_DOMAIN}
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+spec:
+  type: ClusterIP
+  ports:
+    - name: workers
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app.kubernetes.io/name: llm-d
+---
+# Ingress for external workers
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: llm-d-workers
+  namespace: cortex
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  ingressClassName: external
+  rules:
+    - host: llm-d-workers.${SECRET_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: llm-d-external
+                port:
+                  number: 8081

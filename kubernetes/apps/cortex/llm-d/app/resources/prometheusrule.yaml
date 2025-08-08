@@ -1,0 +1,75 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: llm-d-rules
+  namespace: cortex
+spec:
+  groups:
+    - name: llm-d.rules
+      interval: 30s
+      rules:
+        - alert: LLMDNoWorkersAvailable
+          expr: llmd_workers_active == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "No LLM-D workers are available"
+            description: "The distributed inference system has no active workers for {{ $value }} minutes"
+
+        - alert: LLMDHighQueueSize
+          expr: llmd_queue_size > 100
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High request queue size"
+            description: "LLM-D request queue has {{ $value }} pending requests"
+
+        - alert: LLMDWorkerOffline
+          expr: up{job="llmd-worker"} == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "LLM-D worker {{ $labels.instance }} is offline"
+            description: "Worker {{ $labels.instance }} has been offline for 5 minutes"
+
+        - alert: LLMDHighGPUMemoryUsage
+          expr: llmd_worker_gpu_memory_used / llmd_worker_gpu_memory_total > 0.95
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High GPU memory usage on worker {{ $labels.worker }}"
+            description: "GPU memory usage is at {{ $value | humanizePercentage }}"
+
+        - alert: LLMDSlowInference
+          expr: histogram_quantile(0.95, rate(llmd_inference_duration_seconds_bucket[5m])) > 30
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Slow inference performance"
+            description: "95th percentile inference time is {{ $value }}s"
+
+        - alert: LLMDWorkerImbalance
+          expr: |
+            (max(llmd_worker_request_count) - min(llmd_worker_request_count))
+            / max(llmd_worker_request_count) > 0.5
+          for: 15m
+          labels:
+            severity: info
+          annotations:
+            summary: "Worker load imbalance detected"
+            description: "Worker request distribution is uneven with {{ $value | humanizePercentage }} difference"
+
+        - alert: LLMDModelLoadFailure
+          expr: increase(llmd_model_load_failures_total[5m]) > 3
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Model loading failures detected"
+            description: "{{ $value }} model load failures in the last 5 minutes"
