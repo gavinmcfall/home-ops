@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./externalsecret.yaml
+  - ./helmrelease.yaml
+  - ./resources/worker-coordinator.yaml
+  - ./resources/prometheusrule.yaml
+  - ../../../../templates/volsync
+  - ../../../../templates/gatus/guarded
+configMapGenerator:
+  - name: llm-d-configmap
+    files:
+      - config.yaml=./resources/config.yaml
+  - name: llm-d-worker-scripts
+    files:
+      - worker-install.sh=./resources/worker-install.sh
+      - worker-config.yaml=./resources/worker-config.yaml
+  - name: llm-d-dashboard
+    namespace: cortex
+    files:
+      - llm-d-dashboard.json=./resources/grafana-dashboard.yaml
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        grafana_folder: "Cortex"
+generatorOptions:
+  disableNameSuffixHash: true

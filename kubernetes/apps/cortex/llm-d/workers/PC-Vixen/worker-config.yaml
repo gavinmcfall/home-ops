@@ -1,0 +1,38 @@
+# worker-configs/your-pc/worker-config.yaml
+worker:
+  name: "NZVixen-${HOSTNAME}"
+  labels:
+    owner: "NZVixen"
+    gpu_type: "high-end"
+    location: "office"
+
+  server:
+    url: "http://llm-d.internal.yourdomain.com"
+    token: "${LLMD_WORKER_TOKEN}"
+    heartbeat_interval: 30
+
+  resources:
+    gpu:
+      device_ids: [0]  # Adjust based on your GPU setup
+      memory_fraction: 0.9  # Use 90% of GPU memory
+    cpu:
+      cores: 8  # Limit CPU cores for inference
+    memory:
+      limit_gb: 32  # Limit system memory usage
+
+  models:
+    cache_dir: "/opt/llm-d/models"
+    preload:
+      - "llama-3.2-70b"  # Preload your preferred model
+    max_loaded: 2
+    offload_timeout: 600
+
+  performance:
+    batch_size: 8
+    max_sequences: 4
+    use_flash_attention: true
+    quantization: "int8"  # or "int4" for larger models
+
+  monitoring:
+    prometheus_port: 9091
+    enable_gpu_metrics: true

@@ -1,0 +1,40 @@
+# worker-configs/kids-pc/worker-config.yaml
+worker:
+  name: "nznova-${HOSTNAME}"
+  labels:
+    owner: "NZNova"
+    gpu_type: "entry-level"
+    location: "Kids Office"
+
+  server:
+    url: "http://llm-d.internal.yourdomain.com"
+    token: "${LLMD_WORKER_TOKEN}"
+
+  resources:
+    gpu:
+      device_ids: [0]
+      memory_fraction: 0.6  # Lower usage for gaming compatibility
+    cpu:
+      cores: 2
+    memory:
+      limit_gb: 8
+
+  models:
+    cache_dir: "/opt/llm-d/models"
+    preload: []  # Don't preload, load on demand
+    max_loaded: 1
+
+  performance:
+    batch_size: 2
+    max_sequences: 1
+    quantization: "int4"  # Heavy quantization for smaller GPUs
+
+  schedule:
+    # Only available during school hours and late night
+    available_hours:
+      - start: "09:00"
+        end: "15:00"
+        days: ["mon", "tue", "wed", "thu", "fri"]
+      - start: "22:00"
+        end: "06:00"
+    priority: "low"  # Lower priority worker

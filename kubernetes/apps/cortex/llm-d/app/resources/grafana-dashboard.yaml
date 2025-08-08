@@ -1,0 +1,159 @@
+{
+  "dashboard": {
+    "title": "LLM-D Distributed Inference",
+    "uid": "llm-d-distributed",
+    "tags": ["cortex", "llm", "ai"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Active Workers",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 0, "w": 4, "h": 4},
+        "targets": [
+          {
+            "expr": "llmd_workers_active",
+            "legendFormat": "Workers"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 1, "color": "yellow"},
+                {"value": 3, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Total GPU Memory",
+        "type": "gauge",
+        "gridPos": {"x": 4, "y": 0, "w": 4, "h": 4},
+        "targets": [
+          {
+            "expr": "sum(llmd_worker_gpu_memory_total)",
+            "legendFormat": "Total GPU Memory"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "max": 256000000000,
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 128000000000, "color": "yellow"},
+                {"value": 200000000000, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Request Queue Size",
+        "type": "graph",
+        "gridPos": {"x": 8, "y": 0, "w": 8, "h": 4},
+        "targets": [
+          {
+            "expr": "llmd_queue_size",
+            "legendFormat": "Queue Size"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Requests"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Worker GPU Utilization",
+        "type": "graph",
+        "gridPos": {"x": 16, "y": 0, "w": 8, "h": 4},
+        "targets": [
+          {
+            "expr": "llmd_worker_gpu_utilization",
+            "legendFormat": "{{worker}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "percent", "label": "Utilization", "max": 100},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Inference Latency (p95)",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 4, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(llmd_inference_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95 Latency"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(llmd_inference_duration_seconds_bucket[5m]))",
+            "legendFormat": "p50 Latency"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Seconds"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Tokens Per Second",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 4, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "rate(llmd_tokens_generated_total[1m])",
+            "legendFormat": "{{worker}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Tokens/sec"},
+          {"format": "short"}
+        ],
+        "stack": true
+      },
+      {
+        "id": 7,
+        "title": "Worker Status",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 10, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "llmd_worker_info",
+            "format": "table",
+            "instant": true
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Model Load Times",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 10, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "llmd_model_load_duration_seconds",
+            "legendFormat": "{{model}} on {{worker}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Seconds"},
+          {"format": "short"}
+        ]
+      }
+    ]
+  }
+}

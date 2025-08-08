@@ -1,0 +1,40 @@
+# Template worker configuration - this gets customized by the install script
+worker:
+  name: ${WORKER_NAME}
+  server_url: ${SERVER_URL}
+  token: ${WORKER_TOKEN}
+
+  # Labels for worker identification and routing
+  labels:
+    owner: ${OWNER}
+    gpu_type: ${GPU_TYPE}
+    location: ${LOCATION}
+
+  # Resource configuration
+  resources:
+    gpu:
+      device_ids: ${GPU_DEVICES}
+      memory_fraction: ${GPU_MEMORY_FRACTION}
+    cpu:
+      cores: ${CPU_CORES}
+    memory:
+      limit_gb: ${MEMORY_LIMIT}
+
+  # Model settings
+  models:
+    cache_dir: /var/lib/llm-d/models
+    preload: ${PRELOAD_MODELS}
+    max_loaded: ${MAX_LOADED_MODELS}
+    offload_timeout: 600
+
+  # Performance settings
+  performance:
+    batch_size: ${BATCH_SIZE}
+    max_sequences: ${MAX_SEQUENCES}
+    use_flash_attention: true
+    quantization: ${QUANTIZATION}
+
+  # Monitoring
+  monitoring:
+    prometheus_port: 9091
+    enable_gpu_metrics: true
