@@ -1,38 +1,51 @@
-# worker-configs/your-pc/worker-config.yaml
+# LLM-D Worker Configuration
+# Generated: 2025-08-09 16:07:09
+# Host: PC-VENGEANCE
+# GPU: NVIDIA GeForce RTX 4080 (16 GB)
+# Tier: mid-range
+
 worker:
-  name: "NZVengeance-${HOSTNAME}"
+  name: "pc-vengeance"
   labels:
     owner: "NZVengeance"
-    gpu_type: "high-end"
+    gpu_type: "mid-range"
+    gpu_model: "NVIDIA_GeForce_RTX_4080"
     location: "office"
+    platform: "windows"
 
   server:
-    url: "http://llm-d.internal.yourdomain.com"
+    url: "https://llm-d-workers.${SECRET_DOMAIN}"
     token: "${LLMD_WORKER_TOKEN}"
     heartbeat_interval: 30
 
   resources:
     gpu:
-      device_ids: [0]  # Adjust based on your GPU setup
-      memory_fraction: 0.9  # Use 90% of GPU memory
+      device_ids: [0]
+      memory_fraction: 0.85
     cpu:
-      cores: 8  # Limit CPU cores for inference
+      cores: 8
     memory:
-      limit_gb: 32  # Limit system memory usage
+      limit_gb: 32
 
   models:
-    cache_dir: "/opt/llm-d/models"
+    cache_dir: "C:\\llm-d\\models"
     preload:
-      - "llama-3.2-70b"  # Preload your preferred model
-    max_loaded: 2
+    - "mistral-22b"
+    max_loaded: 1
     offload_timeout: 600
 
   performance:
-    batch_size: 8
-    max_sequences: 4
+    batch_size: 4
+    max_sequences: 2
     use_flash_attention: true
-    quantization: "int8"  # or "int4" for larger models
+    quantization: "int8"
 
   monitoring:
     prometheus_port: 9091
     enable_gpu_metrics: true
+
+# Recommended models for this configuration:
+# - llama-3.2-70b (int8 quantized)
+# - mistral-22b (int8 quantized)
+# - deepseek-coder-33b (int8 quantized)
+# - llama-3.2-13b (full precision)
