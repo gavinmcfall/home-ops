@@ -1,0 +1,25 @@
+# C:\llm-d\docker-compose.yml
+version: '3.8'
+
+services:
+  llm-d-worker:
+    image: ghcr.io/llm-d-ai/llm-d-worker:latest
+    container_name: llm-d-worker
+    restart: always  # Always restart if it crashes
+    environment:
+      - WORKER_NAME=${COMPUTERNAME}
+      - SERVER_URL=https://llm-d-workers.yourdomain.com
+      - WORKER_TOKEN=${LLMD_WORKER_TOKEN}
+      - LOG_LEVEL=info
+    volumes:
+      - C:\llm-d\models:/models
+      - C:\llm-d\cache:/cache
+      - C:\llm-d\config\worker-config.yaml:/app/config.yaml:ro
+    network_mode: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
