@@ -1,40 +1,51 @@
-# worker-configs/kids-pc/worker-config.yaml
+# LLM-D Worker Configuration
+# Generated: 2025-08-09 16:15:48
+# Host: BLAZE
+# GPU: NVIDIA GeForce RTX 3050 (8 GB)
+# Tier: entry-level
+
 worker:
-  name: "nzblaze-${HOSTNAME}"
+  name: "blaze"
   labels:
     owner: "NZBlaze"
     gpu_type: "entry-level"
-    location: "Kids Office"
+    gpu_model: "NVIDIA_GeForce_RTX_3050"
+    location: "kids-room"
+    platform: "windows"
 
   server:
-    url: "http://llm-d.internal.yourdomain.com"
+    url: "https://llm-d-workers.${SECRET_DOMAIN}"
     token: "${LLMD_WORKER_TOKEN}"
+    heartbeat_interval: 30
 
   resources:
     gpu:
       device_ids: [0]
-      memory_fraction: 0.6  # Lower usage for gaming compatibility
+      memory_fraction: 0.8
     cpu:
-      cores: 2
+      cores: 4
     memory:
-      limit_gb: 8
+      limit_gb: 6
 
   models:
-    cache_dir: "/opt/llm-d/models"
-    preload: []  # Don't preload, load on demand
+    cache_dir: "C:\\llm-d\\models"
+    preload:
+
     max_loaded: 1
+    offload_timeout: 600
 
   performance:
     batch_size: 2
     max_sequences: 1
-    quantization: "int4"  # Heavy quantization for smaller GPUs
+    use_flash_attention: false
+    quantization: "int4"
 
-  schedule:
-    # Only available during school hours and late night
-    available_hours:
-      - start: "09:00"
-        end: "15:00"
-        days: ["mon", "tue", "wed", "thu", "fri"]
-      - start: "22:00"
-        end: "06:00"
-    priority: "low"  # Lower priority worker
+  monitoring:
+    prometheus_port: 9091
+    enable_gpu_metrics: true
+
+# Recommended models for this configuration:
+# - mistral-22b (int4 quantized)
+# - llama-3.2-13b (int8 quantized)
+# - llama-3.2-7b (full precision)
+# - deepseek-coder-6.7b (full precision)
