@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: llm-d-infra
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://github.com/llm-d-incubation/llm-d-infra
+  ref:
+    tag: v1.1.1
