@@ -4,4 +4,6 @@ kind: Kustomization
 resources:
   - ./app-template.yaml
   - ./mariadb.yaml
+  - ./kgateway.yaml
+  - ./kgateway-crds.yaml
 
