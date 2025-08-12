@@ -1,0 +1,54 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app llm-d
+  namespace: cortex
+spec:
+  # Check for chart updates every 30 minutes
+  interval: 30m
+  # Use an explicit release name for predictable resource names
+  releaseName: llm-d
+  chart:
+    spec:
+      # Use the llm-d-infra chart from our GitRepository source
+      chart: charts/llm-d-infra
+      sourceRef:
+        kind: GitRepository
+        name: llm-d-infra
+        namespace: flux-system
+      interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  dependsOn:
+    # Wait for Ceph and VolSync to be ready before deploying llm-d
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
+  values:
+    # Override namespace for all resources to cortex
+    global:
+      namespaceOverride: cortex
+    # Configure the gateway service; disable built-in ingress
+    gateway:
+      serviceType: ClusterIP
+      ingress:
+        enabled: false
+    # Enable Redis/Dragonfly cache
+    cache:
+      enabled: true
+    # Expose Prometheus metrics
+    metrics:
+      enabled: true
+    # Reference the ExternalSecret for HuggingFace token
+    secrets:
+      hf:
+        existingSecret: llm-d-secret
+        key: HF_TOKEN
