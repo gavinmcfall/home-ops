@@ -57,7 +57,7 @@ spec:
           app:
             image:
               repository: ghcr.io/bjw-s-labs/manyfold
-              tag: 0.119.0@sha256:5df6e7b27db54d1f6e35ef0797878863a97b3bf79f65059d1c4bc61275b85d5f
+              tag: 0.120.1@sha256:e947147a0e383f669e87ce61ba4d4c323e2b4030864af698f53f97e5b79fd86e
             # command:
             #   - sleep
             #   - infinity
