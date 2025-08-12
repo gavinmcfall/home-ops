@@ -27,10 +27,14 @@ spec:
         enabled: false
     gateway:
       gatewayClassName: kgateway
-      serviceType: NodePort
+      serviceType: LoadBalancer
+      annotations:
+        io.cilium/lb-ipam-ips: "10.90.3.214"
     ingress:
       enabled: true
       ingressClassName: internal
       host: "llmd.${SECRET_DOMAIN}"
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: "llmd.${SECRET_DOMAIN}"
       tls:
         enabled: false
