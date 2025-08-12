@@ -11,6 +11,8 @@ resources:
   - ./external-services/ks.yaml
   - ./ingress-nginx/ks.yaml
   - ./k8s-gateway/ks.yaml
+  - ./kgateway/ks.yaml
+  - ./llmd-gateway-crds/ks.yaml
   - ./multus/ks.yaml
   # - ./netboot/ks.yaml
   - ./oauth2-proxy/ks.yaml

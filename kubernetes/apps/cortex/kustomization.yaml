@@ -6,7 +6,7 @@ resources:
   - ./namespace.yaml
   # Flux-Kustomizations
   - ./litellm/ks.yaml
-  # - ./llm-d/ks.yaml
+  - ./llm-d/ks.yaml
   - ./open-webui/ks.yaml
   - ./qdrant/ks.yaml
   # - ./sillytavern/ks.yaml

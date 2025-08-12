@@ -1,0 +1,11 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: llmd-inference-scheduler
+  namespace: flux-system
+spec:
+  interval: 1h
+  ref:
+    branch: main
+  url: https://github.com/llm-d/llm-d-inference-scheduler
