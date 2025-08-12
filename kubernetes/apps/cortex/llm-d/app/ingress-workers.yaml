@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: llm-d-workers
+  namespace: cortex
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts:
+        - "llm-d-workers.${SECRET_DOMAIN}"
+      secretName: llm-d-workers-tls
+  rules:
+    - host: "llm-d-workers.${SECRET_DOMAIN}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: llm-d-gateway
+                port:
+                  number: 80
