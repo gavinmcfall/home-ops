@@ -1,0 +1,18 @@
+worker:
+  name: ${WORKER_NAME}
+  server_url: ${SERVER_URL}
+  auth:
+    token: ${WORKER_TOKEN}
+runtime:
+  gpu:
+    memory_fraction: 0.90
+  model_cache_dir: /models
+  kv_cache_dir: /cache
+models:
+  preload:
+    # Example to preload a model
+    # - repo: openai/gpt-oss-120b
+    #   quantization: mxfp4
+    #   parallelism:
+    #     expert_parallel: true
+    #     tensor_parallel: 1

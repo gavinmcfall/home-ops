@@ -1,0 +1,15 @@
+services:
+  llmd-worker:
+    image: ghcr.io/llm-d-ai/llm-d-worker:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./models:/models
+      - ./cache:/cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
