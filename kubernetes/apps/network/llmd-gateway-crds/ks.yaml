@@ -1,0 +1,26 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: llmd-crds-gateway-api
+  namespace: flux-system
+spec:
+  prune: false
+  interval: 30m
+  sourceRef:
+    kind: GitRepository
+    name: llmd-inference-scheduler
+  path: ./deploy/components/crds-gateway-api
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: llmd-crds-gie
+  namespace: flux-system
+spec:
+  prune: false
+  interval: 30m
+  sourceRef:
+    kind: GitRepository
+    name: llmd-inference-scheduler
+  path: ./deploy/components/crds-gie
