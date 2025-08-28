@@ -27,6 +27,11 @@ spec:
             envFrom: &envFrom
               - secretRef:
                   name: n8n-secret
+        pod:
+          securityContext:
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups: [568]
         containers:
           app:
             image:
@@ -59,14 +64,9 @@ spec:
               N8N_USER_FOLDER: /home/n8n/app
               # External Packages
             envFrom: *envFrom
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 568
-        fsGroupChangePolicy: "OnRootMismatch"
-        supplementalGroups:
-          - 568
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
     service:
       app:
         labels:
