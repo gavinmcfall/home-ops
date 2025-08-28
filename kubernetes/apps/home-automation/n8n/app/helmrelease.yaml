@@ -65,6 +65,8 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
+        supplementalGroups:
+          - 568
     service:
       app:
         labels:
@@ -93,7 +95,7 @@ spec:
           - path: /home/n8n/app
       media:
         type: nfs
-        server: 10.90.1.69
+        server: citadel.internal
         path: /mnt/storage0/media/Syncthing/obsidian
         globalMounts:
           - path: /obsidian
