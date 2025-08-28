@@ -91,6 +91,12 @@ spec:
         existingClaim: n8n
         globalMounts:
           - path: /home/n8n/app
+      media:
+        type: nfs
+        server: 10.90.1.69
+        path: /mnt/storage0/media/Syncthing/obsidian
+        globalMounts:
+          - path: /obsidian
 
     resources:
       requests:
