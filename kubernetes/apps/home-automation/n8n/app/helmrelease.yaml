@@ -31,7 +31,8 @@ spec:
           securityContext:
             fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
-            supplementalGroups: [568]
+            supplementalGroups:
+              - 568
         containers:
           app:
             image:
