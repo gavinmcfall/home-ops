@@ -58,7 +58,7 @@ spec:
               N8N_PUBLIC_API_DISABLED: false
               N8N_PUBLIC_API_SWAGGERUI_DISABLED: true
               NODE_FUNCTION_ALLOW_BUILTIN: "*"
-              NODE_FUNCTION_ALLOW_EXTERNAL: tweetnacl
+              NODE_FUNCTION_ALLOW_EXTERNAL: tweetnacl,chokidar
               N8N_METRICS: true
               DB_TYPE: postgresdb
               DB_POSTGRESDB_PORT: 5432
