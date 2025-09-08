@@ -61,7 +61,7 @@ spec:
           app:
             image:
               repository: ghcr.io/haveagitgat/tdarr_node_acc
-              tag: 2.46.01@sha256:82c14985df6ef3e3578e69493c5a7323babb57deb3d9364a899c288903a52e45
+              tag: 2.46.01@sha256:1ecdd628d424a98773e61a6fd85ec1533da0259baa1aa8c806960cfe2b56aa1b
               pullPolicy: IfNotPresent
             env:
               TZ: "${TZ}"
