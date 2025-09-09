@@ -28,6 +28,8 @@ resources:
   - ./qdrant.yaml
   - ./redash.yaml
   - ./rook-ceph-charts.yaml
+  - ./llm-d-infra.yaml
+  - ./llm-d-modelservice.yaml
   - ./stevehipwell.yaml
   - ./spegel.yaml
   - ./stakater.yaml
