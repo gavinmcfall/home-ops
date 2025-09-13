@@ -55,7 +55,7 @@ spec:
       bdev_flock_retry = 3
     cephClusterSpec:
       cephVersion:
-        image: quay.io/ceph/ceph:v18.2.7
+        image: quay.io/ceph/ceph:v20.1.0
         allowUnsupported: false
       crashCollector:
         disable: false
