@@ -4,5 +4,4 @@ kind: Kustomization
 resources:
   - ./app-template.yaml
   - ./mariadb.yaml
-  - ./rook-oci-sources.yaml
 
