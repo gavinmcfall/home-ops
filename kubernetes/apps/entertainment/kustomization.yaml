@@ -15,4 +15,4 @@ resources:
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
   # - ./tdarr/ks.yaml
-  # - ./wizarr/ks.yaml
+  - ./wizarr/ks.yaml
