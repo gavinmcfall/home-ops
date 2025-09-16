@@ -12,6 +12,7 @@ resources:
   - ./kavita/ks.yaml
   - ./overseerr/ks.yaml
   - ./pasta/ks.yaml
+  # - ./peertube/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
   # - ./tdarr/ks.yaml
