@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: ghcr.io/pocket-id/pocket-id
-              tag: v1.0.0@sha256:bb4b1debee6fa1245a36a0d8a0bd23794033028b803d7639c898bc11697f155f
+              tag: v1.11.1@sha256:053805fa96894c09a084bb87e27e75ef60bdc1ac0e79eed602875588267a4857
             env:
               DB_PROVIDER: postgres
               PUID: 568
