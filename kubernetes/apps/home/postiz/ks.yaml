@@ -16,7 +16,7 @@ spec:
     - name: external-secrets-stores
   interval: 30m
   timeout: 5m
-  path: ./kubernetes/main/apps/home/postiz/app
+  path: ./kubernetes/apps/home/postiz/app
   prune: true
   sourceRef:
     kind: GitRepository
