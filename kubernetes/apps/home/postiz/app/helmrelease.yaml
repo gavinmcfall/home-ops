@@ -1,0 +1,99 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app postiz
+  namespace: default
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: uninstall
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      postiz:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
+            envFrom: &envFrom
+              - secretRef:
+                  name: postiz
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gitroomhq/postiz-app
+              tag: v2.7.0@sha256:a4b24d14913c29ce8ba97671dd13a52b60154ae86b4463d0046711211edb62c0
+            env:
+              MAIN_URL: "https://social.${SECRET_DOMAIN}"
+              FRONTEND_URL: "https://social.${SECRET_DOMAIN}"
+              NEXT_PUBLIC_BACKEND_URL: "https://social.${SECRET_DOMAIN}/api"
+              REDIS_URL: "redis://dragonfly.storage.svc.cluster.local:6379"
+              BACKEND_INTERNAL_URL: "http://localhost:3000"
+              IS_GENERAL: "true" # Required for self-hosting.
+              STORAGE_PROVIDER: "cloudflare"
+            envFrom: *envFrom
+            probes:
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: &port 5000                                  # <- 5000
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  failureThreshold: 6
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    ingress:
+      app:
+        enabled: true
+        className: internal
+        annotations:
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        hosts:
+          - host: &host social.${SECRET_DOMAIN}
+            paths: &paths
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - *host
+    persistence:
+      data:
+        existingClaim: *app
+        globalMounts:
+          - subPath: config
+            path: /config
+          - subPath: uploads
+            path: /uploads
