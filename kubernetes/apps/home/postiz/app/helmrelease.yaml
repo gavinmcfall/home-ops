@@ -95,5 +95,3 @@ spec:
         globalMounts:
           - subPath: config
             path: /config
-          - subPath: uploads
-            path: /uploads
