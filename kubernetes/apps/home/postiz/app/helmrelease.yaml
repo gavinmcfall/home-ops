@@ -46,7 +46,7 @@ spec:
               MAIN_URL: "https://social.${SECRET_DOMAIN}"
               FRONTEND_URL: "https://social.${SECRET_DOMAIN}"
               NEXT_PUBLIC_BACKEND_URL: "https://social.${SECRET_DOMAIN}/api"
-              REDIS_URL: "redis://dragonfly.storage.svc.cluster.local:6379"
+              REDIS_URL: "redis://dragonfly.database.svc.cluster.local:6379"
               BACKEND_INTERNAL_URL: "http://localhost:3000"
               IS_GENERAL: "true" # Required for self-hosting.
               STORAGE_PROVIDER: "cloudflare"
