@@ -50,6 +50,7 @@ spec:
               BACKEND_INTERNAL_URL: "http://localhost:3000"
               IS_GENERAL: "true" # Required for self-hosting.
               STORAGE_PROVIDER: "cloudflare"
+              DISABLE_REGISTRATION: "true" # Disable public registration
             envFrom: *envFrom
     service:
       app:
