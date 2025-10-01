@@ -6,7 +6,7 @@ metadata:
   name: &app plane
   namespace: flux-system
 spec:
-  targetNamespace: home
+  targetNamespace: plane
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
@@ -14,7 +14,7 @@ spec:
     - name: cluster-apps-rook-ceph-cluster
     - name: dragonfly-cluster
     - name: cloudnative-pg-cluster17
-  path: ./kubernetes/apps/home/plane/app
+  path: ./kubernetes/apps/plane/plane/app
   prune: true
   sourceRef:
     kind: GitRepository
