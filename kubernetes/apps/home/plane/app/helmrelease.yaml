@@ -23,7 +23,7 @@ spec:
       retries: 3
       strategy: rollback
   values:
-    planeVersion: stable
+    planeVersion: v1.0.0
 
     ingress:
       enabled: true
@@ -57,7 +57,7 @@ spec:
       rabbitmq_existingSecret: plane-secret
 
     web:
-      image: artifacts.plane.so/makeplane/plane-frontend:v1.0.0@sha256:a07fcc32cf45b1cb5cc7397d86d061f524194c535dec0135741fafdfc3f8c376
+      image: artifacts.plane.so/makeplane/plane-frontend
       pullPolicy: Always
       replicas: 1
       cpuRequest: 50m
@@ -66,7 +66,7 @@ spec:
       memoryLimit: 1000Mi
 
     space:
-      image: artifacts.plane.so/makeplane/plane-space:v1.0.0@sha256:9ce65d871f9afe08e236e14c6c97f5391ea23176cce5dce2fba25ef0019129e4
+      image: artifacts.plane.so/makeplane/plane-space
       pullPolicy: Always
       replicas: 1
       cpuRequest: 50m
@@ -75,7 +75,7 @@ spec:
       memoryLimit: 1000Mi
 
     admin:
-      image: artifacts.plane.so/makeplane/plane-admin:v1.0.0@sha256:013d88c838a7d085e3424a210ceecb2a2a8d37bebd023bf571618b8bc0797a01
+      image: artifacts.plane.so/makeplane/plane-admin
       pullPolicy: Always
       replicas: 1
       cpuRequest: 50m
@@ -84,7 +84,7 @@ spec:
       memoryLimit: 1000Mi
 
     live:
-      image: artifacts.plane.so/makeplane/plane-live:v1.0.0@sha256:d4ee8314c7946357110bcb3c62ad69186f9b12253f670e2ab10c6a84d99b4772
+      image: artifacts.plane.so/makeplane/plane-live
       pullPolicy: Always
       replicas: 1
       cpuRequest: 50m
@@ -93,7 +93,7 @@ spec:
       memoryLimit: 1000Mi
 
     api:
-      image: artifacts.plane.so/makeplane/plane-backend:v1.0.0@sha256:c1492e1437a07877955052bf2da645ca90dd6e0a0bc97ac8bd0efbc34616aca1
+      image: artifacts.plane.so/makeplane/plane-backend
       pullPolicy: Always
       replicas: 1
       cpuRequest: 50m
@@ -102,7 +102,7 @@ spec:
       memoryLimit: 1000Mi
 
     worker:
-      image: artifacts.plane.so/makeplane/plane-backend:v1.0.0@sha256:c1492e1437a07877955052bf2da645ca90dd6e0a0bc97ac8bd0efbc34616aca1
+      image: artifacts.plane.so/makeplane/plane-backend
       pullPolicy: Always
       replicas: 1
       cpuRequest: 50m
@@ -111,7 +111,7 @@ spec:
       memoryLimit: 1000Mi
 
     beatworker:
-      image: artifacts.plane.so/makeplane/plane-backend:v1.0.0@sha256:c1492e1437a07877955052bf2da645ca90dd6e0a0bc97ac8bd0efbc34616aca1
+      image: artifacts.plane.so/makeplane/plane-backend
       pullPolicy: Always
       replicas: 1
       cpuRequest: 50m
