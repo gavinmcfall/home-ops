@@ -11,7 +11,7 @@ resources:
   - ./linkwarden/ks.yaml
   - ./manyfold/ks.yaml
   - ./paperless/ks.yaml
-  - ./plane/ks.yaml
+  # - ./plane/ks.yaml
   - ./searxng/ks.yaml
   - ./smtp-relay/ks.yaml
   - ./thelounge/ks.yaml
