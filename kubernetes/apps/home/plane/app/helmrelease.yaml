@@ -108,7 +108,7 @@ spec:
       cpuRequest: 50m
       cpuLimit: 500m
       memoryRequest: 50Mi
-      memoryLimit: 1000Mi
+      memoryLimit: 2000Mi
 
     beatworker:
       image: artifacts.plane.so/makeplane/plane-backend
