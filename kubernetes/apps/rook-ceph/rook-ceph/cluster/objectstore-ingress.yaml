@@ -14,7 +14,7 @@ spec:
   ingressClassName: external
   tls:
     - hosts:
-        - &host "s3.external.${SECRET_DOMAIN}"
+        - &host "s3.${SECRET_DOMAIN}"
       secretName: *host
   rules:
     - host: *host
