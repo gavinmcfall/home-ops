@@ -27,7 +27,7 @@ ssl:
 
 redis:
   local_setup: true
-  image: valkey/valkey:7.2.5-alpine
+  image: valkey/valkey:7.2.11-alpine
   servicePort: 6379
   storageClass: ""
   volumeSize: 100Mi
