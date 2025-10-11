@@ -44,7 +44,7 @@ spec:
           app:
             image:
               repository: chocobozzz/peertube
-              tag: v7.3.0-bookworm@sha256:3cfe1cd7f1fa7e09da60b99b89b805b8a5eaf2d871ceaa4005cb6eede620ac54
+              tag: v7.3.0-bookworm@sha256:7cdb22d6d07e5029ba2edee3504295f4872fa87d6e8550b5570afab14036e315
             env:
               NODE_ENV: production
               PEERTUBE_WEBSERVER_HOSTNAME: "{{ .Release.Name }}.${SECRET_DOMAIN}"
