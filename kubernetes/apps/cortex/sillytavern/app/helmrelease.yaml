@@ -35,7 +35,7 @@ spec:
           app:
             image: &img
               repository: ghcr.io/sillytavern/sillytavern
-              tag: 1.13.3@sha256:b5ead90262df2b6091014644497996751ea97159b9ab59ba98ca6f8869843311
+              tag: 1.13.5@sha256:12090436211f3380136fb0adbcd1c986519a1e6903055d9736ae14d0e5c0b6a8
             env: &env
               TZ: "${TIMEZONE}"
               SILLYTAVERN_LISTEN: "true"
