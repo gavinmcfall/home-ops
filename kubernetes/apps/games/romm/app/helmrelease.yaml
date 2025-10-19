@@ -151,5 +151,3 @@ spec:
                 subPath: redis-data
               - path: /romm/config
                 subPath: config
-              - path: /tmp
-                subPath: tmp
