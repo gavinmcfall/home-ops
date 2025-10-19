@@ -142,3 +142,14 @@ spec:
         path: /mnt/storage0/media/Library/Emulation/
         globalMounts:
           - path: /romm/library
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          romm:
+            app:
+              - path: /redis-data
+                subPath: redis-data
+              - path: /romm/config
+                subPath: config
+              - path: /tmp
+                subPath: tmp
