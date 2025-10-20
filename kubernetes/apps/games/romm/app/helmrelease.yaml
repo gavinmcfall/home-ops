@@ -33,7 +33,7 @@ spec:
           init-db:
             image:
               repository: ghcr.io/home-operations/postgres-init
-              tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
+              tag: 17.6.0@sha256:1895c339b3c7ca62d52f809f5e4c747d78fc8291ea5ee88b3b57df84acf33449
             envFrom: &envFrom
               - secretRef:
                   name: romm-secret
@@ -42,7 +42,7 @@ spec:
             image:
               repository: ghcr.io/rommapp/romm
               #tag: 4.3.2@sha256:1895c339b3c7ca62d52f809f5e4c747d78fc8291ea5ee88b3b57df84acf33449
-              tag: 4.3.0@sha256:a492592dad85b7d9bae9fca9ac958eb04492e383002abbd3566a7efb3b251091
+              tag: 4.3.2@sha256:a492592dad85b7d9bae9fca9ac958eb04492e383002abbd3566a7efb3b251091
             env:
               ROMM_DB_DRIVER: postgresql
               ROMM_BASE_PATH: /romm
@@ -62,28 +62,23 @@ spec:
               LAUNCHBOX_API_ENABLED: "true"
               TZ: ${TIMEZONE}
             envFrom: *envFrom
-            # probes:
-            #   liveness: &probes
-            #     enabled: true
-            #     custom: true
-            #     spec:
-            #       httpGet:
-            #         path: /
-            #         port: &port 8080
-            #       initialDelaySeconds: 0
-            #       periodSeconds: 10
-            #       timeoutSeconds: 1
-            #       failureThreshold: 3
-            #   readiness: *probes
-            # securityContext:
-            #   allowPrivilegeEscalation: false
-            #   readOnlyRootFilesystem: true
-            #   capabilities: {drop: ["ALL"]}
+            probes:
+              liveness: &probes
+                enabled: true
+              readiness: *probes
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 10m
-              limits:
-                memory: 4Gi
+                memory: 500Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -98,7 +93,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: *port
+            port: 8080
     ingress:
       app:
         className: external
@@ -119,20 +114,17 @@ spec:
           - path: /romm/config/config.yml
             subPath: config.yml
             readOnly: false
-      nginx-conf:
-        type: emptyDir
-        globalMounts:
-          - path: /etc/nginx/conf.d
-      assets:
-        existingClaim: romm-assets
-        globalMounts:
-          - path: /romm/assets
-            readOnly: false
-      resources:
-        existingClaim: romm-resources
-        globalMounts:
-          - path: /romm/resources
-            readOnly: false
+      data:
+        existingClaim: romm-data
+        advancedMounts:
+          romm:
+            app:
+              - path: /romm/config
+                subPath: config
+              - path: /romm/assets
+                subPath: assets
+              - path: /romm/resources
+                subPath: resources
       tmp:
         type: emptyDir
         sizeLimit: 1Gi
