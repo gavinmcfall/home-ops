@@ -104,7 +104,7 @@ spec:
         globalMounts:
           - path: /romm/config/config.yml
             subPath: config.yml
-            readOnly: false
+            readOnly: true
       data:
         existingClaim: romm-data
         advancedMounts:
