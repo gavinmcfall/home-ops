@@ -78,8 +78,8 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [44, 10000]
-        seccompProfile: {type: RuntimeDefault}
+        # supplementalGroups: [44, 10000]
+        # seccompProfile: {type: RuntimeDefault}
     service:
       app:
         controller: *app
@@ -117,6 +117,10 @@ spec:
                 subPath: assets
               - path: /romm/resources
                 subPath: resources
+      nginx-conf:
+        type: emptyDir
+        globalMounts:
+          - path: /etc/nginx/conf.d
       tmp:
         type: emptyDir
         sizeLimit: 1Gi
