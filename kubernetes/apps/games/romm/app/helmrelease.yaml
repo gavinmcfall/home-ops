@@ -46,6 +46,7 @@ spec:
             env:
               ROMM_DB_DRIVER: postgresql
               ROMM_BASE_PATH: /romm
+              ROMM_PORT: &port 8080
               DISABLE_DOWNLOAD_ENDPOINT_AUTH: true
               ENABLE_SCHEDULED_RESCAN: "true"
               SCHEDULED_RESCAN_CRON: "0 3 * * *"
@@ -65,12 +66,16 @@ spec:
             probes:
               liveness: &probes
                 enabled: true
-              readiness: *probes
-              startup:
-                enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 5
+                  httpGet:
+                    path: /
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
             resources:
               requests:
                 cpu: 10m
@@ -93,7 +98,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 80
+            port: *port
     ingress:
       app:
         className: external
@@ -106,7 +111,6 @@ spec:
                 service:
                   identifier: app
                   port: http
-
     persistence:
       config:
         type: configMap
