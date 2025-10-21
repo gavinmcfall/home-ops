@@ -63,19 +63,6 @@ spec:
               LAUNCHBOX_API_ENABLED: "true"
               TZ: ${TIMEZONE}
             envFrom: *envFrom
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /
-                    port: *port
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
             resources:
               requests:
                 cpu: 10m
