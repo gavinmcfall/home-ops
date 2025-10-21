@@ -62,15 +62,15 @@ spec:
               LAUNCHBOX_API_ENABLED: "true"
               TZ: ${TIMEZONE}
             envFrom: *envFrom
-            # probes:
-            #   liveness: &probes
-            #     enabled: true
-            #   readiness: *probes
-            #   startup:
-            #     enabled: true
-            #     spec:
-            #       failureThreshold: 30
-            #       periodSeconds: 5
+            probes:
+              liveness: &probes
+                enabled: true
+              readiness: *probes
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
             resources:
               requests:
                 cpu: 10m
@@ -93,7 +93,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 8080
+            port: 80
     ingress:
       app:
         className: external
@@ -106,6 +106,7 @@ spec:
                 service:
                   identifier: app
                   port: http
+
     persistence:
       config:
         type: configMap
