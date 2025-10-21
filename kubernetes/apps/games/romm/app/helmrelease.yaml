@@ -62,15 +62,15 @@ spec:
               LAUNCHBOX_API_ENABLED: "true"
               TZ: ${TIMEZONE}
             envFrom: *envFrom
-            probes:
-              liveness: &probes
-                enabled: true
-              readiness: *probes
-              startup:
-                enabled: true
-                spec:
-                  failureThreshold: 30
-                  periodSeconds: 5
+            # probes:
+            #   liveness: &probes
+            #     enabled: true
+            #   readiness: *probes
+            #   startup:
+            #     enabled: true
+            #     spec:
+            #       failureThreshold: 30
+            #       periodSeconds: 5
             resources:
               requests:
                 cpu: 10m
