@@ -110,8 +110,6 @@ spec:
         advancedMounts:
           romm:
             app:
-              - path: /romm/config
-                subPath: config
               - path: /romm/assets
                 subPath: assets
               - path: /romm/resources
@@ -120,9 +118,17 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /etc/nginx/conf.d
-      tmp:
+      tmpfs:
         type: emptyDir
-        sizeLimit: 1Gi
+        advancedMounts:
+          romm:
+            app:
+              - path: /redis-data
+                subPath: redis-data
+              - path: /romm/config
+                subPath: config
+              - path: /tmp
+                subPath: tmp
       media:
         type: nfs
         server: citadel.internal
