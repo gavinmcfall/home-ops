@@ -85,7 +85,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: *port
+            port: 80
     ingress:
       app:
         className: external
