@@ -46,7 +46,6 @@ spec:
             env:
               ROMM_DB_DRIVER: postgresql
               ROMM_BASE_PATH: /romm
-              ROMM_PORT: &port 8080
               DISABLE_DOWNLOAD_ENDPOINT_AUTH: true
               ENABLE_SCHEDULED_RESCAN: "true"
               SCHEDULED_RESCAN_CRON: "0 3 * * *"
@@ -85,7 +84,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 80
+            port: 8080
     ingress:
       app:
         className: external
