@@ -8,7 +8,7 @@ resources:
   - ./audiobookshelf/ks.yaml
   - ./calibre-web/ks.yaml
   - ./fileflows/ks.yaml
-  # - ./jellyfin/ks.yaml
+  - ./jellyfin/ks.yaml
   # - ./freshrss/ks.yaml
   - ./kavita/ks.yaml
   - ./overseerr/ks.yaml

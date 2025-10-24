@@ -38,14 +38,11 @@ spec:
           app:
             image:
               repository: ghcr.io/jellyfin/jellyfin
-              tag: 10.9.6
+              tag: 10.11.0@sha256:519b02989eafcc4bdb558bdc7014c2395c19608e5c2d7ed99a5f3edd0c75f7ef
             env:
               TZ: ${TIMEZONE}
               JELLYFIN_PublishedServerUrl: https://jellyfin.${SECRET_DOMAIN}
               DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "false"
-            envFrom:
-              - secretRef:
-                  name: jellyfin-secret
             probes:
               liveness: &tcpProbes
                 enabled: true
@@ -85,26 +82,29 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [44, 10000]
         seccompProfile: { type: RuntimeDefault }
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values: [plex]
+              topologyKey: kubernetes.io/hostname
       nodeSelector:
         intel.feature.node.kubernetes.io/gpu: "true"
     service:
       app:
         controller: jellyfin
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: 10.90.3.208
         ports:
           http:
             port: 8096
     ingress:
       app:
         annotations:
-          gethomepage.dev/enabled: "true"
-          gethomepage.dev/group: Entertainment
-          gethomepage.dev/name: Jellyfin
-          gethomepage.dev/app: *app
-          gethomepage.dev/icon: jellyfin.png
-          gethomepage.dev/description: Media Server
-          gethomepage.dev/widget.type: jellyfin
-          gethomepage.dev/widget.url: https://jellyfin.${SECRET_DOMAIN}
-          gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_JELLYFIN_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         className: external
         hosts:
