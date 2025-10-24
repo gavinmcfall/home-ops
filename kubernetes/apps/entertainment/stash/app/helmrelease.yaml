@@ -36,6 +36,8 @@ spec:
               STASH_METADATA: /data/metadata/
               STASH_CACHE: /data/cache/
               STASH_PORT: &port 9999
+              USER: 568
+              HOME: /config
             probes:
               liveness: &probe
                 enabled: true
