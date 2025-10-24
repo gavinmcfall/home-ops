@@ -34,8 +34,6 @@ spec:
               STASH_BLOBS_PATH: /blobs
               STASH_BLOBS_STORAGE: FILESYSTEM
               STASH_CACHE: /cache
-              STASH_CONFIG_FILE: /config/config.yml
-              STASH_DATABASE: /config/stash-go.sqlite
               STASH_GENERATED: /generated
               STASH_PLUGINS_PATH: /plugins
               STASH_PORT: &port 9999
