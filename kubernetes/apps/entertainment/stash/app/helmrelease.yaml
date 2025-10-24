@@ -107,7 +107,6 @@ spec:
         path: /mnt/storage0/media
         globalMounts:
           - path: /media
-            subPath: Library/Private
       tmpfs:
         type: emptyDir
         advancedMounts:
