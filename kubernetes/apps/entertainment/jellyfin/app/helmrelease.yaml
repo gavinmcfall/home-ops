@@ -1,0 +1,138 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app jellyfin
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: intel-device-plugin-gpu
+      namespace: kube-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
+  values:
+    controllers:
+      jellyfin:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/jellyfin/jellyfin
+              tag: 10.9.6
+            env:
+              TZ: ${TIMEZONE}
+              JELLYFIN_PublishedServerUrl: https://jellyfin.${SECRET_DOMAIN}
+              DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "false"
+            envFrom:
+              - secretRef:
+                  name: jellyfin-secret
+            probes:
+              liveness: &tcpProbes
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: http
+                  initialDelaySeconds: 30
+                  periodSeconds: 20
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              readiness: *tcpProbes
+              startup:
+                enabled: true
+                spec:
+                  tcpSocket:
+                    port: http
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 200m
+                memory: 1Gi
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 8Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [44, 10000]
+        seccompProfile: { type: RuntimeDefault }
+      nodeSelector:
+        intel.feature.node.kubernetes.io/gpu: "true"
+    service:
+      app:
+        controller: jellyfin
+        ports:
+          http:
+            port: 8096
+    ingress:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Entertainment
+          gethomepage.dev/name: Jellyfin
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: jellyfin.png
+          gethomepage.dev/description: Media Server
+          gethomepage.dev/widget.type: jellyfin
+          gethomepage.dev/widget.url: https://jellyfin.${SECRET_DOMAIN}
+          gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_JELLYFIN_TOKEN}}` }}"
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        className: external
+        hosts:
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+    persistence:
+      config:
+        existingClaim: jellyfin
+        globalMounts:
+          - path: /config
+      cache:
+        type: emptyDir
+        sizeLimit: 5Gi
+        globalMounts:
+          - path: /cache
+      transcode:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 16Gi
+        globalMounts:
+          - path: /transcode
+      media:
+        type: nfs
+        server: 10.90.1.69
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /media
