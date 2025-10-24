@@ -116,6 +116,10 @@ spec:
         existingClaim: whisparr
       tmp:
         type: emptyDir
+      run:
+        type: emptyDir
+        globalMounts:
+          - path: /run
       media:
         type: nfs
         server: citadel.internal
