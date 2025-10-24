@@ -51,7 +51,7 @@ spec:
               WHISPARR__BRANCH: develop
               WHISPARR__INSTANCE_NAME: Whisparr
               WHISPARR__LOG_LEVEL: info
-              WHISPARR__PORT: &port 80
+              WHISPARR__PORT: &port 6969
               TZ: ${TIMEZONE}
             envFrom: *envFrom
             probes:
@@ -62,7 +62,7 @@ spec:
                   httpGet:
                     path: /ping
                     port: *port
-                  initialDelaySeconds: 0
+                  initialDelaySeconds: 30
                   periodSeconds: 10
                   timeoutSeconds: 1
                   failureThreshold: 3
