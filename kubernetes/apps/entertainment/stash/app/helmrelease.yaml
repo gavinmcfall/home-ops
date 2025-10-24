@@ -98,7 +98,8 @@ spec:
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media/Library/Private
+          - path: /media
+            subPath: Library/Private
       tmpfs:
         type: emptyDir
         advancedMounts:
