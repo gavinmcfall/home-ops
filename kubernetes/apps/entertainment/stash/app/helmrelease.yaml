@@ -25,7 +25,7 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          stash:
+          app:
             image:
               repository: stashapp/stash
               tag: v0.29.1@sha256:cd73199fd716172c4cf8f5b98ac18ac641c3b68f3efc84a62454da88421a45ea
@@ -64,7 +64,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [10000]
     service:
-      stash:
+      app:
         controller: stash
         ports:
           http:
