@@ -130,6 +130,11 @@ spec:
         sizeLimit: 16Gi
         globalMounts:
           - path: /transcode
+      tmp:
+        type: emptyDir
+        sizeLimit: 1Gi
+        globalMounts:
+          - path: /tmp
       media:
         type: nfs
         server: 10.90.1.69
