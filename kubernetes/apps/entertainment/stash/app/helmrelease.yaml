@@ -24,6 +24,21 @@ spec:
       stash:
         annotations:
           reloader.stakater.com/auto: "true"
+        # initContainers:
+        #   init-perms:
+        #     image:
+        #       repository: docker.io/library/alpine
+        #       tag: 3.20.3
+        #     command:
+        #       - /bin/sh
+        #       - -c
+        #     args:
+        #       - |
+        #         set -e
+        #         mkdir -p /root/.stash /blobs /generated /metadata /plugins /scrapers
+        #         chown -R 568:568 /root/.stash /blobs /generated /metadata /plugins /scrapers || true
+        #     securityContext:
+        #       runAsUser: 0
         containers:
           app:
             image:
@@ -31,15 +46,18 @@ spec:
               tag: v0.29.1@sha256:cd73199fd716172c4cf8f5b98ac18ac641c3b68f3efc84a62454da88421a45ea
             env:
               TZ: ${TIMEZONE}
+              STASH_STASH: /media/
               STASH_BLOBS_PATH: /blobs
               STASH_BLOBS_STORAGE: FILESYSTEM
-              STASH_CACHE: /cache
               STASH_GENERATED: /generated
+              STASH_METADATA: /metadata
+              STASH_CACHE: /cache
               STASH_PLUGINS_PATH: /plugins
-              STASH_PORT: &port 9999
               STASH_SCRAPERS_PATH: /scrapers
-              USER: 568
-              HOME: /config
+              STASH_PORT: &port 9999
+              STASH_OPEN_BROWSER: "false"
+              USER: "568"
+              HOME: /root
             probes:
               liveness: &probe
                 enabled: true
