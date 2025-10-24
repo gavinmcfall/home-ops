@@ -31,11 +31,13 @@ spec:
               tag: v0.29.1@sha256:cd73199fd716172c4cf8f5b98ac18ac641c3b68f3efc84a62454da88421a45ea
             env:
               TZ: ${TIMEZONE}
-              STASH_STASH: /media/
-              STASH_GENERATED: /data/generated/
-              STASH_METADATA: /data/metadata/
-              STASH_CACHE: /data/cache/
-              STASH_PORT: &port 9999
+              STASH_BLOBS_PATH: /blobs
+              STASH_BLOBS_STORAGE: FILESYSTEM
+              STASH_CACHE: /cache
+              STASH_CONFIG_FILE: /config/config.yml
+              STASH_DATABASE: /config/stash-go.sqlite
+              STASH_GENERATED: /generated
+              STASH_PLUGINS_PATH: /plugins
               USER: 568
               HOME: /config
             probes:
