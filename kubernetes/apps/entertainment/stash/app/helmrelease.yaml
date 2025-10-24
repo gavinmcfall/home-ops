@@ -95,7 +95,7 @@ spec:
             subPath: metadata
       media:
         type: nfs
-        server: citadel.local
+        server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
           - path: /media/Library/Private
