@@ -38,6 +38,8 @@ spec:
               STASH_DATABASE: /config/stash-go.sqlite
               STASH_GENERATED: /generated
               STASH_PLUGINS_PATH: /plugins
+              STASH_PORT: &port 9999
+              STASH_SCRAPERS_PATH: /scrapers
               USER: 568
               HOME: /config
             probes:
