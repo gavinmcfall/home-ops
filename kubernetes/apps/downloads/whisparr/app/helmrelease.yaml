@@ -43,6 +43,8 @@ spec:
               repository: ghcr.io/hotio/whisparr
               tag: v3-3.0.1.1319@sha256:771f1e03bbf03856a7d092c69881cf5b98d958182441ab4f066980a45772e557
             env:
+              PUID: "568"
+              PGID: "568"
               WHISPARR__ANALYTICS_ENABLED: "False"
               WHISPARR__AUTHENTICATION_METHOD: External
               WHISPARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
@@ -77,8 +79,8 @@ spec:
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
+        runAsUser: 0
+        runAsGroup: 0
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [10000]
@@ -115,10 +117,6 @@ spec:
         existingClaim: whisparr
       tmp:
         type: emptyDir
-      run:
-        type: emptyDir
-        globalMounts:
-          - path: /run
       media:
         type: nfs
         server: citadel.internal
