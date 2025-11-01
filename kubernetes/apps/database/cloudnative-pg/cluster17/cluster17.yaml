@@ -19,6 +19,7 @@ spec:
     parameters:
       max_connections: "200"
       shared_buffers: 256MB
+      wal_keep_size: 2GB
     # shared_preload_libraries:
     #   - "vectors.so"
   resources:
@@ -35,7 +36,7 @@ spec:
       - regex: cluster
         action: labeldrop
   backup:
-    retentionPolicy: 30d
+    retentionPolicy: 60d
     barmanObjectStore: &barmanObjectStore
       data:
         compression: bzip2
