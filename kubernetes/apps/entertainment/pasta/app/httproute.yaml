@@ -3,23 +3,24 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: pasta-envoy
+  name: pasta
   namespace: entertainment
   annotations:
     external-dns.alpha.kubernetes.io/target: envoy.${SECRET_DOMAIN}
-    external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
     gethomepage.dev/enabled: "true"
-    gethomepage.dev/name: Pasta (Envoy)
-    gethomepage.dev/description: Plex Audio Management (Envoy test)
+    gethomepage.dev/name: Pasta
+    gethomepage.dev/description: Plex Audio Management
     gethomepage.dev/group: Entertainment
     gethomepage.dev/icon: mdi-noodles-#FFFFFF
 spec:
   parentRefs:
-    - name: external
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: external
       namespace: network
       sectionName: https
   hostnames:
-    - pasta-envoy.${SECRET_DOMAIN}
+    - pasta.${SECRET_DOMAIN}
   rules:
     - matches:
         - path:
