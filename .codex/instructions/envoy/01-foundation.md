@@ -35,7 +35,7 @@
    - After ingress-nginx is removed, delete its legacy certificate resources to avoid duplicate renewals.
 
 5. **Update External-DNS configuration**
-   - Add `gateway-httproute` to the External-DNS `sources` list so Gateway HTTPRoutes are discovered alongside CRDs and Ingress resources.
+   - Once Envoy Gateway CRDs are installed, add `gateway-httproute` to the External-DNS `sources` list so Gateway HTTPRoutes are discovered alongside CRDs and Ingress resources.
    - Leave `--source=ingress` during coexistence.
 
 6. **Monitoring hooks**
