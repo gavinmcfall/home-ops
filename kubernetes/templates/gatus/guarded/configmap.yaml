@@ -10,15 +10,15 @@ data:
     endpoints:
       - name: "${APP}"
         group: guarded
-        url: 1.1.1.1
+        url: "${GATUS_URL:-1.1.1.1}"
         interval: 1m
         ui:
           hide-hostname: true
           hide-url: true
-        dns:
+${GATUS_DNS_BLOCK:-        dns:
           query-name: "${GATUS_SUBDOMAIN:-${APP}}.nerdz.cloud"
-          query-type: A
+          query-type: A}
         conditions:
-          - "len([BODY]) == 0"
+          - "${GATUS_CONDITION:-len([BODY]) == 0}"
         alerts:
           - type: pushover
