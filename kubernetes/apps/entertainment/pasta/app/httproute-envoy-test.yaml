@@ -6,7 +6,7 @@ metadata:
   name: pasta-envoy
   namespace: entertainment
   annotations:
-    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+    external-dns.alpha.kubernetes.io/target: envoy.${SECRET_DOMAIN}
     gethomepage.dev/enabled: "true"
     gethomepage.dev/name: Pasta (Envoy)
     gethomepage.dev/description: Plex Audio Management (Envoy test)
