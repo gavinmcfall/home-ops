@@ -2,7 +2,7 @@
 
 | App / Hostname | Namespace | Current NGINX behaviour | Envoy resources needed | Notes / Status |
 | -------------- | --------- | ----------------------- | ---------------------- | -------------- |
-| Pasta (`pasta.${SECRET_DOMAIN}`) | entertainment | 3600 s proxy read/send timeout; homepage annotations | `HTTPRoute` with `timeouts.request/backendRequest=3600s`; reuse homepage annotations | Test host `pasta-envoy.${SECRET_DOMAIN}` created as first HTTPRoute |
+| Pasta (`pasta.${SECRET_DOMAIN}`) | entertainment | 3600 s proxy read/send timeout; homepage annotations | `HTTPRoute` with `timeouts.request/backendRequest=3600s`; reuse homepage annotations | Envoy test host `pasta-envoy.${SECRET_DOMAIN}` returning 200 (points at same service) |
 | Manyfold (`3d.${SECRET_DOMAIN}`) | home | 600 s proxy timeouts; unlimited body size | `HTTPRoute` + timeout override; evaluate max body via `EnvoyPatchPolicy` | Pending |
 | Rook RGW (`s3.${SECRET_DOMAIN}`) | rook-ceph | 3600 s timeouts; proxy body size 0; buffering off | `HTTPRoute`; custom patch to disable buffering / raise limits | Pending |
 | Syncthing (`sync.${SECRET_DOMAIN}`) | storage | CIDR allowlist for ingress | `EnvoyPatchPolicy` injecting RBAC filter or NetworkPolicy | Pending |

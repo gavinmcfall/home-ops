@@ -6,7 +6,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: pasta
+    app.kubernetes.io/name: pasta
   ports:
     - name: tcp
       protocol: TCP
