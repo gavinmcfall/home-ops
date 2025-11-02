@@ -37,9 +37,8 @@ spec:
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
-      - --source=gateway
     policy: sync
-    sources: ["crd", "ingress", "gateway"]
+    sources: ["crd", "ingress"]
     txtPrefix: k8s.
     txtOwnerId: default
     domainFilters: ["${SECRET_DOMAIN}"]
