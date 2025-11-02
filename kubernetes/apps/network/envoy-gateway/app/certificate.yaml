@@ -21,7 +21,7 @@ metadata:
   name: envoy-gateway-tls
 spec:
   secretStoreRefs:
-    - name: onepassword
+    - name: onepassword-connect
       kind: ClusterSecretStore
   selector:
     secret:
