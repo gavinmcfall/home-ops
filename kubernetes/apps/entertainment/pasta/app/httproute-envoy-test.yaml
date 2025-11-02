@@ -7,6 +7,7 @@ metadata:
   namespace: entertainment
   annotations:
     external-dns.alpha.kubernetes.io/target: envoy.${SECRET_DOMAIN}
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
     gethomepage.dev/enabled: "true"
     gethomepage.dev/name: Pasta (Envoy)
     gethomepage.dev/description: Plex Audio Management (Envoy test)
