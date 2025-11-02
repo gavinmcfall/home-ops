@@ -31,7 +31,7 @@
 
 4. **Provision Envoy TLS secret**
    - Create a dedicated cert-manager `Certificate` (`envoy-gateway`) that issues `envoy-gateway-${SECRET_DOMAIN/./-}-tls` covering `${SECRET_DOMAIN}` and `*.${SECRET_DOMAIN}`.
-   - Add a `PushSecret` that publishes the TLS material to the `onepassword` `ClusterSecretStore` under the same name for out-of-cluster access.
+   - Add a `PushSecret` that publishes the TLS material to the `onepassword-connect` `ClusterSecretStore` under the same name for out-of-cluster access.
    - After ingress-nginx is removed, delete its legacy certificate resources to avoid duplicate renewals.
 
 5. **Update External-DNS configuration**
