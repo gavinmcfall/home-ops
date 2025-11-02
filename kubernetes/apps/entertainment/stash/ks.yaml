@@ -23,6 +23,3 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 2Gi
-      GATUS_URL: "http://stash.entertainment.svc.cluster.local:9999/healthz"
-      GATUS_CONDITION: "[STATUS] == 200"
-      GATUS_DNS_BLOCK: ""
