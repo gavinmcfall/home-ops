@@ -16,4 +16,3 @@ resources:
   # - ./netboot/ks.yaml
   - ./oauth2-proxy/ks.yaml
   - ./tailscale/ks.yaml
-  - ./test-push-secret.yaml
