@@ -35,7 +35,8 @@
    - After ingress-nginx is removed, delete its legacy certificate resources to avoid duplicate renewals.
 
 5. **Update External-DNS configuration**
-   - Extend Helm values to include `--source=gateway` and optionally `--gateway-classes=envoy-external,envoy-internal`.
+   - Extend Helm values to include `--source=gateway`.
+   - (Optional) Add `--gateway-classes=envoy-external,envoy-internal` if/when your ExternalDNS build exposes that flag.
    - Leave `--source=ingress` during coexistence.
 
 6. **Monitoring hooks**
