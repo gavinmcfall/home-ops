@@ -5,7 +5,7 @@
 ## Goals
 - Deploy Envoy Gateway controller and CRDs without disrupting ingress-nginx.
 - Define GatewayClasses, EnvoyProxy specs, and Gateways mirroring existing ingress behaviour.
-- Prepare supporting systems (External-DNS, cert-manager references, reference grants).
+- Prepare supporting systems (External-DNS, cert-manager-managed TLS secret, monitoring).
 
 ## Tasks
 1. **Add Envoy Gateway Helm repo + release**
@@ -25,13 +25,14 @@
    - `GatewayClass envoy-external` → references external EnvoyProxy.
    - `GatewayClass envoy-internal` → references internal EnvoyProxy.
    - `Gateway` objects in `network` namespace replicating current listener setup:
-     - External gateway: HTTP 80 & HTTPS 443 listeners, wildcard TLS secret `network/${SECRET_DOMAIN/./-}-production-tls`, DNS annotations for external-dns + Cilium IPAM.
+     - External gateway: HTTP 80 & HTTPS 443 listeners, wildcard TLS secret `network/envoy-gateway-${SECRET_DOMAIN/./-}-tls`, DNS annotations for external-dns + Cilium IPAM.
      - Internal gateway: same TLS secret, IP 10.90.3.202, restricted to internal use.
      - `allowedRoutes`: HTTP limited to same namespace, HTTPS allows all (matching nginx admission selectors).
 
-4. **Reference Grants & Secrets**
-   - Add `ReferenceGrant` objects so routes in other namespaces can reference `network/${SECRET_DOMAIN/./-}-production-tls` and other secrets/configmaps hosted in `network`.
-   - Confirm cert-manager Certificates require no change (secret names unchanged).
+4. **Provision Envoy TLS secret**
+   - Create a dedicated cert-manager `Certificate` (`envoy-gateway`) that issues `envoy-gateway-${SECRET_DOMAIN/./-}-tls` covering `${SECRET_DOMAIN}` and `*.${SECRET_DOMAIN}`.
+   - Add a `PushSecret` that publishes the TLS material to the `onepassword` `ClusterSecretStore` under the same name for out-of-cluster access.
+   - After ingress-nginx is removed, delete its legacy certificate resources to avoid duplicate renewals.
 
 5. **Update External-DNS configuration**
    - Extend Helm values to include `--source=gateway` and optionally `--gateway-classes=envoy-external,envoy-internal`.
