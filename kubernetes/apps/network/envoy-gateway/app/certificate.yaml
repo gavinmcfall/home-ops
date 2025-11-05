@@ -6,6 +6,9 @@ metadata:
   name: envoy-gateway
 spec:
   secretName: "envoy-gateway-${SECRET_DOMAIN/./-}-tls"
+  secretTemplate:
+    labels:
+      app.kubernetes.io/name: envoy-gateway-tls
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
@@ -25,7 +28,9 @@ spec:
       kind: ClusterSecretStore
   selector:
     secret:
-      name: "envoy-gateway-${SECRET_DOMAIN/./-}-tls"
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: envoy-gateway-tls
   template:
     data:
       tls.crt: '{{ index . "tls.crt" | b64enc }}'
