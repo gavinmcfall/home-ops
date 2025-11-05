@@ -10,3 +10,13 @@ ingress:
   - hostname: "sonarr.${SECRET_DOMAIN}"
     service: https://envoy-external.network.svc.cluster.local:443
   - service: http_status:404
+  - hostname: "sonarr.${SECRET_DOMAIN}"
+    service: https://envoy-external.network.svc.cluster.local:443
+
+route:
+  app:
+    hostnames: ["{{ .Release.Name }}.domain"]
+    parentRefs:
+      - name: internal
+        namespace: network
+        sectionName: https
