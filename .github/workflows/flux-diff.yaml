@@ -1,29 +1,65 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: "Flux Diff"
+name: Flux Local
 
 on:
   pull_request:
     branches: ["main"]
-    paths: ["kubernetes/**"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  flux-diff:
-    name: Flux Diff
+  filter:
+    name: Flux Local - Filter
+    runs-on: ubuntu-latest
+    outputs:
+      changed-files: ${{ steps.changed-files.outputs.changed_files }}
+    steps:
+      - name: Get Changed Files
+        id: changed-files
+        uses: bjw-s-labs/action-changed-files@1a5aeab1bfa64d0c4e786f501d5a3f1fad4a24da # v0.4.1
+        with:
+          patterns: kubernetes/**/*
+
+  test:
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    needs: filter
+    name: Flux Local - Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Run flux-local test
+        uses: docker://ghcr.io/allenporter/flux-local:v7.11.0
+        with:
+          args: >-
+            test
+            --all-namespaces
+            --enable-helm
+            --path /github/workspace/kubernetes/flux
+            --sources "home-kubernetes"
+            --verbose
+
+  diff:
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    needs: filter
+    name: Flux Local - Diff
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
     strategy:
       matrix:
-        paths: ["kubernetes"]
-        resources: ["helmrelease", "kustomization"]
+        resource: ["helmrelease", "kustomization"]
+      fail-fast: false
     steps:
-      - name: Checkout
+      - name: Checkout Pull Request Branch
         uses: actions/checkout@v5
         with:
           path: pull
@@ -34,37 +70,52 @@ jobs:
           ref: "${{ github.event.repository.default_branch }}"
           path: default
 
-      - name: Diff Resources
+      - name: Run flux-local diff
         uses: docker://ghcr.io/allenporter/flux-local:v7.11.0
         with:
           args: >-
-            diff ${{ matrix.resources }}
+            diff ${{ matrix.resource }}
             --unified 6
-            --path /github/workspace/pull/${{ matrix.paths }}/flux
-            --path-orig /github/workspace/default/${{ matrix.paths }}/flux
+            --path /github/workspace/pull/kubernetes/flux
+            --path-orig /github/workspace/default/kubernetes/flux
             --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart"
             --limit-bytes 10000
             --all-namespaces
             --sources "home-kubernetes"
             --output-file diff.patch
 
-      - name: Prepare Comment
+      - name: Generate Diff
         id: diff
-        run: |
+        run: |-
           if [[ -s diff.patch ]]; then
-            cat diff.patch
-            {
-              echo '```diff'
-              cat diff.patch
-              echo '```'
-            } > diff-comment.txt
-            echo "has_diff=true" >> "$GITHUB_OUTPUT"
+            echo "diff<<'EOF'" >> "$GITHUB_OUTPUT"
+            cat diff.patch >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
           fi
 
-      - if: ${{ steps.diff.outputs.has_diff == 'true' }}
-        name: Add comment
+      - if: ${{ steps.diff.outputs.diff != '' }}
+        name: Add Comment
         uses: mshick/add-pr-comment@v2
         with:
-          message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}"
+          message-id: "${{ github.event.pull_request.number }}/kubernetes/${{ matrix.resource }}"
           message-failure: Diff was not successful
-          message-path: diff-comment.txt
+          message: |
+            ```diff
+            ${{ steps.diff.outputs.diff }}
+            ```
+
+  success:
+    if: ${{ !cancelled() }}
+    needs:
+      - test
+      - diff
+    name: Flux Local - Success
+    runs-on: ubuntu-latest
+    steps:
+      - name: Any jobs failed?
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
+      - name: All jobs passed or skipped?
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: echo "All jobs passed or skipped" && echo "${{ toJSON(needs.*.result) }}"
