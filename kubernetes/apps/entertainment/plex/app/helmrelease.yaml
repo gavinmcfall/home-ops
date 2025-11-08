@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -22,12 +23,12 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-  - name: intel-device-plugin-gpu
-    namespace: kube-system
-  - name: rook-ceph-cluster
-    namespace: rook-ceph
-  - name: volsync
-    namespace: volsync-system
+    - name: intel-device-plugin-gpu
+      namespace: kube-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
   values:
     controllers:
       plex:
@@ -105,34 +106,34 @@ spec:
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_PLEX_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         parentRefs:
-        - name: external
-          namespace: network
-          sectionName: https
+          - name: external
+            namespace: network
+            sectionName: https
         hostnames:
-        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     persistence:
       config:
         existingClaim: plex
         # TODO: If setting up Plex for the first time, you'll want to add the globalMounts section
         globalMounts:
-        - path: /config/Library/Application Support/Plex Media Server
+          - path: /config/Library/Application Support/Plex Media Server
       # Separate PVC for cache to avoid backing up cache files
       cache:
         existingClaim: plex-cache
         globalMounts:
-        - path: /config/Library/Application Support/Plex Media Server/Cache
+          - path: /config/Library/Application Support/Plex Media Server/Cache
       logs:
         type: emptyDir
         globalMounts:
-        - path: /config/Library/Application Support/Plex Media Server/Logs
+          - path: /config/Library/Application Support/Plex Media Server/Logs
       tmp:
         type: emptyDir
       transcode:
@@ -142,4 +143,4 @@ spec:
         server: 10.90.1.69
         path: /mnt/storage0/media
         globalMounts:
-        - path: /media
+          - path: /media

@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -22,10 +23,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-  - name: rook-ceph-cluster
-    namespace: rook-ceph
-  - name: volsync
-    namespace: volsync-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
   values:
     controllers:
       sabnzbd:
@@ -49,8 +50,8 @@ spec:
                 sabnzbd.${SECRET_DOMAIN},
                 sab.tail21dd8.ts.net
             envFrom:
-            - secretRef:
-                name: sabnzbd-secret
+              - secretRef:
+                  name: sabnzbd-secret
             probes:
               liveness: &probes
                 enabled: true
@@ -103,40 +104,40 @@ spec:
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_SABNZBD_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         parentRefs:
-        - name: internal
-          namespace: network
-          sectionName: https
+          - name: internal
+            namespace: network
+            sectionName: https
         hostnames:
-        - sab.${SECRET_DOMAIN}
+          - sab.${SECRET_DOMAIN}
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-        - host: *app
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
+          - host: *app
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
-        - hosts:
-          - *app
+          - hosts:
+              - *app
     persistence:
       config:
         existingClaim: sabnzbd
       logs:
         type: emptyDir
         globalMounts:
-        - path: /config/logs
+          - path: /config/logs
       tmp:
         type: emptyDir
       media:
@@ -144,4 +145,4 @@ spec:
         server: 10.90.1.69
         path: /mnt/storage0/media
         globalMounts:
-        - path: /media
+          - path: /media

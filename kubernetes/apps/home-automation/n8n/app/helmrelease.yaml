@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -24,14 +25,14 @@ spec:
               repository: ghcr.io/rafaribe/postgres-init
               tag: 16
             envFrom: &envFrom
-            - secretRef:
-                name: n8n-secret
+              - secretRef:
+                  name: n8n-secret
         pod:
           securityContext:
             fsGroup: 568
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
-            - 568
+              - 568
         containers:
           app:
             image:
@@ -81,30 +82,30 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
         parentRefs:
-        - name: external
-          namespace: network
-          sectionName: https
+          - name: external
+            namespace: network
+            sectionName: https
         hostnames:
-        - *host
+          - *host
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     persistence:
       config:
         existingClaim: n8n
         globalMounts:
-        - path: /home/n8n/app
+          - path: /home/n8n/app
       media:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/media/Syncthing/obsidian
         globalMounts:
-        - path: /obsidian
+          - path: /obsidian
 
     resources:
       requests:

@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -40,13 +41,13 @@ spec:
               QDRANT__STORAGE__SNAPSHOT_PATH: "/qdrant/snapshots"
               QDRANT__TELEMETRY__DISABLE: "true"
             envFrom:
-            - secretRef:
-                name: qdrant-secret
+              - secretRef:
+                  name: qdrant-secret
             ports:
-            - name: http
-              containerPort: *http-port
-            - name: grpc
-              containerPort: *grpc-port
+              - name: http
+                containerPort: *http-port
+              - name: grpc
+                containerPort: *grpc-port
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -84,19 +85,19 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         parentRefs:
-        - name: internal
-          namespace: network
-          sectionName: https
+          - name: internal
+            namespace: network
+            sectionName: https
         hostnames:
-        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     persistence:
       data:
         enabled: true
@@ -104,7 +105,7 @@ spec:
         advancedMounts:
           qdrant:
             app:
-            - path: /qdrant/storage
-              subPath: storage
-            - path: /qdrant/snapshots
-              subPath: snapshots
+              - path: /qdrant/storage
+                subPath: storage
+              - path: /qdrant/snapshots
+                subPath: snapshots

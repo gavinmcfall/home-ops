@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -34,8 +35,8 @@ spec:
               repository: quay.io/oauth2-proxy/oauth2-proxy
               tag: v7.12.0@sha256:786bed0f000c0f8a7b31619244ebab02406a8856a4faf3f5fb1df61fbd6c30ed
             envFrom:
-            - secretRef:
-                name: oauth2-proxy-secret
+              - secretRef:
+                  name: oauth2-proxy-secret
             env:
               TZ: ${TIMEZONE}
               OAUTH2_PROXY_OIDC_ISSUER_URL: https://id.${SECRET_DOMAIN}
@@ -112,25 +113,25 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         parentRefs:
-        - name: external
-          namespace: network
-          sectionName: https
+          - name: external
+            namespace: network
+            sectionName: https
         hostnames:
-        - &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /oauth2
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /oauth2
     serviceMonitor:
       app:
         serviceName: *app
         endpoints:
-        - port: metrics
-          scheme: http
-          interval: 30s
-          scrapeTimeout: 5s
+          - port: metrics
+            scheme: http
+            interval: 30s
+            scrapeTimeout: 5s
 

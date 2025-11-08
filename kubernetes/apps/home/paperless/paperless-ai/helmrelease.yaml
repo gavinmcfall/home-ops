@@ -1,3 +1,4 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -25,8 +26,8 @@ spec:
             env:
               TZ: ${TIMEZONE}
             envFrom:
-            - secretRef:
-                name: paperless-ai-secret
+              - secretRef:
+                  name: paperless-ai-secret
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -56,59 +57,59 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         parentRefs:
-        - name: internal
-          namespace: network
-          sectionName: https
+          - name: internal
+            namespace: network
+            sectionName: https
         hostnames:
-        - &host paperless-ai.${SECRET_DOMAIN}
+          - &host paperless-ai.${SECRET_DOMAIN}
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-        - host: &app "{{ .Release.Name }}"
-          paths:
-          - path: /
-            pathType: Prefix
-            service:
-              identifier: app
-              port: http
+          - host: &app "{{ .Release.Name }}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
         tls:
-        - hosts:
-          - *app
+          - hosts:
+              - *app
     persistence:
       config:
         enabled: true
         existingClaim: paperless-ai
         globalMounts:
-        - path: /app/data
-        - path: /app/OPENAPI
+          - path: /app/data
+          - path: /app/OPENAPI
       cache:
         type: emptyDir
         globalMounts:
-        - path: /app/public/images
-        - path: /.cache
+          - path: /app/public/images
+          - path: /.cache
       home:
         type: emptyDir
         globalMounts:
-        - path: /.pm2
+          - path: /.pm2
       logs:
         type: emptyDir
         globalMounts:
-        - path: /app/logs
+          - path: /app/logs
       tmp:
         type: emptyDir
         globalMounts:
-        - path: /tmp
+          - path: /tmp
       ntlk:
         type: emptyDir
         globalMounts:
-        - path: /nltk_data
+          - path: /nltk_data

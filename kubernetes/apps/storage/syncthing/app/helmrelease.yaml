@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -14,10 +15,10 @@ spec:
         namespace: flux-system
   interval: 15m
   dependsOn:
-  - name: rook-ceph-cluster
-    namespace: rook-ceph
-  - name: volsync
-    namespace: volsync-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
   install:
     remediation:
       retries: 3
@@ -29,10 +30,10 @@ spec:
   driftDetection:
     mode: enabled
     ignore:
-    - paths:
-      - /spec/containers/resources/limits
-      target:
-        kind: Pod
+      - paths:
+          - /spec/containers/resources/limits
+        target:
+          kind: Pod
   values:
     controllers:
       syncthing:
@@ -95,35 +96,35 @@ spec:
           nginx.ingress.kubernetes.io/whitelist-source-range: |
             10.69.0.0/16,10.96.0.0/16,10.90.0.0/16
         parentRefs:
-        - name: internal
-          namespace: network
-          sectionName: https
+          - name: internal
+            namespace: network
+            sectionName: https
         hostnames:
-        - &host sync.${SECRET_DOMAIN}
+          - &host sync.${SECRET_DOMAIN}
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     persistence:
       data:
         existingClaim: *app
         globalMounts:
-        - path: /var/syncthing
+          - path: /var/syncthing
       files:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/media/
         globalMounts:
-        - path: /files
-          subPath: Syncthing
+          - path: /files
+            subPath: Syncthing
       emulation:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/media/
         globalMounts:
-        - path: /emulation/
-          subPath: Library/Emulation/
+          - path: /emulation/
+            subPath: Library/Emulation/

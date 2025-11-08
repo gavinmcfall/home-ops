@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/refs/heads/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,8 +24,8 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-  - name: rook-ceph-cluster
-    namespace: rook-ceph
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   values:
     controllers:
       server:
@@ -114,19 +115,19 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         parentRefs:
-        - name: internal
-          namespace: network
-          sectionName: https
+          - name: internal
+            namespace: network
+            sectionName: https
         hostnames:
-        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         rules:
-        - backendRefs:
-          - identifier: server
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: server
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     defaultPodOptions:
       securityContext:
         runAsUser: 568
@@ -142,58 +143,58 @@ spec:
         advancedMounts:
           server:
             ff-server:
-            - path: /app/Data
+              - path: /app/Data
       node-data:
         type: emptyDir
         advancedMounts:
           node:
             ff-node:
-            - path: /app/Data
+              - path: /app/Data
       logs:
         enabled: true
         existingClaim: fileflows-logs
         advancedMounts:
           server:
             ff-server:
-            - path: /app/Logs
-              subPath: ff-server
+              - path: /app/Logs
+                subPath: ff-server
           node:
             ff-node:
-            - path: /app/Logs
-              subPath: ff-node
+              - path: /app/Logs
+                subPath: ff-node
       manually-added:
         existingClaim: fileflows-manually-added
         globalMounts:
-        - path: /app/ManuallyAdded
+          - path: /app/ManuallyAdded
       temp:
         enabled: true
         type: emptyDir
         globalMounts:
-        - path: /temp
-          subPath: temp
+          - path: /temp
+            subPath: temp
           # Mutex
-        - path: /tmp
-          subPath: tmp
+          - path: /tmp
+            subPath: tmp
       common:
         type: emptyDir
         globalMounts:
-        - path: /app/common
+          - path: /app/common
       dockermods:
         type: emptyDir
         globalMounts:
-        - path: /app/DockerMods
+          - path: /app/DockerMods
       plugins:
         type: emptyDir
         globalMounts:
-        - path: /app/Plugins
+          - path: /app/Plugins
       templates:
         type: emptyDir
         globalMounts:
-        - path: /app/Templates
+          - path: /app/Templates
       i18n:
         type: emptyDir
         globalMounts:
-        - path: /app/Server/wwwroot/i18n
+          - path: /app/Server/wwwroot/i18n
       dri:
         hostPath: /dev/dri
         type: hostPath
@@ -202,10 +203,10 @@ spec:
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
-        - path: /media
+          - path: /media
       cache:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/cache
         globalMounts:
-        - path: /cache
+          - path: /cache

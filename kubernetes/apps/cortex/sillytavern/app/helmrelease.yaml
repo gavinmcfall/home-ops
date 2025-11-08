@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/common-3.7.3/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -70,38 +71,38 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         parentRefs:
-        - name: internal
-          namespace: network
-          sectionName: https
+          - name: internal
+            namespace: network
+            sectionName: https
         hostnames:
-        - tavern.${SECRET_DOMAIN}
+          - tavern.${SECRET_DOMAIN}
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     persistence:
       data:
         accessMode: ReadWriteOnce
         size: 8Gi
         globalMounts:
-        - subPath: config
-          path: /home/node/app/config
-        - subPath: data
-          path: /home/node/app/data
-        - subPath: plugins
-          path: /home/node/app/plugins
-        - subPath: extensions
-          path: /home/node/app/public/scripts/extensions/third-party
+          - subPath: config
+            path: /home/node/app/config
+          - subPath: data
+            path: /home/node/app/data
+          - subPath: plugins
+            path: /home/node/app/plugins
+          - subPath: extensions
+            path: /home/node/app/public/scripts/extensions/third-party
       tmp:
         type: emptyDir
         medium: Memory
         sizeLimit: 64Mi
         globalMounts:
-        - subPath: tmp
-          path: /tmp
-        - subPath: backups
-          path: /home/node/app/backups
+          - subPath: tmp
+            path: /tmp
+          - subPath: backups
+            path: /home/node/app/backups

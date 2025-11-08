@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -32,8 +33,8 @@ spec:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
             envFrom: &envFrom
-            - secretRef:
-                name: openwebui-secret
+              - secretRef:
+                  name: openwebui-secret
         containers:
           app:
             image:
@@ -104,42 +105,42 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         parentRefs:
-        - name: external
-          namespace: network
-          sectionName: https
+          - name: external
+            namespace: network
+            sectionName: https
         hostnames:
-        - "chat.${SECRET_DOMAIN}"
+          - "chat.${SECRET_DOMAIN}"
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-        - host: &app "chat"
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
+          - host: &app "chat"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
-        - hosts:
-          - *app
+          - hosts:
+              - *app
     persistence:
       config:
         existingClaim: open-webui-config
         advancedMounts:
           open-webui:
             app:
-            - path: /app/backend/data
-              subPath: data
-            - path: /app/backend/open_webui/static
-              subPath: static
+              - path: /app/backend/data
+                subPath: data
+              - path: /app/backend/open_webui/static
+                subPath: static
       tmp:
         type: emptyDir

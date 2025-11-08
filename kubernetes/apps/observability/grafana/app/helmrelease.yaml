@@ -54,9 +54,9 @@ spec:
       datasources.yaml:
         apiVersion: 1
         deleteDatasources:
-          - { name: Alertmanager, orgId: 1 }
-          - { name: Loki, orgId: 1 }
-          - { name: Prometheus, orgId: 1 }
+          - {name: Alertmanager, orgId: 1}
+          - {name: Loki, orgId: 1}
+          - {name: Prometheus, orgId: 1}
         datasources:
           - name: Prometheus
             type: prometheus
@@ -189,27 +189,31 @@ spec:
           revision: 9
           datasource: Prometheus
         cert-manager:
-          url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
+          url: 
+            https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
           datasource: Prometheus
         cloudflared:
           # renovate: depName="Cloudflare Tunnels (cloudflared)"
           gnetId: 17457
           revision: 6
           datasource:
-            - { name: DS_PROMETHEUS, value: Prometheus }
+            - {name: DS_PROMETHEUS, value: Prometheus}
         external-dns:
           # renovate: depName="External-dns"
           gnetId: 15038
           revision: 3
           datasource: Prometheus
         external-secrets:
-          url: https://raw.githubusercontent.com/external-secrets/external-secrets/main/docs/snippets/dashboard.json
+          url: 
+            https://raw.githubusercontent.com/external-secrets/external-secrets/main/docs/snippets/dashboard.json
           datasource: Prometheus
         flux-cluster:
-          url: https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/cluster.json
+          url: 
+            https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/cluster.json
           datasource: Prometheus
         flux-control-plane:
-          url: https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/control-plane.json
+          url: 
+            https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/control-plane.json
           datasource: Prometheus
         kubernetes-api-server:
           # renovate: depName="Kubernetes / System / API Server"
@@ -247,13 +251,16 @@ spec:
           revision: 14
           datasource: Prometheus
         miniflux:
-          url: https://raw.githubusercontent.com/miniflux/v2/main/contrib/grafana/dashboard.json
+          url: 
+            https://raw.githubusercontent.com/miniflux/v2/main/contrib/grafana/dashboard.json
           datasource: Prometheus
         nginx:
-          url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
+          url: 
+            https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
           datasource: Prometheus
         nginx-request-handling-performance:
-          url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
+          url: 
+            https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
           datasource: Prometheus
         node-exporter-full:
           # renovate: depName="Node Exporter Full"
@@ -261,7 +268,8 @@ spec:
           revision: 37
           datasource: Prometheus
         node-feature-discovery:
-          url: https://raw.githubusercontent.com/kubernetes-sigs/node-feature-discovery/master/examples/grafana-dashboard.json
+          url: 
+            https://raw.githubusercontent.com/kubernetes-sigs/node-feature-discovery/master/examples/grafana-dashboard.json
           datasource: Prometheus
         prometheus:
           # renovate: depName="Prometheus"
@@ -273,7 +281,7 @@ spec:
           gnetId: 20204
           revision: 1
           datasource:
-            - { name: DS_PROMETHEUS, value: Prometheus }
+            - {name: DS_PROMETHEUS, value: Prometheus}
         unifi-insights:
           # renovate: depName="UniFi-Poller: Client Insights - Prometheus"
           gnetId: 11315
@@ -299,14 +307,14 @@ spec:
           gnetId: 18817
           revision: 1
           datasource:
-            - { name: DS_PROMETHEUS, value: Prometheus }
+            - {name: DS_PROMETHEUS, value: Prometheus}
         volsync:
           # removate: depNmae="VolSync Dashboard"
           gnetId: 21356
           revision: 1
           datasource:
-            - { name: DS_PROMETHEUS, value: Prometheus }
-            - { name: VAR_REPLICATIONDESTNAME, value: .*-dst }
+            - {name: DS_PROMETHEUS, value: Prometheus}
+            - {name: VAR_REPLICATIONDESTNAME, value: .*-dst}
         zfs:
           # renovate: depName="ZFS"
           gnetId: 7845
@@ -314,16 +322,20 @@ spec:
           datasource: Prometheus
       cortex:
         cortex-searxng-metrics:
-          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cortex-searxng-metrics.json
+          url: 
+            https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cortex-searxng-metrics.json
           datasource: Prometheus
         cortex-overview:
-          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cortex-combined-overview.json
+          url: 
+            https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cortex-combined-overview.json
           datasource: Prometheus
         cortex-resource-overview:
-          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cortex-resource-overview.json
+          url: 
+            https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cortex-resource-overview.json
           datasource: Prometheus
         cortex-qdrant-overview:
-          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/coretex-qdrant-metrics.json
+          url: 
+            https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/coretex-qdrant-metrics.json
           datasource: Prometheus
       game-servers:
         palworld:
@@ -331,7 +343,7 @@ spec:
           gnetId: 20421
           revision: 1
           datasource:
-            - { name: DS_PROMETHEUS, value: Prometheus }
+            - {name: DS_PROMETHEUS, value: Prometheus}
       kubernetes:
         k8s-system-api-server:
           # renovate: dashboardName="Kubernetes / System / API Server"
@@ -366,10 +378,12 @@ spec:
 
       nginx:
         nginx:
-          url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
+          url: 
+            https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
           datasource: Prometheus
         nginx-request-handling-performance:
-          url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
+          url: 
+            https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
           datasource: Prometheus
 
       video:
@@ -380,64 +394,84 @@ spec:
 
       teslamate:
         battery-health:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/battery-health.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/battery-health.json
           datasource: TeslaMate
         charge-level:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/charge-level.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/charge-level.json
           datasource: TeslaMate
         charges:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/charges.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/charges.json
           datasource: TeslaMate
         charging-stats:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/charging-stats.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/charging-stats.json
           datasource: TeslaMate
         database-info:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/database-info.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/database-info.json
           datasource: TeslaMate
         drive-stats:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/drive-stats.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/drive-stats.json
           datasource: TeslaMate
         drives:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/drives.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/drives.json
           datasource: TeslaMate
         efficiency:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/efficiency.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/efficiency.json
           datasource: TeslaMate
         locations:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/locations.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/locations.json
           datasource: TeslaMate
         mileage:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/mileage.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/mileage.json
           datasource: TeslaMate
         overview:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/overview.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/overview.json
           datasource: TeslaMate
         projected-range:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/projected-range.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/projected-range.json
           datasource: TeslaMate
         states:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/states.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/states.json
           datasource: TeslaMate
         statistics:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/statistics.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/statistics.json
           datasource: TeslaMate
         timeline:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/timeline.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/timeline.json
           datasource: TeslaMate
         tire-pressure:
-          url: https://raw.githubusercontent.com/CarlosCuezva/dashboards-Grafana-Teslamate/main/dashboards/tire-pressure.json
+          url: 
+            https://raw.githubusercontent.com/CarlosCuezva/dashboards-Grafana-Teslamate/main/dashboards/tire-pressure.json
           datasource: TeslaMate
         trip:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/trip.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/trip.json
           datasource: TeslaMate
         updates:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/updates.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/updates.json
           datasource: TeslaMate
         vampire-drain:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/vampire-drain.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/vampire-drain.json
           datasource: TeslaMate
         visited:
-          url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/visited.json
+          url: 
+            https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/visited.json
           datasource: TeslaMate
 
     sidecar:

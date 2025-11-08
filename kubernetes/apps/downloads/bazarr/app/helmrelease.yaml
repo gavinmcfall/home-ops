@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -22,10 +23,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-  - name: rook-ceph-cluster
-    namespace: rook-ceph
-  - name: volsync
-    namespace: volsync-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
   values:
     controllers:
       bazarr:
@@ -37,8 +38,8 @@ spec:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
             envFrom: &envFrom
-            - secretRef:
-                name: bazarr-secret
+              - secretRef:
+                  name: bazarr-secret
         containers:
           app:
             image:
@@ -134,57 +135,57 @@ spec:
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_BAZARR_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         parentRefs:
-        - name: internal
-          namespace: network
-          sectionName: https
+          - name: internal
+            namespace: network
+            sectionName: https
         hostnames:
-        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-        - host: *app
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
+          - host: *app
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
-        - hosts:
-          - *app
+          - hosts:
+              - *app
     persistence:
       add-ons:
         type: emptyDir
       cache:
         type: emptyDir
         globalMounts:
-        - path: /config/cache
+          - path: /config/cache
       config:
         existingClaim: bazarr
       log:
         type: emptyDir
         globalMounts:
-        - path: /config/log
+          - path: /config/log
       media:
         type: nfs
         server: 10.90.1.69
         path: /mnt/storage0/media
         globalMounts:
-        - path: /media
+          - path: /media
       scripts:
         type: configMap
         name: bazarr-scripts
         defaultMode: 0775
         globalMounts:
-        - readOnly: true
+          - readOnly: true
       tmp:
         type: emptyDir

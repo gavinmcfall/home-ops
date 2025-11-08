@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -22,10 +23,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-  - name: rook-ceph-cluster
-    namespace: rook-ceph
-  - name: volsync
-    namespace: volsync-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
   values:
     controllers:
       qbittorrent:
@@ -100,12 +101,12 @@ spec:
               FIREWALL_INPUT_PORTS: 80
               FIREWALL_OUTBOUND_SUBNETS: 10.69.0.0/16,10.96.0.0/16 # Allow access to k8s subnets
             envFrom:
-            - secretRef:
-                name: qbittorrent-secret
+              - secretRef:
+                  name: qbittorrent-secret
             securityContext:
               capabilities:
                 add:
-                - NET_ADMIN
+                  - NET_ADMIN
               allowPrivilegeEscalation: false
           port-forward:
             image:
@@ -127,7 +128,7 @@ spec:
               readOnlyRootFilesystem: false
               capabilities:
                 drop:
-                - ALL
+                  - ALL
     service:
       app:
         controller: qbittorrent
@@ -155,33 +156,33 @@ spec:
             }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         parentRefs:
-        - name: internal
-          namespace: network
-          sectionName: https
+          - name: internal
+            namespace: network
+            sectionName: https
         hostnames:
-        - qb.${SECRET_DOMAIN}
+          - qb.${SECRET_DOMAIN}
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-        - host: *app
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
+          - host: *app
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
-        - hosts:
-          - *app
+          - hosts:
+              - *app
     persistence:
       config:
         enabled: true
@@ -189,16 +190,16 @@ spec:
         advancedMounts:
           qbittorrent:
             app:
-            - path: /config
+              - path: /config
       empty-config:
         type: emptyDir
         advancedMounts:
           qbittorrent:
             port-forward:
-            - path: /config
+              - path: /config
       media:
         type: nfs
         server: 10.90.1.69
         path: /mnt/storage0/media
         globalMounts:
-        - path: /media/
+          - path: /media/

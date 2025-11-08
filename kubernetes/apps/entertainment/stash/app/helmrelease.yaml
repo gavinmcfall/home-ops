@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/refs/heads/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -82,45 +83,45 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         parentRefs:
-        - name: external
-          namespace: network
-          sectionName: https
+          - name: external
+            namespace: network
+            sectionName: https
         hostnames:
-        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     persistence:
       config:
         existingClaim: *app
         globalMounts:
-        - path: /config
-          subPath: config
-        - path: /blobs
-          subPath: blobs
-        - path: /generated
-          subPath: generated
-        - path: /metadata
-          subPath: metadata
+          - path: /config
+            subPath: config
+          - path: /blobs
+            subPath: blobs
+          - path: /generated
+            subPath: generated
+          - path: /metadata
+            subPath: metadata
       media:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
-        - path: /media
+          - path: /media
       tmpfs:
         type: emptyDir
         advancedMounts:
           stash:
             app:
-            - path: /cache
-              subPath: cache
-            - path: /root/.stash/logs
-              subPath: logs
-            - path: /tmp
-              subPath: tmp
+              - path: /cache
+                subPath: cache
+              - path: /root/.stash/logs
+                subPath: logs
+              - path: /tmp
+                subPath: tmp

@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,8 +24,8 @@ spec:
     remediation:
       retries: 3
   dependsOn:
-  - name: paperless
-    namespace: home
+    - name: paperless
+      namespace: home
   uninstall:
     keepHistory: false
   values:
@@ -54,8 +55,8 @@ spec:
               LOCAL_PDF_PATH: "/app/pdf" # Optional, default path
               OCR_LIMIT_PAGES: "0" # No Limit
             envFrom:
-            - secretRef:
-                name: paperless-gpt-secret
+              - secretRef:
+                  name: paperless-gpt-secret
     service:
       app:
         controller: paperless-gpt
@@ -68,31 +69,31 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         parentRefs:
-        - name: internal
-          namespace: network
-          sectionName: https
+          - name: internal
+            namespace: network
+            sectionName: https
         hostnames:
-        - &host paperless-gpt.${SECRET_DOMAIN}
+          - &host paperless-gpt.${SECRET_DOMAIN}
         rules:
-        - backendRefs:
-          - identifier: app
-            port: http
-          matches:
-          - path:
-              type: PathPrefix
-              value: /
+          - backendRefs:
+              - identifier: app
+                port: http
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
     persistence:
       paperless-gpt-app:
         enabled: true
         existingClaim: paperless-gpt
         globalMounts:
-        - path: /app/prompts
-        - path: /app/hocr
-        - path: /app/pdf
+          - path: /app/prompts
+          - path: /app/hocr
+          - path: /app/pdf
       creds:
         type: secret
         name: paperless-gpt-secret
         globalMounts:
-        - path: /app/gdocai-credentials.json
-          subPath: gdocai-credentials.json
-          readOnly: true
+          - path: /app/gdocai-credentials.json
+            subPath: gdocai-credentials.json
+            readOnly: true
