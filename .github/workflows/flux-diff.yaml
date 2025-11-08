@@ -52,7 +52,11 @@ jobs:
           fi
           printf '%s\n' "${!uniq[@]}" | sort > paths.txt
           jq -R . < paths.txt | jq -s '.' > paths.json
-          echo "paths=$(cat paths.json)" >> "$GITHUB_OUTPUT"
+          {
+            echo "paths<<EOF"
+            cat paths.json
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
   flux-diff:
     name: Flux Diff
