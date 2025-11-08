@@ -123,6 +123,8 @@ spec:
       #       paths: *paths
     route:
       app:
+        annotations:
+          external-dns.alpha.kubernetes.io/exclude: "true"
         hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
         parentRefs:
           - name: internal
