@@ -37,7 +37,8 @@ spec:
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
-      - --gateway-label-filter=external-dns.home.arpa/enabled=true
+      - --gateway-name=external
+      - --gateway-namespace=network
     policy: sync
     sources: ["crd", "ingress", "gateway-httproute"]
     txtPrefix: k8s.
