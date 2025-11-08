@@ -12,16 +12,59 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-paths:
+    name: Detect Kubernetes Paths
+    runs-on: ubuntu-latest
+    outputs:
+      paths: ${{ steps.paths.outputs.paths }}
+    steps:
+      - name: Checkout PR Head
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Determine Kubernetes diff paths
+        id: paths
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch origin "${BASE_SHA}"
+          mapfile -t files < <(git diff --name-only "${BASE_SHA}" HEAD -- 'kubernetes/**')
+          declare -A uniq
+          for file in "${files[@]}"; do
+            [[ -z "$file" ]] && continue
+            if [[ "$file" == kubernetes/apps/* ]]; then
+              IFS='/' read -ra parts <<< "$file"
+              if [[ ${#parts[@]} -ge 4 ]]; then
+                path="${parts[0]}/${parts[1]}/${parts[2]}/${parts[3]}"
+              else
+                path="kubernetes/apps"
+              fi
+            elif [[ "$file" == kubernetes/flux/* ]]; then
+              path="kubernetes/flux"
+            else
+              path="kubernetes"
+            fi
+            uniq["$path"]=1
+          done
+          if [[ ${#uniq[@]} -eq 0 ]]; then
+            uniq["kubernetes/flux"]=1
+          fi
+          printf '%s\n' "${!uniq[@]}" | sort > paths.txt
+          jq -R . < paths.txt | jq -s '.' > paths.json
+          echo "paths=$(cat paths.json)" >> "$GITHUB_OUTPUT"
+
   flux-diff:
     name: Flux Diff
+    needs: detect-paths
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
     strategy:
       matrix:
-        paths: ["kubernetes"]
-        resources: ["helmrelease", "kustomization"]
+        path: ${{ fromJSON(needs.detect-paths.outputs.paths) }}
+        resource: ["helmrelease", "kustomization"]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -34,14 +77,18 @@ jobs:
           ref: "${{ github.event.repository.default_branch }}"
           path: default
 
+      - name: Ensure default path exists
+        run: |
+          mkdir -p "/github/workspace/default/${{ matrix.path }}"
+
       - name: Diff Resources
         uses: docker://ghcr.io/allenporter/flux-local:v7.11.0
         with:
           args: >-
-            diff ${{ matrix.resources }}
+            diff ${{ matrix.resource }}
             --unified 6
-            --path /github/workspace/pull/${{ matrix.paths }}/flux
-            --path-orig /github/workspace/default/${{ matrix.paths }}/flux
+            --path /github/workspace/pull/${{ matrix.path }}
+            --path-orig /github/workspace/default/${{ matrix.path }}
             --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart"
             --limit-bytes 10000
             --all-namespaces
@@ -60,7 +107,7 @@ jobs:
         name: Add comment
         uses: mshick/add-pr-comment@v2
         with:
-          message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}"
+          message-id: "${{ github.event.pull_request.number }}/${{ matrix.path }}/${{ matrix.resource }}"
           message-failure: Diff was not successful
           message: |
             ```diff
