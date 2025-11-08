@@ -121,15 +121,6 @@ spec:
       #   hosts:
       #     - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
       #       paths: *paths
-    route:
-      app:
-        annotations:
-          external-dns.alpha.kubernetes.io/exclude: "true"
-        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
-        parentRefs:
-          - name: internal
-            namespace: network
-            sectionName: https
     persistence:
       config:
         existingClaim: sonarr
