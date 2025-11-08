@@ -91,8 +91,8 @@ jobs:
           args: >-
             diff ${{ matrix.resource }}
             --unified 6
-            --path ${{ github.workspace }}/pull/${{ matrix.path }}
-            --path-orig ${{ github.workspace }}/default/${{ matrix.path }}
+            --path /github/workspace/pull/${{ matrix.path }}
+            --path-orig /github/workspace/default/${{ matrix.path }}
             --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart"
             --limit-bytes 10000
             --all-namespaces
