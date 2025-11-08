@@ -72,7 +72,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 8384
+            port: &port 8384
       discovery:
         enabled: true
         controller: *app
@@ -104,11 +104,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *app-http-port
     persistence:
       data:
         existingClaim: *app

@@ -103,11 +103,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *port
     ingress:
       tailscale:
         enabled: true

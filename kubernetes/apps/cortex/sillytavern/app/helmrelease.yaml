@@ -62,7 +62,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 8000
+            port: &port 8000
             protocol: HTTP
             appProtocol: http
     route:
@@ -79,11 +79,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *port
     persistence:
       data:
         accessMode: ReadWriteOnce

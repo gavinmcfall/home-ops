@@ -82,11 +82,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *port
     serviceMonitor:
       app:
         serviceName: echo-server

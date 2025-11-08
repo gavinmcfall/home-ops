@@ -52,7 +52,7 @@ spec:
         controller: teslamate
         ports:
           http:
-            port: 4000
+            port: &port 4000
 
     route:
       app:
@@ -75,11 +75,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *app-http-port
     ingress:
       tailscale:
         enabled: true

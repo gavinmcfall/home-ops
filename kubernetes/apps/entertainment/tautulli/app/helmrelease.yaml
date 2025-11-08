@@ -77,7 +77,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 80
+            port: &port 80
     route:
       app:
         enabled: true
@@ -101,11 +101,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *app-http-port
     persistence:
       config:
         existingClaim: *app

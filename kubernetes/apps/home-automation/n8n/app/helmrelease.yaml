@@ -90,11 +90,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *port
     persistence:
       config:
         existingClaim: n8n

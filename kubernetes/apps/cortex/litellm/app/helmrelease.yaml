@@ -45,8 +45,7 @@ spec:
           app:
             image:
               repository: ghcr.io/berriai/litellm-non_root
-              tag:
-                main-v1.75.8-stable@sha256:eaa381bfd39b56c89e4a61be15ed87e7af02b65bd82a3f50d923e08a5f6d6027
+              tag: main-v1.75.8-stable@sha256:eaa381bfd39b56c89e4a61be15ed87e7af02b65bd82a3f50d923e08a5f6d6027
             env:
               TZ: ${TIMEZONE}
               LITELLM_LOG: "DEBUG"
@@ -121,11 +120,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *port
     persistence:
       config:
         type: configMap

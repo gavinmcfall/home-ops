@@ -123,11 +123,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: server
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *port
     defaultPodOptions:
       securityContext:
         runAsUser: 568

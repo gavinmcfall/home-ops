@@ -62,7 +62,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 8081
+            port: &port 8081
     route:
       app:
         enabled: true
@@ -77,11 +77,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *app-http-port
     ingress:
       tailscale:
         enabled: true

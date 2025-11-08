@@ -52,7 +52,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 3000
+            port: &port 3000
     route:
       app:
         enabled: true
@@ -67,11 +67,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *app-http-port
     ingress:
       tailscale:
         enabled: true

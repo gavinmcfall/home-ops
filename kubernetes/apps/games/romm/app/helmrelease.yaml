@@ -85,7 +85,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 8080
+            port: &port 8080
     route:
       app:
         enabled: true
@@ -100,11 +100,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *app-http-port
     persistence:
       config:
         type: configMap

@@ -98,7 +98,7 @@ spec:
           reloader.stakater.com/auto: "true"
         ports:
           http:
-            port: 8080
+            port: &port 8080
     route:
       app:
         enabled: true
@@ -113,11 +113,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *port
     ingress:
       tailscale:
         enabled: true

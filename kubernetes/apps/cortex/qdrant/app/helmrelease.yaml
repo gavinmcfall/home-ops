@@ -93,11 +93,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *http-port
     persistence:
       data:
         enabled: true

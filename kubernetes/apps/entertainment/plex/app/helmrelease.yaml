@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/plex
-              tag: 
+              tag:
                 1.42.2.10156@sha256:9ad8a3506e1d8ebda873a668603c1a2c10e6887969564561be669efd65ae8871
             env:
               TZ: ${TIMEZONE}
@@ -90,7 +90,7 @@ spec:
           io.cilium/lb-ipam-ips: 10.90.3.206
         ports:
           http:
-            port: 32400
+            port: &port 32400
     route:
       app:
         enabled: true
@@ -114,11 +114,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *app-http-port
     persistence:
       config:
         existingClaim: plex

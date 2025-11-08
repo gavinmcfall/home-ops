@@ -60,7 +60,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 5540
+            port: &port 5540
     route:
       app:
         enabled: true
@@ -69,7 +69,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Observability
           gethomepage.dev/name: Redis Insight
-          gethomepage.dev/icon: 
+          gethomepage.dev/icon:
             https://raw.githubusercontent.com/RedisInsight/RedisInsight/main/resources/logo.svg
           gethomepage.dev/description: Developer GUI for Redis
         parentRefs:
@@ -81,11 +81,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *app-http-port
     persistence:
       data:
         existingClaim: *app

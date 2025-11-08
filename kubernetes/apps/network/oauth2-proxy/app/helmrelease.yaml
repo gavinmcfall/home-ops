@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -103,7 +102,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 4180
+            port: &port 4180
           metrics:
             port: 44180
 
@@ -121,7 +120,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
+                port: *app-http-port
             matches:
               - path:
                   type: PathPrefix

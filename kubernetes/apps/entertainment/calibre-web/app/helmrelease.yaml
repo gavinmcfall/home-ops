@@ -63,7 +63,7 @@ spec:
         ipFamilyPolicy: PreferDualStack
         ports:
           http:
-            port: 8083
+            port: &port 8083
     route:
       app:
         enabled: true
@@ -83,11 +83,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: http
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /
+                port: *app-http-port
     persistence:
       cache:
         type: emptyDir
