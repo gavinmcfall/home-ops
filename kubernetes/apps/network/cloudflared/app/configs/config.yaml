@@ -13,7 +13,7 @@ ingress:
 
 route:
   app:
-    hostnames: ["{{ .Release.Name }}.domain"]
+    hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
     parentRefs:
       - name: internal
         namespace: network
