@@ -22,10 +22,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
-    - name: volsync
-      namespace: volsync-system
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
+  - name: volsync
+    namespace: volsync-system
   values:
     controllers:
       readarr:
@@ -40,13 +40,14 @@ spec:
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
               pullPolicy: IfNotPresent
             envFrom: &envFrom
-              - secretRef:
-                  name: readarr-secret
+            - secretRef:
+                name: readarr-secret
         containers:
           app:
             image:
               repository: ghcr.io/home-operations/readarr
-              tag: 0.4.18.2805@sha256:8f7551205fbdccd526db23a38a6fba18b0f40726e63bb89be0fb2333ff4ee4cd
+              tag: 
+                0.4.18.2805@sha256:8f7551205fbdccd526db23a38a6fba18b0f40726e63bb89be0fb2333ff4ee4cd
             env:
               READARR__APP__INSTANCENAME: Readarr
               READARR__APP__THEME: dark
@@ -71,16 +72,16 @@ spec:
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [10000]
-        seccompProfile: { type: RuntimeDefault }
+        seccompProfile: {type: RuntimeDefault}
     service:
       app:
         controller: *app
         ports:
           http:
             port: *port
-    ingress:
+    route:
       app:
-        className: internal
+        enabled: true
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
@@ -92,22 +93,34 @@ spec:
           gethomepage.dev/widget.url: http://readarr.downloads
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_READARR_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: "{{ .Release.Name }}"
-            paths: *paths
+        - host: "{{ .Release.Name }}"
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *app
+        - hosts:
+          - *app
     persistence:
       config:
         existingClaim: *app
@@ -118,4 +131,4 @@ spec:
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media
+        - path: /media

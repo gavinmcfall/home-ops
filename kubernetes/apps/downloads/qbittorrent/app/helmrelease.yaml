@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,10 +22,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
-    - name: volsync
-      namespace: volsync-system
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
+  - name: volsync
+    namespace: volsync-system
   values:
     controllers:
       qbittorrent:
@@ -76,11 +75,11 @@ spec:
               fsGroup: 568
               fsGroupChangePolicy: OnRootMismatch
               supplementalGroups: [10000]
-              seccompProfile: { type: RuntimeDefault }
+              seccompProfile: {type: RuntimeDefault}
               runAsNonRoot: true
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 100m
@@ -101,12 +100,12 @@ spec:
               FIREWALL_INPUT_PORTS: 80
               FIREWALL_OUTBOUND_SUBNETS: 10.69.0.0/16,10.96.0.0/16 # Allow access to k8s subnets
             envFrom:
-              - secretRef:
-                  name: qbittorrent-secret
+            - secretRef:
+                name: qbittorrent-secret
             securityContext:
               capabilities:
                 add:
-                  - NET_ADMIN
+                - NET_ADMIN
               allowPrivilegeEscalation: false
           port-forward:
             image:
@@ -128,7 +127,7 @@ spec:
               readOnlyRootFilesystem: false
               capabilities:
                 drop:
-                  - ALL
+                - ALL
     service:
       app:
         controller: qbittorrent
@@ -138,41 +137,51 @@ spec:
         ports:
           http:
             port: *port
-          # bittorrent:
-          #   enabled: true
-          #   port: *bittorrentPort
-          #   protocol: TCP
-    ingress:
+    route:
       app:
+        enabled: true
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: qBittorrent
-          gethomepage.dev/app: *app
+          gethomepage.dev/app: &app qb
           gethomepage.dev/icon: qbittorrent.png
           gethomepage.dev/description: Torrent Client
           gethomepage.dev/widget.type: qbittorrent
           gethomepage.dev/widget.url: http://qbittorrent.downloads
-          gethomepage.dev/widget.username: "{{ `{{HOMEPAGE_VAR_QBITTORRENT_USERNAME}}` }}"
-          gethomepage.dev/widget.password: "{{ `{{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}` }}"
+          gethomepage.dev/widget.username: "{{ `{{HOMEPAGE_VAR_QBITTORRENT_USERNAME}}`
+            }}"
+          gethomepage.dev/widget.password: "{{ `{{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}`
+            }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: qb.${SECRET_DOMAIN}
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - qb.${SECRET_DOMAIN}
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app qb
-            paths: *paths
+        - host: *app
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *app
+        - hosts:
+          - *app
     persistence:
       config:
         enabled: true
@@ -180,16 +189,16 @@ spec:
         advancedMounts:
           qbittorrent:
             app:
-              - path: /config
+            - path: /config
       empty-config:
         type: emptyDir
         advancedMounts:
           qbittorrent:
             port-forward:
-              - path: /config
+            - path: /config
       media:
         type: nfs
         server: 10.90.1.69
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media/
+        - path: /media/

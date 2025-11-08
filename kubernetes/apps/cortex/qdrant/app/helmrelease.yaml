@@ -40,13 +40,13 @@ spec:
               QDRANT__STORAGE__SNAPSHOT_PATH: "/qdrant/snapshots"
               QDRANT__TELEMETRY__DISABLE: "true"
             envFrom:
-              - secretRef:
-                  name: qdrant-secret
+            - secretRef:
+                name: qdrant-secret
             ports:
-              - name: http
-                containerPort: *http-port
-              - name: grpc
-                containerPort: *grpc-port
+            - name: http
+              containerPort: *http-port
+            - name: grpc
+              containerPort: *grpc-port
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -78,18 +78,25 @@ spec:
             port: *http-port
           grpc:
             port: *grpc-port
-    ingress:
+    route:
       app:
+        enabled: true
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
     persistence:
       data:
         enabled: true
@@ -97,7 +104,7 @@ spec:
         advancedMounts:
           qdrant:
             app:
-              - path: /qdrant/storage
-                subPath: storage
-              - path: /qdrant/snapshots
-                subPath: snapshots
+            - path: /qdrant/storage
+              subPath: storage
+            - path: /qdrant/snapshots
+              subPath: snapshots

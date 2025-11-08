@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -35,8 +34,8 @@ spec:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
             envFrom: &envFrom
-              - secretRef:
-                  name: atuin-secret
+            - secretRef:
+                name: atuin-secret
         containers:
           app:
             image:
@@ -89,27 +88,34 @@ spec:
             port: *port
           metrics:
             port: *metricsPort
+    route:
+      app:
+        enabled: true
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - sh.${SECRET_DOMAIN}
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
     serviceMonitor:
       app:
         serviceName: atuin
         endpoints:
-          - port: metrics
-            scheme: http
-            path: /metrics
-            interval: 1m
-            scrapeTimeout: 10s
-    ingress:
-      app:
-        annotations:
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: sh.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - port: metrics
+          scheme: http
+          path: /metrics
+          interval: 1m
+          scrapeTimeout: 10s
     persistence:
       config:
         type: emptyDir

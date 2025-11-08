@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,10 +22,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
-    - name: volsync
-      namespace: volsync-system
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
+  - name: volsync
+    namespace: volsync-system
   values:
     controllers:
       calibre-web:
@@ -64,9 +63,9 @@ spec:
         ports:
           http:
             port: 8083
-    ingress:
+    route:
       app:
-        className: external
+        enabled: true
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           gethomepage.dev/enabled: "true"
@@ -74,18 +73,25 @@ spec:
           gethomepage.dev/name: Calibre Web
           gethomepage.dev/icon: calibre.png
           gethomepage.dev/description: eBook Library
-        hosts:
-          - host: ebooks.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: external
+          namespace: network
+          sectionName: https
+        hostnames:
+        - ebooks.${SECRET_DOMAIN}
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
     persistence:
       cache:
         type: emptyDir
         globalMounts:
-          - path: /cache
+        - path: /cache
       config:
         existingClaim: calibre-web
       media:
@@ -93,5 +99,5 @@ spec:
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media # This is the path inside the container
-            readOnly: false
+        - path: /media   # This is the path inside the container
+          readOnly: false

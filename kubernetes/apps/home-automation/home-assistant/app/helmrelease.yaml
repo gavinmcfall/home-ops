@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,8 +22,8 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
   values:
     controllers:
       home-assistant:
@@ -43,15 +42,16 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/home-assistant
-              tag: 2025.10.3@sha256:94c9906ffd11a2958ca07235686ab30927a7b0a684856f9a8c2f7d2b1a6e2e21
+              tag: 
+                2025.10.3@sha256:94c9906ffd11a2958ca07235686ab30927a7b0a684856f9a8c2f7d2b1a6e2e21
             env:
               TZ: ${TIMEZONE}
               HASS_HTTP_TRUSTED_PROXY_1: ${LOCAL_CIDR}
               HASS_HTTP_TRUSTED_PROXY_2: ${CLUSTER_POD_CIDR}
               HASS_HTTP_TRUSTED_PROXY_3: ${CLUSTER_SERVICE_CIDR}
             envFrom:
-              - secretRef:
-                  name: home-assistant-secret
+            - secretRef:
+                name: home-assistant-secret
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -65,18 +65,8 @@ spec:
             image:
               repository: ghcr.io/coder/code-server
               tag: 4.105.0@sha256:b54261ccfb29a6680a0fbce13f83d37487157f1b9b30390bb8ddca1929f49b4e
-            args:
-              [
-                "--auth",
-                "none",
-                "--user-data-dir",
-                "/config/.vscode",
-                "--extensions-dir",
-                "/config/.vscode",
-                "--port",
-                "12321",
-                "/config",
-              ]
+            args: ["--auth", "none", "--user-data-dir", "/config/.vscode", "--extensions-dir",
+              "/config/.vscode", "--port", "12321", "/config"]
             resources:
               requests:
                 cpu: 10m
@@ -98,19 +88,27 @@ spec:
             port: 8123
           code-server:
             port: 12321
-    ingress:
+    route:
       app:
+        enabled: true
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        className: external
-        hosts:
-          - host: hass.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-      tesla-key:  # NEW separate ingress for Tesla key
+        parentRefs:
+        - name: external
+          namespace: network
+          sectionName: https
+        hostnames:
+        - hass.${SECRET_DOMAIN}
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
+      tesla-key:
+        enabled: true
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           nginx.ingress.kubernetes.io/server-snippet: |
@@ -121,40 +119,52 @@ spec:
             -----END PUBLIC KEY-----";
               add_header Content-Type application/x-pem-file;
             }
-        className: external
-        hosts:
-          - host: hass.${SECRET_DOMAIN}
-            paths:
-              - path: /.well-known/appspecific/com.tesla.3p.public-key.pem
-                pathType: Exact
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: external
+          namespace: network
+          sectionName: https
+        hostnames:
+        - hass.${SECRET_DOMAIN}
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /.well-known/appspecific/com.tesla.3p.public-key.pem
       code-server:
+        enabled: true
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: hass-code.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: code-server
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - hass-code.${SECRET_DOMAIN}
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: code-server
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
     persistence:
       config:
         existingClaim: home-assistant
         globalMounts:
-          - path: /config
+        - path: /config
       logs:
         type: emptyDir
         globalMounts:
-          - path: /config/logs
+        - path: /config/logs
       tts:
         type: emptyDir
         globalMounts:
-          - path: /config/tts
+        - path: /config/tts
       tmp:
         type: emptyDir
         globalMounts:
-          - path: /tmp
+        - path: /tmp

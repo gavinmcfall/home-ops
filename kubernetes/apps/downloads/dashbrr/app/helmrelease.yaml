@@ -22,10 +22,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
-    - name: volsync
-      namespace: volsync-system
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
+  - name: volsync
+    namespace: volsync-system
   values:
     controllers:
       dashbrr:
@@ -39,8 +39,8 @@ spec:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
             envFrom: &envFrom
-              - secretRef:
-                  name: dashbrr-secret
+            - secretRef:
+                name: dashbrr-secret
         containers:
           app:
             image:
@@ -85,9 +85,9 @@ spec:
         ports:
           http:
             port: *port
-    ingress:
+    route:
       app:
-        className: internal
+        enabled: true
         annotations:
           # gethomepage.dev/enabled: "true"
           # gethomepage.dev/group: Downloads
@@ -98,22 +98,34 @@ spec:
           # gethomepage.dev/widget.url: http://dashbrr.downloads
           # gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_DASHBRR_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: "{{ .Release.Name }}"
-            paths: *paths
+        - host: "{{ .Release.Name }}"
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *app
+        - hosts:
+          - *app
     serviceAccount:
       create: true
       name: dashbrr

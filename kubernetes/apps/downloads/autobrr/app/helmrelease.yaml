@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -32,8 +31,8 @@ spec:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
             envFrom: &envFrom
-              - secretRef:
-                  name: autobrr-secret
+            - secretRef:
+                name: autobrr-secret
         containers:
           app:
             image:
@@ -69,36 +68,48 @@ spec:
               readOnlyRootFilesystem: true
               capabilities:
                 drop:
-                  - ALL
+                - ALL
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
         runAsUser: 568
         runAsGroup: 568
     ingress:
-      app:
-        annotations:
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: "{{ .Release.Name }}"
-            paths: *paths
+        - host: "{{ .Release.Name }}"
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *app
+        - hosts:
+          - *app
     service:
       app:
         controller: *app
         ports:
           http:
             port: *port
+    route:
+      app:
+        enabled: true
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /

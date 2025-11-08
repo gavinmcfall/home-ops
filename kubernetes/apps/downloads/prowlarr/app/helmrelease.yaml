@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -33,8 +32,8 @@ spec:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
             envFrom: &envFrom
-              - secretRef:
-                  name: prowlarr-secret
+            - secretRef:
+                name: prowlarr-secret
         containers:
           app:
             image:
@@ -67,7 +66,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
@@ -80,43 +79,55 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
-        seccompProfile: { type: RuntimeDefault }
+        seccompProfile: {type: RuntimeDefault}
     service:
       app:
         controller: prowlarr
         ports:
           http:
             port: *port
-    ingress:
+    route:
       app:
+        enabled: true
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: Prowlarr
-          gethomepage.dev/app: *app
+          gethomepage.dev/app: &app "{{ .Release.Name }}"
           gethomepage.dev/icon: prowlarr.png
           gethomepage.dev/description: Torrent/NZB Indexer Management
           gethomepage.dev/widget.type: prowlarr
           gethomepage.dev/widget.url: http://prowlarr.downloads:9696
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_PROWLARR_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "{{ .Release.Name }}"
-            paths: *paths
+        - host: *app
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *app
+        - hosts:
+          - *app
     persistence:
       config:
         type: emptyDir

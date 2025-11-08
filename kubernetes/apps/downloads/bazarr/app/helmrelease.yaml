@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,10 +22,10 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
-    - name: volsync
-      namespace: volsync-system
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
+  - name: volsync
+    namespace: volsync-system
   values:
     controllers:
       bazarr:
@@ -38,8 +37,8 @@ spec:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
             envFrom: &envFrom
-              - secretRef:
-                  name: bazarr-secret
+            - secretRef:
+                name: bazarr-secret
         containers:
           app:
             image:
@@ -64,7 +63,7 @@ spec:
             securityContext: &securityContext
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
@@ -113,67 +112,79 @@ spec:
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [10000]
-        seccompProfile: { type: RuntimeDefault }
+        seccompProfile: {type: RuntimeDefault}
     service:
       app:
         controller: bazarr
         ports:
           http:
             port: *port
-    ingress:
+    route:
       app:
+        enabled: true
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Downloads
           gethomepage.dev/name: Bazarr
-          gethomepage.dev/app: *app
+          gethomepage.dev/app: &app "{{ .Release.Name }}"
           gethomepage.dev/icon: bazarr.png
           gethomepage.dev/description: Subtitle Downloads
           gethomepage.dev/widget.type: bazarr
           gethomepage.dev/widget.url: http://bazarr.downloads:6767
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_BAZARR_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "{{ .Release.Name }}"
-            paths: *paths
+        - host: *app
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *app
+        - hosts:
+          - *app
     persistence:
       add-ons:
         type: emptyDir
       cache:
         type: emptyDir
         globalMounts:
-          - path: /config/cache
+        - path: /config/cache
       config:
         existingClaim: bazarr
       log:
         type: emptyDir
         globalMounts:
-          - path: /config/log
+        - path: /config/log
       media:
         type: nfs
         server: 10.90.1.69
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media
+        - path: /media
       scripts:
         type: configMap
         name: bazarr-scripts
         defaultMode: 0775
         globalMounts:
-          - readOnly: true
+        - readOnly: true
       tmp:
         type: emptyDir

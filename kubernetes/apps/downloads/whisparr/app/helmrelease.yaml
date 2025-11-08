@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -35,13 +34,14 @@ spec:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
             envFrom: &envFrom
-              - secretRef:
-                  name: whisparr-secret
+            - secretRef:
+                name: whisparr-secret
         containers:
           app:
             image:
               repository: ghcr.io/hotio/whisparr
-              tag: v3-3.0.1.1319@sha256:771f1e03bbf03856a7d092c69881cf5b98d958182441ab4f066980a45772e557
+              tag: 
+                v3-3.0.1.1319@sha256:771f1e03bbf03856a7d092c69881cf5b98d958182441ab4f066980a45772e557
             env:
               PUID: "568"
               PGID: "568"
@@ -85,34 +85,46 @@ spec:
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups: [10000]
-        seccompProfile: { type: RuntimeDefault }
+        seccompProfile: {type: RuntimeDefault}
     service:
       app:
         controller: whisparr
         ports:
           http:
             port: *port
-    ingress:
+    route:
       app:
+        enabled: true
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "{{ .Release.Name }}"
-            paths: *paths
+        - host: &app "{{ .Release.Name }}"
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *app
+        - hosts:
+          - *app
     persistence:
       config:
         existingClaim: whisparr
@@ -121,10 +133,10 @@ spec:
       run:
         type: emptyDir
         globalMounts:
-          - path: /run
+        - path: /run
       media:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media
+        - path: /media

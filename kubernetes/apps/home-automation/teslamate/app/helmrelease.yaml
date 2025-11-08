@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -35,8 +34,8 @@ spec:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
             envFrom: &envFrom
-              - secretRef:
-                  name: teslamate-secret
+            - secretRef:
+                name: teslamate-secret
         containers:
           app:
             image:
@@ -47,7 +46,6 @@ spec:
               DISABLE_MQTT: "false"
               MQTT_HOST: mosquitto.database.svc.cluster.local
             envFrom: *envFrom
-
     service:
       app:
         controller: teslamate
@@ -55,34 +53,46 @@ spec:
           http:
             port: 4000
 
-    ingress:
+    route:
       app:
+        enabled: true
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Home Automation
           gethomepage.dev/name: Teslamate
-          gethomepage.dev/app: *app
+          gethomepage.dev/app: &app "{{ .Release.Name }}"
           gethomepage.dev/icon: teslamate.png
           gethomepage.dev/description: Tesla Analytics
           # gethomepage.dev/widget.type: REQUIRES teslamate-api by tobiasehlertr
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "{{ .Release.Name }}"
-            paths: *paths
+        - host: *app
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *app
+        - hosts:
+          - *app
 
     resources:
       requests:

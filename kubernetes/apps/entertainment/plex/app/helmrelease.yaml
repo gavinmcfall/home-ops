@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,12 +22,12 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: intel-device-plugin-gpu
-      namespace: kube-system
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
-    - name: volsync
-      namespace: volsync-system
+  - name: intel-device-plugin-gpu
+    namespace: kube-system
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
+  - name: volsync
+    namespace: volsync-system
   values:
     controllers:
       plex:
@@ -38,7 +37,8 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/plex
-              tag: 1.42.2.10156@sha256:9ad8a3506e1d8ebda873a668603c1a2c10e6887969564561be669efd65ae8871
+              tag: 
+                1.42.2.10156@sha256:9ad8a3506e1d8ebda873a668603c1a2c10e6887969564561be669efd65ae8871
             env:
               TZ: ${TIMEZONE}
               PLEX_ADVERTISE_URL: https://plex.${SECRET_DOMAIN}:443,http://10.90.3.205:32400
@@ -90,8 +90,9 @@ spec:
         ports:
           http:
             port: 32400
-    ingress:
+    route:
       app:
+        enabled: true
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Entertainment
@@ -103,29 +104,35 @@ spec:
           gethomepage.dev/widget.url: http://plex.entertainment:32400
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_PLEX_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        className: external
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        parentRefs:
+        - name: external
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
     persistence:
       config:
         existingClaim: plex
         # TODO: If setting up Plex for the first time, you'll want to add the globalMounts section
         globalMounts:
-          - path: /config/Library/Application Support/Plex Media Server
+        - path: /config/Library/Application Support/Plex Media Server
       # Separate PVC for cache to avoid backing up cache files
       cache:
         existingClaim: plex-cache
         globalMounts:
-          - path: /config/Library/Application Support/Plex Media Server/Cache
+        - path: /config/Library/Application Support/Plex Media Server/Cache
       logs:
         type: emptyDir
         globalMounts:
-          - path: /config/Library/Application Support/Plex Media Server/Logs
+        - path: /config/Library/Application Support/Plex Media Server/Logs
       tmp:
         type: emptyDir
       transcode:
@@ -135,4 +142,4 @@ spec:
         server: 10.90.1.69
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media
+        - path: /media

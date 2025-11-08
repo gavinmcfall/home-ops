@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -33,15 +32,15 @@ spec:
               repository: ghcr.io/larivierec/cloudflare-ddns
               tag: v1.1.0@sha256:c4cf9ffe97f6aff0d26308fd4d452c7ad10530f8f9fc061f8d4d7866b55bdeb2
             args:
-              - --zone-name
-              - nerdz.cloud
-              - --record-name
-              - ipv4.nerdz.cloud
-              - --provider
-              - random
+            - --zone-name
+            - nerdz.cloud
+            - --record-name
+            - ipv4.nerdz.cloud
+            - --provider
+            - random
             envFrom:
-              - secretRef:
-                  name: cloudflare-ddns-secret
+            - secretRef:
+                name: cloudflare-ddns-secret
             probes:
               liveness:
                 enabled: true
@@ -71,22 +70,29 @@ spec:
             port: &port 9000
           health:
             port: *healthPort
+    route:
+      app:
+        enabled: true
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "ddns.nerdz.cloud"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
     serviceMonitor:
       app:
         serviceName: *app
         endpoints:
-          - port: health
-            scheme: http
-            path: /metrics
-            interval: 30s
-            scrapeTimeout: 30s
-    ingress:
-      app:
-        className: internal
-        hosts:
-          - host: "ddns.nerdz.cloud"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - port: health
+          scheme: http
+          path: /metrics
+          interval: 30s
+          scrapeTimeout: 30s

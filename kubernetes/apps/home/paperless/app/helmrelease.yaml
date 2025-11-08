@@ -1,5 +1,3 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -34,8 +32,8 @@ spec:
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
               pullPolicy: IfNotPresent
             envFrom: &envFrom
-              - secretRef:
-                  name: paperless-secret
+            - secretRef:
+                name: paperless-secret
         containers:
           gotenburg:
             image:
@@ -43,7 +41,7 @@ spec:
               tag: 8.24.0
               pullPolicy: IfNotPresent
             env:
-              - {name: DISABLE_GOOGLE_CHROME, value: '1'}
+            - {name: DISABLE_GOOGLE_CHROME, value: '1'}
           tika:
             image:
               repository: ghcr.io/paperless-ngx/tika
@@ -84,13 +82,16 @@ spec:
               PAPERLESS_CONVERT_TMPDIR: /convert-tmp
 
               PAPERLESS_CONSUMER_POLLING: 60
-              PAPERLESS_CONSUMER_IGNORE_PATTERNS: '[".DS_STORE/*", "._*", ".stfolder/*", "@eaDir/*"]'
+              PAPERLESS_CONSUMER_IGNORE_PATTERNS: '[".DS_STORE/*", "._*", ".stfolder/*",
+                "@eaDir/*"]'
               PAPERLESS_CONSUMER_DELETE_DUPLICATES: true
               PAPERLESS_CONSUMER_RECURSIVE: true
               PAPERLESS_TRUSTED_PROXIES: 10.42.0.0/16
 
               PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT: "2"   # HTML, then text
-              PAPERLESS_FILENAME_FORMAT: "{{ `{{ created_year }}/{{ document_type }}/{{ created_year }}-{{ created_month }}-{{ created_day }}_{{correspondent}}_{{ title }}` }}"
+              PAPERLESS_FILENAME_FORMAT: "{{ `{{ created_year }}/{{ document_type
+                }}/{{ created_year }}-{{ created_month }}-{{ created_day }}_{{correspondent}}_{{
+                title }}` }}"
 
               PAPERLESS_EMPTY_TRASH_DELAY: 30
               PAPERLESS_AUDIT_LOG_ENABLED: "true"
@@ -113,42 +114,50 @@ spec:
         ports:
           http:
             port: *port
-    ingress:
+    route:
       app:
         enabled: true
-        className: internal
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        hosts:
-          - host: &host paperless.${SECRET_DOMAIN}
-            paths: &paths
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - hosts:
-              - *host
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - &host paperless.${SECRET_DOMAIN}
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
-          - host: &app "{{ .Release.Name }}"
-            paths: *paths
+        - host: &app "{{ .Release.Name }}"
+          paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: app
+              port: http
         tls:
-          - hosts:
-              - *app
+        - hosts:
+          - *app
     persistence:
       config:
         enabled: true
         existingClaim: paperless-ngx
         globalMounts:
-          - path: /data
-          - path: /convert-tmp
+        - path: /data
+        - path: /convert-tmp
       documents:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/documents
         globalMounts:
-          - path: /documents
+        - path: /documents

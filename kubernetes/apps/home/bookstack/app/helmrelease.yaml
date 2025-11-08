@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -19,12 +18,12 @@ spec:
       strategy: rollback
       retries: 3
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
-    - name: mariadb
-      namespace: database
-    - name: volsync
-      namespace: volsync-system
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
+  - name: mariadb
+    namespace: database
+  - name: volsync
+    namespace: volsync-system
   values:
     controllers:
       bookstack:
@@ -42,8 +41,8 @@ spec:
               AUTH_METHOD: "oidc"
               AUTH_AUTO_INITIATE: "false"  # Keep false to show login options
             envFrom:
-              - secretRef:
-                  name: bookstack-secret
+            - secretRef:
+                name: bookstack-secret
             resources:
               requests:
                 cpu: 10m
@@ -56,21 +55,27 @@ spec:
         ports:
           http:
             port: 80
-    ingress:
+    route:
       app:
+        enabled: true
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-
+        parentRefs:
+        - name: internal
+          namespace: network
+          sectionName: https
+        hostnames:
+        - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        rules:
+        - backendRefs:
+          - identifier: app
+            port: http
+          matches:
+          - path:
+              type: PathPrefix
+              value: /
     persistence:
       config:
         existingClaim: *app
         globalMounts:
-          - path: /config
+        - path: /config
