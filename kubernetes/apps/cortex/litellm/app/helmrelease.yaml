@@ -45,7 +45,7 @@ spec:
           app:
             image:
               repository: ghcr.io/berriai/litellm-non_root
-              tag: 
+              tag:
                 main-v1.75.8-stable@sha256:eaa381bfd39b56c89e4a61be15ed87e7af02b65bd82a3f50d923e08a5f6d6027
             env:
               TZ: ${TIMEZONE}
@@ -85,7 +85,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 10m
