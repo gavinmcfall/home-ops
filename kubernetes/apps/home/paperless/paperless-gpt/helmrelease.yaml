@@ -77,7 +77,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: *app-http-port
+                port: *port
     persistence:
       paperless-gpt-app:
         enabled: true

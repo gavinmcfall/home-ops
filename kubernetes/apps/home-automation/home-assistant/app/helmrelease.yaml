@@ -102,7 +102,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: *app-http-port
+                port: *port
       tesla-key:
         enabled: true
         annotations:
@@ -124,7 +124,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: *app-http-port
+                port: *port
             matches:
               - path:
                   type: PathPrefix

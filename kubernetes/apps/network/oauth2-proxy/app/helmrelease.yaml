@@ -120,7 +120,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: *app-http-port
+                port: *port
             matches:
               - path:
                   type: PathPrefix
