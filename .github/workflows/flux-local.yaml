@@ -35,20 +35,28 @@ jobs:
       - name: Configure git safe directory
         run: |
           git config --global --add safe.directory /github/workspace
+      - name: Relax Talos clusterconfig permissions
+        run: chmod -R u=rwX,go=rX kubernetes/apps/bootstrap/talos/clusterconfig || true
 
       - name: Run flux-local test
-        uses: docker://ghcr.io/allenporter/flux-local:v7.11.0
         env:
           GIT_CONFIG_COUNT: 1
           GIT_CONFIG_KEY_0: safe.directory
           GIT_CONFIG_VALUE_0: "*"
-        with:
-          args: >-
-            test
-            --all-namespaces
-            --enable-helm
-            --path /github/workspace/kubernetes/flux
-            --verbose
+        run: |
+          docker run --rm \
+            -u "$(id -u)":"$(id -g)" \
+            -e GIT_CONFIG_COUNT \
+            -e GIT_CONFIG_KEY_0 \
+            -e GIT_CONFIG_VALUE_0 \
+            -v "${GITHUB_WORKSPACE}":/workspace \
+            -w /workspace \
+            ghcr.io/allenporter/flux-local:v7.11.0 \
+            test \
+              --all-namespaces \
+              --enable-helm \
+              --path /workspace/kubernetes/flux \
+              --verbose
 
   diff:
     name: Flux Local - Diff
@@ -78,24 +86,34 @@ jobs:
         run: |
           git config --global --add safe.directory /github/workspace/pull
           git config --global --add safe.directory /github/workspace/default
+      - name: Relax Talos clusterconfig permissions
+        run: |
+          chmod -R u=rwX,go=rX /github/workspace/pull/kubernetes/apps/bootstrap/talos/clusterconfig || true
+          chmod -R u=rwX,go=rX /github/workspace/default/kubernetes/apps/bootstrap/talos/clusterconfig || true
 
       - name: Run flux-local diff
-        uses: docker://ghcr.io/allenporter/flux-local:v7.11.0
         env:
           GIT_CONFIG_COUNT: 1
           GIT_CONFIG_KEY_0: safe.directory
           GIT_CONFIG_VALUE_0: "*"
-        with:
-          args: >-
-            diff ${{ matrix.resources }}
-            --unified 6
-            --path /github/workspace/pull/${{ matrix.paths }}/flux
-            --path-orig /github/workspace/default/${{ matrix.paths }}/flux
-            --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart"
-            --limit-bytes 10000
-            --all-namespaces
-            --sources "home-kubernetes"
-            --output-file diff.patch
+        run: |
+          docker run --rm \
+            -u "$(id -u)":"$(id -g)" \
+            -e GIT_CONFIG_COUNT \
+            -e GIT_CONFIG_KEY_0 \
+            -e GIT_CONFIG_VALUE_0 \
+            -v "${GITHUB_WORKSPACE}":/workspace \
+            -w /workspace \
+            ghcr.io/allenporter/flux-local:v7.11.0 \
+            diff ${{ matrix.resources }} \
+              --unified 6 \
+              --path /workspace/pull/${{ matrix.paths }}/flux \
+              --path-orig /workspace/default/${{ matrix.paths }}/flux \
+              --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart" \
+              --limit-bytes 10000 \
+              --all-namespaces \
+              --sources "home-kubernetes" \
+              --output-file /workspace/diff.patch
 
       - name: Generate Diff
         id: diff
