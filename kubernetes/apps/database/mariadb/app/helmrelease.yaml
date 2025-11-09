@@ -19,6 +19,10 @@ spec:
       strategy: rollback
       retries: 3
   values:
+    global:
+      defaultFips: off
+      security:
+        allowInsecureImages: false
     auth:
       usePasswordFiles: false
       existingSecret: mariadb-secret
