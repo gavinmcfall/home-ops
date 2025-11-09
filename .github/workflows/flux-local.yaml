@@ -32,9 +32,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+      - name: Configure git safe directory
+        run: |
+          git config --global --add safe.directory /github/workspace
 
       - name: Run flux-local test
         uses: docker://ghcr.io/allenporter/flux-local:v7.11.0
+        env:
+          GIT_CONFIG_COUNT: 1
+          GIT_CONFIG_KEY_0: safe.directory
+          GIT_CONFIG_VALUE_0: "*"
         with:
           args: >-
             test
@@ -67,9 +74,17 @@ jobs:
         with:
           ref: "${{ github.event.repository.default_branch }}"
           path: default
+      - name: Configure git safe directories
+        run: |
+          git config --global --add safe.directory /github/workspace/pull
+          git config --global --add safe.directory /github/workspace/default
 
       - name: Run flux-local diff
         uses: docker://ghcr.io/allenporter/flux-local:v7.11.0
+        env:
+          GIT_CONFIG_COUNT: 1
+          GIT_CONFIG_KEY_0: safe.directory
+          GIT_CONFIG_VALUE_0: "*"
         with:
           args: >-
             diff ${{ matrix.resources }}
