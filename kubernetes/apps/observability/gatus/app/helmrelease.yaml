@@ -56,7 +56,7 @@ spec:
               requests:
                 cpu: 10m
               limits:
-                memory: 256Mi
+                memory: 512Mi
         containers:
           app:
             image:
@@ -131,8 +131,6 @@ spec:
                 service:
                   identifier: app
                   port: http
-    serviceAccount:
-      gatus: {}
     persistence:
       config:
         type: emptyDir
