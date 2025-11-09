@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: "Flux Diff"
+name: "Flux Local"
 
 on:
   pull_request:
@@ -12,8 +12,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  flux-diff:
-    name: Flux Diff
+  filter:
+    name: Flux Local - Filter
+    runs-on: ubuntu-latest
+    outputs:
+      changed-files: ${{ steps.changed-files.outputs.changed_files }}
+    steps:
+      - name: Get Changed Files
+        id: changed-files
+        uses: bjw-s-labs/action-changed-files@1a5aeab1bfa64d0c4e786f501d5a3f1fad4a24da # v0.4.1
+        with:
+          patterns: kubernetes/**/*
+
+  test:
+    name: Flux Local - Test
+    needs: filter
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Run flux-local test
+        uses: docker://ghcr.io/allenporter/flux-local:v7.11.0
+        with:
+          args: >-
+            test
+            --all-namespaces
+            --enable-helm
+            --path /github/workspace/kubernetes/flux
+            --verbose
+
+  diff:
+    name: Flux Local - Diff
+    needs: filter
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,8 +55,9 @@ jobs:
       matrix:
         paths: ["kubernetes"]
         resources: ["helmrelease", "kustomization"]
+      fail-fast: false
     steps:
-      - name: Checkout
+      - name: Checkout Pull Request Branch
         uses: actions/checkout@v5
         with:
           path: pull
@@ -34,7 +68,7 @@ jobs:
           ref: "${{ github.event.repository.default_branch }}"
           path: default
 
-      - name: Diff Resources
+      - name: Run flux-local diff
         uses: docker://ghcr.io/allenporter/flux-local:v7.11.0
         with:
           args: >-
@@ -66,3 +100,19 @@ jobs:
             ```diff
             ${{ steps.diff.outputs.diff }}
             ```
+
+  success:
+    name: Flux Local - Success
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    needs:
+      - test
+      - diff
+    steps:
+      - name: Any jobs failed?
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
+      - name: All jobs passed or skipped?
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: echo "All jobs passed or skipped" && echo "${{ toJSON(needs.*.result) }}"
