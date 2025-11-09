@@ -85,6 +85,7 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
       node:
+        forceRename: node-v4
         pod:
           hostname: &name ff-node
         containers:
