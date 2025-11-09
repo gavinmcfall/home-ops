@@ -25,6 +25,8 @@ spec:
   values:
     controllers:
       gatus:
+        serviceAccount:
+          identifier: gatus
         forceRename: gatus-v4
         annotations:
           reloader.stakater.com/auto: "true"
@@ -130,8 +132,7 @@ spec:
                   identifier: app
                   port: http
     serviceAccount:
-      create: true
-      name: gatus
+      gatus: {}
     persistence:
       config:
         type: emptyDir
