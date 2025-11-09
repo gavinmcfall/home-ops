@@ -30,7 +30,7 @@ spec:
   values:
     controllers:
       litellm:
-        suffix: v4
+        forceRename: litellm-v4
         annotations:
           reloader.stakater.com/auto: "true"
           secret.reloader.stakater.com/reload: &secret litellm-secret

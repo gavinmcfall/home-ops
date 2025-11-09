@@ -25,7 +25,7 @@ spec:
   values:
     controllers:
       qdrant:
-        suffix: v4
+        forceRename: qdrant-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

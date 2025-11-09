@@ -28,7 +28,7 @@ spec:
   values:
     controllers:
       mosquitto:
-        suffix: v4
+        forceRename: mosquitto-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
