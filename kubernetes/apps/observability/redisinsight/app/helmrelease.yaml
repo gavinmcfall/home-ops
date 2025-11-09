@@ -1,9 +1,7 @@
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app redisinsight
+  name: redisinsight
 spec:
   interval: 30m
   chart:
@@ -27,20 +25,22 @@ spec:
       redisinsight:
         forceRename: redisinsight-v4
         annotations:
-          reloader.stakater.com/auto: "true"
+          reloader.stakater.com/auto: 'true'
         containers:
           app:
             image:
               repository: redis/redisinsight
               tag: 2.70.1@sha256:b7aa18e73329ebb2e3d9e949b8d35193bf5415ef35c16fd9a50e6f832922b296
             env:
-              TZ: "${TIMEZONE}"
+              TZ: ${TIMEZONE}
               RI_FILES_LOGGER: false
               RI_STDOUT_LOGGER: true
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities:
+                drop:
+                - ALL
             resources:
               requests:
                 cpu: 10m
@@ -54,11 +54,11 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
-        seccompProfile: { type: RuntimeDefault }
+        seccompProfile:
+          type: RuntimeDefault
     service:
       app:
-        nameOverride: redisinsight-svc
-        controller: *app
+        controller: redisinsight
         ports:
           http:
             port: 5540
@@ -67,18 +67,18 @@ spec:
         className: internal
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-          gethomepage.dev/enabled: "true"
+          gethomepage.dev/enabled: 'true'
           gethomepage.dev/group: Observability
           gethomepage.dev/name: Redis Insight
           gethomepage.dev/icon: https://raw.githubusercontent.com/RedisInsight/RedisInsight/main/resources/logo.svg
           gethomepage.dev/description: Developer GUI for Redis
         hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        - host: '{{ .Release.Name }}.${SECRET_DOMAIN}'
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
     persistence:
       data:
-        existingClaim: *app
+        existingClaim: redisinsight
