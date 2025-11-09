@@ -27,9 +27,16 @@ spec:
     - name: volsync
       namespace: volsync-system
   values:
+    serviceAccount:
+      dashbrr:
+        staticToken: true
+        annotations:
+          kubernetes.io/service-account.name: dashbrr
     controllers:
       dashbrr:
         forceRename: dashbrr-v4
+        serviceAccount:
+          identifier: dashbrr
         labels:
           postgres: "true"
         annotations:
@@ -116,8 +123,13 @@ spec:
           - hosts:
               - *app
     serviceAccount:
-      create: true
-      name: dashbrr
+      dashbrr:
+        identifier: dashbrr
+        staticToken: true
+    controllers:
+      dashbrr:
+        serviceAccount:
+          identifier: dashbrr
     persistence:
       cache:
         type: emptyDir
