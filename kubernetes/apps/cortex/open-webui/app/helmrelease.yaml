@@ -25,6 +25,7 @@ spec:
   values:
     controllers:
       open-webui:
+        suffix: v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
