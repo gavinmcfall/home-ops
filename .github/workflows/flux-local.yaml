@@ -1,0 +1,151 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Flux Local"
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths: ["kubernetes/**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  filter:
+    name: Flux Local - Filter
+    runs-on: ubuntu-latest
+    outputs:
+      changed-files: ${{ steps.changed-files.outputs.changed_files }}
+    steps:
+      - name: Get Changed Files
+        id: changed-files
+        uses: bjw-s-labs/action-changed-files@1a5aeab1bfa64d0c4e786f501d5a3f1fad4a24da # v0.4.1
+        with:
+          patterns: kubernetes/**/*
+
+  test:
+    name: Flux Local - Test
+    needs: filter
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Configure git safe directory
+        run: |
+          git config --global --add safe.directory /github/workspace
+      - name: Relax Talos clusterconfig permissions
+        run: chmod -R u=rwX,go=rX kubernetes/apps/bootstrap/talos/clusterconfig || true
+
+      - name: Run flux-local test
+        env:
+          GIT_CONFIG_COUNT: 1
+          GIT_CONFIG_KEY_0: safe.directory
+          GIT_CONFIG_VALUE_0: "*"
+        run: |
+          docker run --rm \
+            -u "$(id -u)":"$(id -g)" \
+            -e GIT_CONFIG_COUNT \
+            -e GIT_CONFIG_KEY_0 \
+            -e GIT_CONFIG_VALUE_0 \
+            -v "${GITHUB_WORKSPACE}":/workspace \
+            -w /workspace \
+            ghcr.io/allenporter/flux-local:v7.11.0 \
+            test \
+              --all-namespaces \
+              --enable-helm \
+              --path /workspace/kubernetes/flux \
+              --verbose
+
+  diff:
+    name: Flux Local - Diff
+    needs: filter
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      matrix:
+        paths: ["kubernetes"]
+        resources: ["helmrelease", "kustomization"]
+      fail-fast: false
+    steps:
+      - name: Checkout Pull Request Branch
+        uses: actions/checkout@v5
+        with:
+          path: pull
+
+      - name: Checkout Default Branch
+        uses: actions/checkout@v5
+        with:
+          ref: "${{ github.event.repository.default_branch }}"
+          path: default
+      - name: Configure git safe directories
+        run: |
+          git config --global --add safe.directory /github/workspace/pull
+          git config --global --add safe.directory /github/workspace/default
+      - name: Relax Talos clusterconfig permissions
+        run: |
+          chmod -R u=rwX,go=rX /github/workspace/pull/kubernetes/apps/bootstrap/talos/clusterconfig || true
+          chmod -R u=rwX,go=rX /github/workspace/default/kubernetes/apps/bootstrap/talos/clusterconfig || true
+
+      - name: Run flux-local diff
+        env:
+          GIT_CONFIG_COUNT: 1
+          GIT_CONFIG_KEY_0: safe.directory
+          GIT_CONFIG_VALUE_0: "*"
+        run: |
+          docker run --rm \
+            -u "$(id -u)":"$(id -g)" \
+            -e GIT_CONFIG_COUNT \
+            -e GIT_CONFIG_KEY_0 \
+            -e GIT_CONFIG_VALUE_0 \
+            -v "${GITHUB_WORKSPACE}":/workspace \
+            -w /workspace \
+            ghcr.io/allenporter/flux-local:v7.11.0 \
+            diff ${{ matrix.resources }} \
+              --unified 6 \
+              --path /workspace/pull/${{ matrix.paths }}/flux \
+              --path-orig /workspace/default/${{ matrix.paths }}/flux \
+              --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart" \
+              --limit-bytes 10000 \
+              --all-namespaces \
+              --sources "home-kubernetes" \
+              --output-file /workspace/diff.patch
+
+      - name: Generate Diff
+        id: diff
+        run: |
+          cat diff.patch
+          echo "diff<<EOF" >> $GITHUB_OUTPUT
+          cat diff.patch >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - if: ${{ steps.diff.outputs.diff != '' }}
+        name: Add comment
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}"
+          message-failure: Diff was not successful
+          message: |
+            ```diff
+            ${{ steps.diff.outputs.diff }}
+            ```
+
+  success:
+    name: Flux Local - Success
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    needs:
+      - test
+      - diff
+    steps:
+      - name: Any jobs failed?
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
+      - name: All jobs passed or skipped?
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: echo "All jobs passed or skipped" && echo "${{ toJSON(needs.*.result) }}"
