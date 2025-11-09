@@ -118,6 +118,10 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /.npm
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
       media:
         type: nfs
         server: 10.90.1.69
