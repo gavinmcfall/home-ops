@@ -12,7 +12,7 @@ spec:
     - name: external
       namespace: network
       sectionName: https
-  hostnames: ["s3.${CLUSTER_DOMAIN}"]
+  hostnames: ["s3.${SECRET_DOMAIN}"]
   rules:
     - matches:
         - path:

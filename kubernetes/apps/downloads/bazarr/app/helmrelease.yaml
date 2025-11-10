@@ -93,7 +93,7 @@ spec:
               tag: v2.3.0@sha256:af535d94061cf97a52e1661945ffba78c03f9443eae7c0da1a80a5a4be56b520
             env:
               PORT: &metricsPort 9707
-              URL: "http://{{ .Release.Name }}.{{ .Release.Namespace }}.${CLUSTER_DOMAIN}:6767"
+              URL: "http://{{ .Release.Name }}.{{ .Release.Namespace }}.${SECRET_DOMAIN}:6767"
               APIKEY:
                 valueFrom:
                   secretKeyRef:

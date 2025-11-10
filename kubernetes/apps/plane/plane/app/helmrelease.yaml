@@ -25,13 +25,6 @@ spec:
   values:
     planeVersion: v1.0.0
 
-    ingress:
-      enabled: true
-      appHost: "plane.${SECRET_DOMAIN}"
-      ingressClass: external
-      ingress_annotations:
-        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-
     redis:
       local_setup: false
     postgres:
