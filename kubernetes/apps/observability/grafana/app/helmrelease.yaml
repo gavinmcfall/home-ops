@@ -460,23 +460,46 @@ spec:
       - natel-discrete-panel
       - pr0ps-trackmap-panel
       - vonage-status-panel
+    service:
+      type: ClusterIP
+      port: &servicePort 80
+      targetPort: 3000
     serviceMonitor:
       enabled: true
-    ingress:
-      enabled: true
-      annotations:
-        gethomepage.dev/enabled: "true"
-        gethomepage.dev/icon: grafana.png
-        gethomepage.dev/name: Grafana
-        gethomepage.dev/group: Observability
-        gethomepage.dev/description: Monitoring Dashboards
-        gethomepage.dev/widget.type: grafana
-        gethomepage.dev/widget.url: http://grafana.observability
-        gethomepage.dev/widget.username: "{{`{{HOMEPAGE_VAR_GRAFANA_USERNAME}}`}}"
-        gethomepage.dev/widget.password: "{{`{{HOMEPAGE_VAR_GRAFANA_PASSWORD}}`}}"
-        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-      ingressClassName: external
-      hosts: ["grafana.${SECRET_DOMAIN}"]
+    extraObjects:
+      - apiVersion: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        metadata:
+          name: grafana
+          namespace: "{{ .Release.Namespace }}"
+          annotations:
+            gethomepage.dev/enabled: "true"
+            gethomepage.dev/icon: grafana.png
+            gethomepage.dev/name: Grafana
+            gethomepage.dev/group: Observability
+            gethomepage.dev/description: Monitoring Dashboards
+            gethomepage.dev/widget.type: grafana
+            gethomepage.dev/widget.url: http://grafana.observability
+            gethomepage.dev/widget.username: "{{`{{HOMEPAGE_VAR_GRAFANA_USERNAME}}`}}"
+            gethomepage.dev/widget.password: "{{`{{HOMEPAGE_VAR_GRAFANA_PASSWORD}}`}}"
+            external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        spec:
+          hostnames:
+            - "grafana.${SECRET_DOMAIN}"
+          parentRefs:
+            - name: external
+              namespace: network
+              sectionName: https
+          rules:
+            - matches:
+                - path:
+                    type: PathPrefix
+                    value: /
+              backendRefs:
+                - group: ""
+                  kind: Service
+                  name: grafana
+                  port: *servicePort
     persistence:
       enabled: false
     testFramework:
