@@ -5,7 +5,6 @@ kind: HelmRelease
 metadata:
   name: &app mariadb
 spec:
-  force: true
   interval: 30m
   chartRef:
     kind: OCIRepository
