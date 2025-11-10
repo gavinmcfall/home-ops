@@ -102,7 +102,7 @@ spec:
         ports:
           http:
             port: *port
-    ingress:
+    route:
       app:
         annotations:
           gethomepage.dev/enabled: "true"
@@ -115,14 +115,16 @@ spec:
           nginx.ingress.kubernetes.io/proxy-body-size: "0"
           nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
           nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-        className: external
-        hosts:
-          - host: "3d.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - 3d.${SECRET_DOMAIN}
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
     persistence:
       media:
         type: nfs
