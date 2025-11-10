@@ -55,9 +55,9 @@ spec:
         controller: teslamate
         ports:
           http:
-            port: 4000
+            port: &port 4000
 
-    ingress:
+    route:
       app:
         annotations:
           gethomepage.dev/enabled: "true"
@@ -68,20 +68,27 @@ spec:
           gethomepage.dev/description: Tesla Analytics
           # gethomepage.dev/widget.type: REQUIRES teslamate-api by tobiasehlertr
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
           - host: &app "{{ .Release.Name }}"
-            paths: *paths
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
           - hosts:
               - *app
