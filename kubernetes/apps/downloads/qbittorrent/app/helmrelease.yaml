@@ -143,7 +143,7 @@ spec:
           #   enabled: true
           #   port: *bittorrentPort
           #   protocol: TCP
-    ingress:
+    route:
       app:
         annotations:
           gethomepage.dev/enabled: "true"
@@ -157,20 +157,27 @@ spec:
           gethomepage.dev/widget.username: "{{ `{{HOMEPAGE_VAR_QBITTORRENT_USERNAME}}` }}"
           gethomepage.dev/widget.password: "{{ `{{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}` }}"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: qb.${SECRET_DOMAIN}
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - qb.${SECRET_DOMAIN}
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+    ingress:
       tailscale:
         enabled: true
         className: tailscale
         hosts:
           - host: &app qb
-            paths: *paths
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
         tls:
           - hosts:
               - *app
