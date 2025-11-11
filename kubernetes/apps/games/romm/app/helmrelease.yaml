@@ -42,8 +42,7 @@ spec:
           app:
             image:
               repository: ghcr.io/rommapp/romm
-              tag: 4.3.2@sha256:1895c339b3c7ca62d52f809f5e4c747d78fc8291ea5ee88b3b57df84acf33449
-              #tag: 4.4.0-alpha.1@sha256:d2e7b30f6a1f13f51e5d23357bb15bdf5495c276d0a9f0f77d8ec10ce3762eef
+              tag: 4.4.0@sha256:056114e8fdab8d6b592d1330390e6203f08642d6ba17d1b3ad1681ce8fc8fee3
             env:
               ROMM_DB_DRIVER: postgresql
               ROMM_BASE_PATH: /romm
@@ -56,6 +55,7 @@ spec:
               ENABLE_SCHEDULED_RETROACHIEVEMENTS_PROGRESS_SYNC: "true"
               ENABLE_SCHEDULED_CONVERT_IMAGES_TO_WEBP: "true"
               RESCAN_ON_FILESYSTEM_CHANGE_DELAY: 5
+              SCAN_WORKERS: 2
               DISABLE_USERPASS_LOGIN: false
               HASHEOUS_API_ENABLED: true
               PLAYMATCH_API_ENABLED: true
