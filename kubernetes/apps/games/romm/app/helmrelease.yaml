@@ -55,6 +55,7 @@ spec:
               ENABLE_SCHEDULED_RETROACHIEVEMENTS_PROGRESS_SYNC: "true"
               ENABLE_SCHEDULED_CONVERT_IMAGES_TO_WEBP: "true"
               RESCAN_ON_FILESYSTEM_CHANGE_DELAY: 5
+              LOGLEVEL: DEBUG
               SCAN_WORKERS: 2
               DISABLE_USERPASS_LOGIN: false
               HASHEOUS_API_ENABLED: true
