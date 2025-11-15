@@ -26,6 +26,7 @@
   ignorePaths: [
     "**/*.sops.*",
     "**/resources/**",
+    ".codex/**",
   ],
   flux: {
     managerFilePatterns: ["/\\.yaml(?:\\.j2)?$/"],
