@@ -1,0 +1,54 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:recommended",
+    "docker:enableMajor",
+    "helpers:pinGitHubActionDigests",
+    "local>.renovate/autoMerge.json5",
+    "local>.renovate/changelogs.json5",
+    "local>.renovate/customManagers.json5",
+    "local>.renovate/grafanaDashboards.json5",
+    "local>.renovate/groups.json5",
+    "local>.renovate/labels.json5",
+    "local>.renovate/overrides.json5",
+    "local>.renovate/semanticCommits.json5",
+    ":automergeBranch",
+    ":disableRateLimiting",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":timezone(America/New_York)",
+  ],
+  dependencyDashboardTitle: "Renovate Dashboard 🤖",
+  suppressNotifications: [
+    "prEditedNotification",
+    "prIgnoreNotification",
+  ],
+  ignorePaths: [
+    "**/*.sops.*",
+    "**/resources/**",
+  ],
+  flux: {
+    managerFilePatterns: ["/\\.yaml(?:\\.j2)?$/"],
+  },
+  "helm-values": {
+    managerFilePatterns: ["/\\.yaml(?:\\.j2)?$/"],
+  },
+  kubernetes: {
+    managerFilePatterns: ["/\\.yaml(?:\\.j2)?$/"],
+  },
+  packageRules: [
+    {
+      description: ["Skip major updates for stateful databases"],
+      matchPackagePatterns: [
+        "bitnamicharts/mariadb",
+        "bitnamicharts/postgresql",
+        "valkey/valkey",
+        "rabbitmq",
+        "postgres-init",
+      ],
+      matchDatasources: ["helm", "docker"],
+      matchUpdateTypes: ["major"],
+      enabled: false,
+    },
+  ],
+}
