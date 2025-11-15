@@ -7,7 +7,7 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/target: &hostname internal.${SECRET_DOMAIN}
     gatus.home-operations.com/endpoint: |-
-      group: internal
+      group: guarded
       guarded: true
       ui:
         hide-hostname: true
@@ -38,8 +38,6 @@ spec:
       protocol: HTTPS
       port: 443
       allowedRoutes:
-        kinds:
-          - kind: HTTPRoute
         namespaces:
           from: All
       tls:
