@@ -61,7 +61,14 @@ spec:
     extraArgs:
       - --ignore-ingress-tls-spec
     policy: sync
-    sources: ["ingress", "service"]
+    sources:
+      - gateway-httproute
+      - gateway-grpcroute
+      - gateway-tlsroute
+      - gateway-tcproute
+      - gateway-udproute
+      - ingress
+      - service
     txtOwnerId: main
     txtPrefix: k8s.main.
     domainFilters: ["nerdz.cloud"]
