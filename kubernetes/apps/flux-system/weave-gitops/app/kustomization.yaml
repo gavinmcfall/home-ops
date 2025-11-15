@@ -6,3 +6,4 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./rbac.yaml
+  - ./httproute.yaml

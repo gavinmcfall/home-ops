@@ -90,7 +90,7 @@ spec:
         ports:
           http:
             port: 5555
-    ingress:
+    route:
       app:
         annotations:
           gethomepage.dev/enabled: "true"
@@ -103,14 +103,16 @@ spec:
           gethomepage.dev/widget.url: http://audiobookshelf-app.entertainment.svc.cluster.local
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_AUDIOBOOKSHELF_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        className: external
-        hosts:
-          - host: audiobookshelf.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - audiobookshelf.${SECRET_DOMAIN}
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
     persistence:
       config:
         existingClaim: audiobookshelf

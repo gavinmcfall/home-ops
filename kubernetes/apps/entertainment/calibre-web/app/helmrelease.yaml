@@ -64,10 +64,9 @@ spec:
         ipFamilyPolicy: PreferDualStack
         ports:
           http:
-            port: 8083
-    ingress:
+            port: &port 8083
+    route:
       app:
-        className: external
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           gethomepage.dev/enabled: "true"
@@ -75,13 +74,16 @@ spec:
           gethomepage.dev/name: Calibre Web
           gethomepage.dev/icon: calibre.png
           gethomepage.dev/description: eBook Library
-        hosts:
-          - host: ebooks.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - ebooks.${SECRET_DOMAIN}
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
     persistence:
       cache:
         type: emptyDir

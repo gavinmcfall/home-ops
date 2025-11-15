@@ -119,9 +119,20 @@ jobs:
         id: diff
         run: |
           cat diff.patch
-          echo "diff<<EOF" >> $GITHUB_OUTPUT
-          cat diff.patch >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          bytes=$(wc -c < diff.patch)
+          echo "bytes=$bytes" >> $GITHUB_OUTPUT
+          if [ "$bytes" -lt 60000 ]; then
+            echo "diff<<EOF" >> $GITHUB_OUTPUT
+            cat diff.patch >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - if: ${{ steps.diff.outputs.bytes != '' && fromJSON(steps.diff.outputs.bytes) >= 60000 }}
+        name: Upload large diff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flux-local-diff-${{ matrix.paths }}-${{ matrix.resources }}
+          path: diff.patch
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Add comment
@@ -133,6 +144,14 @@ jobs:
             ```diff
             ${{ steps.diff.outputs.diff }}
             ```
+
+      - if: ${{ steps.diff.outputs.diff == '' && steps.diff.outputs.bytes != '' && fromJSON(steps.diff.outputs.bytes) >= 60000 }}
+        name: Add artifact notice
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}/artifact"
+          message: |
+            flux-local diff output was >60kB and was uploaded as the `flux-local-diff-${{ matrix.paths }}-${{ matrix.resources }}` artifact instead of an inline comment.
 
   success:
     name: Flux Local - Success

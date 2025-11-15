@@ -79,18 +79,20 @@ spec:
             port: *http-port
           grpc:
             port: *grpc-port
-    ingress:
+    route:
       app:
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: http
     persistence:
       data:
         enabled: true

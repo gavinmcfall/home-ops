@@ -90,8 +90,8 @@ spec:
           io.cilium/lb-ipam-ips: 10.90.3.206
         ports:
           http:
-            port: 32400
-    ingress:
+            port: &port 32400
+    route:
       app:
         annotations:
           gethomepage.dev/enabled: "true"
@@ -104,14 +104,16 @@ spec:
           gethomepage.dev/widget.url: http://plex.entertainment:32400
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_PLEX_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        className: external
-        hosts:
-          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
     persistence:
       config:
         existingClaim: plex

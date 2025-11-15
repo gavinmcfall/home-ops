@@ -81,13 +81,15 @@ spec:
             path: /metrics
             interval: 30s
             scrapeTimeout: 30s
-    ingress:
+    route:
       app:
-        className: internal
-        hosts:
-          - host: "ddns.nerdz.cloud"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - ddns.nerdz.cloud
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port

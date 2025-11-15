@@ -12,6 +12,7 @@ talosconfig
 # Private
 .private
 .bin
+.repoql/
 # Ansible
 .venv*
 # Taskfile

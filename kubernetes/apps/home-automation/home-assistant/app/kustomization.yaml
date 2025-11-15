@@ -7,3 +7,9 @@ resources:
   - ./helmrelease.yaml
   - ../../../../templates/gatus/external
   - ../../../../templates/volsync
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: home-assistant-tesla-key
+    files:
+      - com.tesla.3p.public-key.pem=./tesla-public-key.pem

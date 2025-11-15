@@ -53,19 +53,21 @@ spec:
         controller: linkwarden
         ports:
           http:
-            port: 3000
-    ingress:
+            port: &port 3000
+    route:
       app:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        className: external
-        hosts:
-          - host: links.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - links.${SECRET_DOMAIN}
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
 
     persistence:
       config:
