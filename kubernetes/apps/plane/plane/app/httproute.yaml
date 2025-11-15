@@ -52,10 +52,3 @@ spec:
       backendRefs:
         - name: plane-admin
           port: 3000
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /uploads
-      backendRefs:
-        - name: plane-minio
-          port: 9000
