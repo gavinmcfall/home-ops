@@ -6,8 +6,9 @@ Document exactly what can’t be inferred from code within this repo: GitOps rul
 ## Point Allocation
 | File | Points | Purpose |
 |------|--------|---------|
-| `README.md` | 35 | Repo story, boundaries, integration map, getting started. |
-| `ARCHITECTURE.md` | 35 | Decisions, constraints, failure modes, monitoring. |
+| `README.md` | 30 | Repo story, boundaries, integration map, getting started. |
+| `GESTALT.md` | 25 | One-page mental model + invariant capsules. |
+| `ARCHITECTURE.md` | 25 | Decisions, constraints, failure modes, monitoring. |
 | `CONTRACTS.md` | 20 | Promises to consumers (Taskfile, Flux, secrets). |
 | `DOMAIN.md` | 10 | Rules/invariants and glossary. |
 | Supporting docs | Not scored | Questions, workflows, tooling, templates.
@@ -34,6 +35,7 @@ Each claim must cite a source and confidence level. Sample table:
 | File | Review Frequency | Trigger |
 |------|------------------|---------|
 | `README.md` | Quarterly | New area or infrastructure change.
+| `GESTALT.md` | On new invariant/pattern | Taskfile, Flux, or placeholder strategy shifts.
 | `ARCHITECTURE.md` | On pattern change | Taskfile or Flux workflow update.
 | `CONTRACTS.md` | Before breaking change | New placeholder, chart, or secret strategy.
 | `DOMAIN.md` | When rules shift | New automation or storage pattern.

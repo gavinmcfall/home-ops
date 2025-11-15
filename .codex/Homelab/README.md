@@ -1,80 +1,137 @@
-# Homelab Infrastructure Playbook
+# Homelab Knowledge Base
 
-## Service Identity
-**Type**: Infrastructure-as-Code + GitOps automation hub
-**Domain**: Home Kubernetes cluster + supporting tooling (Flux, Talos, monitoring)
+**Goal**: Deliver the “aha!” context for the home-ops repository so every helper understands how `Taskfile.yaml`, `bootstrap/`, `talosconfig/`, and the Flux overlays under `kubernetes/apps/*` combine into a single GitOps control plane.
 
-## 👥 Ownership
-**Team**: Solo maintainer (Gavin)
-**Signals**: #home-operations Discord channel
-**On-Call**: Self-managed; GitHub Actions, Flux, and automated Taskfile recipes handle most fixes
+---
 
-## Why This Exists
-This repository tracks every artifact required to boot, configure, and operate the home Kubernetes cluster. The `bootstrap/` scripts, `talosconfig/` definitions, and `Taskfile`/`makejinja.toml` templates render manifests that Flux applies under `kubernetes/apps/*` so the cluster stays in sync from a single Git source [README.md:41-130].
+## The Problem
+This repo powers every part of the homelab—from Talos node configs to HelmReleases—but the knowledge lives across scripts, Taskfiles, GitHub Actions, and dozens of app directories. Without a curated view you must:
+- Reverse-engineer Taskfile orchestration (`Taskfile.yaml`, `.taskfiles/*`).
+- Inspect each area (e.g., `kubernetes/apps/games/romm/app/helmrelease.yaml`) to infer placeholder conventions.
+- Learn Talos + bootstrap workflows from scattered scripts.
 
-## Service Boundaries
-### ✅ This Repository Owns
-- Bootstrapping node hardware via `bootstrap/` scripts, `scripts/`, and Talos configs under `talosconfig/`.
-- Flux-based GitOps manifests under `kubernetes/apps/*`, including HelmReleases, ExternalSecrets, and ingress/secret wiring.
-- Repository tooling (`Taskfile.yaml`, `.taskfiles/*`, `makejinja.toml`) that renders configs, validates with `task kubernetes:kubeconform`, and packages secrets safely.
+Result: newcomers waste hours rediscovering GitOps invariants, placeholder maps, and storage expectations before touching a single manifest.
 
-### ❌ This Repository Does NOT Own
-- External DNS providers or private 1Password vaults; only placeholders such as `${SECRET_DOMAIN}` or `${DB_URI}` appear in Git.
-- Cloud-native managed services; all dependencies (storage, Vault, monitoring dashboards) are on-prem or self-hosted.
+---
 
-## ⚠️ Gotchas
-- Flux requires each area (`kubernetes/apps/games`, `kubernetes/apps/plane`, etc.) to list its HelmRelease in a `kustomization`; missing references stop syncing [kubernetes/apps/games/romm/app/helmrelease.yaml].
-- Secrets are populated via ExternalSecrets, so reloads fail until placeholders (e.g., `PLANE_DB_URL`, `${SECRET_DOMAIN}`) are resolved by the private vault.
-- Storage-heavy workloads like ROMM rely on multiple mounts (PVCs, tmpfs, NFS); changing claim names or servers without matching config leads to pods pending [kubernetes/apps/games/romm/app/helmrelease.yaml:102-140].
+## The Solution
+`.codex/Homelab` follows a structured pattern:
 
-## Integration Map
-### Dependencies (Inbound)
-| System | Purpose | Notes |
-|--------|---------|-------|
-| Flux (`gitops-system`) | Reconciles manifests under `kubernetes/apps/*` and watches HelmReleases | Every change runs `flux diff` or `flux reconcile` after `Taskfile` renders new templates |
-| Taskfile + Makejinja | Renders templates (scripts, configs) before commits | `Taskfile.yaml` includes `.taskfiles/Kubernetes`, `.taskfiles/Talos`, `.taskfiles/Flux`, etc. |
-| ExternalSecrets + placeholder vault | Supplies secrets referenced by `${SECRET_DOMAIN}`, `PLANE_*`, or `romm-secret` | Secrets never land in Git; they point at secure vault keys |
+Start with foundation docs that explain philosophy and tooling, drill into repository capsules (architecture, domain, contracts, workflows), and keep every claim tied back to evidence.
+- **Foundation docs** explain philosophy, tooling, and mental models.
+- **Repository capsules** describe architecture, domain invariants, integration contracts, and workflows.
+- **Evidence tables** link every claim back to concrete files inside `/home/gavin/home-ops`.
 
-### Consumers (Outbound)
-| Service | What They Use | SLA |
-|---------|---------------|-----|
-| Flux | HelmRelease + kustomization outputs | Idempotent deployment; fails fast on missing placeholders |
-| Monitoring dashboards | Expose status badges referenced in `README.md` | ~5 minute reconciliation update |
+Read these docs in <15 minutes and you can answer “Where does this change belong?” or “What breaks if I rename `${SECRET_DOMAIN}`?” without spelunking the entire repo.
 
-### Events
-- **Publishes**: GitHub Actions creates PRs, Renovate updates chart versions, and Taskfile validations log to stdout.
-- **Consumes**: Flux responds to Git pushes, ExternalSecrets polls vault changes, and Taskfile tasks are triggered manually or via GitHub workflows.
+---
 
-## Getting Started
-```bash
-task init
-task configure
-task kubernetes:kubeconform
-flux diff kustomization games --path=kubernetes/apps/games/romm/app
+## Quick Start
+1. **Read `TOOLS.md`** – Search strategy, command recipes, verification patterns.
+2. **Read this README** – Understand the story, ownership, and navigation cues.
+3. **Read `ARCHITECTURE.md`** – Mental model, key decisions, constraints (GitOps/Talos/Flux pipeline).
+4. **Read `DOMAIN.md`** – Rules/invariants, glossary, and lifecycle diagrams.
+5. **Read `CONTRACTS.md`** – Integration guarantees for Taskfile, Flux, and ExternalSecrets.
+6. **Skim `WORKFLOWS.md` + `QUESTIONS.md`** – How to ship safely and which gaps remain.
+
+Need deeper context? Drop into `kubernetes/apps/<area>/app` for the HelmRelease, ExternalSecret, and kustomization referenced here.
+
+---
+
+## What’s Inside
+### Foundation Documents
+- **`GESTALT.md`** – Fast mental model of the Taskfile → Flux → ExternalSecrets pipeline plus invariant capsules.
+- **`ARCHITECTURE.md`** – GitOps pattern, Taskfile decisions, placeholder strategy, constraints (`Taskfile.yaml`, `kubernetes/apps/games/romm/app/helmrelease.yaml`).
+- **`DOMAIN.md`** – Rules like “Flux + Taskfile are the authority,” storage invariants, glossary, state machines.
+- **`CONTRACTS.md`** – Guarantees for Taskfile, Flux, ExternalSecrets, and breaking-change policy.
+- **`WORKFLOWS.md`** – Step-by-step HelmRelease onboarding and rolling update playbooks.
+- **`TOOLS.md`** – Retrieval strategy (`rg`, `task`, `flux diff`), verification ideas, snippet commands.
+- **`QUESTIONS.md`** – Known unknowns (placeholder inventory, ROMM storage history, Flux metrics).
+- **`TEMPLATE_GUIDE.md`** – Placeholder index, evidence standards, maintenance cadence.
+
+### Repository Surface Area
+- **GitOps pipeline**: `Taskfile.yaml`, `.taskfiles/*`, `makejinja.toml`, and `bootstrap/` render everything Flux sees.
+- **Cluster manifests**: `kubernetes/apps/<area>/app/{helmrelease,externalsecret}.yaml` plus area `kustomization.yaml` (ROMM is the canonical example).
+- **Talos + scripts**: `talosconfig/` and `scripts/` hold node configs, bootstrap helpers, and install automation.
+- **Dashboards & automation**: `dashboards/` feed the badges in `README.md`; Renovate/Flux GHAs enforce automation.
+
+---
+
+## Navigation Philosophy
+**Progressive disclosure** – start broad, zoom in only as needed:
+```
+README (story, owners)
+    ↓
+ARCHITECTURE / DOMAIN (mental model)
+    ↓
+CONTRACTS / WORKFLOWS (how to act)
+    ↓
+Specific app manifests under kubernetes/apps/* (implementation)
 ```
 
-## Common Tasks
-- **Add a new app**: create `kubernetes/apps/<area>/app/helmrelease.yaml`, `externalsecret.yaml`, and wire it into the area `kustomization.yaml`.
-- **Refresh secrets**: edit placeholders in `ExternalSecret` resources and rerun your vault sync; check `kubernetes/apps/<area>/app` for env references.
-- **Validate manifests**: `task kubernetes:kubeconform` followed by `flux diff kustomization <area>` ensures Flux will accept the change.
+Never edit YAML blind—verify claims using the evidence links or run `task configure` + `flux diff` before touching manifests.
 
-## Key Concepts
-- **GitOps Manifests**: `kubernetes/apps/*` contains per-area overlays; HelmRelease specs pin chart versions and tags for predictable rollouts.
-- **Bootstrapping**: Scripts under `bootstrap/`, `scripts/`, and templates generated by `makejinja` supply Talos config values and secrets placeholders.
-- **ExternalSecrets**: Secrets are never stored in Git; all workloads pull them via names such as `romm-secret` or `plane-secret` defined beside the HelmRelease.
+---
 
-## Workflows
-- **Cluster updates**: edit Talos configs → `task configure` → `flux diff` → commit + push → Flux applies.
-- **Helm rollout**: bump HelmRelease image/tag → `task kubernetes:kubeconform` → `flux diff` → merge PR → watch Flux reconcile.
+## Critical Invariants
+- **GitOps Authority**: `task configure` must render manifests before Flux (`kubernetes/apps/*` never edited manually). Violating this just reverts on next sync (`Taskfile.yaml`, `ARCHITECTURE.md`).
+- **Placeholder Discipline**: `${SECRET_DOMAIN}`, `${MEDIA_SERVER}`, `${DB_URI}`, and app-specific env vars stay as placeholders. Real values arrive via ExternalSecrets and never land in Git (`kubernetes/apps/games/romm/app/helmrelease.yaml:65-140`).
+- **Storage Declaration**: Any workload needing persistence (ROMM, databases) declares PVC/NFS mounts in the HelmRelease `persistence` block before Flux deploys it (`kubernetes/apps/games/romm/app/helmrelease.yaml:102-140`).
+- **Flux Wiring**: Each area’s HelmRelease must be referenced by a `kustomization.yaml`; otherwise Flux silently ignores it (`kubernetes/apps/games/kustomization.yaml`).
 
-## Troubleshooting
-- Run `flux get kustomizations` to confirm all overlays are healthy.
-- Use `helm template` against the HelmRelease values in `kubernetes/apps/games/romm/app/helmrelease.yaml` to catch render issues.
-- Substitute `${SECRET_DOMAIN}` before testing ingresses; the repo uses placeholders for every public host.
+These invariants appear across `ARCHITECTURE.md`, `DOMAIN.md`, and `CONTRACTS.md`. Breaking them is the fastest path to pods stuck in `Pending` or Flux loops.
+
+---
+
+## Integration Map
+| Dependency | Purpose | Source |
+|------------|---------|--------|
+| **Taskfile + Makejinja** | Render templates, wrap secrets, run kubeconform | `Taskfile.yaml`, `.taskfiles/*`, `makejinja.toml` |
+| **Flux** | Applies everything under `kubernetes/apps/*`, respects dependsOn/remediation | `kubernetes/apps/games/romm/app/helmrelease.yaml` |
+| **ExternalSecrets** | Bridges placeholders (e.g., `romm-secret`, `PLANE_DB_URL`) to real secrets | `kubernetes/apps/<area>/app/externalsecret.yaml` |
+| **Talos configs** | Define node bootstrap + upgrades | `talosconfig/`, `bootstrap/` |
+
+Outputs feed:
+- **Monitoring dashboards** under `dashboards/` → README badges.
+- **GitHub Actions / Renovate** → automated PRs documented in `WORKFLOWS.md`.
+
+---
+
+## Getting Started in the Repo
+```bash
+task init                   # seed config.yaml and direnv values
+task configure              # render templates + manifests
+task kubernetes:kubeconform # validate manifests commonly
+flux diff kustomization games --path=kubernetes/apps/games/romm/app
+```
+- Adding an app? Follow `WORKFLOWS.md` to create the HelmRelease, ExternalSecret, and kustomization entry.
+- Refreshing secrets? Update the ExternalSecret, sync your vault, and rerun `task configure`.
+- Verifying? `flux get kustomizations` + `flux get helmrelease <name>` confirm reconciliation status.
+
+---
+
+## Maintenance & Contribution
+- Follow `TEMPLATE_GUIDE.md` before adding docs—capture timeless patterns, cite sources, avoid secrets.
+- Update `ARCHITECTURE.md` and `DOMAIN.md` whenever GitOps patterns, placeholders, or storage strategies change.
+- Log unanswered questions or pending migrations in `QUESTIONS.md`; future work should resolve or move them to the “Answered” section.
+- Keep evidence tables fresh whenever moving files or renaming directories referenced here.
+
+---
+
+## Success Metrics
+✅ Anyone can orient themselves in <20 minutes and know where to place a change.
+✅ `task configure` + `flux diff` are run before every PR, preventing surprise reconciles.
+✅ Placeholder inventory lives in `TEMPLATE_GUIDE.md`, so secrets never leak.
+✅ Storage-heavy workloads document their claims/mounts before shipping.
+
+If those aren’t true, update the relevant doc or create an issue in `/home/gavin/home-ops`.
+
+---
 
 ## Evidence
 | Claim | Source | Confidence | Details |
 |-------|:------:|:----------:|---------|
-| GitOps + Flux workflow | `README.md:41-130`, `kubernetes/apps/games/romm/app/helmrelease.yaml:2-140` | 🟢 | Root README describes Flux/Taskfile usage; HelmRelease demonstrates real values/dependsOn. |
-| Bootstrapping tools | `Taskfile.yaml`, `bootstrap/`, `talosconfig/` | 🟢 | Taskfile includes `.taskfiles/Kubernetes`, `.taskfiles/Talos`, Bootstrapping happens inside `bootstrap` scripts. |
-| Placeholder/secrets strategy | `kubernetes/apps/games/romm/app/helmrelease.yaml:65-140` | 🟢 | `${SECRET_DOMAIN}`, `existingClaim`, `tmpfs`, and env secrets documented. |
+| GitOps workflow = Taskfile → Flux | `Taskfile.yaml`, `kubernetes/apps/games/romm/app/helmrelease.yaml` | 🟢 | Taskfile renders/validates; HelmRelease shows Flux interval/dependsOn. |
+| Placeholders guard secrets | `kubernetes/apps/games/romm/app/helmrelease.yaml:65-140` | 🟢 | `${SECRET_DOMAIN}`, `envFrom` referencing ExternalSecret names. |
+| Storage + wiring requirements | `kubernetes/apps/games/romm/app/helmrelease.yaml:90-150`, `kubernetes/apps/games/kustomization.yaml` | 🟢 | Shows `persistence` + required kustomization pointers. |
+| Dashboards/automation exist | `README.md:1-130`, `dashboards/` | 🟢 | README badges and dashboards folder show observability output. |

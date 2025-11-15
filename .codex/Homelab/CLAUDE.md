@@ -1,16 +1,43 @@
 # Homelab Guidance for Claude/Codex
 
-This folder holds the templates Claude or Codex should follow before touching the rest of the repository. Keep your answers scoped to what lives directly under `/home/gavin/home-ops`.
+You are a thinking partner, not a shell runner. Use this playbook before editing `/home/gavin/home-ops`.
 
-## Reading Order
-1. Start with `README.md` to learn how the repo is structured, what components it owns, and how tasks are triggered from `.codex/Homelab` tooling.
-2. Use `ARCHITECTURE.md` to understand the GitOps workflow (Flux + HelmRelease + Taskfile rendering), the Talos/bootstrap pattern, and the constraints that keep the public repo safe.
-3. Consult `CONTRACTS.md` for the promises the repo makes to GitOps consumers (Flux intervals, placeholder handling, signal dashboards).
-4. Study `DOMAIN.md` for invariants, state machines, and domain-specific vocabulary such as `${SECRET_DOMAIN}` or ROMM media mounts.
-5. Keep `QUESTIONS.md` up to date with unknowns before asking the human to fill gaps.
-6. Use `WORKFLOWS.md`, `TOOLS.md`, and `TEMPLATE_GUIDE.md` for the procedural guidance and placeholder substitution rules.
+---
 
-## Safety
-- Everything referenced here must exist within `/home/gavin/home-ops`; any path outside (e.g., other repos) is off-limits.
-- Replace real hostnames, IPs, or credentials with placeholders such as `${SECRET_DOMAIN}`, `${MEDIA_SERVER}`, or `${KUBE_NAMESPACE}`.
-- When in doubt, cite files like `README.md`, `Taskfile.yaml`, or `kubernetes/apps/games/romm/app/helmrelease.yaml` to support statements.
+## Step 1: Read the Foundation Docs (in order)
+1. **`TOOLS.md`** – Learn the search strategy (`rg`, `task`, `flux diff`) and how to verify claims.
+2. **`README.md`** – Understand the knowledge base’s purpose, navigation pattern, and invariants.
+3. **`ARCHITECTURE.md`** – Internal mental model for GitOps/Talos/Flux, decisions, constraints, failure modes.
+4. **`DOMAIN.md`** – Domain rules, lifecycle diagrams, glossary.
+5. **`CONTRACTS.md`** – Integration guarantees for Taskfile, Flux, ExternalSecrets.
+6. **`WORKFLOWS.md`** – Operational runbooks for HelmRelease onboarding and rolling updates.
+7. **`TEMPLATE_GUIDE.md`** – Placeholder inventory, evidence standards, maintenance cadence.
+8. **`QUESTIONS.md`** – Known gaps to prioritize.
+
+Do not start coding until you can restate the GitOps pipeline (Taskfile → Flux → ExternalSecrets) and cite where placeholders live.
+
+---
+
+## Step 2: Discover the Repository Surface
+Before reading random files, inventory the repo:
+```bash
+ls bootstrap talosconfig kubernetes/apps scripts
+rg -n "helmrelease" kubernetes/apps --files
+rg -n "\${SECRET_DOMAIN}" kubernetes/apps -g"*.yaml"
+```
+- Map `kubernetes/apps/<area>/app` directories and their `kustomization.yaml` parents.
+- Identify placeholder usage (`${SECRET_DOMAIN}`, `${MEDIA_SERVER}`, `PLANE_*`) via `rg`.
+- Use `task --list` or read `Taskfile.yaml` to see orchestration entry points.
+
+Only after you know what exists should you drill into a specific app or script.
+
+---
+
+## Step 3: Work Within These Rules
+- **Stay scoped** to `/home/gavin/home-ops`. No cross-repo edits or assumptions.
+- **Never leak secrets**: keep hostnames/paths abstract (`${SECRET_DOMAIN}`, `${DB_URI}`).
+- **Cite sources**: every architectural claim in `.codex/Homelab` must reference files like `Taskfile.yaml`, `kubernetes/apps/games/romm/app/helmrelease.yaml`, or `README.md`.
+- **Prefer omission over speculation**: if you can’t verify something, add it to `QUESTIONS.md` rather than guessing.
+- **Run commands intentionally**: `task configure`, `task kubernetes:kubeconform`, and `flux diff` are the validation tools; don’t invent new ones without reason.
+
+Following these steps recreates the disciplined workflow this knowledge base expects for the homelab repo.
