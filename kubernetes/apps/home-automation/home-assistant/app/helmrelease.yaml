@@ -120,14 +120,6 @@ spec:
       tesla-key:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-          nginx.ingress.kubernetes.io/server-snippet: |
-            location = /.well-known/appspecific/com.tesla.3p.public-key.pem {
-              return 200 "-----BEGIN PUBLIC KEY-----
-            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEMlj2zyHUptFNJWuE11vfkaEhV8lG
-            q31op/Glpzt0jQWINCMzRCCcL8d0Vo+uvOEv2Peg2K+SfUMl5HWEbDsDpg==
-            -----END PUBLIC KEY-----";
-              add_header Content-Type application/x-pem-file;
-            }
         hostnames:
           - hass.${SECRET_DOMAIN}
         parentRefs:
@@ -172,3 +164,10 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
+      tesla-key:
+        type: configMap
+        name: home-assistant-tesla-key
+        globalMounts:
+          - path: /config/www/.well-known/appspecific/com.tesla.3p.public-key.pem
+            subPath: com.tesla.3p.public-key.pem
+            readOnly: true
