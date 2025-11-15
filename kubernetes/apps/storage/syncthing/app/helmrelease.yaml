@@ -90,23 +90,18 @@ spec:
             enabled: true
             port: 22000
             protocol: UDP
-    ingress:
+    route:
       app:
-        className: internal
-        annotations:
-          nginx.ingress.kubernetes.io/whitelist-source-range: |
-            10.69.0.0/16,10.96.0.0/16,10.90.0.0/16
-        hosts:
-          - host: &host sync.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - hosts:
-              - *host
+        hostnames:
+          - sync.${SECRET_DOMAIN}
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: http
 
     persistence:
       data:

@@ -96,52 +96,57 @@ spec:
         controller: home-assistant
         ports:
           http:
-            port: 8123
+            port: &httpPort 8123
           code-server:
-            port: 12321
-    ingress:
+            port: &codePort 12321
+    route:
       app:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        className: external
-        hosts:
-          - host: hass.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-      tesla-key:  # NEW separate ingress for Tesla key
+        hostnames:
+          - hass.${SECRET_DOMAIN}
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: /
+            backendRefs:
+              - identifier: app
+                port: *httpPort
+      tesla-key:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-          nginx.ingress.kubernetes.io/server-snippet: |
-            location = /.well-known/appspecific/com.tesla.3p.public-key.pem {
-              return 200 "-----BEGIN PUBLIC KEY-----
-            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEMlj2zyHUptFNJWuE11vfkaEhV8lG
-            q31op/Glpzt0jQWINCMzRCCcL8d0Vo+uvOEv2Peg2K+SfUMl5HWEbDsDpg==
-            -----END PUBLIC KEY-----";
-              add_header Content-Type application/x-pem-file;
-            }
-        className: external
-        hosts:
-          - host: hass.${SECRET_DOMAIN}
-            paths:
-              - path: /.well-known/appspecific/com.tesla.3p.public-key.pem
-                pathType: Exact
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - hass.${SECRET_DOMAIN}
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - matches:
+              - path:
+                  type: Exact
+                  value: /.well-known/appspecific/com.tesla.3p.public-key.pem
+            backendRefs:
+              - identifier: app
+                port: *httpPort
       code-server:
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        className: internal
-        hosts:
-          - host: hass-code.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: code-server
+        hostnames:
+          - hass-code.${SECRET_DOMAIN}
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *codePort
     persistence:
       config:
         existingClaim: home-assistant
@@ -159,3 +164,10 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
+      tesla-key:
+        type: configMap
+        name: home-assistant-tesla-key
+        globalMounts:
+          - path: /config/www/.well-known/appspecific/com.tesla.3p.public-key.pem
+            subPath: com.tesla.3p.public-key.pem
+            readOnly: true

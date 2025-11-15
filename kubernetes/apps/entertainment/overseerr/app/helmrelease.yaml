@@ -59,10 +59,9 @@ spec:
         controller: *app
         ports:
           http:
-            port: 5055
-    ingress:
+            port: &port 5055
+    route:
       app:
-        className: external
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Entertainment
@@ -74,13 +73,16 @@ spec:
           gethomepage.dev/widget.url: http://overseerr.entertainment:5055
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_OVERSEERR_TOKEN}}` }}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        hosts:
-          - host: requests.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - requests.${SECRET_DOMAIN}
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
     persistence:
       config:
         existingClaim: *app

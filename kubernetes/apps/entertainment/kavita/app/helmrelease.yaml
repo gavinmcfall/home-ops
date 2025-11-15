@@ -53,10 +53,9 @@ spec:
         controller: *app
         ports:
           http:
-            port: 5000
-    ingress:
+            port: &port 5000
+    route:
       app:
-        className: external
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Entertainment
@@ -69,13 +68,16 @@ spec:
           gethomepage.dev/widget.username: "{{ `{{HOMEPAGE_VAR_KAVITA_USERNAME}}` }}"
           gethomepage.dev/widget.password: "{{ `{{HOMEPAGE_VAR_KAVITA_PASSWORD}}` }}"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        hosts:
-          - host: comics.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - comics.${SECRET_DOMAIN}
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
     persistence:
       config:
         existingClaim: *app
