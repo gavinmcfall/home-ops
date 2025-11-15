@@ -4,14 +4,23 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: internal
+  annotations:
+    external-dns.alpha.kubernetes.io/target: &hostname internal.ok8.sh
+    gatus.home-operations.com/endpoint: |-
+      group: internal
+      guarded: true
+      ui:
+        hide-hostname: true
+        hide-url: true
 spec:
   gatewayClassName: envoy-internal
   addresses:
     - type: IPAddress
-      value: "10.90.3.202"
+      value: &address "10.90.3.202"
   infrastructure:
     annotations:
-      io.cilium/lb-ipam-ips: "10.90.3.202"
+      external-dns.alpha.kubernetes.io/hostname: *hostname
+      lbipam.cilium.io/ips: *address
     parametersRef:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
