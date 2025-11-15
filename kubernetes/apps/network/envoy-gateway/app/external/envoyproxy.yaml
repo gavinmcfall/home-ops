@@ -41,9 +41,5 @@ spec:
           scaleDown:
             stabilizationWindowSeconds: 300
       envoyService:
-        name: envoy-external
-        type: LoadBalancer
-        loadBalancerIP: "10.90.3.201"
         externalTrafficPolicy: Local
-        annotations:
-          io.cilium/lb-ipam-ips: "10.90.3.201"
+        name: envoy-external
