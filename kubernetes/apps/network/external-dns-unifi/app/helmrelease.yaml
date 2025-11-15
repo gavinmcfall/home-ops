@@ -67,7 +67,6 @@ spec:
       - gateway-tlsroute
       - gateway-tcproute
       - gateway-udproute
-      # - ingress
       - service
     txtOwnerId: main
     txtPrefix: k8s.main.
