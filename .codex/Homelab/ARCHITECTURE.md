@@ -17,7 +17,7 @@
 
 ### Decision 2: Flux + HelmRelease per app
 **Context**: Desire flexible service ownership while keeping the cluster consistent.
-**Decision**: Each app (games, plane, etc.) lives in its own `kubernetes/apps/<area>` folder with HelmRelease, ExternalSecret, and kustomization manifests.[kubernetes/apps/games/romm/app/helmrelease.yaml]
+**Decision**: Each app (games, plane, etc.) lives in its own `kubernetes/apps/<namespace>` folder with HelmRelease, ExternalSecret, and kustomization manifests.[kubernetes/apps/games/romm/app/helmrelease.yaml]
 **Impact**:
 - ✅ Dependencies/lifecycle captured via `dependsOn`, `remediation`, and pinned chart versions.
 - ⚠️ You need to wire the HelmRelease into the area `kustomization.yaml` or Flux will skip it.
@@ -56,7 +56,7 @@
 ### Flux can't render HelmRelease
 **Symptoms**: `helm` hook errors in Flux status.
 **Cause**: Missing placeholder, invalid value, or unrendered template from `.taskfiles/Kubernetes`.
-**Immediate Fix**: Run `task configure` locally, check `kubernetes/apps/<area>/app` output for errors.
+**Immediate Fix**: Run `task configure` locally, check `kubernetes/apps/<namespace>/app` output for errors.
 **Long-term Fix**: Document required placeholders in `TEMPLATE_GUIDE.md` and evidence table.
 
 ### Secrets unresolved
@@ -80,7 +80,7 @@
 - Status badges referenced in `README.md` (e.g., `https://status.nerdz.cloud`).
 
 ## Technology Stack
-- **Runtime**: Kubernetes (k3s/Talos mix) with Helm + Flux.
+- **Runtime**: Kubernetes (Talos) with Helm + Flux.
 - **Provisioning**: Taskfile/Makejinja templates, `bootstrap/` scripts, `talosconfig/` configs.
 - **Secrets**: ExternalSecrets + placeholder names (see `TEMPLATE_GUIDE.md`).
 - **Storage**: PVCs and NFS mounts defined in HelmRelease values (ROMM example). Adjust via `kubernetes/apps/*/app/helmrelease.yaml`.

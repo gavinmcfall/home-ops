@@ -10,8 +10,8 @@
 | Operation | Guarantee |
 |-----------|-----------|
 | `task configure` | Renders all `kubernetes/apps/*/app` HelmReleases with current placeholder substitutions; fails if `makejinja` encounters missing vars. |
-| `flux diff kustomization <area>` | Shows exactly what Flux will apply for the area by rendering the HelmRelease values and secrets. |
-| `flux reconcile kustomization <area>` | Applies GitOps changes idempotently; it either finishes or surfaces errors in `flux get helmrelease`. |
+| `flux diff kustomization <namespace>` | Shows exactly what Flux will apply for the area by rendering the HelmRelease values and secrets. |
+| `flux reconcile kustomization <namespace>` | Applies GitOps changes idempotently; it either finishes or surfaces errors in `flux get helmrelease`. |
 
 ### Breaking Change Policy
 - **Add placeholder fields**: ✅ Allowed if you document the new variable in `TEMPLATE_GUIDE.md`. |
