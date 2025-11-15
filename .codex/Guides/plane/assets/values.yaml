@@ -36,7 +36,7 @@ redis:
 
 postgres:
   local_setup: true
-  image: postgres:15.14-alpine
+  image: postgres:18.1-alpine
   servicePort: 5432
   storageClass: ""
   volumeSize: 1Gi
