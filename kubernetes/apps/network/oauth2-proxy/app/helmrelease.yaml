@@ -132,6 +132,3 @@ spec:
               - path:
                   type: PathPrefix
                   value: /oauth2
-            backendRefs:
-              - identifier: app
-                port: http
