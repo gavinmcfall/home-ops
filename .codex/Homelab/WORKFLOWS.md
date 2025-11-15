@@ -2,7 +2,7 @@
 
 ## Deploying a new HelmRelease-based app
 ### Overview
-Bring up new functionality by adding a HelmRelease to `kubernetes/apps/<area>/app` and wiring it into the area’s `kustomization`.
+Bring up new functionality by adding a HelmRelease to `kubernetes/apps/<namespace>/app` and wiring it into the area’s `kustomization`.
 
 ### Flow Diagram
 ```mermaid
@@ -23,8 +23,8 @@ sequenceDiagram
 ### Steps
 1. **Create area folder** – add `kustomization.yaml`, `app/helmrelease.yaml`, and optional `externalsecret.yaml`.
 2. **Pin chart/tag** – choose Helm chart/image tags and configure env placeholders (`${SECRET_DOMAIN}`, `${DB_URI}`) and any storage sections (`persistence`).
-3. **Render templates** – run `task configure` to produce the Flux-ready YAML under `kubernetes/apps/<area>/app`.
-4. **Validate and push** – run `task kubernetes:kubeconform` and `flux diff kustomization <area>`, then open a PR.
+3. **Render templates** – run `task configure` to produce the Flux-ready YAML under `kubernetes/apps/<namespace>/app`.
+4. **Validate and push** – run `task kubernetes:kubeconform` and `flux diff kustomization <namespace>`, then open a PR.
 5. **Monitor Flux** – after merge, `flux get helmrelease <name>` should reach `Ready`; address errors via `flux logs`.
 
 ### Error Handling
@@ -41,7 +41,7 @@ Use Taskfile commands to rerender configs, validate them, and keep Talos/Flux al
 ### Steps
 1. Update config sources (`bootstrap/`, `scripts/`, or `makejinja.toml`).
 2. Run `task configure` → `task kubernetes:kubeconform` to validate.
-3. Inspect diffs with `flux diff kustomization <area>`.
+3. Inspect diffs with `flux diff kustomization <namespace>`.
 4. Merge the PR, then watch Flux (`flux get helmrelease` / `flux get kustomizations`).
 
 ### Code Entry Points

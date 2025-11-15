@@ -20,7 +20,7 @@ Result: newcomers waste hours rediscovering GitOps invariants, placeholder maps,
 Start with foundation docs that explain philosophy and tooling, drill into repository capsules (architecture, domain, contracts, workflows), and keep every claim tied back to evidence.
 - **Foundation docs** explain philosophy, tooling, and mental models.
 - **Repository capsules** describe architecture, domain invariants, integration contracts, and workflows.
-- **Evidence tables** link every claim back to concrete files inside `/home/gavin/home-ops`.
+- **Evidence tables** link every claim back to concrete files inside `~/home-ops`.
 
 Read these docs in <15 minutes and you can answer “Where does this change belong?” or “What breaks if I rename `${SECRET_DOMAIN}`?” without spelunking the entire repo.
 
@@ -34,7 +34,7 @@ Read these docs in <15 minutes and you can answer “Where does this change belo
 5. **Read `CONTRACTS.md`** – Integration guarantees for Taskfile, Flux, and ExternalSecrets.
 6. **Skim `WORKFLOWS.md` + `QUESTIONS.md`** – How to ship safely and which gaps remain.
 
-Need deeper context? Drop into `kubernetes/apps/<area>/app` for the HelmRelease, ExternalSecret, and kustomization referenced here.
+Need deeper context? Drop into `kubernetes/apps/<namespace>/app` for the HelmRelease, ExternalSecret, and kustomization referenced here.
 
 ---
 
@@ -51,7 +51,7 @@ Need deeper context? Drop into `kubernetes/apps/<area>/app` for the HelmRelease,
 
 ### Repository Surface Area
 - **GitOps pipeline**: `Taskfile.yaml`, `.taskfiles/*`, `makejinja.toml`, and `bootstrap/` render everything Flux sees.
-- **Cluster manifests**: `kubernetes/apps/<area>/app/{helmrelease,externalsecret}.yaml` plus area `kustomization.yaml` (ROMM is the canonical example).
+- **Cluster manifests**: `kubernetes/apps/<namespace>/app/{helmrelease,externalsecret}.yaml` plus area `kustomization.yaml` (ROMM is the canonical example).
 - **Talos + scripts**: `talosconfig/` and `scripts/` hold node configs, bootstrap helpers, and install automation.
 - **Dashboards & automation**: `dashboards/` feed the badges in `README.md`; Renovate/Flux GHAs enforce automation.
 
@@ -88,7 +88,7 @@ These invariants appear across `ARCHITECTURE.md`, `DOMAIN.md`, and `CONTRACTS.md
 |------------|---------|--------|
 | **Taskfile + Makejinja** | Render templates, wrap secrets, run kubeconform | `Taskfile.yaml`, `.taskfiles/*`, `makejinja.toml` |
 | **Flux** | Applies everything under `kubernetes/apps/*`, respects dependsOn/remediation | `kubernetes/apps/games/romm/app/helmrelease.yaml` |
-| **ExternalSecrets** | Bridges placeholders (e.g., `romm-secret`, `PLANE_DB_URL`) to real secrets | `kubernetes/apps/<area>/app/externalsecret.yaml` |
+| **ExternalSecrets** | Bridges placeholders (e.g., `romm-secret`, `PLANE_DB_URL`) to real secrets | `kubernetes/apps/<namespace>/app/externalsecret.yaml` |
 | **Talos configs** | Define node bootstrap + upgrades | `talosconfig/`, `bootstrap/` |
 
 Outputs feed:
@@ -124,7 +124,7 @@ flux diff kustomization games --path=kubernetes/apps/games/romm/app
 ✅ Placeholder inventory lives in `TEMPLATE_GUIDE.md`, so secrets never leak.
 ✅ Storage-heavy workloads document their claims/mounts before shipping.
 
-If those aren’t true, update the relevant doc or create an issue in `/home/gavin/home-ops`.
+If those aren’t true, update the relevant doc or create an issue in `~/home-ops`.
 
 ---
 

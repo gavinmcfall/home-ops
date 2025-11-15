@@ -1,7 +1,7 @@
 ---
 title: Homelab System Gestalt
 purpose: Provide the mental model that makes the home-ops repo click in 15 minutes
-audience: Gavin + automation agents working inside `/home/gavin/home-ops`
+audience: Gavin + automation agents working inside `~/home-ops`
 verified: README.md / Taskfile.yaml / kubernetes/apps/games/romm/app/helmrelease.yaml
 ---
 
@@ -66,7 +66,7 @@ Each area `kustomization.yaml` must reference the HelmRelease folder. Without it
 |-------|----------|---------|-------|
 | **Bootstrapping** | `bootstrap/`, `scripts/`, `talosconfig/` | Bring nodes online, generate Talos machine configs | Rendered via Taskfile + Makejinja before any Flux work. |
 | **Render Pipeline** | `Taskfile.yaml`, `.taskfiles/*`, `makejinja.toml` | Defines `task init`, `task configure`, `task kubernetes:kubeconform`, flux helpers | Reinforces a RepoQL-style habit—render/validate before diffing. |
-| **GitOps Manifests** | `kubernetes/apps/<area>/app` & `kustomization.yaml` | HelmReleases, ExternalSecrets, ingress + storage definitions | Each app follows the triad: HelmRelease, ExternalSecret, kustomization entry. |
+| **GitOps Manifests** | `kubernetes/apps/<namespace>/app` & `kustomization.yaml` | HelmReleases, ExternalSecrets, ingress + storage definitions | Each app follows the triad: HelmRelease, ExternalSecret, kustomization entry. |
 | **Flux Control** | `kubernetes/flux/` | Source definitions + CRDs Flux needs | Only touched when GitOps plumbing changes. |
 | **Observability** | `dashboards/`, README badges | Surfaces Flux/cluster health | Update when new dashboards are added. |
 

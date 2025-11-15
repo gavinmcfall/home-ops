@@ -1,6 +1,6 @@
 # Homelab Guidance for Claude/Codex
 
-You are a thinking partner, not a shell runner. Use this playbook before editing `/home/gavin/home-ops`.
+You are a thinking partner, not a shell runner. Use this playbook before editing `~/home-ops`.
 
 ---
 
@@ -25,7 +25,7 @@ ls bootstrap talosconfig kubernetes/apps scripts
 rg -n "helmrelease" kubernetes/apps --files
 rg -n "\${SECRET_DOMAIN}" kubernetes/apps -g"*.yaml"
 ```
-- Map `kubernetes/apps/<area>/app` directories and their `kustomization.yaml` parents.
+- Map `kubernetes/apps/<namespace>/app` directories and their `kustomization.yaml` parents.
 - Identify placeholder usage (`${SECRET_DOMAIN}`, `${MEDIA_SERVER}`, `PLANE_*`) via `rg`.
 - Use `task --list` or read `Taskfile.yaml` to see orchestration entry points.
 
@@ -34,7 +34,7 @@ Only after you know what exists should you drill into a specific app or script.
 ---
 
 ## Step 3: Work Within These Rules
-- **Stay scoped** to `/home/gavin/home-ops`. No cross-repo edits or assumptions.
+- **Stay scoped** to `~/home-ops`. No cross-repo edits or assumptions.
 - **Never leak secrets**: keep hostnames/paths abstract (`${SECRET_DOMAIN}`, `${DB_URI}`).
 - **Cite sources**: every architectural claim in `.codex/Homelab` must reference files like `Taskfile.yaml`, `kubernetes/apps/games/romm/app/helmrelease.yaml`, or `README.md`.
 - **Prefer omission over speculation**: if you can’t verify something, add it to `QUESTIONS.md` rather than guessing.

@@ -1,6 +1,6 @@
 # Tool Strategy for Homelab Exploration
 
-**Purpose**: Apply a RepoQL-style discipline inside `/home/gavin/home-ops` using the tools we actually have (rg, task, flux CLI). Treat the repo like a database: inventory structure first, then inspect specific manifests.
+**Purpose**: Apply a RepoQL-style discipline inside `~/home-ops` using the tools we actually have (rg, task, flux CLI). Treat the repo like a database: inventory structure first, then inspect specific manifests.
 
 ---
 
@@ -10,7 +10,7 @@ ls / inventory directories → rg (find placeholders/patterns) → task/flux com
 ```
 - Start broad with `ls kubernetes/apps` and `rg --files -g"kustomization.yaml"` to understand what exists.
 - Narrow with `rg` against placeholders (`${SECRET_DOMAIN}`, `PLANE_DB_URL`) or resource names (`HelmRelease`, `ExternalSecret`).
-- Verify with `task configure`, `task kubernetes:kubeconform`, and `flux diff kustomization <area>` before drawing conclusions.
+- Verify with `task configure`, `task kubernetes:kubeconform`, and `flux diff kustomization <namespace>` before drawing conclusions.
 
 ---
 
@@ -20,7 +20,7 @@ ls / inventory directories → rg (find placeholders/patterns) → task/flux com
 | “Where is this service defined?” | `rg --files -g"helmrelease.yaml" kubernetes/apps` | Lists all HelmReleases so you can pick the right area. |
 | “Which manifests reference `${SECRET_DOMAIN}`?” | `rg -n "\${SECRET_DOMAIN}" -g"*.yaml" kubernetes/apps` | Finds every ingress/secret placeholder. |
 | “What does Taskfile do for Kubernetes?” | Read `Taskfile.yaml` + `.taskfiles/Kubernetes.yaml` | Shows render/validation tasks, dependencies, env vars. |
-| “How does Flux see this change?” | `flux diff kustomization <area> --path kubernetes/apps/<area>` | Simulates Flux apply like RepoQL verification. |
+| “How does Flux see this change?” | `flux diff kustomization <namespace> --path kubernetes/apps/<namespace>` | Simulates Flux apply like RepoQL verification. |
 | “How do I prove a claim?” | Combine `rg`, `sed -n`, file paths | Evidence tables require explicit references (e.g., ROMM HelmRelease). |
 
 ---
@@ -90,4 +90,4 @@ Use `task` for reproducible operations and `flux` for source-of-truth validation
 |-------|:------:|:----------:|---------|
 | Placeholders (`${SECRET_DOMAIN}`) drive ingress & secrets | `kubernetes/apps/games/romm/app/helmrelease.yaml:65-120` | 🟢 | Hosts, env vars, and persistence all rely on placeholders. |
 | Taskfile exposes configure/validate tasks | `Taskfile.yaml`, `.taskfiles/Kubernetes.yaml` | 🟢 | Defines `task configure`, `task kubernetes:kubeconform`, flux helpers. |
-| Flux diff mirrors RepoQL verification | `WORKFLOWS.md`, `kubernetes/apps/games/romm/app/helmrelease.yaml` | 🟢 | Docs instruct running `flux diff kustomization <area>` before merge. |
+| Flux diff mirrors RepoQL verification | `WORKFLOWS.md`, `kubernetes/apps/games/romm/app/helmrelease.yaml` | 🟢 | Docs instruct running `flux diff kustomization <namespace>` before merge. |
