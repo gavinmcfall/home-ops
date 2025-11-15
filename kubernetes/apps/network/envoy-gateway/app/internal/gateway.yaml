@@ -5,7 +5,7 @@ kind: Gateway
 metadata:
   name: internal
   annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname internal.ok8.sh
+    external-dns.alpha.kubernetes.io/target: &hostname internal.${SECRET_DOMAIN}
     gatus.home-operations.com/endpoint: |-
       group: internal
       guarded: true
