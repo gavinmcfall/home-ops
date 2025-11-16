@@ -92,6 +92,25 @@ spec:
         ports:
           http:
             port: *port
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Downloads
+          gethomepage.dev/name: Sonarr
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: sonarr.png
+          gethomepage.dev/description: TV Downloads
+          gethomepage.dev/widget.type: sonarr
+          gethomepage.dev/widget.url: http://sonarr.downloads
+          gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_SONARR_TOKEN}}` }}"
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
     ingress:
       tailscale:
         enabled: true
@@ -106,22 +125,6 @@ spec:
         tls:
           - hosts:
               - *app
-      # app:
-      #   annotations:
-      #     gethomepage.dev/enabled: "true"
-      #     gethomepage.dev/group: Downloads
-      #     gethomepage.dev/name: Sonarr
-      #     gethomepage.dev/app: *app
-      #     gethomepage.dev/icon: sonarr.png
-      #     gethomepage.dev/description: TV Downloads
-      #     gethomepage.dev/widget.type: sonarr
-      #     gethomepage.dev/widget.url: http://sonarr.downloads
-      #     gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_SONARR_TOKEN}}` }}"
-      #     external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-      #   className: internal
-      #   hosts:
-      #     - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
-      #       paths: *paths
     persistence:
       config:
         existingClaim: sonarr

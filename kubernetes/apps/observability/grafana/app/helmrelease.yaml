@@ -490,16 +490,6 @@ spec:
             - name: external
               namespace: network
               sectionName: https
-          rules:
-            - matches:
-                - path:
-                    type: PathPrefix
-                    value: /
-              backendRefs:
-                - group: ""
-                  kind: Service
-                  name: grafana
-                  port: *servicePort
     persistence:
       enabled: false
     testFramework:

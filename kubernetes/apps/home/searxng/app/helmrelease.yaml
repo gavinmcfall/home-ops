@@ -103,27 +103,16 @@ spec:
               password:
                 name: searxng-secret
                 key: SEARXNG_OPEN_METRICS_SECRET
-
     route:
       app:
         annotations:
-          # nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/auth"
-          # nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.${SECRET_DOMAIN}/oauth2/start?rd=$scheme://$host$request_uri"
           external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-          # nginx.ingress.kubernetes.io/auth-snippet: |
-          #   if ($request_uri ~ "^/metrics$") {
-          #     auth_request off;
-          #   }
         hostnames:
           - search.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network
             sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *httpPort
     persistence:
       config:
         type: configMap
