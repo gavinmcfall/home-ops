@@ -72,8 +72,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/sighup/mosquitto-exporter
-              tag: latest
+              repository: docker.io/sapcc/mosquitto-exporter
+              tag: 0.6.0
             env:
               - name: BROKER_ENDPOINT
                 value: tcp://mosquitto.database.svc.cluster.local:1883

@@ -29,12 +29,6 @@ spec:
       memory: 1Gi
   monitoring:
     enablePodMonitor: true
-    podMonitorMetricRelabelings:
-      - sourceLabels: ["cluster"]
-        targetLabel: cnpg_cluster
-        action: replace
-      - regex: cluster
-        action: labeldrop
   backup:
     retentionPolicy: 60d
     barmanObjectStore: &barmanObjectStore
