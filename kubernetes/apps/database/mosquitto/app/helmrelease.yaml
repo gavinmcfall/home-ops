@@ -68,6 +68,51 @@ spec:
             runAsNonRoot: true
             fsGroup: 65534
             fsGroupChangePolicy: OnRootMismatch
+      mosquitto-exporter:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/sighup/mosquitto-exporter
+              tag: latest
+            env:
+              - name: BROKER_ENDPOINT
+                value: tcp://mosquitto.database.svc.cluster.local:1883
+              - name: MQTT_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: mosquitto-secret
+                    key: username
+              - name: MQTT_PASS
+                valueFrom:
+                  secretKeyRef:
+                    name: mosquitto-secret
+                    key: password
+            ports:
+              - name: http
+                containerPort: &exporterPort 9234
+            probes:
+              liveness: &exporterProbe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /metrics
+                    port: *exporterPort
+                  initialDelaySeconds: 5
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *exporterProbe
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 64Mi
     service:
       app:
         controller: mosquitto
@@ -77,6 +122,20 @@ spec:
         ports:
           http:
             port: 1883
+      exporter:
+        controller: mosquitto-exporter
+        ports:
+          http:
+            port: *exporterPort
+    serviceMonitor:
+      exporter:
+        serviceName: mosquitto-exporter
+        endpoints:
+          - port: http
+            scheme: http
+            path: /metrics
+            interval: 1m
+            scrapeTimeout: 15s
     persistence:
       data:
         existingClaim: mosquitto
