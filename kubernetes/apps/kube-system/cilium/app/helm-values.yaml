@@ -21,6 +21,10 @@ cni:
 devices: "bond0"
 endpointRoutes:
   enabled: true
+envoy:
+  enabled: false
+gatewayAPI:
+  enabled: false
 hubble:
   enabled: false
 ipam:
