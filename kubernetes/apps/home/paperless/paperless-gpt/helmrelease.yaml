@@ -74,14 +74,6 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
-        rules:
-          - matches:
-              - path:
-                  type: PathPrefix
-                  value: /
-            backendRefs:
-              - identifier: app
-                port: *port
     persistence:
       paperless-gpt-app:
         enabled: true

@@ -87,11 +87,6 @@ spec:
           - name: external
             namespace: network
             sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
-
     persistence:
       config:
         existingClaim: n8n
@@ -103,7 +98,6 @@ spec:
         path: /mnt/storage0/media/Syncthing/obsidian
         globalMounts:
           - path: /obsidian
-
     resources:
       requests:
         cpu: 20m

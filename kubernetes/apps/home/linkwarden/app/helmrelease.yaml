@@ -40,7 +40,7 @@ spec:
               HOME: /data/config
               NEXT_PUBLIC_DISABLE_REGISTRATION: "true"
               NEXT_PUBLIC_CREDENTIALS_ENABLED: "false"
-              
+
             envFrom: *envFrom
             resources:
               requests:
@@ -64,11 +64,6 @@ spec:
           - name: external
             namespace: network
             sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
-
     persistence:
       config:
         enabled: true

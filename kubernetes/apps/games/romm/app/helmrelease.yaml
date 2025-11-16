@@ -97,10 +97,6 @@ spec:
           - name: external
             namespace: network
             sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: http
     persistence:
       config:
         type: configMap

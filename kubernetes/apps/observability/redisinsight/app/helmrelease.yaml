@@ -77,10 +77,6 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: 5540
     persistence:
       data:
         existingClaim: redisinsight

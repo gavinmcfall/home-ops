@@ -140,10 +140,7 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
+
     ingress:
       tailscale:
         enabled: true
