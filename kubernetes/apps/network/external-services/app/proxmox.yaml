@@ -29,8 +29,8 @@ endpoints:
   - addresses:
       - "${SECRET_PROXMOX_IP}"
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
   name: proxmox
   namespace: network
@@ -39,21 +39,18 @@ metadata:
     app.kubernetes.io/instance: proxmox
   annotations:
     external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-    nginx.ingress.kubernetes.io/ssl-redirect: "true" # Redirects HTTP to HTTPS
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
-  ingressClassName: internal
-  tls:
-    - hosts:
-        - nexus.${SECRET_DOMAIN}
+  parentRefs:
+    - name: internal
+      namespace: network
+      sectionName: https
+  hostnames:
+    - nexus.${SECRET_DOMAIN}
   rules:
-    - host: nexus.${SECRET_DOMAIN}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: proxmox
-                port:
-                  number: 443
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: proxmox
+          port: 443
