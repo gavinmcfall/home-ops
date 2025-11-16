@@ -9,8 +9,7 @@ spec:
     - protocol: TCP
       port: 443 # Port exposed by the service (ingress will use this)
       targetPort: 8006 # Target port on the Proxmox server
-  selector:
-    app: proxmox
+---
 apiVersion: v1
 kind: Endpoints
 metadata:
