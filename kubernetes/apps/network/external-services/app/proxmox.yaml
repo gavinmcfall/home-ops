@@ -6,7 +6,7 @@ metadata:
   namespace: network
 spec:
   type: ClusterIP
-  clusterIP: None  # Headless service to prevent auto-creation of EndpointSlice
+  # Remove the clusterIP: None line - keep the existing ClusterIP
   ports:
     - name: https
       protocol: TCP
@@ -20,7 +20,6 @@ metadata:
   namespace: network
   labels:
     kubernetes.io/service-name: proxmox
-    # Use a custom manager to prevent the mirroring controller from touching it
     endpointslice.kubernetes.io/managed-by: external-services-controller
 addressType: IPv4
 endpoints:
@@ -28,8 +27,8 @@ endpoints:
       - "${SECRET_PROXMOX_IP}"
     conditions:
       ready: true
-      serving: true  # Required by Envoy Gateway
-      terminating: false  # Required by Envoy Gateway
+      serving: true
+      terminating: false
 ports:
   - name: https
     port: 8006
@@ -61,7 +60,6 @@ spec:
         - name: proxmox
           port: 443
 ---
-# Since Proxmox uses self-signed certs on port 8006
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: BackendTLSPolicy
 metadata:
@@ -74,5 +72,4 @@ spec:
       name: proxmox
   validation:
     caCertificateRefs: []
-    hostname: "${SECRET_PROXMOX_IP}"  # Use IP for self-signed cert
-    wellKnownCACertificates: "System"
+    wellKnownCACertificates: "Skip"
