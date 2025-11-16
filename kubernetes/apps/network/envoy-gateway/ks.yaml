@@ -4,13 +4,13 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app envoy-gateway
-  namespace: &namespace networking
+  namespace: &namespace network
 spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   interval: 1h
-  path: ./kubernetes/apps/networking/envoy-gateway/app
+  path: ./kubernetes/apps/network/envoy-gateway/app
   prune: true
   sourceRef:
     kind: GitRepository
@@ -19,11 +19,11 @@ spec:
   targetNamespace: *namespace
   timeout: 15m
   healthChecks:
-    - apiVersion: gateway.networking.k8s.io/v1
+    - apiVersion: gateway.network.k8s.io/v1
       kind: Gateway
       name: external
       namespace: *namespace
-    - apiVersion: gateway.networking.k8s.io/v1
+    - apiVersion: gateway.network.k8s.io/v1
       kind: Gateway
       name: internal
       namespace: *namespace
@@ -36,7 +36,7 @@ spec:
       name: backend
       namespace: *namespace
   healthCheckExprs:
-    - apiVersion: gateway.networking.k8s.io/v1
+    - apiVersion: gateway.network.k8s.io/v1
       kind: Gateway
       current: |-
         status.listeners.exists(l,
