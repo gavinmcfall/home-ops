@@ -76,7 +76,7 @@ spec:
               tag: 0.6.0
             env:
               - name: BROKER_ENDPOINT
-                value: tcp://mosquitto.database.svc.cluster.local:1883
+                value: tcp://mosquitto-app.database.svc.cluster.local:1883
               - name: MQTT_USER
                 valueFrom:
                   secretKeyRef:

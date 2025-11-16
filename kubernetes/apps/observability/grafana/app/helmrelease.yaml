@@ -259,7 +259,7 @@ spec:
           datasource: Prometheus
       database:
         cloudnative-pg-cluster:
-          url: https://raw.githubusercontent.com/cloudnative-pg/grafana-dashboards/main/charts/cluster/grafana-dashboard.json
+          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/cloudnative-pg-cluster.json
           datasource: Prometheus
         dragonfly-cluster:
           url: https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/v1.3.0/monitoring/grafana-dashboard.json
