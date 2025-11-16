@@ -9,10 +9,10 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: networking
+      namespace: network
       sectionName: http
     - name: external
-      namespace: networking
+      namespace: network
       sectionName: http
   rules:
     - filters:
