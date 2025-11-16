@@ -483,7 +483,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
-            namespace: networking
+            namespace: network
             sectionName: https
     persistence:
       enabled: false
