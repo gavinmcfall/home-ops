@@ -11,7 +11,7 @@ spec:
   hostnames: ["flux-webhook.${SECRET_DOMAIN}"]
   parentRefs:
     - name: external
-      namespace: networking
+      namespace: network
       sectionName: https
   rules:
     - backendRefs:
