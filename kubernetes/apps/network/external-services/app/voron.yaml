@@ -9,8 +9,7 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-  selector:
-    app: voron
+---
 apiVersion: v1
 kind: Endpoints
 metadata:

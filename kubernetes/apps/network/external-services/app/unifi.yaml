@@ -9,8 +9,7 @@ spec:
     - protocol: TCP
       port: 443
       targetPort: 443
-  selector:
-    app: unifi
+---
 apiVersion: v1
 kind: Endpoints
 metadata:
