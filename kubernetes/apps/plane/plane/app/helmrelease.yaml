@@ -24,6 +24,8 @@ spec:
       strategy: rollback
   values:
     planeVersion: v1.0.0
+    ingress:
+      appHost: plane.${SECRET_DOMAIN}
 
     redis:
       local_setup: false
