@@ -6,7 +6,6 @@ metadata:
   namespace: network
 spec:
   type: ClusterIP
-  # Remove the clusterIP: None line - keep the existing ClusterIP
   ports:
     - name: https
       protocol: TCP
@@ -59,17 +58,3 @@ spec:
       backendRefs:
         - name: proxmox
           port: 443
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: BackendTLSPolicy
-metadata:
-  name: proxmox-tls
-  namespace: network
-spec:
-  targetRefs:
-    - group: ""
-      kind: Service
-      name: proxmox
-  validation:
-    caCertificateRefs: []
-    wellKnownCACertificates: "Skip"
