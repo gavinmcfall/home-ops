@@ -11,25 +11,18 @@ spec:
       targetPort: 8006 # Target port on the Proxmox server
   selector:
     app: proxmox
----
-apiVersion: discovery.k8s.io/v1
-kind: EndpointSlice
+apiVersion: v1
+kind: Endpoints
 metadata:
   name: proxmox
   namespace: network
-  labels:
-    kubernetes.io/service-name: proxmox
-addressType: IPv4
-ports:
-  - name: https
-    appProtocol: https
-    protocol: TCP
-    port: 8006 # The actual Proxmox HTTPS port
-endpoints:
+subsets:
   - addresses:
-      - "${SECRET_PROXMOX_IP}"
-    conditions:
-      ready: true
+      - ip: "${SECRET_PROXMOX_IP}"
+    ports:
+      - name: https
+        port: 8006 # The actual Proxmox HTTPS port
+        protocol: TCP
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
