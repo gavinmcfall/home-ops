@@ -4,34 +4,32 @@ kind: Service
 metadata:
   name: proxmox
   namespace: network
-  labels:
-    # Add this label for EndpointSlice discovery
-    service.kubernetes.io/headless: "false"
 spec:
-  # Remove the selector to make it a headless service
-  clusterIP: None
+  type: ClusterIP
+  clusterIP: None  # Headless service to prevent auto-creation of EndpointSlice
   ports:
     - name: https
       protocol: TCP
-      port: 8006
+      port: 443
       targetPort: 8006
 ---
 apiVersion: discovery.k8s.io/v1
 kind: EndpointSlice
 metadata:
-  name: proxmox-1
+  name: proxmox-external
   namespace: network
   labels:
     kubernetes.io/service-name: proxmox
-    endpointslice.kubernetes.io/managed-by: manual
+    # Use a custom manager to prevent the mirroring controller from touching it
+    endpointslice.kubernetes.io/managed-by: external-services-controller
 addressType: IPv4
 endpoints:
   - addresses:
       - "${SECRET_PROXMOX_IP}"
     conditions:
       ready: true
-      serving: true
-      terminating: false
+      serving: true  # Required by Envoy Gateway
+      terminating: false  # Required by Envoy Gateway
 ports:
   - name: https
     port: 8006
@@ -61,4 +59,20 @@ spec:
             value: /
       backendRefs:
         - name: proxmox
-          port: 8006
+          port: 443
+---
+# Since Proxmox uses self-signed certs on port 8006
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTLSPolicy
+metadata:
+  name: proxmox-tls
+  namespace: network
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: proxmox
+  validation:
+    caCertificateRefs: []
+    hostname: "${SECRET_PROXMOX_IP}"  # Use IP for self-signed cert
+    wellKnownCACertificates: "System"
