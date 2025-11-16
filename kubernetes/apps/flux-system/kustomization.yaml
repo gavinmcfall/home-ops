@@ -5,3 +5,4 @@ resources:
   - ./namespace.yaml
   - ./webhooks/ks.yaml
   - ./weave-gitops/ks.yaml
+  - ./monitoring/ks.yaml
