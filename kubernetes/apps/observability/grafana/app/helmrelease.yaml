@@ -466,30 +466,25 @@ spec:
       targetPort: 3000
     serviceMonitor:
       enabled: true
-    extraObjects:
-      - apiVersion: gateway.networking.k8s.io/v1
-        kind: HTTPRoute
-        metadata:
-          name: grafana
-          namespace: "{{ .Release.Namespace }}"
-          annotations:
-            gethomepage.dev/enabled: "true"
-            gethomepage.dev/icon: grafana.png
-            gethomepage.dev/name: Grafana
-            gethomepage.dev/group: Observability
-            gethomepage.dev/description: Monitoring Dashboards
-            gethomepage.dev/widget.type: grafana
-            gethomepage.dev/widget.url: http://grafana.observability
-            gethomepage.dev/widget.username: "{{`{{HOMEPAGE_VAR_GRAFANA_USERNAME}}`}}"
-            gethomepage.dev/widget.password: "{{`{{HOMEPAGE_VAR_GRAFANA_PASSWORD}}`}}"
-            external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        spec:
-          hostnames:
-            - "grafana.${SECRET_DOMAIN}"
-          parentRefs:
-            - name: external
-              namespace: network
-              sectionName: https
+    route:
+      main:
+        enabled: true
+        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/icon: grafana.png
+          gethomepage.dev/name: Grafana
+          gethomepage.dev/group: Observability
+          gethomepage.dev/description: Monitoring Dashboards
+          gethomepage.dev/widget.type: grafana
+          gethomepage.dev/widget.url: http://grafana.observability
+          gethomepage.dev/widget.username: "{{`{{HOMEPAGE_VAR_GRAFANA_USERNAME}}`}}"
+          gethomepage.dev/widget.password: "{{`{{HOMEPAGE_VAR_GRAFANA_PASSWORD}}`}}"
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        parentRefs:
+          - name: internal
+            namespace: networking
+            sectionName: https
     persistence:
       enabled: false
     testFramework:
