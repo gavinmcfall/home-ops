@@ -1,5 +1,30 @@
 #prettier-ignore
 ---
+- Events:
+    - Agenda:
+        widget:
+          type: calendar
+          view: agenda
+          maxEvents: 25
+          integrations:
+            - type: sonarr
+              service_group: Downloads
+              service_name: Sonarr
+            - type: sonarr
+              service_group: Downloads
+              service_name: Sonarr UHD
+            - type: sonarr
+              service_group: Downloads
+              service_name: Sonarr-Foreign
+            - type: radarr
+              service_group: Downloads
+              service_name: Radarr
+            - type: radarr
+              service_group: Downloads
+              service_name: Radarr UHD
+            - type: readarr
+              service_group: Downloads
+              service_name: Readarr
 - Infrastructure:
     - Cloudflared:
         href: https://dash.cloudflare.com/
@@ -20,7 +45,7 @@
           url: https://api.uptimerobot.com
           key: {{HOMEPAGE_VAR_UPTIMEROBOT_TOKEN}}
     - Unifi:
-        href: https://unifi.ui.com
+        href: https://unifi.${SECRET_DOMAIN}
         icon: unifi.png
         description: Unifi Dashboard
         widget:
@@ -38,71 +63,209 @@
           key: {{HOMEPAGE_VAR_TRUENAS_TOKEN}}
           enablePools: true
           nasType: scale
-- Events:
-    - Agenda:
+    - Rook:
+        href: https://rook.${SECRET_DOMAIN}
+        icon: ceph.png
+        description: Ceph storage dashboard
+- Downloads:
+    - Sonarr:
+        href: https://sonarr.${SECRET_DOMAIN}
+        icon: sonarr.png
+        description: HD TV automation
         widget:
-          type: calendar
-          view: agenda # optional - possible values monthly, agenda
-          maxEvents: 10 # optional - defaults to 10
-          integrations: # optional
-            - type: sonarr # active widget type that is currently enabled on homepage - possible values: radarr, sonarr>
-              service_group: Downloads # group name where widget exists
-              service_name: Sonarr # service name for that widget
-            - type: radarr # active widget type that is currently enabled on homepage - possible values: radarr, sonarr>
-              service_group: Downloads # group name where widget exists
-              service_name: Radarr # service name for that widget
-            - type: readarr # active widget type that is currently enabled on homepage - possible values: radarr, sonar>
-              service_group: Downloads # group name where widget exists
-              service_name: Readarr # service name for that widget
+          type: sonarr
+          url: http://sonarr.downloads
+          key: {{HOMEPAGE_VAR_SONARR_TOKEN}}
+    - Sonarr UHD:
+        href: https://sonarr-uhd.${SECRET_DOMAIN}
+        icon: sonarr.png
+        description: 4K TV automation
+        widget:
+          type: sonarr
+          url: http://sonarr-uhd.downloads
+          key: {{HOMEPAGE_VAR_SONARR_UHD_TOKEN}}
+    - Sonarr-Foreign:
+        href: https://sonarr-foreign.${SECRET_DOMAIN}
+        icon: sonarr.png
+        description: Foreign language TV automation
+        widget:
+          type: sonarr
+          url: http://sonarr-foreign.downloads
+          key: {{HOMEPAGE_VAR_SONARR_FOREIGN_TOKEN}}
+    - Radarr:
+        href: https://radarr.${SECRET_DOMAIN}
+        icon: radarr.png
+        description: HD movie automation
+        widget:
+          type: radarr
+          url: http://radarr.downloads
+          key: {{HOMEPAGE_VAR_RADARR_TOKEN}}
+    - Radarr UHD:
+        href: https://radarr-uhd.${SECRET_DOMAIN}
+        icon: radarr.png
+        description: 4K movie automation
+        widget:
+          type: radarr
+          url: http://radarr-uhd.downloads
+          key: {{HOMEPAGE_VAR_RADARR_UHD_TOKEN}}
+    - Readarr:
+        href: https://readarr.${SECRET_DOMAIN}
+        icon: readarr.png
+        description: eBook downloads
+        widget:
+          type: readarr
+          url: http://readarr.downloads
+          key: {{HOMEPAGE_VAR_READARR_TOKEN}}
+    - Bazarr:
+        href: https://bazarr.${SECRET_DOMAIN}
+        icon: bazarr.png
+        description: Subtitle management
+        widget:
+          type: bazarr
+          url: http://bazarr.downloads:6767
+          key: {{HOMEPAGE_VAR_BAZARR_TOKEN}}
+    - Prowlarr:
+        href: https://prowlarr.${SECRET_DOMAIN}
+        icon: prowlarr.png
+        description: Indexer manager
+        widget:
+          type: prowlarr
+          url: http://prowlarr.downloads:9696
+          key: {{HOMEPAGE_VAR_PROWLARR_TOKEN}}
+    - qBittorrent:
+        href: https://qb.${SECRET_DOMAIN}
+        icon: qbittorrent.png
+        description: BitTorrent client
+        widget:
+          type: qbittorrent
+          url: http://qbittorrent.downloads
+          username: {{HOMEPAGE_VAR_QBITTORRENT_USERNAME}}
+          password: {{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}
+    - SABnzbd:
+        href: https://sab.${SECRET_DOMAIN}
+        icon: sabnzbd.png
+        description: Usenet downloader
+        widget:
+          type: sabnzbd
+          url: http://sabnzbd.downloads:80
+          key: {{HOMEPAGE_VAR_SABNZBD_TOKEN}}
+- Entertainment:
+    - Plex:
+        href: https://plex.${SECRET_DOMAIN}
+        icon: plex.png
+        description: Plex Media Server
+        widget:
+          type: plex
+          url: http://plex.entertainment:32400
+          token: {{HOMEPAGE_VAR_PLEX_TOKEN}}
+    - Jellyfin:
+        href: https://jellyfin.${SECRET_DOMAIN}
+        icon: jellyfin.png
+        description: Jellyfin streaming
+    - Overseerr:
+        href: https://requests.${SECRET_DOMAIN}
+        icon: overseerr.png
+        description: Media request portal
+        widget:
+          type: overseerr
+          url: http://overseerr.entertainment:5055
+          key: {{HOMEPAGE_VAR_OVERSEERR_TOKEN}}
+    - Tautulli:
+        href: https://tautulli.${SECRET_DOMAIN}
+        icon: tautulli.png
+        description: Plex activity monitoring
+        widget:
+          type: tautulli
+          url: http://tautulli.entertainment
+          key: {{HOMEPAGE_VAR_TAUTULLI_TOKEN}}
+    - Audiobookshelf:
+        href: https://audiobookshelf.${SECRET_DOMAIN}
+        icon: audiobookshelf.png
+        description: Audiobook library
+        widget:
+          type: audiobookshelf
+          url: http://audiobookshelf-app.entertainment.svc.cluster.local
+          key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF_TOKEN}}
+    - Kavita:
+        href: https://kavita.${SECRET_DOMAIN}
+        icon: kavita.png
+        description: Comics and manga server
+        widget:
+          type: kavita
+          url: http://kavita.entertainment:5000
+          username: {{HOMEPAGE_VAR_KAVITA_USERNAME}}
+          password: {{HOMEPAGE_VAR_KAVITA_PASSWORD}}
+    - Wizarr:
+        href: https://join.${SECRET_DOMAIN}
+        icon: wizarr.png
+        description: Plex invite management
+- Observability:
+    - Grafana:
+        href: https://grafana.${SECRET_DOMAIN}
+        icon: grafana.png
+        description: Dashboards and metrics
+        widget:
+          type: grafana
+          url: http://grafana.observability
+          username: {{HOMEPAGE_VAR_GRAFANA_USERNAME}}
+          password: {{HOMEPAGE_VAR_GRAFANA_PASSWORD}}
+    - Gatus:
+        href: https://status.${SECRET_DOMAIN}
+        icon: gatus.png
+        description: Synthetic monitoring
+        widget:
+          type: gatus
+          url: http://gatus.observability
+    - Prometheus:
+        href: https://prometheus.${SECRET_DOMAIN}
+        icon: prometheus.png
+        description: Metrics scrape service
+        widget:
+          type: prometheus
+          url: http://kube-prometheus-stack-prometheus.observability:9090
+    - Redis Insight:
+        href: https://redisinsight.${SECRET_DOMAIN}
+        icon: https://raw.githubusercontent.com/RedisInsight/RedisInsight/main/resources/logo.svg
+        description: Redis developer GUI
+    - Kromgo:
+        href: https://kromgo.${SECRET_DOMAIN}
+        icon: prometheus.png
+        description: Thanos SLO explorer
+- Home:
+    - File Browser:
+        href: https://filebrowser.${SECRET_DOMAIN}
+        icon: filebrowser.png
+        description: Media file explorer
+    - Bookstack:
+        href: https://bookstack.${SECRET_DOMAIN}
+        icon: bookstack.png
+        description: Personal wiki
+    - Linkwarden:
+        href: https://linkwarden.${SECRET_DOMAIN}
+        icon: mdi-link
+        description: Bookmark archiver
+    - Paperless:
+        href: https://paperless.${SECRET_DOMAIN}
+        icon: paperless-ngx.png
+        description: Document management
+    - Manyfold:
+        href: https://manyfold.${SECRET_DOMAIN}
+        icon: mdi-printer-3d
+        description: STL library
+    - SearXNG:
+        href: https://searxng.${SECRET_DOMAIN}
+        icon: searxng.png
+        description: Privacy-friendly search
+    - The Lounge:
+        href: https://irc.${SECRET_DOMAIN}
+        icon: thelounge.png
+        description: IRC web client
 - Home Automation:
     - Home-Assistant:
         href: https://hass.${SECRET_DOMAIN}
         icon: home-assistant.png
-        description: Home Automation Software
+        description: Home automation software
         widget:
           type: homeassistant
           url: https://hass.${SECRET_DOMAIN}
           key: {{HOMEPAGE_VAR_HASS_TOKEN}}
-# - Cortex:
-#     - Open WebUI:
-#         icon: chatbot
-#         description: Chat interface for local models
-#         href: http://openwebui.cortex.svc.cluster.local:80
-#         widget:
-#           type: service
-#           url: http://openwebui.cortex.svc.cluster.local:80
-#     - TinyLLaMA:
-#         icon: brain
-#         description: Fast lightweight model
-#         href: http://tinyllama.cortex.svc.cluster.local:8080
-#         widget:
-#           type: service
-#           url: http://tinyllama.cortex.svc.cluster.local:8080
-#     - Mistral 7B:
-#         icon: brain-circuit
-#         description: General purpose assistant
-#         href: http://mistral-7b.cortex.svc.cluster.local:8080
-#         widget:
-#           type: service
-#           url: http://mistral-7b.cortex.svc.cluster.local:8080
-#     - Code LLaMA:
-#         icon: code
-#         description: Dev/code assistant
-#         href: http://codellama-7b.cortex.svc.cluster.local:8080
-#         widget:
-#           type: service
-#           url: http://codellama-7b.cortex.svc.cluster.local:8080
-#     - Mixtral:
-#         icon: cpu
-#         description: High-accuracy research model
-#         href: http://mixtral-8x7b.cortex.svc.cluster.local:8080
-#         widget:
-#           type: service
-#           url: http://mixtral-8x7b.cortex.svc.cluster.local:8080
-#     - WizardCoder:
-#         icon: wand
-#         description: Advanced code gen model
-#         href: http://wizardcoder-15b.cortex.svc.cluster.local:8080
-#         widget:
-#           type: service
-#           url: http://wizardcoder-15b.cortex.svc.cluster.local:8080
