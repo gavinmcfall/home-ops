@@ -5,32 +5,42 @@ metadata:
   name: truenas
   namespace: network
 spec:
+  type: ClusterIP
   ports:
-    - protocol: TCP
+    - name: https
+      protocol: TCP
       port: 443
       targetPort: 443
 ---
-apiVersion: v1
-kind: Endpoints
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
 metadata:
-  name: truenas
+  name: truenas-external
   namespace: network
-subsets:
+  labels:
+    kubernetes.io/service-name: truenas
+    endpointslice.kubernetes.io/managed-by: external-services-controller
+addressType: IPv4
+endpoints:
   - addresses:
-      - ip: "${SECRET_TRUENAS_IP}"
-    ports:
-      - name: https
-        port: 443
-        protocol: TCP
+      - "${SECRET_TRUENAS_IP}"
+    conditions:
+      ready: true
+      serving: true
+      terminating: false
+ports:
+  - name: https
+    port: 443
+    protocol: TCP
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: &app truenas
+  name: truenas
   namespace: network
   labels:
-    app.kubernetes.io/name: *app
-    app.kubernetes.io/instance: *app
+    app.kubernetes.io/name: truenas
+    app.kubernetes.io/instance: truenas
   annotations:
     external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
 spec:
@@ -46,5 +56,5 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: *app
+        - name: truenas
           port: 443

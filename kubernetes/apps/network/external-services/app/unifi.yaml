@@ -5,32 +5,42 @@ metadata:
   name: unifi
   namespace: network
 spec:
+  type: ClusterIP
   ports:
-    - protocol: TCP
+    - name: https
+      protocol: TCP
       port: 443
       targetPort: 443
 ---
-apiVersion: v1
-kind: Endpoints
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
 metadata:
-  name: unifi
+  name: unifi-external
   namespace: network
-subsets:
+  labels:
+    kubernetes.io/service-name: unifi
+    endpointslice.kubernetes.io/managed-by: external-services-controller
+addressType: IPv4
+endpoints:
   - addresses:
-      - ip: "${SECRET_UNIFI_IP}"
-    ports:
-      - name: https
-        port: 443
-        protocol: TCP
+      - "${SECRET_UNIFI_IP}"
+    conditions:
+      ready: true
+      serving: true
+      terminating: false
+ports:
+  - name: https
+    port: 443
+    protocol: TCP
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: &app unifi
+  name: unifi
   namespace: network
   labels:
-    app.kubernetes.io/name: *app
-    app.kubernetes.io/instance: *app
+    app.kubernetes.io/name: unifi
+    app.kubernetes.io/instance: unifi
   annotations:
     external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
 spec:
@@ -46,5 +56,5 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: *app
+        - name: unifi
           port: 443
