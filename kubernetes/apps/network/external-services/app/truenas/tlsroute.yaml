@@ -12,7 +12,7 @@ spec:
   parentRefs:
     - name: internal
       namespace: network
-      sectionName: https
+      sectionName: tls-passthrough
   hostnames:
     - citadel.${SECRET_DOMAIN}
   rules:
