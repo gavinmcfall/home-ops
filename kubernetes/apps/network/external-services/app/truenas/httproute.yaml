@@ -19,19 +19,6 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /websocket
-      filters:
-        - type: RequestHeaderModifier
-          requestHeaderModifier:
-            set:
-              - name: Host
-                value: localhost
-      backendRefs:
-        - name: truenas
-          port: 443
-    - matches:
-        - path:
-            type: PathPrefix
             value: /
       backendRefs:
         - name: truenas

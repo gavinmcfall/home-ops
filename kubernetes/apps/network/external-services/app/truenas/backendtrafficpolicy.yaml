@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.envoyproxy.io_backendtrafficpolicy_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: truenas-backend-traffic
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: truenas
+  connection:
+    protocol:
+      type: HTTP1
