@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       paperless:
-        forceRename: paperless-v4
         annotations:
           reloader.stakater.com/auto: 'true'
         initContainers:

@@ -24,7 +24,6 @@ spec:
   values:
     controllers:
       tagging:
-        forceRename: tagging-v4
         type: cronjob
         cronjob:
           schedule: "@hourly"
@@ -84,14 +83,12 @@ spec:
         pod:
           restartPolicy: Never
       reannounce:
-        forceRename: reannounce-v4
         containers:
           app:
             <<: *container
             args:
               - reannounce
       limiter:
-        forceRename: limiter-v4
         containers:
           app:
             <<: *container

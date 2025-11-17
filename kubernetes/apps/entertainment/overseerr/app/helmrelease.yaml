@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       overseerr:
-        forceRename: overseerr-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

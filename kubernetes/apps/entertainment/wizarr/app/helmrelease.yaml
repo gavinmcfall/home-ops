@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       wizarr:
-        forceRename: wizarr-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

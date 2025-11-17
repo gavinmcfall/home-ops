@@ -28,7 +28,6 @@ spec:
   values:
     controllers:
       home-assistant:
-        forceRename: home-assistant-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

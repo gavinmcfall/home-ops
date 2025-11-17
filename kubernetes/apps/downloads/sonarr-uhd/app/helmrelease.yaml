@@ -28,7 +28,6 @@ spec:
   values:
     controllers:
       sonarr-uhd:
-        forceRename: sonarr-uhd-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

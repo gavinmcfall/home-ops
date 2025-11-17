@@ -17,7 +17,6 @@ spec:
   values:
     controllers:
       linkwarden:
-        forceRename: linkwarden-v4
         annotations:
           reloader.stakater.com/auto: "true"
         strategy: RollingUpdate

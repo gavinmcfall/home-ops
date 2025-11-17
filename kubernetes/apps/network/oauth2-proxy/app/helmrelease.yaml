@@ -26,7 +26,6 @@ spec:
   values:
     controllers:
       oauth2-proxy:
-        forceRename: oauth2-proxy-v4
         replicas: 3
         annotations:
           reloader.stakater.com/auto: "true"

@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       kapowarr:
-        forceRename: kapowarr-v4
         labels:
           nfsMount: "true"
         annotations:

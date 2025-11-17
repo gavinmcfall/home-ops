@@ -28,7 +28,6 @@ spec:
   values:
     controllers:
       sonarr:
-        forceRename: sonarr-foreign-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

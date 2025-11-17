@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       kavita:
-        forceRename: kavita-v4
         labels:
           nfsMount: "true"
         annotations:

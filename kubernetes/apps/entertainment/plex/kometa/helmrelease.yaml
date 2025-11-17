@@ -28,7 +28,6 @@ spec:
   values:
     controllers:
       kometa:
-        forceRename: kometa-v4
         type: cronjob
         annotations:
           reloader.stakater.com/auto: "true"

@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       plex-auto-languages:
-        forceRename: plex-auto-languages-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

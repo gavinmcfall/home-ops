@@ -17,7 +17,6 @@ spec:
   values:
     controllers:
       paperless-ai:
-        forceRename: paperless-ai-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
