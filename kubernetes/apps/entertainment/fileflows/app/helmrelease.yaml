@@ -107,6 +107,10 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: server
+                port: *port
 
     service:
       server:
