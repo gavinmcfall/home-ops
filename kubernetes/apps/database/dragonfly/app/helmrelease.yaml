@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       dragonfly-operator:
-        forceRename: dragonfly-operator-v4
         strategy: RollingUpdate
         containers:
           app:

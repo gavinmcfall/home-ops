@@ -37,7 +37,6 @@ spec:
   values:
     controllers:
       syncthing:
-        forceRename: syncthing-v4
         containers:
           app:
             image:

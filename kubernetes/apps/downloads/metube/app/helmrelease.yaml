@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       metube:
-        forceRename: metube-v4
         labels:
           nfsMount: "true"
         annotations:

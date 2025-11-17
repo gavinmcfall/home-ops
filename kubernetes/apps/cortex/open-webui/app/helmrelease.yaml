@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       open-webui:
-        forceRename: open-webui-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

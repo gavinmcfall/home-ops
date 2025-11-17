@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       recyclarr:
-        forceRename: recyclarr-v4
         type: cronjob
         annotations:
           reloader.stakater.com/auto: "true"

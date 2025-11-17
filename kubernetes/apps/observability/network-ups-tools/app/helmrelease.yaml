@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       network-ups-tools:
-        forceRename: network-ups-tools-v4
         strategy: RollingUpdate
         containers:
           app:

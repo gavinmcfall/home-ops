@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       audiobookshelf:
-        forceRename: audiobookshelf-v4
         pod:
           securityContext:
             runAsNonRoot: true

@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       qbittorrent:
-        forceRename: qbittorrent-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

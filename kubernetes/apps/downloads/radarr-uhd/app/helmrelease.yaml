@@ -28,7 +28,6 @@ spec:
   values:
     controllers:
       radarr-uhd:
-        forceRename: radarr-uhd-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

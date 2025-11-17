@@ -29,7 +29,6 @@ spec:
   values:
     controllers:
       server:
-        forceRename: server-v4
         annotations:
           reloader.stakater.com/auto: "true"
         # initContainers:
@@ -85,7 +84,6 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
       node:
-        forceRename: node-v4
         pod:
           hostname: &name ff-node
         containers:

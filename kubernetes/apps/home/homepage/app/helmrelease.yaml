@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       homepage:
-        forceRename: homepage-v4
         serviceAccount:
           identifier: homepage
         replicas: 1

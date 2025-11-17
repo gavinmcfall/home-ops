@@ -24,7 +24,6 @@ spec:
   values:
     controllers:
       pocket-id:
-        forceRename: pocket-id-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

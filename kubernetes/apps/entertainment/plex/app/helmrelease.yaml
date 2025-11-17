@@ -32,7 +32,6 @@ spec:
   values:
     controllers:
       plex:
-        forceRename: plex-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

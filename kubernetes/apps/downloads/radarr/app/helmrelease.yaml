@@ -28,7 +28,6 @@ spec:
   values:
     controllers:
       radarr:
-        forceRename: radarr-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

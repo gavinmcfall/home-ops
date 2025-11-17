@@ -28,7 +28,6 @@ spec:
   values:
     controllers:
       teslamate:
-        forceRename: teslamate-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

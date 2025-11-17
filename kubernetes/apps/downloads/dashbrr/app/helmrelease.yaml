@@ -32,7 +32,6 @@ spec:
         staticToken: true
     controllers:
       dashbrr:
-        forceRename: dashbrr-v4
         serviceAccount:
           identifier: dashbrr
         labels:
