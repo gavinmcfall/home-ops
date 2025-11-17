@@ -9,4 +9,3 @@ resources:
   - ./endpoints.yaml
   - ./httproute.yaml
   - ./backendtlspolicy.yaml
-  - ./backendtrafficpolicy.yaml
