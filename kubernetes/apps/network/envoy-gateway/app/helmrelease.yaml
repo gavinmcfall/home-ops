@@ -24,6 +24,10 @@ spec:
     kind: OCIRepository
     name: *app
   values:
+    config:
+      envoyGateway:
+        extensionApis:
+          enableBackend: true
     hpa:
       enabled: true
       minReplicas: 1
