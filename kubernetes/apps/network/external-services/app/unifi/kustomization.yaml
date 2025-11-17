@@ -7,3 +7,4 @@ resources:
   - ./service.yaml
   - ./endpoints.yaml
   - ./httproute.yaml
+  - ./backendtlspolicy.yaml
