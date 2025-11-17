@@ -11,4 +11,4 @@ spec:
       name: unifi
   validation:
     wellKnownCACertificates: System
-    hostname: unifi.${SECRET_DOMAIN}
+    hostname: unifi.local
