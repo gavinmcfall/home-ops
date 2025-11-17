@@ -14,4 +14,4 @@ spec:
       - group: ""
         kind: ConfigMap
         name: unifi-backend-ca
-    hostname: unifi.${SECRET_DOMAIN}
+    hostname: unifi.local
