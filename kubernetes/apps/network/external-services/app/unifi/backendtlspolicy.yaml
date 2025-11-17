@@ -10,5 +10,8 @@ spec:
       kind: Service
       name: unifi
   validation:
-    wellKnownCACertificates: System
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: unifi-backend-ca
     hostname: unifi.${SECRET_DOMAIN}
