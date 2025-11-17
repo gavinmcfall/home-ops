@@ -5,6 +5,9 @@ metadata:
   name: &app external-services
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: gateway-api-crds
+      namespace: flux-system
   targetNamespace: network
   commonMetadata:
     labels:
