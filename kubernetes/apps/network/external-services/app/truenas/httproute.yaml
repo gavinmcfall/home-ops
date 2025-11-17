@@ -20,6 +20,12 @@ spec:
         - path:
             type: PathPrefix
             value: /
+      filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            set:
+              - name: Host
+                value: localhost
       backendRefs:
         - name: truenas
           port: 443
