@@ -10,5 +10,8 @@ spec:
       kind: Service
       name: truenas
   validation:
-    wellKnownCACertificates: System
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: truenas-backend-ca
     hostname: citadel.${SECRET_DOMAIN}
