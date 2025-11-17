@@ -1,13 +1,11 @@
 ---
 apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+kind: TLSRoute
 metadata:
   name: truenas
   labels:
     app.kubernetes.io/name: truenas
     app.kubernetes.io/instance: truenas
-  annotations:
-    external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
 spec:
   parentRefs:
     - name: internal
@@ -16,10 +14,6 @@ spec:
   hostnames:
     - citadel.${SECRET_DOMAIN}
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
+    - backendRefs:
         - name: truenas
           port: 443
