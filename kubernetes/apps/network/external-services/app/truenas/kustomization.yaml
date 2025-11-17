@@ -6,4 +6,5 @@ namespace: network
 resources:
   - ./service.yaml
   - ./endpoints.yaml
-  - ./tlsroute.yaml
+  - ./httproute.yaml
+  - ./backendtlspolicy.yaml
