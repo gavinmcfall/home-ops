@@ -6,6 +6,8 @@ metadata:
   labels:
     app.kubernetes.io/name: truenas
     app.kubernetes.io/instance: truenas
+  annotations:
+    external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
 spec:
   parentRefs:
     - name: internal
