@@ -14,4 +14,4 @@ spec:
       - group: ""
         kind: ConfigMap
         name: truenas-backend-ca
-    hostname: citadel.${SECRET_DOMAIN}
+    hostname: localhost
