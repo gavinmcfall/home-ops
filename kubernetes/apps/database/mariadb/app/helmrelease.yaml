@@ -23,14 +23,24 @@ spec:
       defaultFips: off
       security:
         allowInsecureImages: false
+    image:
+      tag: latest
+      digest: sha256:281d0d6b94b399d5f70fcfb635617de2a60ac2736581df8470616624f17c341d
     auth:
       usePasswordFiles: false
       existingSecret: mariadb-secret
     metrics:
       enabled: true
+      image:
+        tag: latest
+        digest: sha256:69af700d0ddd48a29c7208d269413c4c73fcb35400a2542eb8e49ee51b5e7930
       resourcesPreset: small
       serviceMonitor:
         enabled: true
+    volumePermissions:
+      image:
+        tag: latest
+        digest: sha256:45d10007092d1cc1076d1d9196facbf43f5942ee15e702d55475e01d5f987d79
     primary:
       resourcesPreset: small
       persistence:
