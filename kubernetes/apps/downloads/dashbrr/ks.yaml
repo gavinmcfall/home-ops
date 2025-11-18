@@ -1,10 +1,9 @@
----
 # yaml-language-server: $schema=https://kube-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app dashbrr
-  namespace: flux-system
+  namespace: downloads
 spec:
   targetNamespace: downloads
   commonMetadata:
@@ -12,15 +11,20 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cloudnative-pg-cluster17
+      namespace: database
     - name: external-secrets-stores
+      namespace: external-secrets
   path: ./kubernetes/apps/downloads/dashbrr/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: false # no flux ks dependents
   interval: 30m
   timeout: 5m
   postBuild:
     substitute:
       APP: *app
+  components:
+    - ../../../../components/gatus/guarded

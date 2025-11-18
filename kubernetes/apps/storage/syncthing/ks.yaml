@@ -1,10 +1,9 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app syncthing
-  namespace: flux-system
+  namespace: storage
 spec:
   targetNamespace: storage
   commonMetadata:
@@ -12,11 +11,13 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
+      namespace: rook-ceph
   path: ./kubernetes/apps/storage/syncthing/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -30,3 +31,5 @@ spec:
       VOLSYNC_STORAGECLASS: ${CLUSTER_STORAGE_BLOCK}
       VOLSYNC_SNAPSHOTCLASS: ${CLUSTER_SNAPSHOT_BLOCK}
       VOLSYNC_COPY_METHOD: Snapshot
+  components:
+    - ../../../../components/volsync
