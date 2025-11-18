@@ -1,9 +1,10 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app plex
-  namespace: entertainment
+  namespace: flux-system
 spec:
   targetNamespace: entertainment
   commonMetadata:
@@ -11,13 +12,11 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets-stores
-      namespace: external-secrets
   path: ./kubernetes/apps/entertainment/plex/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -27,16 +26,13 @@ spec:
       APP: *app
       GATUS_PATH: /web/index.html
       VOLSYNC_CAPACITY: 30Gi
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/gatus/external
 ---
 # yaml-language-server: $schema=https://kube-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app plex-auto-languages
-  namespace: entertainment
+  namespace: flux-system
 spec:
   targetNamespace: entertainment
   commonMetadata:
@@ -44,13 +40,11 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: plex
-      namespace: entertainment
   path: ./kubernetes/apps/entertainment/plex/plex-auto-languages
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false # no flux ks dependents
   interval: 30m
   retryInterval: 1m
@@ -61,7 +55,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app plex-image-cleanup
-  namespace: entertainment
+  namespace: flux-system
 spec:
   targetNamespace: entertainment
   commonMetadata:
@@ -69,15 +63,12 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: plex
-      namespace: entertainment
     - name: external-secrets-stores
-      namespace: external-secrets
   path: ./kubernetes/apps/entertainment/plex/plex-image-cleanup
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false # no flux ks dependents
   interval: 30m
   retryInterval: 1m
@@ -92,7 +83,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app kometa
-  namespace: entertainment
+  namespace: flux-system
 spec:
   targetNamespace: entertainment
   commonMetadata:
@@ -100,21 +91,15 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: plex
-      namespace: entertainment
     - name: tautulli
-      namespace: entertainment
     - name: radarr
-      namespace: downloads
     - name: sonarr
-      namespace: downloads
     - name: external-secrets-stores
-      namespace: external-secrets
   path: ./kubernetes/apps/entertainment/plex/kometa
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false # no flux ks dependents
   interval: 30m
   retryInterval: 1m
@@ -123,5 +108,3 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 10Gi
-  components:
-    - ../../../../components/volsync

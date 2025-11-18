@@ -1,6 +1,8 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - ./namespace.yaml
   - ./cloudflared/ks.yaml
   - ./cloudflare-ddns/ks.yaml
   - ./echo-server/ks.yaml
@@ -8,12 +10,9 @@ resources:
   - ./external-dns-unifi/ks.yaml
   - ./external-services/ks.yaml
   - ./envoy-gateway/ks.yaml
+  # - ./ingress-nginx/ks.yaml  # Disabled after Envoy Gateway migration - 2025-11-17
   - ./k8s-gateway/ks.yaml
   - ./multus/ks.yaml
+  # - ./netboot/ks.yaml
   - ./oauth2-proxy/ks.yaml
   - ./tailscale/ks.yaml
-namespace: network
-components:
-  - ../../components/namespace
-replacements:
-  - path: ../../components/replacements/ks.yaml

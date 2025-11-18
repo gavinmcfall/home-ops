@@ -1,8 +1,9 @@
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app cilium
-  namespace: kube-system
+  namespace: flux-system
 spec:
   targetNamespace: kube-system
   commonMetadata:
@@ -13,7 +14,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m
@@ -23,7 +23,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app cilium-config
-  namespace: kube-system
+  namespace: flux-system
 spec:
   targetNamespace: kube-system
   commonMetadata:
@@ -31,13 +31,11 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cilium
-      namespace: kube-system
   path: ./kubernetes/apps/kube-system/cilium/config
   prune: false # never should be deleted
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
