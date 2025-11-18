@@ -24,4 +24,4 @@ spec:
       APP: *app
       GATUS_SUBDOMAIN: teslamate
   components:
-    - ../../../components/gatus/guarded
+    - ../../../../components/gatus/guarded

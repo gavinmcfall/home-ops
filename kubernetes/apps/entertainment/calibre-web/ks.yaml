@@ -27,5 +27,5 @@ spec:
       VOLSYNC_UID: "2000"
       VOLSYNC_GID: "2000"
   components:
-    - ../../../components/volsync
-    - ../../../components/gatus/external
+    - ../../../../components/volsync
+    - ../../../../components/gatus/external

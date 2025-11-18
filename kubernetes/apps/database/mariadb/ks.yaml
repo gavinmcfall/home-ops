@@ -29,5 +29,5 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 8Gi
   components:
-    - ../../../components/volsync
-    - ../../../components/gatus/guarded
+    - ../../../../components/volsync
+    - ../../../../components/gatus/guarded

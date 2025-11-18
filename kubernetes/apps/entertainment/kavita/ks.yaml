@@ -25,5 +25,5 @@ spec:
       VOLSYNC_CAPACITY: 4Gi
       GATUS_SUBDOMAIN: comics
   components:
-    - ../../../components/volsync
-    - ../../../components/gatus/external
+    - ../../../../components/volsync
+    - ../../../../components/gatus/external

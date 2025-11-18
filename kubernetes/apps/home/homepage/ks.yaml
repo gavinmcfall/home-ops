@@ -26,4 +26,4 @@ spec:
     substitute:
       APP: *app
   components:
-    - ../../../components/gatus/guarded
+    - ../../../../components/gatus/guarded

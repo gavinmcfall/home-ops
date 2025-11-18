@@ -27,4 +27,4 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 1Gi
   components:
-    - ../../../components/volsync
+    - ../../../../components/volsync

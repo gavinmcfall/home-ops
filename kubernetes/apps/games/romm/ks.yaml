@@ -32,5 +32,5 @@ spec:
       GATUS_STATUS: "200"
 
   components:
-    - ../../../components/volsync
-    - ../../../components/gatus/external
+    - ../../../../components/volsync
+    - ../../../../components/gatus/external

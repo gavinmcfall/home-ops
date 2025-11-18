@@ -25,5 +25,5 @@ spec:
       VOLSYNC_CAPACITY: 20Gi
       GATUS_PATH: /ping
   components:
-    - ../../../components/volsync
-    - ../../../components/gatus/external
+    - ../../../../components/volsync
+    - ../../../../components/gatus/external

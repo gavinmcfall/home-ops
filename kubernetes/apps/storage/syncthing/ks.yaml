@@ -32,4 +32,4 @@ spec:
       VOLSYNC_SNAPSHOTCLASS: ${CLUSTER_SNAPSHOT_BLOCK}
       VOLSYNC_COPY_METHOD: Snapshot
   components:
-    - ../../../components/volsync
+    - ../../../../components/volsync

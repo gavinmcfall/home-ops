@@ -56,4 +56,4 @@ spec:
       GATUS_SVC_PORT: "5432"
       GATUS_NAMESPACE: database
   components:
-    - ../../../components/gatus/infrastructure
+    - ../../../../components/gatus/infrastructure

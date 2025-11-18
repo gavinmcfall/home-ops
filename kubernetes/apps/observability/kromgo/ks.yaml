@@ -24,4 +24,4 @@ spec:
       APP: *app
       GATUS_STATUS: "404"
   components:
-    - ../../../components/gatus/external
+    - ../../../../components/gatus/external

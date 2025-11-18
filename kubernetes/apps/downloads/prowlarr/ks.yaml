@@ -32,4 +32,4 @@ spec:
       VOLSYNC_STORAGECLASS: ceph-filesystem
       VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
   components:
-    - ../../../components/volsync
+    - ../../../../components/volsync

@@ -30,5 +30,5 @@ spec:
       VOLSYNC_CAPACITY: 2Gi
       GATUS_SUBDOMAIN: join
   components:
-    - ../../../components/volsync
-    - ../../../components/gatus/external
+    - ../../../../components/volsync
+    - ../../../../components/gatus/external

@@ -30,5 +30,5 @@ spec:
       VOLSYNC_CAPACITY: 1Gi
       VOLSYNC_CLAIM: *app
   components:
-    - ../../../components/volsync
-    - ../../../components/gatus/guarded
+    - ../../../../components/volsync
+    - ../../../../components/gatus/guarded

@@ -24,4 +24,4 @@ spec:
       VOLSYNC_STORAGECLASS: ceph-block
       VOLSYNC_SNAPSHOTCLASS: csi-ceph-block
   components:
-    - ../../../components/volsync
+    - ../../../../components/volsync
