@@ -46,6 +46,10 @@ spec:
         # Force trim operations
       bdev_flock_retry = 3
     cephClusterSpec:
+      cleanupPolicy:
+        confirmation: ""
+        allowUninstallWithVolumes: false
+        wipeDevicesFromOtherClusters: true
       cephVersion:
         image: quay.io/ceph/ceph:v18.2.7
         allowUnsupported: false
