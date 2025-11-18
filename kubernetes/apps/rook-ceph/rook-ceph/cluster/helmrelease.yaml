@@ -47,8 +47,12 @@ spec:
       bdev_flock_retry = 3
     cephClusterSpec:
       cleanupPolicy:
-        confirmation: ""
+        confirmation: yes-really-destroy-data
         allowUninstallWithVolumes: false
+        sanitizeDisks:
+          method: quick
+          dataSource: zero
+          iteration: 1
         wipeDevicesFromOtherClusters: true
       cephVersion:
         image: quay.io/ceph/ceph:v18.2.7
