@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../app/external
+  - ../app/internal
+  - ../app/policy
+  - ../app/certificate.yaml
+  - ../app/podmonitor.yaml
+  - ../app/servicemonitor.yaml
+  - ../app/httproute.yaml
