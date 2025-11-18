@@ -1,10 +1,9 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app external-secrets
-  namespace: flux-system
+  namespace: external-secrets
 spec:
   targetNamespace: external-secrets
   commonMetadata:
@@ -15,6 +14,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m
@@ -25,7 +25,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app external-secrets-stores
-  namespace: flux-system
+  namespace: external-secrets
 spec:
   targetNamespace: external-secrets
   commonMetadata:
@@ -33,11 +33,13 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets
+      namespace: external-secrets
   path: ./kubernetes/apps/external-secrets/external-secrets/stores
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m
@@ -48,7 +50,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app external-secrets-secrets
-  namespace: flux-system
+  namespace: external-secrets
 spec:
   targetNamespace: external-secrets
   commonMetadata:
@@ -56,11 +58,13 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets
+      namespace: external-secrets
   path: ./kubernetes/apps/external-secrets/external-secrets/secrets
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m

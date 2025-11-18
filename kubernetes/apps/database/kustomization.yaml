@@ -1,12 +1,16 @@
----
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # Pre Flux-Kustomizations
-  - ./namespace.yaml
-  # Flux-Kustomizations
   - ./cloudnative-pg/ks.yaml
   - ./dragonfly/ks.yaml
   - ./mosquitto/ks.yaml
   - ./mariadb/ks.yaml
+namespace: database
+components:
+  - ../../components/namespace
+replacements:
+  - path: ../../components/replacements/ks.yaml
+patches:
+  - path: ./patches/namespace.yaml

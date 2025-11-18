@@ -1,10 +1,9 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app jellyfin
-  namespace: flux-system
+  namespace: entertainment
 spec:
   targetNamespace: entertainment
   commonMetadata:
@@ -12,11 +11,13 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets-stores
+      namespace: external-secrets
   path: ./kubernetes/apps/entertainment/jellyfin/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -26,3 +27,6 @@ spec:
       APP: *app
       GATUS_PATH: /web/index.html
       VOLSYNC_CAPACITY: 20Gi
+  components:
+    - ../../../../components/volsync
+    - ../../../../components/gatus/external
