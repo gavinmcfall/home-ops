@@ -1,10 +1,9 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app fileflows
-  namespace: flux-system
+  namespace: entertainment
 spec:
   targetNamespace: entertainment
   commonMetadata:
@@ -16,6 +15,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: false
   postBuild:
     substitute:
@@ -23,3 +23,5 @@ spec:
       VOLSYNC_CAPACITY: 10Gi
       VOLSYNC_STORAGECLASS: ceph-block
       VOLSYNC_SNAPSHOTCLASS: csi-ceph-block
+  components:
+    - ../../../components/volsync

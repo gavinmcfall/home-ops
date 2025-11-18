@@ -1,15 +1,12 @@
----
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   # - ./pvc.yaml
-  - ../../../../templates/volsync
-  - ../../../../templates/gatus/external
 configMapGenerator:
-- name: romm-config
-  files:
-    - ./config/config.yml
-  options:
-    disableNameSuffixHash: true
+  - name: romm-config
+    files:
+      - ./config/config.yml
+    options:
+      disableNameSuffixHash: true

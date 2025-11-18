@@ -1,10 +1,8 @@
-# Disabled after migration to Envoy Gateway - 2025-11-17
----
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app ingress-nginx-certificates
-  namespace: flux-system
+  namespace: network
 spec:
   targetNamespace: network
   commonMetadata:
@@ -12,11 +10,13 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cert-manager-issuers
+      namespace: cert-manager
   path: ./kubernetes/apps/network/ingress-nginx/certificates
   prune: false
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m
@@ -26,7 +26,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app ingress-nginx-internal
-  namespace: flux-system
+  namespace: network
 spec:
   targetNamespace: network
   commonMetadata:
@@ -34,11 +34,13 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: ingress-nginx-certificates
+      namespace: network
   path: ./kubernetes/apps/network/ingress-nginx/internal
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -48,7 +50,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app ingress-nginx-external
-  namespace: flux-system
+  namespace: network
 spec:
   targetNamespace: network
   commonMetadata:
@@ -56,11 +58,13 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: ingress-nginx-certificates
+      namespace: network
   path: ./kubernetes/apps/network/ingress-nginx/external
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m

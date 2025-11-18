@@ -1,0 +1,5157 @@
+diff --git a/kubernetes/apps/cert-manager/cert-manager/ks.yaml b/kubernetes/apps/cert-manager/cert-manager/ks.yaml
+index ea0d2af9..f4a9b49a 100644
+--- a/kubernetes/apps/cert-manager/cert-manager/ks.yaml
++++ b/kubernetes/apps/cert-manager/cert-manager/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app cert-manager
+-  namespace: flux-system
++  namespace: cert-manager
+ spec:
+   targetNamespace: cert-manager
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -23,7 +23,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app cert-manager-issuers
+-  namespace: flux-system
++  namespace: cert-manager
+ spec:
+   targetNamespace: cert-manager
+   commonMetadata:
+@@ -31,11 +31,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cert-manager
++      namespace: cert-manager
+   path: ./kubernetes/apps/cert-manager/cert-manager/issuers
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/cert-manager/kustomization.yaml b/kubernetes/apps/cert-manager/kustomization.yaml
+index a0a3e5ed..cbfd5cc2 100644
+--- a/kubernetes/apps/cert-manager/kustomization.yaml
++++ b/kubernetes/apps/cert-manager/kustomization.yaml
+@@ -1,6 +1,9 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+   - ./cert-manager/ks.yaml
++namespace: cert-manager
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/cert-manager/namespace.yaml b/kubernetes/apps/cert-manager/namespace.yaml
+deleted file mode 100644
+index ed788350..00000000
+--- a/kubernetes/apps/cert-manager/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: cert-manager
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/cortex/kustomization.yaml b/kubernetes/apps/cortex/kustomization.yaml
+index bd768e40..3d1b7385 100644
+--- a/kubernetes/apps/cortex/kustomization.yaml
++++ b/kubernetes/apps/cortex/kustomization.yaml
+@@ -3,11 +3,14 @@ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   # Pre Flux-Kustomizations
+-  - ./namespace.yaml
+-  # Flux-Kustomizations
+   - ./litellm/ks.yaml
+-  # - ./llm-d/ks.yaml
+   - ./open-webui/ks.yaml
+   - ./qdrant/ks.yaml
+-  # - ./sillytavern/ks.yaml
+   - ./whisper/ks.yaml
++namespace: cortex
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
++patches:
++  - path: ./patches/namespace.yaml
+diff --git a/kubernetes/apps/cortex/litellm/ks.yaml b/kubernetes/apps/cortex/litellm/ks.yaml
+index 86f0fb68..948bbdfc 100644
+--- a/kubernetes/apps/cortex/litellm/ks.yaml
++++ b/kubernetes/apps/cortex/litellm/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app litellm
+-  namespace: flux-system
++  namespace: cortex
+ spec:
+   targetNamespace: cortex
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/cortex/litellm/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/cortex/namespace.yaml b/kubernetes/apps/cortex/namespace.yaml
+deleted file mode 100644
+index 04e702a2..00000000
+--- a/kubernetes/apps/cortex/namespace.yaml
++++ /dev/null
+@@ -1,10 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: cortex
+-  annotations:
+-    volsync.backube/privileged-movers: "true"
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+-    goldilocks.fairwinds.com/enabled: "true"
+diff --git a/kubernetes/apps/cortex/open-webui/app/kustomization.yaml b/kubernetes/apps/cortex/open-webui/app/kustomization.yaml
+index 12b9e402..5835eea0 100644
+--- a/kubernetes/apps/cortex/open-webui/app/kustomization.yaml
++++ b/kubernetes/apps/cortex/open-webui/app/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+   - ./externalsecret.yaml
+-  - ../../../../templates/volsync
+-  - ../../../../templates/gatus/guarded
+diff --git a/kubernetes/apps/cortex/open-webui/ks.yaml b/kubernetes/apps/cortex/open-webui/ks.yaml
+index 366e6720..2ac63580 100644
+--- a/kubernetes/apps/cortex/open-webui/ks.yaml
++++ b/kubernetes/apps/cortex/open-webui/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app open-webui
+-  namespace: flux-system
++  namespace: cortex
+ spec:
+   targetNamespace: cortex
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -24,3 +24,6 @@ spec:
+       APP: *app
+       VOLSYNC_CLAIM: open-webui-config
+       VOLSYNC_CAPACITY: 5Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/cortex/qdrant/app/kustomization.yaml b/kubernetes/apps/cortex/qdrant/app/kustomization.yaml
+index 0f2200a0..96b914fe 100644
+--- a/kubernetes/apps/cortex/qdrant/app/kustomization.yaml
++++ b/kubernetes/apps/cortex/qdrant/app/kustomization.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+@@ -6,5 +5,3 @@ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+   - ./servicemonitor.yaml
+-  - ../../../../templates/volsync
+-  - ../../../../templates/gatus/guarded
+diff --git a/kubernetes/apps/cortex/qdrant/ks.yaml b/kubernetes/apps/cortex/qdrant/ks.yaml
+index b6741173..38c7d1e7 100644
+--- a/kubernetes/apps/cortex/qdrant/ks.yaml
++++ b/kubernetes/apps/cortex/qdrant/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app qdrant
+-  namespace: flux-system
++  namespace: cortex
+ spec:
+   targetNamespace: cortex
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cluster-apps-volsync
++      namespace: volsync-system
+     - name: cluster-apps-rook-ceph-cluster
++      namespace: rook-ceph
+   path: ./kubernetes/apps/cortex/qdrant/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   timeout: 5m
+@@ -25,3 +27,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 25Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/cortex/sillytavern/app/kustomization.yaml b/kubernetes/apps/cortex/sillytavern/app/kustomization.yaml
+index 01befaa6..372f754a 100644
+--- a/kubernetes/apps/cortex/sillytavern/app/kustomization.yaml
++++ b/kubernetes/apps/cortex/sillytavern/app/kustomization.yaml
+@@ -1,8 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+-  - ../../../../templates/gatus/guarded
+diff --git a/kubernetes/apps/cortex/sillytavern/ks.yaml b/kubernetes/apps/cortex/sillytavern/ks.yaml
+index 5f998951..ce05b3f2 100644
+--- a/kubernetes/apps/cortex/sillytavern/ks.yaml
++++ b/kubernetes/apps/cortex/sillytavern/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app sillytaverns
+-  namespace: flux-system
++  namespace: cortex
+ spec:
+   targetNamespace: cortex
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cluster-apps-volsync
++      namespace: volsync-system
+     - name: cluster-apps-rook-ceph-cluster
++      namespace: rook-ceph
+   path: ./kubernetes/apps/cortex/sillytavern/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   timeout: 5m
+@@ -25,3 +27,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 10Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/cortex/whisper/app/kustomization.yaml b/kubernetes/apps/cortex/whisper/app/kustomization.yaml
+index 83349e15..005710c6 100644
+--- a/kubernetes/apps/cortex/whisper/app/kustomization.yaml
++++ b/kubernetes/apps/cortex/whisper/app/kustomization.yaml
+@@ -1,8 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+diff --git a/kubernetes/apps/cortex/whisper/ks.yaml b/kubernetes/apps/cortex/whisper/ks.yaml
+index 1245b516..0268d4a4 100644
+--- a/kubernetes/apps/cortex/whisper/ks.yaml
++++ b/kubernetes/apps/cortex/whisper/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app whisper
+-  namespace: flux-system
++  namespace: cortex
+ spec:
+   targetNamespace: cortex
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -22,3 +22,5 @@ spec:
+   postBuild:
+     substitute:
+       APP: *app
++  components:
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/database/cloudnative-pg/cluster17/kustomization.yaml b/kubernetes/apps/database/cloudnative-pg/cluster17/kustomization.yaml
+index 69841311..2d3f7dbd 100644
+--- a/kubernetes/apps/database/cloudnative-pg/cluster17/kustomization.yaml
++++ b/kubernetes/apps/database/cloudnative-pg/cluster17/kustomization.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+@@ -7,4 +6,3 @@ resources:
+   - ./scheduledbackup.yaml
+   - ./prometheusrule.yaml
+   - ./service.yaml
+-  - ../../../../templates/gatus/infrastructure
+diff --git a/kubernetes/apps/database/cloudnative-pg/ks.yaml b/kubernetes/apps/database/cloudnative-pg/ks.yaml
+index 89288bd3..252b0e74 100644
+--- a/kubernetes/apps/database/cloudnative-pg/ks.yaml
++++ b/kubernetes/apps/database/cloudnative-pg/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app cloudnative-pg
+-  namespace: flux-system
++  namespace: database
+ spec:
+   targetNamespace: database
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/database/cloudnative-pg/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -27,7 +28,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app cloudnative-pg-cluster17
+-  namespace: flux-system
++  namespace: database
+ spec:
+   targetNamespace: database
+   commonMetadata:
+@@ -35,12 +36,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/database/cloudnative-pg/cluster17
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -51,3 +55,5 @@ spec:
+       GATUS_SVC_NAME: postgres17-lb
+       GATUS_SVC_PORT: "5432"
+       GATUS_NAMESPACE: database
++  components:
++    - ../../../components/gatus/infrastructure
+diff --git a/kubernetes/apps/database/dragonfly/ks.yaml b/kubernetes/apps/database/dragonfly/ks.yaml
+index dd5ba3ab..010e0af5 100644
+--- a/kubernetes/apps/database/dragonfly/ks.yaml
++++ b/kubernetes/apps/database/dragonfly/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app dragonfly-operator
+-  namespace: flux-system
++  namespace: database
+ spec:
+   targetNamespace: database
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/database/dragonfly/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -27,7 +28,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app dragonfly-cluster
+-  namespace: flux-system
++  namespace: database
+ spec:
+   targetNamespace: database
+   commonMetadata:
+@@ -35,11 +36,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: dragonfly-operator
++      namespace: database
+   path: ./kubernetes/apps/database/dragonfly/cluster
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/database/kustomization.yaml b/kubernetes/apps/database/kustomization.yaml
+index 4f0b5df2..2a2f88b1 100644
+--- a/kubernetes/apps/database/kustomization.yaml
++++ b/kubernetes/apps/database/kustomization.yaml
+@@ -1,12 +1,16 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   # Pre Flux-Kustomizations
+-  - ./namespace.yaml
+-  # Flux-Kustomizations
+   - ./cloudnative-pg/ks.yaml
+   - ./dragonfly/ks.yaml
+   - ./mosquitto/ks.yaml
+   - ./mariadb/ks.yaml
++namespace: database
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
++patches:
++  - path: ./patches/namespace.yaml
+diff --git a/kubernetes/apps/database/mariadb/app/kustomization.yaml b/kubernetes/apps/database/mariadb/app/kustomization.yaml
+index 259b31dc..fec34629 100644
+--- a/kubernetes/apps/database/mariadb/app/kustomization.yaml
++++ b/kubernetes/apps/database/mariadb/app/kustomization.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+@@ -7,5 +6,3 @@ resources:
+   - ./helmrelease.yaml
+   - ./oci-mariadb.yaml
+   # Templates
+-  - ../../../../templates/gatus/guarded
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/database/mariadb/ks.yaml b/kubernetes/apps/database/mariadb/ks.yaml
+index e864d4bc..ea326e01 100644
+--- a/kubernetes/apps/database/mariadb/ks.yaml
++++ b/kubernetes/apps/database/mariadb/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://cluster-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app mariadb
+-  namespace: flux-system
++  namespace: database
+ spec:
+   targetNamespace: database
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cluster-apps-volsync
++      namespace: volsync-system
+     - name: cluster-apps-rook-ceph-cluster
++      namespace: rook-ceph
+   path: ./kubernetes/apps/database/mariadb/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -26,3 +28,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 8Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/database/mosquitto/ks.yaml b/kubernetes/apps/database/mosquitto/ks.yaml
+index 662d4565..c91d0fbd 100644
+--- a/kubernetes/apps/database/mosquitto/ks.yaml
++++ b/kubernetes/apps/database/mosquitto/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app mosquitto
+-  namespace: flux-system
++  namespace: database
+ spec:
+   targetNamespace: database
+   commonMetadata:
+@@ -12,6 +11,7 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/database/mosquitto/app
+   prune: true
+   sourceRef:
+diff --git a/kubernetes/apps/database/namespace.yaml b/kubernetes/apps/database/namespace.yaml
+deleted file mode 100644
+index 2ddec54a..00000000
+--- a/kubernetes/apps/database/namespace.yaml
++++ /dev/null
+@@ -1,8 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: database
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+-    goldilocks.fairwinds.com/enabled: "true"
+diff --git a/kubernetes/apps/downloads/autobrr/ks.yaml b/kubernetes/apps/downloads/autobrr/ks.yaml
+index 88d83112..411b1bdf 100644
+--- a/kubernetes/apps/downloads/autobrr/ks.yaml
++++ b/kubernetes/apps/downloads/autobrr/ks.yaml
+@@ -1,19 +1,21 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: cluster-apps-autobrr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/autobrr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/downloads/bazarr/app/kustomization.yaml b/kubernetes/apps/downloads/bazarr/app/kustomization.yaml
+index f041d76e..4db7c0a7 100644
+--- a/kubernetes/apps/downloads/bazarr/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/bazarr/app/kustomization.yaml
+@@ -1,11 +1,9 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+ configMapGenerator:
+   - name: bazarr-scripts
+     files:
+diff --git a/kubernetes/apps/downloads/bazarr/ks.yaml b/kubernetes/apps/downloads/bazarr/ks.yaml
+index 1068ce69..e06de835 100644
+--- a/kubernetes/apps/downloads/bazarr/ks.yaml
++++ b/kubernetes/apps/downloads/bazarr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app bazarr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/bazarr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -27,3 +28,5 @@ spec:
+       VOLSYNC_CAPACITY: 5Gi
+       GATUS_PATH: /api/system/status
+       GATUS_STATUS: "200"
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/downloads/dashbrr/app/kustomization.yaml b/kubernetes/apps/downloads/dashbrr/app/kustomization.yaml
+index e1cbcad5..90e5f34b 100644
+--- a/kubernetes/apps/downloads/dashbrr/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/dashbrr/app/kustomization.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+@@ -6,7 +5,6 @@ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+   - ./rbac.yaml
+-  - ../../../../templates/gatus/guarded
+ configMapGenerator:
+   - name: dashbrr-config
+     files:
+diff --git a/kubernetes/apps/downloads/dashbrr/ks.yaml b/kubernetes/apps/downloads/dashbrr/ks.yaml
+index d0b6159c..8297c0ee 100644
+--- a/kubernetes/apps/downloads/dashbrr/ks.yaml
++++ b/kubernetes/apps/downloads/dashbrr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kube-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app dashbrr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,15 +11,20 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/dashbrr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   timeout: 5m
+   postBuild:
+     substitute:
+       APP: *app
++  components:
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/downloads/flaresolverr/ks.yaml b/kubernetes/apps/downloads/flaresolverr/ks.yaml
+index a732c18d..1f40daaf 100644
+--- a/kubernetes/apps/downloads/flaresolverr/ks.yaml
++++ b/kubernetes/apps/downloads/flaresolverr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app flaresolverr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/downloads/kapowarr/app/kustomization.yaml b/kubernetes/apps/downloads/kapowarr/app/kustomization.yaml
+index a928a563..372f754a 100644
+--- a/kubernetes/apps/downloads/kapowarr/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/kapowarr/app/kustomization.yaml
+@@ -1,7 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/downloads/kapowarr/ks.yaml b/kubernetes/apps/downloads/kapowarr/ks.yaml
+index 941aa986..e3e2f910 100644
+--- a/kubernetes/apps/downloads/kapowarr/ks.yaml
++++ b/kubernetes/apps/downloads/kapowarr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app kapowarr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -23,3 +23,5 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/downloads/kustomization.yaml b/kubernetes/apps/downloads/kustomization.yaml
+index c2bd08ca..c0466370 100644
+--- a/kubernetes/apps/downloads/kustomization.yaml
++++ b/kubernetes/apps/downloads/kustomization.yaml
+@@ -1,17 +1,12 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+-  # Applications
+-  # - ./aria2-ng/ks.yaml
+   - ./autobrr/ks.yaml
+   - ./bazarr/ks.yaml
+   - ./dashbrr/ks.yaml
+   - ./flaresolverr/ks.yaml
+   - ./kapowarr/ks.yaml
+   - ./metube/ks.yaml
+-  # - ./mylar/ks.yaml
+   - ./prowlarr/ks.yaml
+   - ./qbittorrent/ks.yaml
+   - ./radarr/ks.yaml
+@@ -24,3 +19,10 @@ resources:
+   - ./sonarr-uhd/ks.yaml
+   - ./unpackerr/ks.yaml
+   - ./whisparr/ks.yaml
++namespace: downloads
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
++patches:
++  - path: ./patches/namespace.yaml
+diff --git a/kubernetes/apps/downloads/metube/app/kustomization.yaml b/kubernetes/apps/downloads/metube/app/kustomization.yaml
+index a928a563..372f754a 100644
+--- a/kubernetes/apps/downloads/metube/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/metube/app/kustomization.yaml
+@@ -1,7 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/downloads/metube/ks.yaml b/kubernetes/apps/downloads/metube/ks.yaml
+index c8cd93ef..ac45753c 100644
+--- a/kubernetes/apps/downloads/metube/ks.yaml
++++ b/kubernetes/apps/downloads/metube/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app metube
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -23,3 +23,5 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/downloads/namespace.yaml b/kubernetes/apps/downloads/namespace.yaml
+deleted file mode 100644
+index be584fb7..00000000
+--- a/kubernetes/apps/downloads/namespace.yaml
++++ /dev/null
+@@ -1,10 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: downloads
+-  annotations:
+-    volsync.backube/privileged-movers: "true"
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+-    goldilocks.fairwinds.com/enabled: "true"
+diff --git a/kubernetes/apps/downloads/prowlarr/app/kustomization.yaml b/kubernetes/apps/downloads/prowlarr/app/kustomization.yaml
+index be13d2db..005710c6 100644
+--- a/kubernetes/apps/downloads/prowlarr/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/prowlarr/app/kustomization.yaml
+@@ -1,8 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/downloads/prowlarr/ks.yaml b/kubernetes/apps/downloads/prowlarr/ks.yaml
+index 55c3da76..bd9e6ad1 100644
+--- a/kubernetes/apps/downloads/prowlarr/ks.yaml
++++ b/kubernetes/apps/downloads/prowlarr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app prowlarr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/prowlarr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -29,3 +31,5 @@ spec:
+       VOLSYNC_ACCESSMODES: ReadWriteMany
+       VOLSYNC_STORAGECLASS: ceph-filesystem
+       VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/downloads/qbittorrent/app/kustomization.yaml b/kubernetes/apps/downloads/qbittorrent/app/kustomization.yaml
+index d5f66921..b5a4c37d 100644
+--- a/kubernetes/apps/downloads/qbittorrent/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/qbittorrent/app/kustomization.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+@@ -6,8 +5,6 @@ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+   # - ./networkpolicy.yaml
+-  - ../../../../templates/gatus/guarded
+-  - ../../../../templates/volsync
+ configMapGenerator:
+   - name: qbittorrent-scripts
+     files:
+diff --git a/kubernetes/apps/downloads/qbittorrent/ks.yaml b/kubernetes/apps/downloads/qbittorrent/ks.yaml
+index 3fed6118..0b82551c 100644
+--- a/kubernetes/apps/downloads/qbittorrent/ks.yaml
++++ b/kubernetes/apps/downloads/qbittorrent/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app qbittorrent
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -27,13 +27,16 @@ spec:
+       VOLSYNC_ACCESSMODES: ReadWriteMany
+       VOLSYNC_STORAGECLASS: ceph-filesystem
+       VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+ ---
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app qbittorrent-tools
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -44,6 +47,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/downloads/radarr-uhd/ks.yaml b/kubernetes/apps/downloads/radarr-uhd/ks.yaml
+index 0198858b..1b1c681f 100644
+--- a/kubernetes/apps/downloads/radarr-uhd/ks.yaml
++++ b/kubernetes/apps/downloads/radarr-uhd/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app radarr-uhd
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/radarr-uhd/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/downloads/radarr/ks.yaml b/kubernetes/apps/downloads/radarr/ks.yaml
+index 2068fc9d..eb7c901c 100644
+--- a/kubernetes/apps/downloads/radarr/ks.yaml
++++ b/kubernetes/apps/downloads/radarr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app radarr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/radarr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/downloads/readarr/app/kustomization.yaml b/kubernetes/apps/downloads/readarr/app/kustomization.yaml
+index de76dcff..9e364a0f 100644
+--- a/kubernetes/apps/downloads/readarr/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/readarr/app/kustomization.yaml
+@@ -1,11 +1,9 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+ configMapGenerator:
+   - name: readarr-configmap
+     files:
+diff --git a/kubernetes/apps/downloads/readarr/ks.yaml b/kubernetes/apps/downloads/readarr/ks.yaml
+index 0311051a..586e78b9 100644
+--- a/kubernetes/apps/downloads/readarr/ks.yaml
++++ b/kubernetes/apps/downloads/readarr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app readarr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/readarr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -26,3 +28,5 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/downloads/recyclarr/app/kustomization.yaml b/kubernetes/apps/downloads/recyclarr/app/kustomization.yaml
+index 5d1e1b48..611be25e 100644
+--- a/kubernetes/apps/downloads/recyclarr/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/recyclarr/app/kustomization.yaml
+@@ -1,11 +1,9 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+ configMapGenerator:
+   - name: recyclarr-configmap
+     files:
+diff --git a/kubernetes/apps/downloads/recyclarr/ks.yaml b/kubernetes/apps/downloads/recyclarr/ks.yaml
+index e2348741..08cfaaa0 100644
+--- a/kubernetes/apps/downloads/recyclarr/ks.yaml
++++ b/kubernetes/apps/downloads/recyclarr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app recyclarr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/recyclarr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -25,3 +26,5 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 1Gi
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/downloads/sabnzbd/app/kustomization.yaml b/kubernetes/apps/downloads/sabnzbd/app/kustomization.yaml
+index b5cc32d3..005710c6 100644
+--- a/kubernetes/apps/downloads/sabnzbd/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/sabnzbd/app/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/downloads/sabnzbd/ks.yaml b/kubernetes/apps/downloads/sabnzbd/ks.yaml
+index 8dbf88be..51c2d51f 100644
+--- a/kubernetes/apps/downloads/sabnzbd/ks.yaml
++++ b/kubernetes/apps/downloads/sabnzbd/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app sabnzbd
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/sabnzbd/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -29,3 +30,6 @@ spec:
+       VOLSYNC_ACCESSMODES: ReadWriteMany
+       VOLSYNC_STORAGECLASS: ceph-filesystem
+       VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/downloads/sonarr-foreign/ks.yaml b/kubernetes/apps/downloads/sonarr-foreign/ks.yaml
+index 591de785..b1ea8222 100644
+--- a/kubernetes/apps/downloads/sonarr-foreign/ks.yaml
++++ b/kubernetes/apps/downloads/sonarr-foreign/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app sonarr-foreign
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/sonarr-foreign/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/downloads/sonarr-uhd/ks.yaml b/kubernetes/apps/downloads/sonarr-uhd/ks.yaml
+index 713b2738..e9e09214 100644
+--- a/kubernetes/apps/downloads/sonarr-uhd/ks.yaml
++++ b/kubernetes/apps/downloads/sonarr-uhd/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app sonarr-uhd
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/sonarr-uhd/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/downloads/sonarr/ks.yaml b/kubernetes/apps/downloads/sonarr/ks.yaml
+index ab13095e..530a781b 100644
+--- a/kubernetes/apps/downloads/sonarr/ks.yaml
++++ b/kubernetes/apps/downloads/sonarr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app sonarr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/sonarr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/downloads/unpackerr/ks.yaml b/kubernetes/apps/downloads/unpackerr/ks.yaml
+index 992753e8..646aaa47 100644
+--- a/kubernetes/apps/downloads/unpackerr/ks.yaml
++++ b/kubernetes/apps/downloads/unpackerr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app unpackerr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/unpackerr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/downloads/whisparr/app/kustomization.yaml b/kubernetes/apps/downloads/whisparr/app/kustomization.yaml
+index 5b6ba6b5..758175fa 100644
+--- a/kubernetes/apps/downloads/whisparr/app/kustomization.yaml
++++ b/kubernetes/apps/downloads/whisparr/app/kustomization.yaml
+@@ -1,12 +1,9 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+-  - ../../../../templates/volsync
+ generatorOptions:
+   disableNameSuffixHash: true
+   annotations:
+diff --git a/kubernetes/apps/downloads/whisparr/ks.yaml b/kubernetes/apps/downloads/whisparr/ks.yaml
+index 824e467b..ae8c43d4 100644
+--- a/kubernetes/apps/downloads/whisparr/ks.yaml
++++ b/kubernetes/apps/downloads/whisparr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app whisparr
+-  namespace: flux-system
++  namespace: downloads
+ spec:
+   targetNamespace: downloads
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/downloads/whisparr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -26,3 +28,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 5Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/entertainment/audiobookshelf/app/kustomization.yaml b/kubernetes/apps/entertainment/audiobookshelf/app/kustomization.yaml
+index ae6835d4..372f754a 100644
+--- a/kubernetes/apps/entertainment/audiobookshelf/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/audiobookshelf/app/kustomization.yaml
+@@ -1,8 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/audiobookshelf/ks.yaml b/kubernetes/apps/entertainment/audiobookshelf/ks.yaml
+index 40bb7f45..0639f687 100644
+--- a/kubernetes/apps/entertainment/audiobookshelf/ks.yaml
++++ b/kubernetes/apps/entertainment/audiobookshelf/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app audiobookshelf
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   prune: true
+   wait: false
+   interval: 30m
+@@ -24,3 +24,6 @@ spec:
+       APP: *app
+       VOLSYNC_CAPACITY: 20Gi
+       GATUS_PATH: /ping
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/entertainment/calibre-web/app/kustomization.yaml b/kubernetes/apps/entertainment/calibre-web/app/kustomization.yaml
+index ae6835d4..372f754a 100644
+--- a/kubernetes/apps/entertainment/calibre-web/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/calibre-web/app/kustomization.yaml
+@@ -1,8 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/calibre-web/ks.yaml b/kubernetes/apps/entertainment/calibre-web/ks.yaml
+index 2247aadc..c8d49013 100644
+--- a/kubernetes/apps/entertainment/calibre-web/ks.yaml
++++ b/kubernetes/apps/entertainment/calibre-web/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://github.com/fluxcd-community/flux2-schemas/raw/main/kustomization-kustomize-v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app calibre-web
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -26,3 +26,6 @@ spec:
+       VOLSYNC_CAPACITY: 1Gi
+       VOLSYNC_UID: "2000"
+       VOLSYNC_GID: "2000"
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/entertainment/fileflows/app/kustomization.yaml b/kubernetes/apps/entertainment/fileflows/app/kustomization.yaml
+index 8a9abf29..e6c2c1ca 100644
+--- a/kubernetes/apps/entertainment/fileflows/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/fileflows/app/kustomization.yaml
+@@ -3,4 +3,3 @@ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+   - ./pvc.yaml
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/fileflows/ks.yaml b/kubernetes/apps/entertainment/fileflows/ks.yaml
+index 84bf19a4..d9bb3360 100644
+--- a/kubernetes/apps/entertainment/fileflows/ks.yaml
++++ b/kubernetes/apps/entertainment/fileflows/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app fileflows
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -16,6 +15,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   postBuild:
+     substitute:
+@@ -23,3 +23,5 @@ spec:
+       VOLSYNC_CAPACITY: 10Gi
+       VOLSYNC_STORAGECLASS: ceph-block
+       VOLSYNC_SNAPSHOTCLASS: csi-ceph-block
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/entertainment/jellyfin/app/kustomization.yaml b/kubernetes/apps/entertainment/jellyfin/app/kustomization.yaml
+index ae6835d4..372f754a 100644
+--- a/kubernetes/apps/entertainment/jellyfin/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/jellyfin/app/kustomization.yaml
+@@ -1,8 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/jellyfin/ks.yaml b/kubernetes/apps/entertainment/jellyfin/ks.yaml
+index 6997f17b..177d25ee 100644
+--- a/kubernetes/apps/entertainment/jellyfin/ks.yaml
++++ b/kubernetes/apps/entertainment/jellyfin/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app jellyfin
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/entertainment/jellyfin/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -26,3 +27,6 @@ spec:
+       APP: *app
+       GATUS_PATH: /web/index.html
+       VOLSYNC_CAPACITY: 20Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/entertainment/kavita/app/kustomization.yaml b/kubernetes/apps/entertainment/kavita/app/kustomization.yaml
+index ae6835d4..372f754a 100644
+--- a/kubernetes/apps/entertainment/kavita/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/kavita/app/kustomization.yaml
+@@ -1,8 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/kavita/ks.yaml b/kubernetes/apps/entertainment/kavita/ks.yaml
+index 882fa240..0acde550 100644
+--- a/kubernetes/apps/entertainment/kavita/ks.yaml
++++ b/kubernetes/apps/entertainment/kavita/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app kavita
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -24,3 +24,6 @@ spec:
+       APP: *app
+       VOLSYNC_CAPACITY: 4Gi
+       GATUS_SUBDOMAIN: comics
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/entertainment/kustomization.yaml b/kubernetes/apps/entertainment/kustomization.yaml
+index bb10ec4f..a8126f6e 100644
+--- a/kubernetes/apps/entertainment/kustomization.yaml
++++ b/kubernetes/apps/entertainment/kustomization.yaml
+@@ -1,21 +1,21 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+-
+-  # Applications
+   - ./audiobookshelf/ks.yaml
+   - ./calibre-web/ks.yaml
+   - ./fileflows/ks.yaml
+   - ./jellyfin/ks.yaml
+-  # - ./freshrss/ks.yaml
+   - ./kavita/ks.yaml
+   - ./overseerr/ks.yaml
+   - ./pasta/ks.yaml
+-  # - ./peertube/ks.yaml
+   - ./plex/ks.yaml
+   - ./stash/ks.yaml
+   - ./tautulli/ks.yaml
+-  # - ./tdarr/ks.yaml
+   - ./wizarr/ks.yaml
++namespace: entertainment
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
++patches:
++  - path: ./patches/namespace.yaml
+diff --git a/kubernetes/apps/entertainment/namespace.yaml b/kubernetes/apps/entertainment/namespace.yaml
+deleted file mode 100644
+index ce16a6d6..00000000
+--- a/kubernetes/apps/entertainment/namespace.yaml
++++ /dev/null
+@@ -1,10 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: entertainment
+-  annotations:
+-    volsync.backube/privileged-movers: "true"
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+-    goldilocks.fairwinds.com/enabled: "true"
+diff --git a/kubernetes/apps/entertainment/overseerr/app/kustomization.yaml b/kubernetes/apps/entertainment/overseerr/app/kustomization.yaml
+index ae6835d4..372f754a 100644
+--- a/kubernetes/apps/entertainment/overseerr/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/overseerr/app/kustomization.yaml
+@@ -1,8 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/overseerr/ks.yaml b/kubernetes/apps/entertainment/overseerr/ks.yaml
+index 52b69aca..ece29122 100644
+--- a/kubernetes/apps/entertainment/overseerr/ks.yaml
++++ b/kubernetes/apps/entertainment/overseerr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app overseerr
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -24,3 +24,6 @@ spec:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
+       GATUS_SUBDOMAIN: requests
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/entertainment/pasta/ks.yaml b/kubernetes/apps/entertainment/pasta/ks.yaml
+index 56855e50..ba1ce729 100644
+--- a/kubernetes/apps/entertainment/pasta/ks.yaml
++++ b/kubernetes/apps/entertainment/pasta/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app pasta
+-  namespace: flux-system
++  namespace: entertainment
+   labels:
+     app.kubernetes.io/name: *app
+ spec:
+@@ -17,6 +16,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/entertainment/peertube/app/kustomization.yaml b/kubernetes/apps/entertainment/peertube/app/kustomization.yaml
+index d4bd1ddb..8e3a1ec0 100644
+--- a/kubernetes/apps/entertainment/peertube/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/peertube/app/kustomization.yaml
+@@ -1,8 +1,5 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - externalsecret.yaml
+   - helmrelease.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/peertube/ks.yaml b/kubernetes/apps/entertainment/peertube/ks.yaml
+index 79153901..148da92a 100644
+--- a/kubernetes/apps/entertainment/peertube/ks.yaml
++++ b/kubernetes/apps/entertainment/peertube/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app peertube
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   prune: true
+   wait: false
+   interval: 30m
+@@ -24,3 +24,6 @@ spec:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
+       GATUS_PATH: /
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/entertainment/plex/app/kustomization.yaml b/kubernetes/apps/entertainment/plex/app/kustomization.yaml
+index d1eebe82..f1948e04 100644
+--- a/kubernetes/apps/entertainment/plex/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/plex/app/kustomization.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+@@ -6,8 +5,6 @@ resources:
+   - ./externalsecret.yaml
+   - ./pvc.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+ configMapGenerator:
+   - name: plex-loki-rules
+     files:
+diff --git a/kubernetes/apps/entertainment/plex/kometa/kustomization.yaml b/kubernetes/apps/entertainment/plex/kometa/kustomization.yaml
+index b60bd798..be945806 100644
+--- a/kubernetes/apps/entertainment/plex/kometa/kustomization.yaml
++++ b/kubernetes/apps/entertainment/plex/kometa/kustomization.yaml
+@@ -1,11 +1,9 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+ configMapGenerator:
+   - name: kometa-configmap
+     files:
+diff --git a/kubernetes/apps/entertainment/plex/ks.yaml b/kubernetes/apps/entertainment/plex/ks.yaml
+index ae239410..e3e2aeaa 100644
+--- a/kubernetes/apps/entertainment/plex/ks.yaml
++++ b/kubernetes/apps/entertainment/plex/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app plex
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/entertainment/plex/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -26,13 +27,16 @@ spec:
+       APP: *app
+       GATUS_PATH: /web/index.html
+       VOLSYNC_CAPACITY: 30Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+ ---
+ # yaml-language-server: $schema=https://kube-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app plex-auto-languages
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -40,11 +44,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: plex
++      namespace: entertainment
+   path: ./kubernetes/apps/entertainment/plex/plex-auto-languages
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -55,7 +61,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app plex-image-cleanup
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -63,12 +69,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: plex
++      namespace: entertainment
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/entertainment/plex/plex-image-cleanup
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -83,7 +92,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app kometa
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -91,15 +100,21 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: plex
++      namespace: entertainment
+     - name: tautulli
++      namespace: entertainment
+     - name: radarr
++      namespace: downloads
+     - name: sonarr
++      namespace: downloads
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/entertainment/plex/kometa
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -108,3 +123,5 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 10Gi
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/entertainment/stash/app/kustomization.yaml b/kubernetes/apps/entertainment/stash/app/kustomization.yaml
+index a9473e7e..6fa462cf 100644
+--- a/kubernetes/apps/entertainment/stash/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/stash/app/kustomization.yaml
+@@ -1,8 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+   - ./gatus.yaml
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/stash/ks.yaml b/kubernetes/apps/entertainment/stash/ks.yaml
+index 4d260f13..addd9a7c 100644
+--- a/kubernetes/apps/entertainment/stash/ks.yaml
++++ b/kubernetes/apps/entertainment/stash/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app stash
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -23,3 +23,5 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/entertainment/tautulli/app/kustomization.yaml b/kubernetes/apps/entertainment/tautulli/app/kustomization.yaml
+index 509ea92d..eaab998e 100644
+--- a/kubernetes/apps/entertainment/tautulli/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/tautulli/app/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+   - ./pvc.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/tautulli/ks.yaml b/kubernetes/apps/entertainment/tautulli/ks.yaml
+index 758d12ef..d037e8f8 100644
+--- a/kubernetes/apps/entertainment/tautulli/ks.yaml
++++ b/kubernetes/apps/entertainment/tautulli/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app tautulli
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -23,3 +23,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/entertainment/wizarr/app/kustomization.yaml b/kubernetes/apps/entertainment/wizarr/app/kustomization.yaml
+index ae6835d4..372f754a 100644
+--- a/kubernetes/apps/entertainment/wizarr/app/kustomization.yaml
++++ b/kubernetes/apps/entertainment/wizarr/app/kustomization.yaml
+@@ -1,8 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/entertainment/wizarr/ks.yaml b/kubernetes/apps/entertainment/wizarr/ks.yaml
+index 81146080..23dbc9e8 100644
+--- a/kubernetes/apps/entertainment/wizarr/ks.yaml
++++ b/kubernetes/apps/entertainment/wizarr/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app wizarr
+-  namespace: flux-system
++  namespace: entertainment
+ spec:
+   targetNamespace: entertainment
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: plex
++      namespace: entertainment
+     - name: overseerr
++      namespace: entertainment
+   path: ./kubernetes/apps/entertainment/wizarr/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -27,3 +29,6 @@ spec:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
+       GATUS_SUBDOMAIN: join
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/external-secrets/external-secrets/ks.yaml b/kubernetes/apps/external-secrets/external-secrets/ks.yaml
+index 8db0a8fb..0a5fb2c4 100644
+--- a/kubernetes/apps/external-secrets/external-secrets/ks.yaml
++++ b/kubernetes/apps/external-secrets/external-secrets/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app external-secrets
+-  namespace: flux-system
++  namespace: external-secrets
+ spec:
+   targetNamespace: external-secrets
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -25,7 +25,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app external-secrets-stores
+-  namespace: flux-system
++  namespace: external-secrets
+ spec:
+   targetNamespace: external-secrets
+   commonMetadata:
+@@ -33,11 +33,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets
++      namespace: external-secrets
+   path: ./kubernetes/apps/external-secrets/external-secrets/stores
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -48,7 +50,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app external-secrets-secrets
+-  namespace: flux-system
++  namespace: external-secrets
+ spec:
+   targetNamespace: external-secrets
+   commonMetadata:
+@@ -56,11 +58,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets
++      namespace: external-secrets
+   path: ./kubernetes/apps/external-secrets/external-secrets/secrets
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/external-secrets/kustomization.yaml b/kubernetes/apps/external-secrets/kustomization.yaml
+index 8b5a7e34..fffa0df2 100644
+--- a/kubernetes/apps/external-secrets/kustomization.yaml
++++ b/kubernetes/apps/external-secrets/kustomization.yaml
+@@ -1,9 +1,13 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   # Pre Flux-Kustomizations
+-  - ./namespace.yaml
+-  # Flux-Kustomizations
+   - ./external-secrets/ks.yaml
++namespace: external-secrets
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
++patches:
++  - path: ./patches/namespace.yaml
+diff --git a/kubernetes/apps/external-secrets/namespace.yaml b/kubernetes/apps/external-secrets/namespace.yaml
+deleted file mode 100644
+index f71990e0..00000000
+--- a/kubernetes/apps/external-secrets/namespace.yaml
++++ /dev/null
+@@ -1,8 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: external-secrets
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+-    goldilocks.fairwinds.com/enabled: "true"
+diff --git a/kubernetes/apps/flux-system/kustomization.yaml b/kubernetes/apps/flux-system/kustomization.yaml
+index 4c2ff9e5..befb7f9f 100644
+--- a/kubernetes/apps/flux-system/kustomization.yaml
++++ b/kubernetes/apps/flux-system/kustomization.yaml
+@@ -1,8 +1,11 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+   - ./webhooks/ks.yaml
+   - ./weave-gitops/ks.yaml
+   - ./monitoring/ks.yaml
++namespace: flux-system
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/flux-system/monitoring/ks.yaml b/kubernetes/apps/flux-system/monitoring/ks.yaml
+index 36db47ed..6ebefe05 100644
+--- a/kubernetes/apps/flux-system/monitoring/ks.yaml
++++ b/kubernetes/apps/flux-system/monitoring/ks.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+@@ -12,6 +11,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/flux-system/namespace.yaml b/kubernetes/apps/flux-system/namespace.yaml
+deleted file mode 100644
+index b48db452..00000000
+--- a/kubernetes/apps/flux-system/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: flux-system
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/flux-system/weave-gitops/ks.yaml b/kubernetes/apps/flux-system/weave-gitops/ks.yaml
+index 0c85eeca..a8fb50a7 100644
+--- a/kubernetes/apps/flux-system/weave-gitops/ks.yaml
++++ b/kubernetes/apps/flux-system/weave-gitops/ks.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/flux-system/weave-gitops/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/flux-system/webhooks/ks.yaml b/kubernetes/apps/flux-system/webhooks/ks.yaml
+index e80c50b2..a4339a32 100644
+--- a/kubernetes/apps/flux-system/webhooks/ks.yaml
++++ b/kubernetes/apps/flux-system/webhooks/ks.yaml
+@@ -1,4 +1,3 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/games/kustomization.yaml b/kubernetes/apps/games/kustomization.yaml
+index 225985d4..b10c0b82 100644
+--- a/kubernetes/apps/games/kustomization.yaml
++++ b/kubernetes/apps/games/kustomization.yaml
+@@ -3,8 +3,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   # Pre Flux-Kustomizations
+-  - ./namespace.yaml
+-  # Flux-Kustomizations
+-  # - ./minecraft/ks.yaml
+-  # - ./palworld/ks.yaml
+   - ./romm/ks.yaml
++namespace: games
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
++patches:
++  - path: ./patches/namespace.yaml
+diff --git a/kubernetes/apps/games/namespace.yaml b/kubernetes/apps/games/namespace.yaml
+deleted file mode 100644
+index 4fcffb2d..00000000
+--- a/kubernetes/apps/games/namespace.yaml
++++ /dev/null
+@@ -1,10 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: games
+-  annotations:
+-    volsync.backube/privileged-movers: "true"
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+-    goldilocks.fairwinds.com/enabled: "true"
+\ No newline at end of file
+diff --git a/kubernetes/apps/games/romm/app/kustomization.yaml b/kubernetes/apps/games/romm/app/kustomization.yaml
+index 48e44172..b9b03eed 100644
+--- a/kubernetes/apps/games/romm/app/kustomization.yaml
++++ b/kubernetes/apps/games/romm/app/kustomization.yaml
+@@ -1,15 +1,12 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+   # - ./pvc.yaml
+-  - ../../../../templates/volsync
+-  - ../../../../templates/gatus/external
+ configMapGenerator:
+-- name: romm-config
+-  files:
+-    - ./config/config.yml
+-  options:
+-    disableNameSuffixHash: true
++  - name: romm-config
++    files:
++      - ./config/config.yml
++    options:
++      disableNameSuffixHash: true
+diff --git a/kubernetes/apps/games/romm/ks.yaml b/kubernetes/apps/games/romm/ks.yaml
+index 83318d9a..5e22111c 100644
+--- a/kubernetes/apps/games/romm/ks.yaml
++++ b/kubernetes/apps/games/romm/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app romm
+-  namespace: flux-system
++  namespace: games
+ spec:
+   targetNamespace: games
+   commonMetadata:
+@@ -11,13 +10,16 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cluster-apps-rook-ceph
++      namespace: rook-ceph
+     - name: cluster-apps-volsync
++      namespace: volsync-system
+   prune: true
+   interval: 30m
+   path: "./kubernetes/apps/games/romm/app"
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   retryInterval: 1m
+   timeout: 5m
+@@ -29,3 +31,6 @@ spec:
+       GATUS_PATH: /
+       GATUS_STATUS: "200"
+ 
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/home-automation/home-assistant/app/kustomization.yaml b/kubernetes/apps/home-automation/home-assistant/app/kustomization.yaml
+index 6ab886dd..1d2899cf 100644
+--- a/kubernetes/apps/home-automation/home-assistant/app/kustomization.yaml
++++ b/kubernetes/apps/home-automation/home-assistant/app/kustomization.yaml
+@@ -1,12 +1,9 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+ generatorOptions:
+   disableNameSuffixHash: true
+ configMapGenerator:
+diff --git a/kubernetes/apps/home-automation/home-assistant/ks.yaml b/kubernetes/apps/home-automation/home-assistant/ks.yaml
+index d098d196..4cbb9e7e 100644
+--- a/kubernetes/apps/home-automation/home-assistant/ks.yaml
++++ b/kubernetes/apps/home-automation/home-assistant/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app home-assistant
+-  namespace: flux-system
++  namespace: home-automation
+ spec:
+   targetNamespace: home-automation
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   prune: true
+   wait: false
+   interval: 30m
+@@ -24,3 +24,6 @@ spec:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
+       GATUS_SUBDOMAIN: hass
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/home-automation/kustomization.yaml b/kubernetes/apps/home-automation/kustomization.yaml
+index 39ec1436..b516762a 100644
+--- a/kubernetes/apps/home-automation/kustomization.yaml
++++ b/kubernetes/apps/home-automation/kustomization.yaml
+@@ -1,9 +1,13 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+-  # Applications
+   - ./home-assistant/ks.yaml
+   - ./n8n/ks.yaml
+   - ./teslamate/ks.yaml
++namespace: home-automation
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
++patches:
++  - path: ./patches/namespace.yaml
+diff --git a/kubernetes/apps/home-automation/n8n/app/kustomization.yaml b/kubernetes/apps/home-automation/n8n/app/kustomization.yaml
+index 28d99c51..96b914fe 100644
+--- a/kubernetes/apps/home-automation/n8n/app/kustomization.yaml
++++ b/kubernetes/apps/home-automation/n8n/app/kustomization.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+@@ -6,5 +5,3 @@ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+   - ./servicemonitor.yaml
+-  - ../../../../templates/gatus/external
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/home-automation/n8n/ks.yaml b/kubernetes/apps/home-automation/n8n/ks.yaml
+index 28899f0d..0605a191 100644
+--- a/kubernetes/apps/home-automation/n8n/ks.yaml
++++ b/kubernetes/apps/home-automation/n8n/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app n8n
+-  namespace: flux-system
++  namespace: home-automation
+ spec:
+   targetNamespace: home-automation
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   prune: true
+   wait: false
+   interval: 30m
+@@ -23,3 +23,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 5Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/home-automation/namespace.yaml b/kubernetes/apps/home-automation/namespace.yaml
+deleted file mode 100644
+index 317fedea..00000000
+--- a/kubernetes/apps/home-automation/namespace.yaml
++++ /dev/null
+@@ -1,10 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: home-automation
+-  annotations:
+-    volsync.backube/privileged-movers: "true"
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+-    goldilocks.fairwinds.com/enabled: "true"
+diff --git a/kubernetes/apps/home-automation/teslamate/app/kustomization.yaml b/kubernetes/apps/home-automation/teslamate/app/kustomization.yaml
+index c386c2c7..c86f872c 100644
+--- a/kubernetes/apps/home-automation/teslamate/app/kustomization.yaml
++++ b/kubernetes/apps/home-automation/teslamate/app/kustomization.yaml
+@@ -1,10 +1,8 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - externalsecret.yaml
+   - helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+ configMapGenerator:
+   - name: teslamate-datasource-tpl
+     files:
+diff --git a/kubernetes/apps/home-automation/teslamate/ks.yaml b/kubernetes/apps/home-automation/teslamate/ks.yaml
+index 0edfc2b8..7c1fd50e 100644
+--- a/kubernetes/apps/home-automation/teslamate/ks.yaml
++++ b/kubernetes/apps/home-automation/teslamate/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app teslamate
+-  namespace: flux-system
++  namespace: home-automation
+ spec:
+   targetNamespace: home-automation
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   prune: true
+   wait: false
+   interval: 30m
+@@ -23,3 +23,5 @@ spec:
+     substitute:
+       APP: *app
+       GATUS_SUBDOMAIN: teslamate
++  components:
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/home/atuin/app/kustomization.yaml b/kubernetes/apps/home/atuin/app/kustomization.yaml
+index 83349e15..005710c6 100644
+--- a/kubernetes/apps/home/atuin/app/kustomization.yaml
++++ b/kubernetes/apps/home/atuin/app/kustomization.yaml
+@@ -1,8 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+diff --git a/kubernetes/apps/home/atuin/ks.yaml b/kubernetes/apps/home/atuin/ks.yaml
+index ada6415a..d72ba038 100644
+--- a/kubernetes/apps/home/atuin/ks.yaml
++++ b/kubernetes/apps/home/atuin/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app atuin
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/home/atuin/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   timeout: 5m
+@@ -25,3 +27,5 @@ spec:
+     substitute:
+       APP: *app
+       GATUS_SUBDOMAIN: sh
++  components:
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/home/bookstack/app/kustomization.yaml b/kubernetes/apps/home/bookstack/app/kustomization.yaml
+index b5cc32d3..005710c6 100644
+--- a/kubernetes/apps/home/bookstack/app/kustomization.yaml
++++ b/kubernetes/apps/home/bookstack/app/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/home/bookstack/ks.yaml b/kubernetes/apps/home/bookstack/ks.yaml
+index 3a173ae9..8c32d273 100644
+--- a/kubernetes/apps/home/bookstack/ks.yaml
++++ b/kubernetes/apps/home/bookstack/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app bookstack
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -23,3 +23,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 5Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/home/filebrowser/app/kustomization.yaml b/kubernetes/apps/home/filebrowser/app/kustomization.yaml
+index 11adc182..2d79f304 100644
+--- a/kubernetes/apps/home/filebrowser/app/kustomization.yaml
++++ b/kubernetes/apps/home/filebrowser/app/kustomization.yaml
+@@ -1,8 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./pvc.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+diff --git a/kubernetes/apps/home/filebrowser/ks.yaml b/kubernetes/apps/home/filebrowser/ks.yaml
+index 48f72d2c..d83e44db 100644
+--- a/kubernetes/apps/home/filebrowser/ks.yaml
++++ b/kubernetes/apps/home/filebrowser/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app filebrowser
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -22,3 +22,5 @@ spec:
+   postBuild:
+     substitute:
+       APP: *app
++  components:
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/home/homepage/app/kustomization.yaml b/kubernetes/apps/home/homepage/app/kustomization.yaml
+index 25bf8b26..7f8a662f 100644
+--- a/kubernetes/apps/home/homepage/app/kustomization.yaml
++++ b/kubernetes/apps/home/homepage/app/kustomization.yaml
+@@ -1,4 +1,3 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+@@ -7,7 +6,6 @@ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+   - ./rbac.yaml
+-  - ../../../../templates/gatus/guarded
+ configMapGenerator:
+   - name: homepage-config
+     files:
+diff --git a/kubernetes/apps/home/homepage/ks.yaml b/kubernetes/apps/home/homepage/ks.yaml
+index 423efe1d..8c229c91 100644
+--- a/kubernetes/apps/home/homepage/ks.yaml
++++ b/kubernetes/apps/home/homepage/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app homepage
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/home/homepage/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -24,3 +25,5 @@ spec:
+   postBuild:
+     substitute:
+       APP: *app
++  components:
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/home/kustomization.yaml b/kubernetes/apps/home/kustomization.yaml
+index 1fb9a78b..5ff00fc2 100644
+--- a/kubernetes/apps/home/kustomization.yaml
++++ b/kubernetes/apps/home/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+-  # Applications
+   - ./atuin/ks.yaml
+   - ./bookstack/ks.yaml
+   - ./homepage/ks.yaml
+@@ -14,3 +11,10 @@ resources:
+   - ./searxng/ks.yaml
+   - ./smtp-relay/ks.yaml
+   - ./thelounge/ks.yaml
++namespace: home
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
++patches:
++  - path: ./patches/namespace.yaml
+diff --git a/kubernetes/apps/home/linkwarden/app/kustomization.yaml b/kubernetes/apps/home/linkwarden/app/kustomization.yaml
+index b5cc32d3..005710c6 100644
+--- a/kubernetes/apps/home/linkwarden/app/kustomization.yaml
++++ b/kubernetes/apps/home/linkwarden/app/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/home/linkwarden/ks.yaml b/kubernetes/apps/home/linkwarden/ks.yaml
+index 9a956bf8..7d9f3b2b 100644
+--- a/kubernetes/apps/home/linkwarden/ks.yaml
++++ b/kubernetes/apps/home/linkwarden/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app linkwarden
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -23,3 +23,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 10Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/home/manyfold/app/kustomization.yaml b/kubernetes/apps/home/manyfold/app/kustomization.yaml
+index e8dbc151..5835eea0 100644
+--- a/kubernetes/apps/home/manyfold/app/kustomization.yaml
++++ b/kubernetes/apps/home/manyfold/app/kustomization.yaml
+@@ -1,8 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+   - ./externalsecret.yaml
+-  - ../../../../templates/gatus/guarded
+diff --git a/kubernetes/apps/home/manyfold/ks.yaml b/kubernetes/apps/home/manyfold/ks.yaml
+index 29350793..f64937bb 100644
+--- a/kubernetes/apps/home/manyfold/ks.yaml
++++ b/kubernetes/apps/home/manyfold/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app manyfold
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -23,3 +23,5 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 5Gi
++  components:
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/home/namespace.yaml b/kubernetes/apps/home/namespace.yaml
+deleted file mode 100644
+index 376915ab..00000000
+--- a/kubernetes/apps/home/namespace.yaml
++++ /dev/null
+@@ -1,10 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: home
+-  annotations:
+-    volsync.backube/privileged-movers: "true"
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+-    goldilocks.fairwinds.com/enabled: "true"
+diff --git a/kubernetes/apps/home/paperless/app/kustomization.yaml b/kubernetes/apps/home/paperless/app/kustomization.yaml
+index b5cc32d3..005710c6 100644
+--- a/kubernetes/apps/home/paperless/app/kustomization.yaml
++++ b/kubernetes/apps/home/paperless/app/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/home/paperless/ks.yaml b/kubernetes/apps/home/paperless/ks.yaml
+index a53cb3ec..60d02b9a 100644
+--- a/kubernetes/apps/home/paperless/ks.yaml
++++ b/kubernetes/apps/home/paperless/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app paperless-ngx
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -11,12 +10,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cluster-apps-rook-ceph-cluster
++      namespace: rook-ceph
+     - name: cluster-apps-volsync
++      namespace: volsync-system
+   path: ./kubernetes/apps/home/paperless/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -25,12 +27,15 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 20Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+ ---
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app paperless-gpt
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -38,11 +43,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: paperless-ngx
++      namespace: home
+   path: ./kubernetes/apps/home/paperless/paperless-gpt
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -51,12 +58,15 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+ ---
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app paperless-ai
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -64,11 +74,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: paperless-ngx
++      namespace: home
+   path: ./kubernetes/apps/home/paperless/paperless-ai
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -77,3 +89,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 2Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/home/paperless/paperless-ai/kustomization.yaml b/kubernetes/apps/home/paperless/paperless-ai/kustomization.yaml
+index b5cc32d3..005710c6 100644
+--- a/kubernetes/apps/home/paperless/paperless-ai/kustomization.yaml
++++ b/kubernetes/apps/home/paperless/paperless-ai/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/home/paperless/paperless-gpt/kustomization.yaml b/kubernetes/apps/home/paperless/paperless-gpt/kustomization.yaml
+index b5cc32d3..005710c6 100644
+--- a/kubernetes/apps/home/paperless/paperless-gpt/kustomization.yaml
++++ b/kubernetes/apps/home/paperless/paperless-gpt/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/home/searxng/app/kustomization.yaml b/kubernetes/apps/home/searxng/app/kustomization.yaml
+index 3be1c01e..d6cba7c2 100644
+--- a/kubernetes/apps/home/searxng/app/kustomization.yaml
++++ b/kubernetes/apps/home/searxng/app/kustomization.yaml
+@@ -1,11 +1,9 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+   - ./externalsecret.yaml
+-  - ../../../../templates/gatus/guarded
+ configMapGenerator:
+   - name: searxng-config
+     files:
+diff --git a/kubernetes/apps/home/searxng/ks.yaml b/kubernetes/apps/home/searxng/ks.yaml
+index 1e9b52ab..abb8db6e 100644
+--- a/kubernetes/apps/home/searxng/ks.yaml
++++ b/kubernetes/apps/home/searxng/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app searxng
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -25,3 +25,5 @@ spec:
+     substituteFrom:
+       - kind: Secret
+         name: cluster-secrets
++  components:
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/home/smtp-relay/ks.yaml b/kubernetes/apps/home/smtp-relay/ks.yaml
+index e59cac02..02c16f12 100644
+--- a/kubernetes/apps/home/smtp-relay/ks.yaml
++++ b/kubernetes/apps/home/smtp-relay/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app smtp-relay
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/home/smtp-relay/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/home/thelounge/app/kustomization.yaml b/kubernetes/apps/home/thelounge/app/kustomization.yaml
+index a928a563..372f754a 100644
+--- a/kubernetes/apps/home/thelounge/app/kustomization.yaml
++++ b/kubernetes/apps/home/thelounge/app/kustomization.yaml
+@@ -1,7 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/home/thelounge/ks.yaml b/kubernetes/apps/home/thelounge/ks.yaml
+index c1410eef..d6e259b1 100644
+--- a/kubernetes/apps/home/thelounge/ks.yaml
++++ b/kubernetes/apps/home/thelounge/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kube-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app thelounge
+-  namespace: flux-system
++  namespace: home
+ spec:
+   targetNamespace: home
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -23,3 +23,5 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 1Gi
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/kube-system/cilium/ks.yaml b/kubernetes/apps/kube-system/cilium/ks.yaml
+index 2522f1df..a8b81dad 100644
+--- a/kubernetes/apps/kube-system/cilium/ks.yaml
++++ b/kubernetes/apps/kube-system/cilium/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app cilium
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -23,7 +23,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app cilium-config
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   commonMetadata:
+@@ -31,11 +31,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cilium
++      namespace: kube-system
+   path: ./kubernetes/apps/kube-system/cilium/config
+   prune: false # never should be deleted
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/kube-system/coredns/ks.yaml b/kubernetes/apps/kube-system/coredns/ks.yaml
+index bf2a537e..040cc2b1 100644
+--- a/kubernetes/apps/kube-system/coredns/ks.yaml
++++ b/kubernetes/apps/kube-system/coredns/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app coredns
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/kube-system/descheduler/ks.yaml b/kubernetes/apps/kube-system/descheduler/ks.yaml
+index e3e2fcfc..3e1f89b3 100644
+--- a/kubernetes/apps/kube-system/descheduler/ks.yaml
++++ b/kubernetes/apps/kube-system/descheduler/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app descheduler
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/kube-system/intel-device-plugin/ks.yaml b/kubernetes/apps/kube-system/intel-device-plugin/ks.yaml
+index bc74bb2f..be564e01 100644
+--- a/kubernetes/apps/kube-system/intel-device-plugin/ks.yaml
++++ b/kubernetes/apps/kube-system/intel-device-plugin/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: cluster-apps-intel-device-plugin-operator
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   path: ./kubernetes/apps/kube-system/intel-device-plugin/app
+@@ -11,6 +10,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -20,17 +20,20 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: cluster-apps-intel-device-plugin-gpu
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   dependsOn:
+     - name: cluster-apps-intel-device-plugin-operator
++      namespace: kube-system
+     - name: cluster-apps-node-feature-discovery-features
++      namespace: kube-system
+   path: ./kubernetes/apps/kube-system/intel-device-plugin/gpu
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/kube-system/irqbalance/ks.yaml b/kubernetes/apps/kube-system/irqbalance/ks.yaml
+index 5d3a89cb..5fefb64b 100644
+--- a/kubernetes/apps/kube-system/irqbalance/ks.yaml
++++ b/kubernetes/apps/kube-system/irqbalance/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app irqbalance
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/kube-system/kustomization.yaml b/kubernetes/apps/kube-system/kustomization.yaml
+index 56e578c7..cdc08ff7 100644
+--- a/kubernetes/apps/kube-system/kustomization.yaml
++++ b/kubernetes/apps/kube-system/kustomization.yaml
+@@ -1,10 +1,6 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+-
+-  # Apps
+   - ./descheduler/ks.yaml
+   - ./cilium/ks.yaml
+   - ./coredns/ks.yaml
+@@ -14,3 +10,8 @@ resources:
+   - ./node-feature-discovery/ks.yaml
+   - ./reloader/ks.yaml
+   - ./spegel/ks.yaml
++namespace: kube-system
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/kube-system/metrics-server/ks.yaml b/kubernetes/apps/kube-system/metrics-server/ks.yaml
+index 244f53c1..17be636c 100644
+--- a/kubernetes/apps/kube-system/metrics-server/ks.yaml
++++ b/kubernetes/apps/kube-system/metrics-server/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app metrics-server
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/kube-system/namespace.yaml b/kubernetes/apps/kube-system/namespace.yaml
+deleted file mode 100644
+index 5eeb2c91..00000000
+--- a/kubernetes/apps/kube-system/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: kube-system
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/kube-system/node-feature-discovery/ks.yaml b/kubernetes/apps/kube-system/node-feature-discovery/ks.yaml
+index 8b64014e..64eee9e3 100644
+--- a/kubernetes/apps/kube-system/node-feature-discovery/ks.yaml
++++ b/kubernetes/apps/kube-system/node-feature-discovery/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: cluster-apps-node-feature-discovery
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   path: ./kubernetes/apps/kube-system/node-feature-discovery/app
+@@ -11,6 +10,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -20,16 +20,18 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: cluster-apps-node-feature-discovery-features
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   dependsOn:
+     - name: cluster-apps-node-feature-discovery
++      namespace: kube-system
+   path: ./kubernetes/apps/kube-system/node-feature-discovery/features
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   interval: 30m
+   retryInterval: 1m
+   timeout: 5m
+diff --git a/kubernetes/apps/kube-system/reloader/ks.yaml b/kubernetes/apps/kube-system/reloader/ks.yaml
+index 9aa42993..7b7d0f2c 100644
+--- a/kubernetes/apps/kube-system/reloader/ks.yaml
++++ b/kubernetes/apps/kube-system/reloader/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app reloader
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/kube-system/spegel/ks.yaml b/kubernetes/apps/kube-system/spegel/ks.yaml
+index 83c730b0..f7836bd6 100644
+--- a/kubernetes/apps/kube-system/spegel/ks.yaml
++++ b/kubernetes/apps/kube-system/spegel/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app spegel
+-  namespace: flux-system
++  namespace: kube-system
+ spec:
+   targetNamespace: kube-system
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/network/cloudflare-ddns/ks.yaml b/kubernetes/apps/network/cloudflare-ddns/ks.yaml
+index e7509fb1..38b7d6cf 100644
+--- a/kubernetes/apps/network/cloudflare-ddns/ks.yaml
++++ b/kubernetes/apps/network/cloudflare-ddns/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app cloudflare-ddns
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/network/cloudflared/ks.yaml b/kubernetes/apps/network/cloudflared/ks.yaml
+index eb8d8da0..c90cb556 100644
+--- a/kubernetes/apps/network/cloudflared/ks.yaml
++++ b/kubernetes/apps/network/cloudflared/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app cloudflared
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -11,11 +10,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-dns
++      namespace: network
+   path: ./kubernetes/apps/network/cloudflared/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/network/echo-server/ks.yaml b/kubernetes/apps/network/echo-server/ks.yaml
+index 2984f219..193ca369 100644
+--- a/kubernetes/apps/network/echo-server/ks.yaml
++++ b/kubernetes/apps/network/echo-server/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app echo-server
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/network/envoy-gateway/ks.yaml b/kubernetes/apps/network/envoy-gateway/ks.yaml
+index 79946324..4bb7f84c 100644
+--- a/kubernetes/apps/network/envoy-gateway/ks.yaml
++++ b/kubernetes/apps/network/envoy-gateway/ks.yaml
+@@ -1,12 +1,11 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app envoy-gateway
+-  namespace: flux-system
++  namespace: &namespace network
+ spec:
+-  targetNamespace: &namespace network
++  targetNamespace: *namespace
+   commonMetadata:
+     labels:
+       app.kubernetes.io/name: *app
+@@ -16,6 +15,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   timeout: 15m
+   # healthChecks:
+   #   - apiVersion: gateway.network.k8s.io/v1
+diff --git a/kubernetes/apps/network/external-dns-unifi/ks.yaml b/kubernetes/apps/network/external-dns-unifi/ks.yaml
+index 892a09e3..5070fa96 100644
+--- a/kubernetes/apps/network/external-dns-unifi/ks.yaml
++++ b/kubernetes/apps/network/external-dns-unifi/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app external-dns-unifi
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/network/external-dns/ks.yaml b/kubernetes/apps/network/external-dns/ks.yaml
+index eaed4b56..4a318943 100644
+--- a/kubernetes/apps/network/external-dns/ks.yaml
++++ b/kubernetes/apps/network/external-dns/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app external-dns
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/network/external-services/ks.yaml b/kubernetes/apps/network/external-services/ks.yaml
+index 36e5ad5f..8815a3d5 100644
+--- a/kubernetes/apps/network/external-services/ks.yaml
++++ b/kubernetes/apps/network/external-services/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app external-services
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/network/ingress-nginx/ks.yaml b/kubernetes/apps/network/ingress-nginx/ks.yaml
+index 2037ed09..e20437ef 100644
+--- a/kubernetes/apps/network/ingress-nginx/ks.yaml
++++ b/kubernetes/apps/network/ingress-nginx/ks.yaml
+@@ -1,10 +1,8 @@
+-# Disabled after migration to Envoy Gateway - 2025-11-17
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app ingress-nginx-certificates
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -12,11 +10,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cert-manager-issuers
++      namespace: cert-manager
+   path: ./kubernetes/apps/network/ingress-nginx/certificates
+   prune: false
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -26,7 +26,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app ingress-nginx-internal
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -34,11 +34,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: ingress-nginx-certificates
++      namespace: network
+   path: ./kubernetes/apps/network/ingress-nginx/internal
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -48,7 +50,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app ingress-nginx-external
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -56,11 +58,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: ingress-nginx-certificates
++      namespace: network
+   path: ./kubernetes/apps/network/ingress-nginx/external
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/network/k8s-gateway/ks.yaml b/kubernetes/apps/network/k8s-gateway/ks.yaml
+index 06f44255..901ec738 100644
+--- a/kubernetes/apps/network/k8s-gateway/ks.yaml
++++ b/kubernetes/apps/network/k8s-gateway/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app k8s-gateway
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/network/kustomization.yaml b/kubernetes/apps/network/kustomization.yaml
+index b41fd39b..2c582ad1 100644
+--- a/kubernetes/apps/network/kustomization.yaml
++++ b/kubernetes/apps/network/kustomization.yaml
+@@ -1,8 +1,6 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+   - ./cloudflared/ks.yaml
+   - ./cloudflare-ddns/ks.yaml
+   - ./echo-server/ks.yaml
+@@ -10,9 +8,12 @@ resources:
+   - ./external-dns-unifi/ks.yaml
+   - ./external-services/ks.yaml
+   - ./envoy-gateway/ks.yaml
+-  # - ./ingress-nginx/ks.yaml  # Disabled after Envoy Gateway migration - 2025-11-17
+   - ./k8s-gateway/ks.yaml
+   - ./multus/ks.yaml
+-  # - ./netboot/ks.yaml
+   - ./oauth2-proxy/ks.yaml
+   - ./tailscale/ks.yaml
++namespace: network
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/network/multus/ks.yaml b/kubernetes/apps/network/multus/ks.yaml
+index 3a49ed97..6b00d441 100644
+--- a/kubernetes/apps/network/multus/ks.yaml
++++ b/kubernetes/apps/network/multus/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &appname multus
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -17,6 +16,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+ ---
+ # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+@@ -24,7 +24,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &appname multus-config
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -37,6 +37,8 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   dependsOn:
+     - name: multus
++      namespace: network
+diff --git a/kubernetes/apps/network/namespace.yaml b/kubernetes/apps/network/namespace.yaml
+deleted file mode 100644
+index 4d78d7b1..00000000
+--- a/kubernetes/apps/network/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: network
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/network/oauth2-proxy/ks.yaml b/kubernetes/apps/network/oauth2-proxy/ks.yaml
+index f2a44820..cfb3d8a8 100644
+--- a/kubernetes/apps/network/oauth2-proxy/ks.yaml
++++ b/kubernetes/apps/network/oauth2-proxy/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app oauth2-proxy
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -15,13 +14,16 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+   timeout: 5m
+   dependsOn:
+     - name: dragonfly-cluster
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   postBuild:
+     substitute:
+       APP: *app
+diff --git a/kubernetes/apps/network/tailscale/ks.yaml b/kubernetes/apps/network/tailscale/ks.yaml
+index 94bf4cf5..d11ae5a3 100644
+--- a/kubernetes/apps/network/tailscale/ks.yaml
++++ b/kubernetes/apps/network/tailscale/ks.yaml
+@@ -1,10 +1,8 @@
+-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app tailscale
+-  namespace: flux-system
++  namespace: network
+ spec:
+   targetNamespace: network
+   commonMetadata:
+@@ -12,11 +10,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/network/tailscale/operator/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/exporters/blackbox-exporter/ks.yaml b/kubernetes/apps/observability/exporters/blackbox-exporter/ks.yaml
+index 41c05f25..fdc0b1b6 100644
+--- a/kubernetes/apps/observability/exporters/blackbox-exporter/ks.yaml
++++ b/kubernetes/apps/observability/exporters/blackbox-exporter/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app blackbox-exporter
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/exporters/intel-gpu-exporter/ks.yaml b/kubernetes/apps/observability/exporters/intel-gpu-exporter/ks.yaml
+index f8446979..97f67bad 100644
+--- a/kubernetes/apps/observability/exporters/intel-gpu-exporter/ks.yaml
++++ b/kubernetes/apps/observability/exporters/intel-gpu-exporter/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app intel-gpu-exporter
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/exporters/nut-exporter/ks.yaml b/kubernetes/apps/observability/exporters/nut-exporter/ks.yaml
+index 1ba3cd2f..1bf1f498 100644
+--- a/kubernetes/apps/observability/exporters/nut-exporter/ks.yaml
++++ b/kubernetes/apps/observability/exporters/nut-exporter/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app nut-exporter
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -25,7 +25,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app nut-exporter-dashboard
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -36,6 +36,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/exporters/smartctl-exporter/ks.yaml b/kubernetes/apps/observability/exporters/smartctl-exporter/ks.yaml
+index 15ce2b6f..2ed47b40 100644
+--- a/kubernetes/apps/observability/exporters/smartctl-exporter/ks.yaml
++++ b/kubernetes/apps/observability/exporters/smartctl-exporter/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app smartctl-exporter
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/exporters/snmp-exporter/ks.yaml b/kubernetes/apps/observability/exporters/snmp-exporter/ks.yaml
+index 94d0f25f..2a0b1a89 100644
+--- a/kubernetes/apps/observability/exporters/snmp-exporter/ks.yaml
++++ b/kubernetes/apps/observability/exporters/snmp-exporter/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app snmp-exporter
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/exporters/speedtest-exporter/ks.yaml b/kubernetes/apps/observability/exporters/speedtest-exporter/ks.yaml
+index 253cf659..bdb6384d 100644
+--- a/kubernetes/apps/observability/exporters/speedtest-exporter/ks.yaml
++++ b/kubernetes/apps/observability/exporters/speedtest-exporter/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app speedtest-exporter
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/gatus/ks.yaml b/kubernetes/apps/observability/gatus/ks.yaml
+index f5f55acf..8a03b977 100644
+--- a/kubernetes/apps/observability/gatus/ks.yaml
++++ b/kubernetes/apps/observability/gatus/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app gatus
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cloudnative-pg-cluster17
++      namespace: database
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/observability/gatus/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/grafana/ks.yaml b/kubernetes/apps/observability/grafana/ks.yaml
+index 7ca57cba..9bdbcfd9 100644
+--- a/kubernetes/apps/observability/grafana/ks.yaml
++++ b/kubernetes/apps/observability/grafana/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app grafana
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/observability/grafana/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/kromgo/app/kustomization.yaml b/kubernetes/apps/observability/kromgo/app/kustomization.yaml
+index 1d8eabb4..6f8a8765 100644
+--- a/kubernetes/apps/observability/kromgo/app/kustomization.yaml
++++ b/kubernetes/apps/observability/kromgo/app/kustomization.yaml
+@@ -1,10 +1,8 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/gatus/external
+ configMapGenerator:
+   - name: kromgo-configmap
+     files:
+diff --git a/kubernetes/apps/observability/kromgo/ks.yaml b/kubernetes/apps/observability/kromgo/ks.yaml
+index 8cc786b0..73902d4b 100644
+--- a/kubernetes/apps/observability/kromgo/ks.yaml
++++ b/kubernetes/apps/observability/kromgo/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app kromgo
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -23,3 +23,5 @@ spec:
+     substitute:
+       APP: *app
+       GATUS_STATUS: "404"
++  components:
++    - ../../../components/gatus/external
+diff --git a/kubernetes/apps/observability/kube-prometheus-stack/ks.yaml b/kubernetes/apps/observability/kube-prometheus-stack/ks.yaml
+index 2984679a..e8c16347 100644
+--- a/kubernetes/apps/observability/kube-prometheus-stack/ks.yaml
++++ b/kubernetes/apps/observability/kube-prometheus-stack/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app kube-prometheus-stack
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: external-secrets-stores
++      namespace: external-secrets
+   path: ./kubernetes/apps/observability/kube-prometheus-stack/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/kustomization.yaml b/kubernetes/apps/observability/kustomization.yaml
+index a36134e3..c99b2a17 100644
+--- a/kubernetes/apps/observability/kustomization.yaml
++++ b/kubernetes/apps/observability/kustomization.yaml
+@@ -1,10 +1,7 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   # Pre Flux-Kustomizations
+-  - ./namespace.yaml
+-  # Flux-Kustomizations
+   - ./gatus/ks.yaml
+   - ./grafana/ks.yaml
+   - ./kromgo/ks.yaml
+@@ -15,6 +12,9 @@ resources:
+   - ./promtail/ks.yaml
+   - ./redisinsight/ks.yaml
+   - ./unpoller/ks.yaml
+-
+-  # Exporters
+   - ./exporters
++namespace: observability
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/observability/loki/ks.yaml b/kubernetes/apps/observability/loki/ks.yaml
+index 8cefe44c..bf6ca11f 100644
+--- a/kubernetes/apps/observability/loki/ks.yaml
++++ b/kubernetes/apps/observability/loki/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app loki
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/namespace.yaml b/kubernetes/apps/observability/namespace.yaml
+deleted file mode 100644
+index ce3a5bd2..00000000
+--- a/kubernetes/apps/observability/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: observability
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/observability/network-ups-tools/app/kustomization.yaml b/kubernetes/apps/observability/network-ups-tools/app/kustomization.yaml
+index 33cffc9b..231c8dc0 100644
+--- a/kubernetes/apps/observability/network-ups-tools/app/kustomization.yaml
++++ b/kubernetes/apps/observability/network-ups-tools/app/kustomization.yaml
+@@ -1,10 +1,8 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - helmrelease.yaml
+-  - ../../../../templates/gatus/guarded
+ configMapGenerator:
+   - name: network-ups-tools-config
+     files:
+diff --git a/kubernetes/apps/observability/network-ups-tools/ks.yaml b/kubernetes/apps/observability/network-ups-tools/ks.yaml
+index d1c8fd69..469ed75f 100644
+--- a/kubernetes/apps/observability/network-ups-tools/ks.yaml
++++ b/kubernetes/apps/observability/network-ups-tools/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app network-ups-tools
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false # no flux ks dependents
+   interval: 30m
+   retryInterval: 1m
+@@ -22,3 +22,5 @@ spec:
+   postBuild:
+     substitute:
+       APP: *app
++  components:
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/observability/prometheus-operator-crds/ks.yaml b/kubernetes/apps/observability/prometheus-operator-crds/ks.yaml
+index ffbb5dcb..eb0a5566 100644
+--- a/kubernetes/apps/observability/prometheus-operator-crds/ks.yaml
++++ b/kubernetes/apps/observability/prometheus-operator-crds/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app prometheus-operator-crds
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/promtail/ks.yaml b/kubernetes/apps/observability/promtail/ks.yaml
+index 07248aba..562fb8c1 100644
+--- a/kubernetes/apps/observability/promtail/ks.yaml
++++ b/kubernetes/apps/observability/promtail/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app promtail
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/observability/redisinsight/app/kustomization.yaml b/kubernetes/apps/observability/redisinsight/app/kustomization.yaml
+index 01befaa6..372f754a 100644
+--- a/kubernetes/apps/observability/redisinsight/app/kustomization.yaml
++++ b/kubernetes/apps/observability/redisinsight/app/kustomization.yaml
+@@ -1,8 +1,5 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+-  - ../../../../templates/gatus/guarded
+diff --git a/kubernetes/apps/observability/redisinsight/ks.yaml b/kubernetes/apps/observability/redisinsight/ks.yaml
+index 3a4283c3..a5dc7026 100644
+--- a/kubernetes/apps/observability/redisinsight/ks.yaml
++++ b/kubernetes/apps/observability/redisinsight/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app redisinsight
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: dragonfly-operator
++      namespace: database
+     - name: cluster-apps-volsync
++      namespace: volsync-system
+   path: ./kubernetes/apps/observability/redisinsight/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -26,3 +28,6 @@ spec:
+     substitute:
+       APP: *app
+       VOLSYNC_CAPACITY: 1Gi
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/observability/unpoller/ks.yaml b/kubernetes/apps/observability/unpoller/ks.yaml
+index d6f417e8..7ff2f6d9 100644
+--- a/kubernetes/apps/observability/unpoller/ks.yaml
++++ b/kubernetes/apps/observability/unpoller/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app unpoller
+-  namespace: flux-system
++  namespace: observability
+ spec:
+   targetNamespace: observability
+   commonMetadata:
+@@ -15,6 +14,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/openebs-system/kustomization.yaml b/kubernetes/apps/openebs-system/kustomization.yaml
+index 9cd8d4e4..bf109781 100644
+--- a/kubernetes/apps/openebs-system/kustomization.yaml
++++ b/kubernetes/apps/openebs-system/kustomization.yaml
+@@ -1,6 +1,9 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+   - ./openebs/ks.yaml
++namespace: openebs-system
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/openebs-system/namespace.yaml b/kubernetes/apps/openebs-system/namespace.yaml
+deleted file mode 100644
+index f173c6c9..00000000
+--- a/kubernetes/apps/openebs-system/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: openebs-system
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/openebs-system/openebs/ks.yaml b/kubernetes/apps/openebs-system/openebs/ks.yaml
+index 170feca9..9950f9c5 100644
+--- a/kubernetes/apps/openebs-system/openebs/ks.yaml
++++ b/kubernetes/apps/openebs-system/openebs/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app openebs
+-  namespace: flux-system
++  namespace: openebs-system
+ spec:
+   targetNamespace: openebs-system
+   commonMetadata:
+@@ -14,6 +13,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/plane/kustomization.yaml b/kubernetes/apps/plane/kustomization.yaml
+index e6f79cc7..bc77db1c 100644
+--- a/kubernetes/apps/plane/kustomization.yaml
++++ b/kubernetes/apps/plane/kustomization.yaml
+@@ -1,7 +1,11 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+-  # Applications
+   - ./plane/ks.yaml
++namespace: plane
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
++patches:
++  - path: ./patches/namespace.yaml
+diff --git a/kubernetes/apps/plane/namespace.yaml b/kubernetes/apps/plane/namespace.yaml
+deleted file mode 100644
+index e49058c9..00000000
+--- a/kubernetes/apps/plane/namespace.yaml
++++ /dev/null
+@@ -1,10 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: plane
+-  annotations:
+-    volsync.backube/privileged-movers: "true"
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+-    goldilocks.fairwinds.com/enabled: "true"
+diff --git a/kubernetes/apps/plane/plane/ks.yaml b/kubernetes/apps/plane/plane/ks.yaml
+index 6f50a72b..24dcd826 100644
+--- a/kubernetes/apps/plane/plane/ks.yaml
++++ b/kubernetes/apps/plane/plane/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app plane
+-  namespace: flux-system
++  namespace: plane
+ spec:
+   targetNamespace: plane
+   commonMetadata:
+@@ -12,13 +11,17 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cluster-apps-rook-ceph-cluster
++      namespace: rook-ceph
+     - name: dragonfly-cluster
++      namespace: database
+     - name: cloudnative-pg-cluster17
++      namespace: database
+   path: ./kubernetes/apps/plane/plane/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/rook-ceph/kustomization.yaml b/kubernetes/apps/rook-ceph/kustomization.yaml
+index dae5e501..56e9d215 100644
+--- a/kubernetes/apps/rook-ceph/kustomization.yaml
++++ b/kubernetes/apps/rook-ceph/kustomization.yaml
+@@ -1,6 +1,9 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+   - ./rook-ceph/ks.yaml
++namespace: rook-ceph
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/rook-ceph/namespace.yaml b/kubernetes/apps/rook-ceph/namespace.yaml
+deleted file mode 100644
+index 4f4d74a8..00000000
+--- a/kubernetes/apps/rook-ceph/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: rook-ceph
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/rook-ceph/rook-ceph/ks.yaml b/kubernetes/apps/rook-ceph/rook-ceph/ks.yaml
+index c4644230..71e4e710 100644
+--- a/kubernetes/apps/rook-ceph/rook-ceph/ks.yaml
++++ b/kubernetes/apps/rook-ceph/rook-ceph/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: cluster-apps-rook-ceph
+-  namespace: flux-system
++  namespace: rook-ceph
+ spec:
+   targetNamespace: rook-ceph
+   path: ./kubernetes/apps/rook-ceph/rook-ceph/app
+@@ -11,6 +10,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+@@ -20,16 +20,18 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: cluster-apps-rook-ceph-cluster
+-  namespace: flux-system
++  namespace: rook-ceph
+ spec:
+   targetNamespace: rook-ceph
+   dependsOn:
+     - name: cluster-apps-rook-ceph
++      namespace: rook-ceph
+   path: ./kubernetes/apps/rook-ceph/rook-ceph/cluster
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/security/kustomization.yaml b/kubernetes/apps/security/kustomization.yaml
+index a93d2155..342d014a 100644
+--- a/kubernetes/apps/security/kustomization.yaml
++++ b/kubernetes/apps/security/kustomization.yaml
+@@ -1,10 +1,11 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   # Pre Flux-Kustomizations
+-  - ./namespace.yaml
+-  # Flux-Kustomizations
+-  # - ./authentik/ks.yaml
+   - ./pocket-id/ks.yaml
++namespace: security
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/security/namespace.yaml b/kubernetes/apps/security/namespace.yaml
+deleted file mode 100644
+index 397a2359..00000000
+--- a/kubernetes/apps/security/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: security
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/security/pocket-id/app/kustomization.yaml b/kubernetes/apps/security/pocket-id/app/kustomization.yaml
+index 208fcd69..005710c6 100644
+--- a/kubernetes/apps/security/pocket-id/app/kustomization.yaml
++++ b/kubernetes/apps/security/pocket-id/app/kustomization.yaml
+@@ -1,9 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./externalsecret.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+-  - ../../../../templates/gatus/guarded
+\ No newline at end of file
+diff --git a/kubernetes/apps/security/pocket-id/ks.yaml b/kubernetes/apps/security/pocket-id/ks.yaml
+index 7fdca134..29655879 100644
+--- a/kubernetes/apps/security/pocket-id/ks.yaml
++++ b/kubernetes/apps/security/pocket-id/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app pocket-id
+-  namespace: flux-system
++  namespace: security
+ spec:
+   targetNamespace: security
+   commonMetadata:
+@@ -12,12 +11,15 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cluster-apps-volsync
++      namespace: volsync-system
+     - name: cluster-apps-rook-ceph
++      namespace: rook-ceph
+   path: ./kubernetes/apps/security/pocket-id/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -27,3 +29,6 @@ spec:
+       APP: *app
+       VOLSYNC_CAPACITY: 1Gi
+       VOLSYNC_CLAIM: *app
++  components:
++    - ../../../components/volsync
++    - ../../../components/gatus/guarded
+diff --git a/kubernetes/apps/storage/kustomization.yaml b/kubernetes/apps/storage/kustomization.yaml
+index f92cf13d..14edb7bc 100644
+--- a/kubernetes/apps/storage/kustomization.yaml
++++ b/kubernetes/apps/storage/kustomization.yaml
+@@ -1,8 +1,9 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+-  # apps
+-  # - ./minio/ks.yaml
+   - ./syncthing/ks.yaml
++namespace: storage
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/storage/namespace.yaml b/kubernetes/apps/storage/namespace.yaml
+deleted file mode 100644
+index a8966521..00000000
+--- a/kubernetes/apps/storage/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: storage
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/storage/syncthing/app/kustomization.yaml b/kubernetes/apps/storage/syncthing/app/kustomization.yaml
+index f4ef3c02..17c4f925 100644
+--- a/kubernetes/apps/storage/syncthing/app/kustomization.yaml
++++ b/kubernetes/apps/storage/syncthing/app/kustomization.yaml
+@@ -1,8 +1,6 @@
+----
+ # yaml-language-server: $schema=https://json.schemastore.org/kustomization
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+   - ./securitypolicy.yaml
+   - ./helmrelease.yaml
+-  - ../../../../templates/volsync
+diff --git a/kubernetes/apps/storage/syncthing/ks.yaml b/kubernetes/apps/storage/syncthing/ks.yaml
+index e2a23379..fe08965e 100644
+--- a/kubernetes/apps/storage/syncthing/ks.yaml
++++ b/kubernetes/apps/storage/syncthing/ks.yaml
+@@ -1,10 +1,9 @@
+----
+ # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: &app syncthing
+-  namespace: flux-system
++  namespace: storage
+ spec:
+   targetNamespace: storage
+   commonMetadata:
+@@ -12,11 +11,13 @@ spec:
+       app.kubernetes.io/name: *app
+   dependsOn:
+     - name: cluster-apps-rook-ceph-cluster
++      namespace: rook-ceph
+   path: ./kubernetes/apps/storage/syncthing/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: false
+   interval: 30m
+   retryInterval: 1m
+@@ -30,3 +31,5 @@ spec:
+       VOLSYNC_STORAGECLASS: ${CLUSTER_STORAGE_BLOCK}
+       VOLSYNC_SNAPSHOTCLASS: ${CLUSTER_SNAPSHOT_BLOCK}
+       VOLSYNC_COPY_METHOD: Snapshot
++  components:
++    - ../../../components/volsync
+diff --git a/kubernetes/apps/volsync-system/kustomization.yaml b/kubernetes/apps/volsync-system/kustomization.yaml
+index a3a18c9c..90b4b004 100644
+--- a/kubernetes/apps/volsync-system/kustomization.yaml
++++ b/kubernetes/apps/volsync-system/kustomization.yaml
+@@ -1,7 +1,10 @@
+----
+ apiVersion: kustomize.config.k8s.io/v1beta1
+ kind: Kustomization
+ resources:
+-  - ./namespace.yaml
+   - ./snapshot-controller/ks.yaml
+   - ./volsync/ks.yaml
++namespace: volsync-system
++components:
++  - ../../components/namespace
++replacements:
++  - path: ../../components/replacements/ks.yaml
+diff --git a/kubernetes/apps/volsync-system/namespace.yaml b/kubernetes/apps/volsync-system/namespace.yaml
+deleted file mode 100644
+index 10f3c084..00000000
+--- a/kubernetes/apps/volsync-system/namespace.yaml
++++ /dev/null
+@@ -1,7 +0,0 @@
+----
+-apiVersion: v1
+-kind: Namespace
+-metadata:
+-  name: volsync-system
+-  labels:
+-    kustomize.toolkit.fluxcd.io/prune: disabled
+diff --git a/kubernetes/apps/volsync-system/snapshot-controller/ks.yaml b/kubernetes/apps/volsync-system/snapshot-controller/ks.yaml
+index 40cd43cc..86aaf1c8 100644
+--- a/kubernetes/apps/volsync-system/snapshot-controller/ks.yaml
++++ b/kubernetes/apps/volsync-system/snapshot-controller/ks.yaml
+@@ -1,9 +1,8 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: cluster-apps-snapshot-controller
+-  namespace: flux-system
++  namespace: volsync-system
+ spec:
+   targetNamespace: volsync-system
+   path: ./kubernetes/apps/volsync-system/snapshot-controller/app
+@@ -11,6 +10,7 @@ spec:
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/apps/volsync-system/volsync/ks.yaml b/kubernetes/apps/volsync-system/volsync/ks.yaml
+index 529726f8..754d3a4d 100644
+--- a/kubernetes/apps/volsync-system/volsync/ks.yaml
++++ b/kubernetes/apps/volsync-system/volsync/ks.yaml
+@@ -1,18 +1,19 @@
+----
+ apiVersion: kustomize.toolkit.fluxcd.io/v1
+ kind: Kustomization
+ metadata:
+   name: cluster-apps-volsync
+-  namespace: flux-system
++  namespace: volsync-system
+ spec:
+   targetNamespace: volsync-system
+   dependsOn:
+     - name: cluster-apps-snapshot-controller
++      namespace: volsync-system
+   path: ./kubernetes/apps/volsync-system/volsync/app
+   prune: true
+   sourceRef:
+     kind: GitRepository
+     name: home-kubernetes
++    namespace: flux-system
+   wait: true
+   interval: 30m
+   retryInterval: 1m
+diff --git a/kubernetes/templates/gatus/external/configmap.yaml b/kubernetes/templates/gatus/external/configmap.yaml
+deleted file mode 100644
+index ddc00193..00000000
+--- a/kubernetes/templates/gatus/external/configmap.yaml
++++ /dev/null
+@@ -1,20 +0,0 @@
+----
+-apiVersion: v1
+-kind: ConfigMap
+-metadata:
+-  name: "${APP}-gatus-ep"
+-  labels:
+-    gatus.io/enabled: "true"
+-data:
+-  config.yaml: |
+-    endpoints:
+-      - name: "${APP}"
+-        group: external
+-        url: "https://${GATUS_SUBDOMAIN:-${APP}}.nerdz.cloud${GATUS_PATH:-/}"
+-        interval: 1m
+-        client:
+-          dns-resolver: tcp://1.1.1.1:53
+-        conditions:
+-          - "[STATUS] == ${GATUS_STATUS:-200}"
+-        alerts:
+-          - type: pushover
+diff --git a/kubernetes/templates/gatus/external/kustomization.yaml b/kubernetes/templates/gatus/external/kustomization.yaml
+deleted file mode 100644
+index e09060b9..00000000
+--- a/kubernetes/templates/gatus/external/kustomization.yaml
++++ /dev/null
+@@ -1,6 +0,0 @@
+----
+-# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+-apiVersion: kustomize.config.k8s.io/v1beta1
+-kind: Kustomization
+-resources:
+-  - ./configmap.yaml
+diff --git a/kubernetes/templates/gatus/guarded/configmap.yaml b/kubernetes/templates/gatus/guarded/configmap.yaml
+deleted file mode 100644
+index db0e67a1..00000000
+--- a/kubernetes/templates/gatus/guarded/configmap.yaml
++++ /dev/null
+@@ -1,24 +0,0 @@
+----
+-apiVersion: v1
+-kind: ConfigMap
+-metadata:
+-  name: "${APP}-gatus-ep"
+-  labels:
+-    gatus.io/enabled: "true"
+-data:
+-  config.yaml: |
+-    endpoints:
+-      - name: "${APP}"
+-        group: guarded
+-        url: 1.1.1.1
+-        interval: 1m
+-        ui:
+-          hide-hostname: true
+-          hide-url: true
+-        dns:
+-          query-name: "${GATUS_SUBDOMAIN:-${APP}}.nerdz.cloud"
+-          query-type: A
+-        conditions:
+-          - "len([BODY]) == 0"
+-        alerts:
+-          - type: pushover
+diff --git a/kubernetes/templates/gatus/guarded/kustomization.yaml b/kubernetes/templates/gatus/guarded/kustomization.yaml
+deleted file mode 100644
+index e09060b9..00000000
+--- a/kubernetes/templates/gatus/guarded/kustomization.yaml
++++ /dev/null
+@@ -1,6 +0,0 @@
+----
+-# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+-apiVersion: kustomize.config.k8s.io/v1beta1
+-kind: Kustomization
+-resources:
+-  - ./configmap.yaml
+diff --git a/kubernetes/templates/gatus/infrastructure/configmap.yaml b/kubernetes/templates/gatus/infrastructure/configmap.yaml
+deleted file mode 100644
+index 550cde0f..00000000
+--- a/kubernetes/templates/gatus/infrastructure/configmap.yaml
++++ /dev/null
+@@ -1,23 +0,0 @@
+----
+-apiVersion: v1
+-kind: ConfigMap
+-metadata:
+-  name: "${APP}-gatus-ep"
+-  labels:
+-    gatus.io/enabled: "true"
+-data:
+-  config.yaml: |
+-    endpoints:
+-      - name: "${APP}"
+-        group: infrastructure
+-        url: "tcp://${GATUS_SVC_NAME}.${GATUS_NAMESPACE}.svc.cluster.local:${GATUS_SVC_PORT}"
+-        interval: 1m
+-        client:
+-          dns-resolver: tcp://1.1.1.1:53
+-        conditions: ["[CONNECTED] == true"]
+-        alerts:
+-          - type: pushover
+-        ui:
+-          hide-url: true
+-          hide-hostname: true
+-
+diff --git a/kubernetes/templates/gatus/infrastructure/kustomization.yaml b/kubernetes/templates/gatus/infrastructure/kustomization.yaml
+deleted file mode 100644
+index e09060b9..00000000
+--- a/kubernetes/templates/gatus/infrastructure/kustomization.yaml
++++ /dev/null
+@@ -1,6 +0,0 @@
+----
+-# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+-apiVersion: kustomize.config.k8s.io/v1beta1
+-kind: Kustomization
+-resources:
+-  - ./configmap.yaml
+diff --git a/kubernetes/templates/volsync/backblaze.yaml b/kubernetes/templates/volsync/backblaze.yaml
+deleted file mode 100644
+index 24f93452..00000000
+--- a/kubernetes/templates/volsync/backblaze.yaml
++++ /dev/null
+@@ -1,73 +0,0 @@
+----
+-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/external-secrets.io/externalsecret_v1beta1.json
+-apiVersion: external-secrets.io/v1
+-kind: ExternalSecret
+-metadata:
+-  name: "${APP}-volsync-backblaze"
+-spec:
+-  secretStoreRef:
+-    kind: ClusterSecretStore
+-    name: onepassword-connect
+-  target:
+-    name: "${APP}-volsync-backblaze-secret"
+-    template:
+-      engineVersion: v2
+-      data:
+-        RESTIC_REPOSITORY: "{{ .REPOSITORY_TEMPLATE }}/${APP}"
+-        RESTIC_PASSWORD: "{{ .RESTIC_PASSWORD }}"
+-        AWS_ACCESS_KEY_ID: "{{ .AWS_ACCESS_KEY_ID }}"
+-        AWS_SECRET_ACCESS_KEY: "{{ .AWS_SECRET_ACCESS_KEY }}"
+-  dataFrom:
+-    - extract:
+-        key: backblaze
+-    - extract:
+-        key: volsync-backblaze-template
+----
+-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+-apiVersion: volsync.backube/v1alpha1
+-kind: ReplicationSource
+-metadata:
+-  name: "${APP}-backblaze"
+-spec:
+-  sourcePVC: "${VOLSYNC_CLAIM:-${APP}}"
+-  trigger:
+-    schedule: "0 0 * * *"
+-  restic:
+-    copyMethod: "${VOLSYNC_COPYMETHOD:-Snapshot}"
+-    pruneIntervalDays: 7
+-    repository: "${APP}-volsync-backblaze-secret"
+-    volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-block}"
+-    cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-8Gi}"
+-    cacheStorageClassName: "${VOLSYNC_CACHE_SNAPSHOTCLASS:-openebs-hostpath}"
+-    cacheAccessModes: ["${VOLSYNC_CACHE_ACCESSMODES:-ReadWriteOnce}"]
+-    storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
+-    accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
+-    moverSecurityContext:
+-      runAsUser: 568
+-      runAsGroup: 568
+-      fsGroup: 568
+-    retain:
+-      daily: 7
+----
+-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationdestination_v1alpha1.json
+-apiVersion: volsync.backube/v1alpha1
+-kind: ReplicationDestination
+-metadata:
+-  name: "${APP}-dst"
+-spec:
+-  trigger:
+-    manual: restore-once
+-  restic:
+-    repository: "${APP}-volsync-r2-secret"
+-    copyMethod: Snapshot # must be Snapshot
+-    volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-block}"
+-    cacheStorageClassName: "${VOLSYNC_CACHE_SNAPSHOTCLASS:-openebs-hostpath}"
+-    cacheAccessModes: ["${VOLSYNC_CACHE_ACCESSMODES:-ReadWriteOnce}"]
+-    cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-8Gi}"
+-    storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
+-    accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
+-    capacity: "${VOLSYNC_CAPACITY}"
+-    moverSecurityContext:
+-      runAsUser: 568
+-      runAsGroup: 568
+-      fsGroup: 568
+diff --git a/kubernetes/templates/volsync/claim.yaml b/kubernetes/templates/volsync/claim.yaml
+deleted file mode 100644
+index a190559e..00000000
+--- a/kubernetes/templates/volsync/claim.yaml
++++ /dev/null
+@@ -1,15 +0,0 @@
+----
+-apiVersion: v1
+-kind: PersistentVolumeClaim
+-metadata:
+-  name: "${VOLSYNC_CLAIM:-${APP}}"
+-spec:
+-  accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
+-  dataSourceRef:
+-    kind: ReplicationDestination
+-    apiGroup: volsync.backube
+-    name: "${APP}-dst"
+-  resources:
+-    requests:
+-      storage: "${VOLSYNC_CAPACITY}"
+-  storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
+diff --git a/kubernetes/templates/volsync/kustomization.yaml b/kubernetes/templates/volsync/kustomization.yaml
+deleted file mode 100644
+index 36fc7a6d..00000000
+--- a/kubernetes/templates/volsync/kustomization.yaml
++++ /dev/null
+@@ -1,8 +0,0 @@
+----
+-# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+-apiVersion: kustomize.config.k8s.io/v1beta1
+-kind: Kustomization
+-resources:
+-  - ./claim.yaml
+-  - ./backblaze.yaml
+-  - ./r2.yaml
+diff --git a/kubernetes/templates/volsync/r2.yaml b/kubernetes/templates/volsync/r2.yaml
+deleted file mode 100644
+index bc5e4a95..00000000
+--- a/kubernetes/templates/volsync/r2.yaml
++++ /dev/null
+@@ -1,50 +0,0 @@
+----
+-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/external-secrets.io/externalsecret_v1beta1.json
+-apiVersion: external-secrets.io/v1
+-kind: ExternalSecret
+-metadata:
+-  name: "${APP}-volsync-r2"
+-spec:
+-  secretStoreRef:
+-    kind: ClusterSecretStore
+-    name: onepassword-connect
+-  target:
+-    name: "${APP}-volsync-r2-secret"
+-    template:
+-      engineVersion: v2
+-      data:
+-        RESTIC_REPOSITORY: "{{ .REPOSITORY_TEMPLATE }}/${APP}"
+-        RESTIC_PASSWORD: "{{ .RESTIC_PASSWORD }}"
+-        AWS_ACCESS_KEY_ID: "{{ .AWS_ACCESS_KEY_ID }}"
+-        AWS_SECRET_ACCESS_KEY: "{{ .AWS_SECRET_ACCESS_KEY }}"
+-  dataFrom:
+-    - extract:
+-        key: cloudflare
+-    - extract:
+-        key: volsync-r2-template
+----
+-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+-apiVersion: volsync.backube/v1alpha1
+-kind: ReplicationSource
+-metadata:
+-  name: "${APP}-r2"
+-spec:
+-  sourcePVC: "${VOLSYNC_CLAIM:-${APP}}"
+-  trigger:
+-    schedule: "0 0 * * *"
+-  restic:
+-    copyMethod: "${VOLSYNC_COPYMETHOD:-Snapshot}"
+-    pruneIntervalDays: 7
+-    repository: "${APP}-volsync-r2-secret"
+-    volumeSnapshotClassName: "${VOLSYNC_SNAPSHOTCLASS:-csi-ceph-block}"
+-    cacheCapacity: "${VOLSYNC_CACHE_CAPACITY:-8Gi}"
+-    cacheStorageClassName: "${VOLSYNC_CACHE_SNAPSHOTCLASS:-openebs-hostpath}"
+-    cacheAccessModes: ["${VOLSYNC_CACHE_ACCESSMODES:-ReadWriteOnce}"]
+-    storageClassName: "${VOLSYNC_STORAGECLASS:-ceph-block}"
+-    accessModes: ["${VOLSYNC_ACCESSMODES:-ReadWriteOnce}"]
+-    moverSecurityContext:
+-      runAsUser: 568
+-      runAsGroup: 568
+-      fsGroup: 568
+-    retain:
+-      daily: 7
+diff --git a/kubernetes/templates/volsync/readme.md b/kubernetes/templates/volsync/readme.md
+deleted file mode 100644
+index e133d25f..00000000
+--- a/kubernetes/templates/volsync/readme.md
++++ /dev/null
+@@ -1,38 +0,0 @@
+-# VolSync Template
+-
+-## Flux Kustomization
+-
+-This requires `postBuild` configured on the Flux Kustomization
+-
+-```yaml
+-apiVersion: kustomize.toolkit.fluxcd.io/v1
+-kind: Kustomization
+-metadata:
+-  name: &app plex
+-  namespace: flux-system
+-spec:
+-  # ...
+-  postBuild:
+-    substitute:
+-      APP: *app
+-      VOLSYNC_CAPACITY: 5Gi
+-```
+-
+-and then call the template in your applications `kustomization.yaml`
+-
+-```yaml
+-apiVersion: kustomize.config.k8s.io/v1beta1
+-kind: Kustomization
+-resources:
+-  # ...
+-  - ../../../../templates/volsync
+-```
+-
+-## Required `postBuild` vars:
+-
+-- `APP`: The application name
+-- `VOLSYNC_CAPACITY`: The PVC size
+-
+-## Optional `postBuild` vars:
+-
+-- TBD
