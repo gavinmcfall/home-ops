@@ -1,8 +1,9 @@
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app paperless-ngx
-  namespace: home
+  namespace: flux-system
 spec:
   targetNamespace: home
   commonMetadata:
@@ -10,15 +11,12 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
-      namespace: rook-ceph
     - name: cluster-apps-volsync
-      namespace: volsync-system
   path: ./kubernetes/apps/home/paperless/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -27,15 +25,12 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 20Gi
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/gatus/guarded
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app paperless-gpt
-  namespace: home
+  namespace: flux-system
 spec:
   targetNamespace: home
   commonMetadata:
@@ -43,13 +38,11 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: paperless-ngx
-      namespace: home
   path: ./kubernetes/apps/home/paperless/paperless-gpt
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -58,15 +51,12 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 2Gi
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/gatus/guarded
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app paperless-ai
-  namespace: home
+  namespace: flux-system
 spec:
   targetNamespace: home
   commonMetadata:
@@ -74,13 +64,11 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: paperless-ngx
-      namespace: home
   path: ./kubernetes/apps/home/paperless/paperless-ai
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -89,6 +77,3 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 2Gi
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/gatus/guarded

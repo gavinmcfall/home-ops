@@ -1,9 +1,10 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app redisinsight
-  namespace: observability
+  namespace: flux-system
 spec:
   targetNamespace: observability
   commonMetadata:
@@ -11,15 +12,12 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: dragonfly-operator
-      namespace: database
     - name: cluster-apps-volsync
-      namespace: volsync-system
   path: ./kubernetes/apps/observability/redisinsight/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -28,6 +26,3 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 1Gi
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/gatus/guarded

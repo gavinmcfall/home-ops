@@ -1,8 +1,9 @@
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app cert-manager
-  namespace: cert-manager
+  namespace: flux-system
 spec:
   targetNamespace: cert-manager
   commonMetadata:
@@ -13,7 +14,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m
@@ -23,7 +23,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app cert-manager-issuers
-  namespace: cert-manager
+  namespace: flux-system
 spec:
   targetNamespace: cert-manager
   commonMetadata:
@@ -31,13 +31,11 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cert-manager
-      namespace: cert-manager
   path: ./kubernetes/apps/cert-manager/cert-manager/issuers
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m

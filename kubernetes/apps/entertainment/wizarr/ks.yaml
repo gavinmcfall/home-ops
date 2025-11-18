@@ -1,9 +1,10 @@
+---
 # yaml-language-server: $schema=https://lds-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app wizarr
-  namespace: entertainment
+  namespace: flux-system
 spec:
   targetNamespace: entertainment
   commonMetadata:
@@ -11,15 +12,12 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: plex
-      namespace: entertainment
     - name: overseerr
-      namespace: entertainment
   path: ./kubernetes/apps/entertainment/wizarr/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false # no flux ks dependents
   interval: 30m
   retryInterval: 1m
@@ -29,6 +27,3 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 2Gi
       GATUS_SUBDOMAIN: join
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/gatus/external

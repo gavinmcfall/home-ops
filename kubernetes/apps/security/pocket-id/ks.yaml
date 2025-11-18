@@ -1,9 +1,10 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app pocket-id
-  namespace: security
+  namespace: flux-system
 spec:
   targetNamespace: security
   commonMetadata:
@@ -11,15 +12,12 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cluster-apps-volsync
-      namespace: volsync-system
     - name: cluster-apps-rook-ceph
-      namespace: rook-ceph
   path: ./kubernetes/apps/security/pocket-id/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -29,6 +27,3 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 1Gi
       VOLSYNC_CLAIM: *app
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/gatus/guarded

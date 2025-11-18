@@ -1,9 +1,10 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app linkwarden
-  namespace: home
+  namespace: flux-system
 spec:
   targetNamespace: home
   commonMetadata:
@@ -14,7 +15,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: home-kubernetes
-    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -23,6 +23,3 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 10Gi
-  components:
-    - ../../../../components/volsync
-    - ../../../../components/gatus/guarded
