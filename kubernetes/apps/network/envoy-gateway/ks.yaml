@@ -17,6 +17,8 @@ spec:
     kind: GitRepository
     name: home-kubernetes
   timeout: 15m
+  dependsOn:
+    - name: gateway-api
   # healthChecks:
   #   - apiVersion: gateway.network.k8s.io/v1
   #     kind: Gateway
