@@ -5,9 +5,7 @@ resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
   # Flux-Kustomizations
-  - ./litellm/ks.yaml
-  # - ./llm-d/ks.yaml
-  - ./open-webui/ks.yaml
-  - ./qdrant/ks.yaml
-  # - ./sillytavern/ks.yaml
-  - ./whisper/ks.yaml
+  # - ./litellm/ks.yaml
+  # - ./open-webui/ks.yaml
+  # - ./qdrant/ks.yaml
+  # - ./whisper/ks.yaml

@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   # Applications
-  - ./plane/ks.yaml
+  # - ./plane/ks.yaml

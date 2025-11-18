@@ -4,23 +4,21 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   # Applications
-  # - ./aria2-ng/ks.yaml
-  - ./autobrr/ks.yaml
-  - ./bazarr/ks.yaml
-  - ./dashbrr/ks.yaml
-  - ./flaresolverr/ks.yaml
-  - ./kapowarr/ks.yaml
-  - ./metube/ks.yaml
-  # - ./mylar/ks.yaml
-  - ./prowlarr/ks.yaml
-  - ./qbittorrent/ks.yaml
-  - ./radarr/ks.yaml
-  - ./radarr-uhd/ks.yaml
-  - ./readarr/ks.yaml
-  - ./recyclarr/ks.yaml
-  - ./sabnzbd/ks.yaml
-  - ./sonarr/ks.yaml
-  - ./sonarr-foreign/ks.yaml
-  - ./sonarr-uhd/ks.yaml
-  - ./unpackerr/ks.yaml
-  - ./whisparr/ks.yaml
+  # - ./autobrr/ks.yaml
+  # - ./bazarr/ks.yaml
+  # - ./dashbrr/ks.yaml
+  # - ./flaresolverr/ks.yaml
+  # - ./kapowarr/ks.yaml
+  # - ./metube/ks.yaml
+  # - ./prowlarr/ks.yaml
+  # - ./qbittorrent/ks.yaml
+  # - ./radarr/ks.yaml
+  # - ./radarr-uhd/ks.yaml
+  # - ./readarr/ks.yaml
+  # - ./recyclarr/ks.yaml
+  # - ./sabnzbd/ks.yaml
+  # - ./sonarr/ks.yaml
+  # - ./sonarr-foreign/ks.yaml
+  # - ./sonarr-uhd/ks.yaml
+  # - ./unpackerr/ks.yaml
+  # - ./whisparr/ks.yaml
