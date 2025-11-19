@@ -10,11 +10,7 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: unifi
-  http:
-    http1:
-      enableTrailers: true
-      preserveHeaderCase: true
-      http10: {}
+  useClientProtocol: true
   connection:
     bufferLimit: 8Mi
   timeout:
