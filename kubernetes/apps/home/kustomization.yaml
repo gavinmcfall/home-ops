@@ -4,13 +4,13 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   # Applications
-  # - ./atuin/ks.yaml
-  # - ./bookstack/ks.yaml
-  # - ./homepage/ks.yaml
-  # - ./filebrowser/ks.yaml
-  # - ./linkwarden/ks.yaml
-  # - ./manyfold/ks.yaml
-  # - ./paperless/ks.yaml
-  # - ./searxng/ks.yaml
-  # - ./smtp-relay/ks.yaml
-  # - ./thelounge/ks.yaml
+  - ./atuin/ks.yaml
+  - ./bookstack/ks.yaml
+  - ./homepage/ks.yaml
+  - ./filebrowser/ks.yaml
+  - ./linkwarden/ks.yaml
+  - ./manyfold/ks.yaml
+  - ./paperless/ks.yaml
+  - ./searxng/ks.yaml
+  - ./smtp-relay/ks.yaml
+  - ./thelounge/ks.yaml
