@@ -9,7 +9,6 @@ spec:
     - group: ""
       kind: Service
       name: truenas
-      namespace: network
       sectionName: https
   validation:
     wellKnownCACertificates: System
