@@ -1,8 +1,5 @@
 machine:
   kubelet:
-    extraConfig:
-      featureGates:
-        ImageVolume: true
     nodeIP:
       validSubnets:
         - 10.90.3.0/16
