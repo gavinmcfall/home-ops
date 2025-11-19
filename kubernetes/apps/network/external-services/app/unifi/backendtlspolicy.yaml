@@ -9,6 +9,8 @@ spec:
     - group: ""
       kind: Service
       name: unifi
+      namespace: network
+      sectionName: https
   validation:
     caCertificateRefs:
       - name: unifi-ca-cert
