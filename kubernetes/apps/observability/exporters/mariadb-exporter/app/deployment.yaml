@@ -27,12 +27,12 @@ spec:
             - -ec
           args:
             - |
-              password_aux="${MARIADB_ROOT_PASSWORD:-}"
+              password_aux="$${MARIADB_ROOT_PASSWORD:-}"
               if [ -z "$password_aux" ]; then
                 echo "MARIADB_ROOT_PASSWORD not set" >&2
                 exit 1
               fi
-              MYSQLD_EXPORTER_PASSWORD="${password_aux}" /bin/mysqld_exporter \
+              MYSQLD_EXPORTER_PASSWORD="$${password_aux}" /bin/mysqld_exporter \
                 --mysqld.address=mariadb.database.svc.cluster.local:3306 \
                 --mysqld.username=root \
                 --web.listen-address=:9104
