@@ -34,8 +34,8 @@ spec:
         initContainers:
           retag: &container
             image:
-              repository: ghcr.io/autobrr/tqm
-              tag: v1.17.0
+              repository: ghcr.io/home-operations/tqm
+              tag: 1.17.0@sha256:05b62239063ad1e884f2254532e3dc9b60cff08870112dca244af328d761be0d
             args:
               - retag
               - qbt
