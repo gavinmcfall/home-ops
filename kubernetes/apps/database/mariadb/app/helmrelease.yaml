@@ -20,22 +20,24 @@ spec:
       retries: 3
   values:
     global:
-      defaultFips: off
+      defaultFips: "off"
       security:
         allowInsecureImages: false
     auth:
       usePasswordFiles: false
       existingSecret: mariadb-secret
     metrics:
-      enabled: true
-      resourcesPreset: small
-      serviceMonitor:
-        enabled: true
+      enabled: false
+    volumePermissions:
+      fips:
+        openssl: "off"
     primary:
       resourcesPreset: small
       persistence:
         enabled: true
         existingClaim: *app
+      fips:
+        openssl: "off"
     initdbScripts:
       create-bookstack.sql: |
         CREATE DATABASE IF NOT EXISTS bookstackapp;
