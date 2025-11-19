@@ -30,11 +30,11 @@ spec:
     serviceMonitor:
       enabled: true
       params:
-        - name: Kubernetes-UPS
+        - name: kubernetes-ups
           module: ["kubernetes"]
           target: network-ups-tools.observability.svc.cluster.local
           auth: ["public_v2"]
-        - name: Nexus-UPS
+        - name: nexus-ups
           module: ["nexus"]
           target: 10.90.1.1
           auth: ["public_v2"]
