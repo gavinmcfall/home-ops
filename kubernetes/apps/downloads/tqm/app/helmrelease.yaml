@@ -72,7 +72,8 @@ spec:
 
     persistence:
       config:
-        type: emptyDir
+        type: image
+        image: ghcr.io/home-operations/tqm:1.17.0
         globalMounts:
           - path: /.config/tqm
       config-file:
