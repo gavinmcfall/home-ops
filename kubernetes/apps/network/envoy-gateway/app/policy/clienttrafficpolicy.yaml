@@ -22,7 +22,6 @@ spec:
     initialStreamWindowSize: 512Ki
     initialConnectionWindowSize: 8Mi
     onInvalidMessage: TerminateStream
-    allowConnect: true
   http3: {}
   tcpKeepalive: {}
   timeout:
