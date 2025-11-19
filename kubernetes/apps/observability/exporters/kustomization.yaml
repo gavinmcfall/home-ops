@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   # - ./blackbox-exporter/ks.yaml
   - ./intel-gpu-exporter/ks.yaml
+  - ./mariadb-exporter/ks.yaml
   - ./nut-exporter/ks.yaml
   - ./smartctl-exporter/ks.yaml
   # - ./snmp-exporter/ks.yaml

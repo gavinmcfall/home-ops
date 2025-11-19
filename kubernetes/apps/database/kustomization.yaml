@@ -10,4 +10,3 @@ resources:
   - ./dragonfly/ks.yaml
   - ./mosquitto/ks.yaml
   - ./mariadb/ks.yaml
-  - ./mariadb-exporter/ks.yaml
