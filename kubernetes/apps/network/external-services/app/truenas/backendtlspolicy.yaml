@@ -11,4 +11,4 @@ spec:
       name: truenas
   validation:
     wellKnownCACertificates: System
-    hostname: nerdz.cloud
+    hostname: ${SECRET_DOMAIN}
