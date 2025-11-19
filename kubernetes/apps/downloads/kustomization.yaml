@@ -20,5 +20,6 @@ resources:
   - ./sonarr/ks.yaml
   - ./sonarr-foreign/ks.yaml
   - ./sonarr-uhd/ks.yaml
+  - ./tqm/ks.yaml
   - ./unpackerr/ks.yaml
   - ./whisparr/ks.yaml
