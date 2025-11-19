@@ -39,6 +39,15 @@ filters:
       # animetosho - 1.01 ratio or 7.1 days
       - TrackerName contains "animetosho.org" && (Ratio > 1.01 || SeedingDays >= 7.1)
 
+      # avistaz - 0.91 ratio or 7.1 days (size-based HnR, using safe defaults)
+      - TrackerName contains "avistaz.to" && (Ratio > 0.91 || SeedingDays >= 7.1)
+
+      # exoticaz - 0.91 ratio or 7.1 days (size-based HnR, using safe defaults)
+      - TrackerName contains "exoticaz.to" && (Ratio > 0.91 || SeedingDays >= 7.1)
+
+      # pussytorrents - 0.41 ratio or 3.1 days (0.4 ratio or 60 hours within 72 hours)
+      - TrackerName contains "pussytorrents.org" && (Ratio > 0.41 || SeedingDays >= 3.1)
+
       # beyond-hd - no requirements
       - TrackerName contains "beyond-hd.me" && (Ratio > 0 || SeedingDays >= 0.1)
 
@@ -121,6 +130,9 @@ filters:
           - TrackerName contains "alpharatio.cc" && (Ratio >= 1.01 || SeedingDays >= 7.1)
           - TrackerName contains "anthelion.me" && (Ratio >= 1.01 || SeedingDays >= 7.1)
           - TrackerName contains "animetosho.org" && (Ratio >= 1.01 || SeedingDays >= 7.1)
+          - TrackerName contains "avistaz.to" && (Ratio >= 0.91 || SeedingDays >= 7.1)
+          - TrackerName contains "exoticaz.to" && (Ratio >= 0.91 || SeedingDays >= 7.1)
+          - TrackerName contains "pussytorrents.org" && (Ratio >= 0.41 || SeedingDays >= 3.1)
           - TrackerName contains "fearnopeer.com" && (Ratio >= 1.01 || SeedingDays >= 7.1)
           - (TrackerName contains "filelist.io" || TrackerName contains "flro.org") && (Ratio >= 1.01 || SeedingDays >= 2.1)
           - TrackerName contains "hdts-announce.ru" && (Ratio >= 1.01 || SeedingDays >= 3.1)
