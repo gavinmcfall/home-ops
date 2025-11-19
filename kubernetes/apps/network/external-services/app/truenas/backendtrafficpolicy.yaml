@@ -10,7 +10,7 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: truenas
-  useClientProtocol: true
+  # useClientProtocol removed - backends only support HTTP/1.1
   connection:
     bufferLimit: 8Mi
   timeout:
