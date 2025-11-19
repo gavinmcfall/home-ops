@@ -10,7 +10,11 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: unifi
-  # useClientProtocol removed - backends only support HTTP/1.1
+  http:
+    http1:
+      enableTrailers: true
+      preserveHeaderCase: true
+      http10: {}
   connection:
     bufferLimit: 8Mi
   timeout:
