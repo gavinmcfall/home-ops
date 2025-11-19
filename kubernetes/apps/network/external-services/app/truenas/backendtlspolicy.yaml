@@ -9,7 +9,6 @@ spec:
     - group: ""
       kind: Service
       name: truenas
-      sectionName: https
   validation:
     wellKnownCACertificates: System
     hostname: ${SECRET_DOMAIN}
