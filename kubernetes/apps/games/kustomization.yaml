@@ -5,6 +5,4 @@ resources:
   # Pre Flux-Kustomizations
   - ./namespace.yaml
   # Flux-Kustomizations
-  # - ./minecraft/ks.yaml
-  # - ./palworld/ks.yaml
-  # - ./romm/ks.yaml
+  - ./romm/ks.yaml
