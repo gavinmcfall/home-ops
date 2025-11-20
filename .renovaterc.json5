@@ -37,6 +37,8 @@
   kubernetes: {
     managerFilePatterns: ["/\\.yaml(?:\\.j2)?$/"],
   },
+  // Applying this label to a Renovate PR triggers an immediate rebase on the next run
+  rebaseLabel: "renovate/force-rebase",
   packageRules: [
     {
       description: ["Skip major updates for stateful databases"],
