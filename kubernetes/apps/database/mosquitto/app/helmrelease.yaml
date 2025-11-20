@@ -72,7 +72,7 @@ spec:
           app:
             image:
               repository: docker.io/sapcc/mosquitto-exporter
-              tag: 0.6.0
+              tag: 0.8.0
             env:
               - name: BROKER_ENDPOINT
                 value: tcp://mosquitto-app.database.svc.cluster.local:1883
