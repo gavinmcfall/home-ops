@@ -129,7 +129,7 @@ jobs:
 
       - if: ${{ steps.diff.outputs.bytes != '' && fromJSON(steps.diff.outputs.bytes) >= 60000 }}
         name: Upload large diff artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: flux-local-diff-${{ matrix.paths }}-${{ matrix.resources }}
           path: diff.patch
@@ -147,7 +147,7 @@ jobs:
 
       - if: ${{ steps.diff.outputs.diff == '' && steps.diff.outputs.bytes != '' && fromJSON(steps.diff.outputs.bytes) >= 60000 }}
         name: Add artifact notice
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2
         with:
           message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}/artifact"
           message: |
