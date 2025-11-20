@@ -36,7 +36,7 @@ jobs:
         run: |
           git config --global --add safe.directory /github/workspace
       - name: Relax Talos clusterconfig permissions
-        run: chmod -R u=rwX,go=rX kubernetes/apps/bootstrap/talos/clusterconfig || true
+        run: chmod -R u=rwX,go=rX kubernetes/bootstrap/talos/clusterconfig || true
 
       - name: Run flux-local test
         env:
@@ -88,8 +88,8 @@ jobs:
           git config --global --add safe.directory /github/workspace/default
       - name: Relax Talos clusterconfig permissions
         run: |
-          chmod -R u=rwX,go=rX /github/workspace/pull/kubernetes/apps/bootstrap/talos/clusterconfig || true
-          chmod -R u=rwX,go=rX /github/workspace/default/kubernetes/apps/bootstrap/talos/clusterconfig || true
+          chmod -R u=rwX,go=rX /github/workspace/pull/kubernetes/bootstrap/talos/clusterconfig || true
+          chmod -R u=rwX,go=rX /github/workspace/default/kubernetes/bootstrap/talos/clusterconfig || true
 
       - name: Run flux-local diff
         env:
