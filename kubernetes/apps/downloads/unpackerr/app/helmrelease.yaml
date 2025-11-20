@@ -91,4 +91,4 @@ spec:
         path: /mnt/storage0/media
         globalMounts:
           - path: /downloads/
-            subPath: downloads/qbittorrent
+            subPath: Downloads/qbittorrent
