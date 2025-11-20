@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       calibre-web:
-        forceRename: calibre-web-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

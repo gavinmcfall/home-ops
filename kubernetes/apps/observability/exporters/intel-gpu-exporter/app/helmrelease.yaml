@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       main:
-        forceRename: main-v4
         type: daemonset
         strategy: RollingUpdate
         pod:

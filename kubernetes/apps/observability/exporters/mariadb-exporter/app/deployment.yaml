@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-exporter
+  labels:
+    app.kubernetes.io/name: mariadb-exporter
+    app.kubernetes.io/component: metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mariadb-exporter
+      app.kubernetes.io/component: metrics
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mariadb-exporter
+        app.kubernetes.io/component: metrics
+    spec:
+      containers:
+        - name: exporter
+          image: docker.io/bitnami/mysqld-exporter:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+          args:
+            - |
+              password_aux="$${MARIADB_ROOT_PASSWORD:-}"
+              if [ -z "$password_aux" ]; then
+                echo "MARIADB_ROOT_PASSWORD not set" >&2
+                exit 1
+              fi
+              MYSQLD_EXPORTER_PASSWORD="$${password_aux}" /bin/mysqld_exporter \
+                --mysqld.address=mariadb.database.svc.cluster.local:3306 \
+                --mysqld.username=root \
+                --web.listen-address=:9104
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: mariadb-root-password
+          ports:
+            - name: metrics
+              containerPort: 9104
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 128Mi

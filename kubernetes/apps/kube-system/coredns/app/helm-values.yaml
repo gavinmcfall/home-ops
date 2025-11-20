@@ -8,6 +8,19 @@ service:
   clusterIP: "10.96.0.10"
 servers:
   - zones:
+      - zone: ${SECRET_DOMAIN}
+        scheme: dns://
+    port: 53
+    plugins:
+      - name: errors
+      - name: log
+        configBlock: |-
+          class error
+      - name: cache
+        parameters: 30
+      - name: forward
+        parameters: . 10.96.100.130
+  - zones:
       - zone: .
         scheme: dns://
         use_tcp: true

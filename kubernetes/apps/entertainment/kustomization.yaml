@@ -2,6 +2,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  # Namespace
   - ./namespace.yaml
 
   # Applications
@@ -9,13 +10,10 @@ resources:
   - ./calibre-web/ks.yaml
   - ./fileflows/ks.yaml
   - ./jellyfin/ks.yaml
-  # - ./freshrss/ks.yaml
   - ./kavita/ks.yaml
   - ./overseerr/ks.yaml
   - ./pasta/ks.yaml
-  # - ./peertube/ks.yaml
   - ./plex/ks.yaml
   - ./stash/ks.yaml
   - ./tautulli/ks.yaml
-  # - ./tdarr/ks.yaml
   - ./wizarr/ks.yaml

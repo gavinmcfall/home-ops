@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       paperless:
-        forceRename: paperless-v4
         annotations:
           reloader.stakater.com/auto: 'true'
         initContainers:
@@ -47,8 +46,8 @@ spec:
               - {name: DISABLE_GOOGLE_CHROME, value: '1'}
           tika:
             image:
-              repository: ghcr.io/paperless-ngx/tika
-              tag: 2.9.1-full
+              repository: docker.io/apache/tika
+              tag: 2.9.1.0-full
               pullPolicy: IfNotPresent
           app:
             image:

@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       whisper:
-        forceRename: whisper-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

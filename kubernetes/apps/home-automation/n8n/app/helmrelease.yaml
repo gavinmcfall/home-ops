@@ -19,7 +19,6 @@ spec:
   values:
     controllers:
       n8n:
-        forceRename: n8n-v4
         initContainers:
           init-db:
             image:

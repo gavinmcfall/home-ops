@@ -1,0 +1,4 @@
+cluster:
+  apiServer:
+    extraArgs:
+      feature-gates: ImageVolume=true

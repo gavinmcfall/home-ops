@@ -3,3 +3,6 @@ machine:
     nodeIP:
       validSubnets:
         - 10.90.3.0/16
+    extraConfig:
+      featureGates:
+        ImageVolume: true

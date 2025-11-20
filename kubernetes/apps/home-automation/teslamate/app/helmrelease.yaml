@@ -28,7 +28,6 @@ spec:
   values:
     controllers:
       teslamate:
-        forceRename: teslamate-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -47,7 +46,7 @@ spec:
             env:
               TZ: &tz ${TIMEZONE}
               DISABLE_MQTT: "false"
-              MQTT_HOST: mosquitto.database.svc.cluster.local
+              MQTT_HOST: mosquitto-app.database.svc.cluster.local
             envFrom: *envFrom
 
     service:

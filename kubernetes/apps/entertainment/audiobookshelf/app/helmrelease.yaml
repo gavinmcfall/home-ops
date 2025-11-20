@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       audiobookshelf:
-        forceRename: audiobookshelf-v4
         pod:
           securityContext:
             runAsNonRoot: true
@@ -109,6 +108,10 @@ spec:
           - name: external
             namespace: network
             sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
     persistence:
       config:
         existingClaim: audiobookshelf

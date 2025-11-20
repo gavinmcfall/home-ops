@@ -26,7 +26,6 @@ spec:
   values:
     controllers:
       fstrim:
-        forceRename: fstrim-v4
         type: daemonset
         containers:
           app:

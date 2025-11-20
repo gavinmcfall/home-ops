@@ -11,4 +11,4 @@ spec:
       name: truenas
   validation:
     wellKnownCACertificates: System
-    hostname: citadel.${SECRET_DOMAIN}
+    hostname: ${SECRET_DOMAIN}

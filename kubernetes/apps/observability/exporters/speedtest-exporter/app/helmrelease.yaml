@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       speedtest-exporter:
-        forceRename: speedtest-exporter-v4
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"

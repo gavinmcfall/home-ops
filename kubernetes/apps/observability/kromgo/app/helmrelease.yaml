@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       kromgo:
-        forceRename: kromgo-v4
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"

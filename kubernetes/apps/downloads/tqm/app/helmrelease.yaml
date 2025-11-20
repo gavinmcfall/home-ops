@@ -1,0 +1,84 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tqm
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      tqm:
+        type: cronjob
+        cronjob:
+          schedule: "@hourly"
+          timeZone: &timeZone ${TIMEZONE}
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 3
+        initContainers:
+          retag: &container
+            image:
+              repository: ghcr.io/home-operations/tqm
+              tag: 1.17.0@sha256:05b62239063ad1e884f2254532e3dc9b60cff08870112dca244af328d761be0d
+            args:
+              - retag
+              - qbt
+            env:
+              TZ: *timeZone
+            envFrom:
+              - secretRef:
+                  name: tqm-secret
+            resources:
+              requests:
+                cpu: 25m
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+        containers:
+          clean:
+            <<: *container
+            args:
+              - clean
+              - qbt
+        pod:
+          restartPolicy: Never
+
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+
+    persistence:
+      config:
+        type: emptyDir
+        globalMounts:
+          - path: /.config/tqm
+      config-file:
+        type: configMap
+        name: tqm-configmap
+        globalMounts:
+          - path: /.config/tqm/config.yaml
+            subPath: config.yaml
+            readOnly: true

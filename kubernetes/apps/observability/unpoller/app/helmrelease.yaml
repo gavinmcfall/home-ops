@@ -28,7 +28,6 @@ spec:
   values:
     controllers:
       unpoller:
-        forceRename: unpoller-v4
         containers:
           app:
             image:

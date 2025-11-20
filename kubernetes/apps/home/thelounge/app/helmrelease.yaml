@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       thelounge:
-        forceRename: thelounge-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

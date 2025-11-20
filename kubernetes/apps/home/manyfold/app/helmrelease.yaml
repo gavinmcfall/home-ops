@@ -31,7 +31,6 @@ spec:
   values:
     controllers:
       manyfold:
-        forceRename: manyfold-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

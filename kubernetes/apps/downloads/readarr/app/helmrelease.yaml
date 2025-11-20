@@ -29,7 +29,6 @@ spec:
   values:
     controllers:
       readarr:
-        forceRename: readarr-v4
         labels:
           nfsMount: "true"
         annotations:

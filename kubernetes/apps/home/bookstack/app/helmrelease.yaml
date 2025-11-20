@@ -33,7 +33,6 @@ spec:
   values:
     controllers:
       bookstack:
-        forceRename: bookstack-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

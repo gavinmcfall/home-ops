@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       onepassword-connect:
-        forceRename: onepassword-connect-v4
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"

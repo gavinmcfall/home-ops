@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       filebrowser:
-        forceRename: filebrowser-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

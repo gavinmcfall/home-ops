@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       unpackerr:
-        forceRename: unpackerr-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -92,4 +91,4 @@ spec:
         path: /mnt/storage0/media
         globalMounts:
           - path: /downloads/
-            subPath: downloads/qbittorrent
+            subPath: Downloads/qbittorrent

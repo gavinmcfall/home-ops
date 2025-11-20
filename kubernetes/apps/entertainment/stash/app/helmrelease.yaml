@@ -26,7 +26,6 @@ spec:
   values:
     controllers:
       stash:
-        forceRename: stash-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

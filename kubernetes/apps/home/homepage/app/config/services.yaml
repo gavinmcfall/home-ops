@@ -157,7 +157,7 @@
         widget:
           type: plex
           url: http://plex.entertainment:32400
-          token: {{HOMEPAGE_VAR_PLEX_TOKEN}}
+          key: {{HOMEPAGE_VAR_PLEX_TOKEN}}
     - Jellyfin:
         href: https://jellyfin.${SECRET_DOMAIN}
         icon: jellyfin.png

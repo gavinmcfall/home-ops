@@ -32,7 +32,6 @@ spec:
   values:
     controllers:
       jellyfin:
-        forceRename: jellyfin-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

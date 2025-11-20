@@ -24,7 +24,6 @@ spec:
   values:
     controllers:
       echo-server:
-        forceRename: echo-server-v4
         strategy: RollingUpdate
         containers:
           app:

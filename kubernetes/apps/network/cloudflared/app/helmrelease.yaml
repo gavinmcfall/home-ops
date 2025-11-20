@@ -24,7 +24,6 @@ spec:
   values:
     controllers:
       cloudflared:
-        forceRename: cloudflared-v4
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"

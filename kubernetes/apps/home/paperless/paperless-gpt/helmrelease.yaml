@@ -31,7 +31,6 @@ spec:
   values:
     controllers:
       paperless-gpt:
-        forceRename: paperless-gpt-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

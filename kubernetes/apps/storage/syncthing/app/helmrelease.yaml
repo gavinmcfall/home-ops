@@ -37,7 +37,6 @@ spec:
   values:
     controllers:
       syncthing:
-        forceRename: syncthing-v4
         containers:
           app:
             image:
@@ -98,6 +97,10 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: 8384
 
     persistence:
       data:

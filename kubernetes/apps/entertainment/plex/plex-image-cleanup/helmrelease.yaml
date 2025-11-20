@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       plex-image-cleanup:
-        forceRename: plex-image-cleanup-v4
         type: cronjob
         annotations:
           reloader.stakater.com/auto: "true"

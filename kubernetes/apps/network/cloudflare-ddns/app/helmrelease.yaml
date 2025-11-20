@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       cloudflare-ddns:
-        forceRename: cloudflare-ddns-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -35,9 +34,9 @@ spec:
               tag: v1.1.0@sha256:c4cf9ffe97f6aff0d26308fd4d452c7ad10530f8f9fc061f8d4d7866b55bdeb2
             args:
               - --zone-name
-              - nerdz.cloud
+              - ${SECRET_DOMAIN}
               - --record-name
-              - ipv4.nerdz.cloud
+              - ipv4.${SECRET_DOMAIN}
               - --provider
               - random
             envFrom:
@@ -84,7 +83,7 @@ spec:
     route:
       app:
         hostnames:
-          - ddns.nerdz.cloud
+          - ddns.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network

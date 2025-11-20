@@ -30,7 +30,6 @@ spec:
   values:
     controllers:
       sabnzbd:
-        forceRename: sabnzbd-v4
         annotations:
           reloader.stakater.com/auto: "true"
         containers:

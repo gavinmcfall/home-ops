@@ -27,7 +27,6 @@ spec:
   values:
     controllers:
       whisparr:
-        forceRename: whisparr-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

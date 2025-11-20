@@ -29,7 +29,6 @@ spec:
       gatus:
         serviceAccount:
           identifier: gatus
-        forceRename: gatus-v4
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:

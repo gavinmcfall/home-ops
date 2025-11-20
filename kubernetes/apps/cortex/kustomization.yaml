@@ -2,12 +2,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  # Pre Flux-Kustomizations
+  # Namespace
   - ./namespace.yaml
-  # Flux-Kustomizations
-  - ./litellm/ks.yaml
-  # - ./llm-d/ks.yaml
-  - ./open-webui/ks.yaml
-  - ./qdrant/ks.yaml
-  # - ./sillytavern/ks.yaml
-  - ./whisper/ks.yaml
+
+  # Applications
+  # - ./litellm/ks.yaml
+  # - ./open-webui/ks.yaml
+  # - ./qdrant/ks.yaml
+  # - ./whisper/ks.yaml

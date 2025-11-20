@@ -39,6 +39,8 @@ l2announcements:
 loadBalancer:
   algorithm: maglev
   mode: snat
+socketLB:
+  enabled: true
 localRedirectPolicy: true
 operator:
   rollOutPods: true

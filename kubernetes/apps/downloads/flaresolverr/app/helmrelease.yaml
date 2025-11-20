@@ -25,7 +25,6 @@ spec:
   values:
     controllers:
       flaresolverr:
-        forceRename: flaresolverr-v4
         replicas: 2
         strategy: RollingUpdate
         annotations:
