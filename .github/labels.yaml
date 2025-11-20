@@ -11,6 +11,7 @@
 - { name: "renovate/github-action",  color: "027fa0" }
 - { name: "renovate/github-release", color: "027fa0" }
 - { name: "renovate/helm",           color: "027fa0" }
+- { name: "renovate/force-rebase",   color: "027fa0" }
 # Semantic Type
 - { name: "type/patch",              color: "ffec19" }
 - { name: "type/minor",              color: "ff9800" }
