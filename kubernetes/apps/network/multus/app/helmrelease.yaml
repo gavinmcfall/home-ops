@@ -28,7 +28,7 @@ spec:
     cni:
       image:
         repository: ghcr.io/angelnu/cni-plugins
-        tag: 1.8.0@sha256:afc03ea5df3cf5c8ec5fecc0a77feb49135dc35e1679f949f1fcff28c0d23d07
+        tag: 1.8.0@sha256:3dcc127643fd0cdfb2877f45c2292cb68f2ed8ca0f627b321f7a1bc31506e1da
       logLevel: error
       paths:
         bin: /opt/cni/bin
