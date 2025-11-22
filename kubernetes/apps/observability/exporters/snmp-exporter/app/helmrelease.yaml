@@ -29,10 +29,38 @@ spec:
     fullnameOverride: *app
     extraArgs:
       - --config.file=/etc/snmp-exporter/snmp.yml
+    extraConfigmapMounts:
+      - name: snmp-modules
+        mountPath: /etc/snmp-modules
+        configMap: snmp-exporter-modules
+        readOnly: true
     extraSecretMounts:
-      - name: snmp-exporter-config
-        mountPath: /etc/snmp-exporter
+      - name: snmp-auth
+        mountPath: /etc/snmp-auth
         secretName: snmp-exporter-secret
+        readOnly: true
+    initContainers:
+      - name: merge-config
+        image: busybox:latest
+        command:
+          - sh
+          - -c
+          - |
+            cat /etc/snmp-auth/auth.yml > /config/snmp.yml
+            cat /etc/snmp-modules/modules.yml >> /config/snmp.yml
+        volumeMounts:
+          - name: snmp-auth
+            mountPath: /etc/snmp-auth
+          - name: snmp-modules
+            mountPath: /etc/snmp-modules
+          - name: config
+            mountPath: /config
+    extraVolumes:
+      - name: config
+        emptyDir: {}
+    extraVolumeMounts:
+      - name: config
+        mountPath: /etc/snmp-exporter
         readOnly: true
     serviceMonitor:
       enabled: true
