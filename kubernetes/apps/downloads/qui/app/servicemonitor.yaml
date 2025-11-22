@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/monitoring.coreos.com/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: qui
+  namespace: downloads
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: qui
+  namespaceSelector:
+    matchNames:
+      - downloads
+  endpoints:
+    - port: metrics
+      path: /metrics
+      scheme: http
+      interval: 1m
+      scrapeTimeout: 30s
+  targetLabels:
+    - app.kubernetes.io/name
