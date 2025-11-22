@@ -36,6 +36,10 @@ spec:
               QUI__HOST: 0.0.0.0
               QUI__PORT: &port 7476
               QUI__LOG_LEVEL: INFO
+              QUI__OIDC_DISABLE_BUILT_IN_LOGIN: "true"
+              QUI__METRICS_ENABLED: "true"
+              QUI__METRICS_HOST: "0.0.0.0"
+              QUI__METRICS_PORT: &metricsPort 9074
               TZ: ${TIMEZONE}
             envFrom:
               - secretRef:
@@ -79,6 +83,8 @@ spec:
         ports:
           http:
             port: *port
+          metrics:
+            port: *metricsPort
     route:
       app:
         annotations:
