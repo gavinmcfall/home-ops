@@ -27,17 +27,20 @@ spec:
       namespace: observability
   values:
     fullnameOverride: *app
+    extraArgs:
+      - --config.file=/etc/snmp-exporter/snmp.yml
+    extraSecretMounts:
+      - name: snmp-exporter-config
+        mountPath: /etc/snmp-exporter
+        secretName: snmp-exporter-secret
+        readOnly: true
     serviceMonitor:
       enabled: true
       params:
-        - name: kubernetes-ups
-          module: ["kubernetes"]
-          target: network-ups-tools.observability.svc.cluster.local
-          auth: ["public_v2"]
-        - name: nexus-ups
-          module: ["nexus"]
-          target: 10.90.1.1
-          auth: ["public_v2"]
+        - name: udm-pro
+          module: ["unifi"]
+          target: ${SECRET_UNIFI_IP}
+          auth: ["unifi_v3"]
       path: /snmp
       scrapeTimeout: 10s
       relabelings:
