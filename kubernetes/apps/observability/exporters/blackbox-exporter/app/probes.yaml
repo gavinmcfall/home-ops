@@ -12,6 +12,4 @@ spec:
     staticConfig:
       static:
         - citadel.internal #NAS
-        - pikvm.internal
-        - voron.internal #3D printer
-        - ups.internal #NUT server Pi
+        # - voron.internal #3D printer current dissassembled
