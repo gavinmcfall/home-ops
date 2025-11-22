@@ -124,6 +124,14 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/game-servers
+          - name: "infrastructure"
+            orgId: 1
+            folder: Infrastructure
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/infrastructure
           - name: kubernetes
             orgId: 1
             folder: Kubernetes
@@ -216,6 +224,10 @@ spec:
           datasource: Prometheus
         flux-control-plane:
           url: https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/control-plane.json
+          datasource: Prometheus
+      infrastructure:
+        unifi-snmp-overview:
+          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/unifi-snmp-overview.json
           datasource: Prometheus
       kubernetes:
         k8s-system-api-server:
