@@ -140,7 +140,7 @@ spec:
             namespace: network
             sectionName: https
 
-    ingress:
+    ingress: #tailscale
       tailscale:
         enabled: true
         className: tailscale
