@@ -97,7 +97,8 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
-    ingress:
+
+    ingress: #tailscale
       tailscale:
         enabled: true
         className: tailscale
