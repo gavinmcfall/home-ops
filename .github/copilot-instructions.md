@@ -9,11 +9,11 @@ description: Instructions for GitHub Copilot when working with this homelab repo
 **All comprehensive repository context is centralized in `docs/ai-context/`:**
 
 - [docs/ai-context/README.md](../docs/ai-context/README.md) - Navigation and overview
-- [docs/ai-context/architecture.md](../docs/ai-context/architecture.md) - GitOps architecture and key decisions
-- [docs/ai-context/domain.md](../docs/ai-context/domain.md) - Business rules and domain model
-- [docs/ai-context/workflows.md](../docs/ai-context/workflows.md) - Operational workflows
-- [docs/ai-context/tools.md](../docs/ai-context/tools.md) - Discovery and validation commands
-- [docs/ai-context/conventions.md](../docs/ai-context/conventions.md) - Coding standards
+- [docs/ai-context/ARCHITECTURE.md](../docs/ai-context/ARCHITECTURE.md) - GitOps architecture and key decisions
+- [docs/ai-context/DOMAIN.md](../docs/ai-context/DOMAIN.md) - Business rules and domain model
+- [docs/ai-context/WORKFLOWS.md](../docs/ai-context/WORKFLOWS.md) - Operational workflows
+- [docs/ai-context/TOOLS.md](../docs/ai-context/TOOLS.md) - Discovery and validation commands
+- [docs/ai-context/CONVENTIONS.md](../docs/ai-context/CONVENTIONS.md) - Coding standards
 
 Please reference these files for complete context about the repository structure, workflows, and conventions.
 
