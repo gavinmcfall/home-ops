@@ -8,7 +8,6 @@ data:
     # UniFi module configuration from https://github.com/zygiss/snmp-exporter-unifi
     modules:
       unifi:
-        auth: unifi_v3
         walk:
         - 1.3.6.1.4.1.41112.1.6.1.1.1.1
         - 1.3.6.1.4.1.41112.1.6.1.1.1.2
