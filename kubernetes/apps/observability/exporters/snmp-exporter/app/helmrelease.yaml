@@ -45,7 +45,7 @@ spec:
       params:
         - name: udm-pro
           auth: ["unifi_v3"]
-          module: ["unifi"]
+          module: ["udm_pro"]
           target: ${SECRET_UNIFI_IP}
       path: /snmp
       scrapeTimeout: 10s
