@@ -7,11 +7,11 @@ This repository uses multiple AI coding assistants with shared context from a ce
 All AI assistant context is centralized in **[`docs/ai-context/`](docs/ai-context/)**:
 
 - [README.md](docs/ai-context/README.md) - Overview and navigation
-- [architecture.md](docs/ai-context/architecture.md) - GitOps architecture, key decisions, and constraints
-- [domain.md](docs/ai-context/domain.md) - Business rules, entity relationships, and invariants
-- [workflows.md](docs/ai-context/workflows.md) - Operational workflows and procedures
-- [tools.md](docs/ai-context/tools.md) - Tool usage patterns and discovery commands
-- [conventions.md](docs/ai-context/conventions.md) - Coding standards and project guidelines
+- [ARCHITECTURE.md](docs/ai-context/ARCHITECTURE.md) - GitOps architecture, key decisions, and constraints
+- [DOMAIN.md](docs/ai-context/DOMAIN.md) - Business rules, entity relationships, and invariants
+- [WORKFLOWS.md](docs/ai-context/WORKFLOWS.md) - Operational workflows and procedures
+- [TOOLS.md](docs/ai-context/TOOLS.md) - Tool usage patterns and discovery commands
+- [CONVENTIONS.md](docs/ai-context/CONVENTIONS.md) - Coding standards and project guidelines
 
 This centralized approach provides:
 - ✅ Single source of truth for all AI tools
@@ -108,11 +108,11 @@ This is a Kubernetes homelab managed using:
 ├── docs/
 │   └── ai-context/              # 📚 Single source of truth for AI context
 │       ├── README.md
-│       ├── architecture.md
-│       ├── domain.md
-│       ├── workflows.md
-│       ├── tools.md
-│       └── conventions.md
+│       ├── ARCHITECTURE.md
+│       ├── DOMAIN.md
+│       ├── WORKFLOWS.md
+│       ├── TOOLS.md
+│       └── CONVENTIONS.md
 │
 ├── .claude/
 │   └── CLAUDE.md                # Imports from docs/ai-context/

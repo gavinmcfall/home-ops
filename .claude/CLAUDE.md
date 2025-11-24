@@ -7,11 +7,11 @@ This repository manages a Kubernetes homelab using GitOps principles with Flux, 
 The following files contain comprehensive context about this repository. They are the single source of truth shared across all AI coding assistants:
 
 @docs/ai-context/README.md
-@docs/ai-context/architecture.md
-@docs/ai-context/domain.md
-@docs/ai-context/workflows.md
-@docs/ai-context/tools.md
-@docs/ai-context/conventions.md
+@docs/ai-context/ARCHITECTURE.md
+@docs/ai-context/DOMAIN.md
+@docs/ai-context/WORKFLOWS.md
+@docs/ai-context/TOOLS.md
+@docs/ai-context/CONVENTIONS.md
 
 ## MCP Configuration
 

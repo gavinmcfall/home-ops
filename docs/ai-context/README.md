@@ -6,11 +6,11 @@ This directory contains the single source of truth for AI assistant context acro
 
 ### Core Documentation
 
-- [architecture.md](architecture.md) - GitOps architecture, key decisions, and constraints
-- [domain.md](domain.md) - Business rules, entity relationships, and invariants
-- [workflows.md](workflows.md) - Operational workflows and procedures
-- [tools.md](tools.md) - Tool usage patterns and discovery commands
-- [conventions.md](conventions.md) - Coding standards and project guidelines
+- [ARCHITECTURE.md](ARCHITECTURE.md) - GitOps architecture, key decisions, and constraints
+- [DOMAIN.md](DOMAIN.md) - Business rules, entity relationships, and invariants
+- [WORKFLOWS.md](WORKFLOWS.md) - Operational workflows and procedures
+- [TOOLS.md](TOOLS.md) - Tool usage patterns and discovery commands
+- [CONVENTIONS.md](CONVENTIONS.md) - Coding standards and project guidelines
 
 ## Purpose
 
