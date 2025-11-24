@@ -1350,8 +1350,3 @@ kubectl get pods -n network | grep -E "OOMKilled|CrashLoop|Error"
 - [Tailscale Operator README](../../kubernetes/apps/network/tailscale/operator/readme.md) - Operator setup guide
 
 ---
-
-**Document Version:** 1.0
-**Last Updated:** 2025-11-24
-**Maintained By:** Claude Code (AI Assistant)
-**Review Schedule:** Quarterly
