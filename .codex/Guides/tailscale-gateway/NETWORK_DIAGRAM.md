@@ -8,160 +8,144 @@
 
 ## Complete Network Architecture
 
+**Network Flow: Users → Entry Points → Infrastructure → Authentication → Services**
+
 ```mermaid
 graph TB
-    subgraph Internet["🌐 Internet"]
-        PublicUser["Public User<br/>(via domain)"]
-        CloudflareEdge["Cloudflare Edge Network"]
+    subgraph Title[" "]
+        TitleText["<b>Network Architecture: Three-Gateway Pattern</b><br/>Users → Entry Points → Gateways → Authentication → Services"]
     end
 
-    subgraph TailscaleNet["🔐 Tailscale VPN Network"]
-        TailscaleUser["Remote User<br/>(Tailscale Client)"]
-        TailscaleMagicDNS["MagicDNS<br/>(Split DNS Config)"]
-    end
-
-    subgraph LocalNetwork["🏠 Home Network (LAN)"]
-        LocalUser["Local User<br/>(192.168.x.x)"]
-        Router["Home Router<br/>(Gateway)"]
-    end
-
-    subgraph K8sCluster["☸️ Kubernetes Cluster (Talos)"]
-
-        subgraph KubeSystem["kube-system namespace"]
-            Cilium["Cilium<br/>CNI + LoadBalancer IPAM<br/>Provides IPs:<br/>10.90.3.200-210"]
-            CoreDNS["CoreDNS<br/>Cluster DNS<br/>10.96.0.10"]
+    subgraph Col1["Column 1: Users & Entry"]
+        subgraph Users["👥 Users"]
+            direction TB
+            PublicUser["Public User"]
+            LocalUser["Local User LAN"]
+            TailscaleUser["Remote User VPN"]
         end
 
-        subgraph NetworkNS["network namespace"]
-            K8sGateway["k8s-gateway<br/>DNS Server<br/>10.90.3.200<br/>Watches: Ingress, Service, HTTPRoute"]
-            ExternalDNS["external-dns<br/>DNS Automation<br/>Creates A records"]
-            ExternalDNSUnifi["external-dns-unifi<br/>UniFi Controller DNS"]
-            TailscaleOp["Tailscale Operator<br/>VPN Integration<br/>API Server Proxy Mode"]
-            OAuth2Proxy["OAuth2-Proxy<br/>Authentication Layer"]
-            Cloudflared["Cloudflared<br/>Cloudflare Tunnel<br/>Secure Ingress"]
-
-            subgraph EnvoyGatewayInfra["Envoy Gateway Infrastructure"]
-                EnvoyController["Envoy Gateway<br/>Controller<br/>Manages Gateways"]
-
-                subgraph ExternalGW["External Gateway"]
-                    ExtGateway["Gateway: external<br/>Class: envoy-external<br/>IP: 10.90.3.201<br/>Listeners: HTTP/HTTPS"]
-                    ExtEnvoyProxy["EnvoyProxy Pods<br/>HPA: 1-5 replicas"]
-                    ExtEnvoySvc["LoadBalancer Service<br/>Cilium IPAM<br/>10.90.3.201:80,443"]
-                end
-
-                subgraph InternalGW["Internal Gateway"]
-                    IntGateway["Gateway: internal<br/>Class: envoy-internal<br/>IP: 10.90.3.202<br/>Listeners: HTTP/HTTPS"]
-                    IntEnvoyProxy["EnvoyProxy Pods<br/>HPA: 1-5 replicas"]
-                    IntEnvoySvc["LoadBalancer Service<br/>Cilium IPAM<br/>10.90.3.202:80,443"]
-                end
-
-                subgraph TailscaleGW["Tailscale Gateway (NEW)"]
-                    TSGateway["Gateway: tailscale<br/>Class: envoy-tailscale<br/>Addr: gateway-envoy.ts.net<br/>Listeners: HTTP/HTTPS"]
-                    TSEnvoyProxy["EnvoyProxy Pods<br/>HPA: 1-3 replicas"]
-                    TSEnvoySvc["LoadBalancer Service<br/>LoadBalancerClass: tailscale<br/>Tailscale Hostname: gateway-envoy"]
-                end
-            end
-
-            subgraph TrafficPolicies["Gateway Policies"]
-                ClientPolicy["ClientTrafficPolicy<br/>- HTTP/2 & HTTP/3<br/>- TLS 1.2+<br/>- Client IP Detection"]
-                BackendPolicy["BackendTrafficPolicy<br/>- Brotli/Gzip Compression<br/>- TCP Keepalive<br/>- Buffer Limits"]
-            end
-        end
-
-        subgraph AppNamespaces["Application Namespaces"]
-            subgraph RoutingPatterns["Service Routing Patterns"]
-                InternalOnly["Internal-Only Services<br/>(HTTPRoute: parent=internal)<br/>Examples: TrueNAS, UniFi, etc."]
-                ExternalOnly["External-Only Services<br/>(HTTPRoute: parent=external)<br/>Public-facing apps via Cloudflare"]
-                DualAccess["Internal + Tailscale Services<br/>(HTTPRoute: parents=internal,tailscale)<br/>Examples: Grafana, Paperless, Homepage<br/>Accessible from LAN & VPN"]
-            end
-
-            subgraph AuthNS["Authentication"]
-                PocketID["PocketID Service<br/>(OIDC Provider)"]
-                PocketIDRoute["HTTPRoute: pocket-id<br/>Parents: internal, tailscale"]
-            end
+        subgraph Entry["🌐 Entry Points"]
+            direction TB
+            CloudflareEdge["Cloudflare Edge<br/>CDN + Proxy"]
+            LocalDNS["Local DNS Query"]
+            TailscaleDNS["Tailscale MagicDNS"]
         end
     end
 
-    %% Internet Traffic Flow
-    PublicUser -->|"1. HTTPS Request<br/>public.domain.com"| CloudflareEdge
-    CloudflareEdge -->|"2. Cloudflare Tunnel<br/>Encrypted (QUIC)"| Cloudflared
-    Cloudflared -->|"3. Route to Gateway<br/>Based on Hostname"| ExtEnvoySvc
+    subgraph Col2["Column 2: Infrastructure"]
+        subgraph Ingress["Ingress"]
+            direction TB
+            Cloudflared["Cloudflared<br/>QUIC Tunnel"]
+        end
 
-    %% Local Network Traffic Flow
-    LocalUser -->|"1. DNS Query<br/>grafana.domain.com"| K8sGateway
-    K8sGateway -->|"2. Returns IP<br/>10.90.3.202"| LocalUser
-    LocalUser -->|"3. HTTPS Request<br/>grafana.domain.com"| IntEnvoySvc
+        subgraph DNS["DNS Services"]
+            direction TB
+            K8sGW["k8s-gateway<br/>10.90.3.200"]
+            ExtDNS["external-dns<br/>Cloudflare"]
+            ExtDNSUnifi["external-dns-unifi<br/>UniFi"]
+        end
 
-    %% Tailscale VPN Traffic Flow
-    TailscaleUser -->|"1. DNS Query<br/>grafana.domain.com"| TailscaleMagicDNS
-    TailscaleMagicDNS -->|"2. Split DNS Forward<br/>Query *.domain.com"| K8sGateway
-    K8sGateway -->|"3. Returns IP<br/>10.90.3.202"| TailscaleMagicDNS
-    TailscaleMagicDNS -->|"4. DNS Response"| TailscaleUser
-    TailscaleUser -->|"5. HTTPS Request<br/>via Tailscale Mesh"| TSEnvoySvc
+        subgraph Foundation["Foundation"]
+            direction TB
+            Cilium["Cilium IPAM<br/>10.90.3.200-210"]
+            TailscaleOp["Tailscale Operator"]
+        end
+    end
 
-    %% Gateway to Service Routing
-    ExtEnvoySvc --> ExtEnvoyProxy
-    ExtEnvoyProxy -->|"HTTPRoute Matching"| ExtGateway
+    subgraph Col3["Column 3: Gateways"]
+        subgraph Gateways["Gateway Layer Envoy"]
+            direction TB
+            ExtGW["External Gateway<br/>envoy-external<br/>10.90.3.201"]
+            IntGW["Internal Gateway<br/>envoy-internal<br/>10.90.3.202"]
+            TSGW["Tailscale Gateway<br/>envoy-tailscale<br/>*.ts.net"]
+        end
+    end
 
-    IntEnvoySvc --> IntEnvoyProxy
-    IntEnvoyProxy -->|"HTTPRoute Matching"| IntGateway
+    subgraph Col4["Column 4: Auth & Services"]
+        subgraph Auth["Authentication"]
+            direction TB
+            OAuth2["OAuth2-Proxy<br/>/oauth2"]
+            PocketID["PocketID<br/>OIDC Provider"]
+        end
 
-    TSEnvoySvc -->|"Tailscale LoadBalancer"| TailscaleOp
-    TSEnvoySvc --> TSEnvoyProxy
-    TSEnvoyProxy -->|"HTTPRoute Matching"| TSGateway
+        subgraph Services["🎯 Services"]
+            direction TB
+            ExternalOnly["External-Only<br/>via Cloudflare"]
+            InternalOnly["Internal-Only<br/>LAN"]
+            DualAccess["Dual Access<br/>Internal+Tailscale"]
+        end
+    end
 
-    %% HTTPRoute to Services by Pattern
-    ExtGateway -->|"Routes Traffic"| ExternalOnly
+    subgraph ExternalSys["🌍 External Systems"]
+        direction TB
+        CloudflareDNS["Cloudflare DNS<br/>Public Records"]
+        UniFiUDM["UniFi UDM-Pro<br/>10.90.254.1"]
+    end
 
-    IntGateway -->|"Routes Traffic"| InternalOnly
-    IntGateway -->|"Routes Traffic"| DualAccess
+    %% User to Entry
+    PublicUser --> CloudflareEdge
+    LocalUser --> LocalDNS
+    TailscaleUser --> TailscaleDNS
 
-    TSGateway -->|"Routes Traffic"| DualAccess
+    %% Entry to Infrastructure
+    CloudflareEdge --> Cloudflared
+    LocalDNS --> K8sGW
+    TailscaleDNS --> K8sGW
 
-    IntGateway -->|"Routes Traffic"| PocketIDRoute
-    TSGateway -->|"Routes Traffic"| PocketIDRoute
-    PocketIDRoute -->|"Backend Ref"| PocketID
+    %% DNS responses
+    K8sGW -.-> LocalUser
+    K8sGW -.-> TailscaleUser
 
-    %% DNS Automation
-    ExternalDNS -.->|"Watches HTTPRoutes<br/>Creates DNS Records"| K8sGateway
-    ExternalDNS -.->|"Optional: External DNS<br/>Provider (Cloudflare)"| CloudflareEdge
-    ExternalDNSUnifi -.->|"Manages UniFi<br/>DNS Records"| UniFi
+    %% Infrastructure to Gateways
+    Cloudflared --> ExtGW
+    LocalUser --> IntGW
+    TailscaleUser --> TSGW
 
-    %% Policy Application
-    ClientPolicy -.->|"Applied to"| ExtGateway
-    ClientPolicy -.->|"Applied to"| IntGateway
-    ClientPolicy -.->|"Applied to"| TSGateway
-    BackendPolicy -.->|"Applied to"| ExtGateway
-    BackendPolicy -.->|"Applied to"| IntGateway
-    BackendPolicy -.->|"Applied to"| TSGateway
+    %% Foundation to Gateways
+    Cilium -.-> ExtGW
+    Cilium -.-> IntGW
+    Cilium -.-> K8sGW
+    TailscaleOp -.-> TSGW
 
-    %% Infrastructure Dependencies
-    Cilium -.->|"Provides IP<br/>via IPAM"| ExtEnvoySvc
-    Cilium -.->|"Provides IP<br/>via IPAM"| IntEnvoySvc
-    Cilium -.->|"Provides IP<br/>via IPAM"| K8sGateway
+    %% Gateway to Auth
+    ExtGW --> OAuth2
+    OAuth2 --> PocketID
+    IntGW -.-> PocketID
 
-    CoreDNS -.->|"Cluster DNS<br/>Resolution"| K8sGateway
+    %% Gateway to Services
+    ExtGW --> ExternalOnly
+    IntGW --> InternalOnly
+    IntGW --> DualAccess
+    TSGW --> DualAccess
 
-    EnvoyController -.->|"Manages<br/>Lifecycle"| ExtGateway
-    EnvoyController -.->|"Manages<br/>Lifecycle"| IntGateway
-    EnvoyController -.->|"Manages<br/>Lifecycle"| TSGateway
+    %% DNS Management to External
+    ExtDNS --> CloudflareDNS
+    ExtDNSUnifi --> UniFiUDM
 
-    %% Styling (High Contrast)
-    classDef internet fill:#ffdddd,stroke:#cc0000,stroke-width:2px,color:#000
-    classDef tailscale fill:#ddddff,stroke:#0000cc,stroke-width:2px,color:#000
-    classDef local fill:#ddffdd,stroke:#00cc00,stroke-width:2px,color:#000
+    %% DNS watches
+    ExtDNS -.-> K8sGW
+    ExtDNSUnifi -.-> K8sGW
+
+    %% Styling
+    classDef users fill:#ffdddd,stroke:#cc0000,stroke-width:2px,color:#000
+    classDef entry fill:#ffe6cc,stroke:#ff8800,stroke-width:2px,color:#000
     classDef gateway fill:#ffe6cc,stroke:#ff8800,stroke-width:3px,color:#000
+    classDef auth fill:#d4f1d4,stroke:#00aa00,stroke-width:2px,color:#000
     classDef service fill:#e6e6ff,stroke:#6666cc,stroke-width:2px,color:#000
     classDef dns fill:#cce6ff,stroke:#0066cc,stroke-width:2px,color:#000
     classDef infra fill:#e6e6e6,stroke:#666666,stroke-width:2px,color:#000
+    classDef external fill:#fff4cc,stroke:#cc9900,stroke-width:2px,color:#000
+    classDef title fill:#ffffff,stroke:#ffffff,color:#000
 
-    class PublicUser,CloudflareEdge internet
-    class TailscaleUser,TailscaleMagicDNS tailscale
-    class LocalUser,Router local
-    class ExtGateway,IntGateway,TSGateway gateway
-    class InternalOnly,ExternalOnly,DualAccess,PocketID service
-    class K8sGateway,ExternalDNS,CoreDNS,ExternalDNSUnifi dns
-    class Cilium,EnvoyController,TailscaleOp,OAuth2Proxy,Cloudflared infra
+    class PublicUser,LocalUser,TailscaleUser users
+    class CloudflareEdge,LocalDNS,TailscaleDNS entry
+    class ExtGW,IntGW,TSGW gateway
+    class PocketID,OAuth2 auth
+    class ExternalOnly,InternalOnly,DualAccess service
+    class K8sGW,ExtDNS,ExtDNSUnifi dns
+    class Cilium,TailscaleOp,Cloudflared infra
+    class CloudflareDNS,UniFiUDM external
+    class TitleText title
 ```
 
 ---
