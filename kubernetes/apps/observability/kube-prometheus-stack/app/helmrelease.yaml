@@ -116,7 +116,7 @@ spec:
               resources:
                 requests:
                   storage: 75Gi
-    extraObjects:
+    extraManifests:
       - apiVersion: gateway.networking.k8s.io/v1
         kind: HTTPRoute
         metadata:
