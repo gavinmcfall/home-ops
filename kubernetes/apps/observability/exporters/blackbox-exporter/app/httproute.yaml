@@ -13,3 +13,7 @@ spec:
       namespace: network
       sectionName: https
   hostnames: ["blackbox-exporter.${SECRET_DOMAIN}"]
+  rules:
+    - backendRefs:
+        - name: blackbox-exporter
+          port: 9115
