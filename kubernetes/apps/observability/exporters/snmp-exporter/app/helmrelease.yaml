@@ -44,8 +44,9 @@ spec:
           - sh
           - -c
           - |
-            cp /etc/snmp-auth/auth.yml /config/auth.yml
-            cp /etc/snmp-modules/modules.yml /config/modules.yml
+            cat /etc/snmp-auth/auth.yml > /config/snmp.yml
+            echo "" >> /config/snmp.yml
+            cat /etc/snmp-modules/modules.yml >> /config/snmp.yml
         volumeMounts:
           - name: snmp-auth
             mountPath: /etc/snmp-auth
@@ -58,7 +59,7 @@ spec:
         emptyDir: {}
     extraVolumeMounts:
       - name: config
-        mountPath: /etc/snmp-exporter
+        mountPath: /etc/snmp_exporter
         readOnly: true
     serviceMonitor:
       enabled: true
