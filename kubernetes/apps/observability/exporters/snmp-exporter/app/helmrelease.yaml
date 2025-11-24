@@ -27,6 +27,9 @@ spec:
       namespace: observability
   values:
     fullnameOverride: *app
+    extraArgs:
+      - --config.file=/etc/snmp-auth/auth.yml
+      - --config.file=/etc/snmp-modules/modules.yml
     extraConfigmapMounts:
       - name: snmp-modules
         mountPath: /etc/snmp-modules
@@ -36,30 +39,6 @@ spec:
       - name: snmp-auth
         mountPath: /etc/snmp-auth
         secretName: snmp-exporter-secret
-        readOnly: true
-    extraInitContainers:
-      - name: setup-config
-        image: busybox:latest
-        command:
-          - sh
-          - -c
-          - |
-            cat /etc/snmp-auth/auth.yml > /config/snmp.yml
-            echo "" >> /config/snmp.yml
-            cat /etc/snmp-modules/modules.yml >> /config/snmp.yml
-        volumeMounts:
-          - name: snmp-auth
-            mountPath: /etc/snmp-auth
-          - name: snmp-modules
-            mountPath: /etc/snmp-modules
-          - name: config
-            mountPath: /config
-    extraVolumes:
-      - name: config
-        emptyDir: {}
-    extraVolumeMounts:
-      - name: config
-        mountPath: /etc/snmp_exporter
         readOnly: true
     serviceMonitor:
       enabled: true
