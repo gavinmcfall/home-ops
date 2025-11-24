@@ -1,9 +1,5 @@
 {
   "mcpServers": {
-    "repoql": {
-      "command": "/home/gavin/repoql",
-      "args": []
-    },
     "mermaid-validator": {
       "command": "npx",
       "args": [
@@ -27,6 +23,15 @@
       "env": {
         "ERASER_API_KEY": "${ERASER_API_KEY}"
       }
+    }
+  },
+  "servers": {
+    "repoql": {
+      "type": "stdio",
+      "command": "~/mcp/repoql",
+      "args": [
+        "mcp"
+      ]
     }
   }
 }
