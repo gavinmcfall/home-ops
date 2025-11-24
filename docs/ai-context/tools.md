@@ -17,11 +17,11 @@ ls / inventory directories → rg (find placeholders/patterns) → task/flux com
 ## 🔧 Tool Selection Matrix
 | Question | Tool | Why |
 |----------|------|-----|
-| “Where is this service defined?” | `rg --files -g"helmrelease.yaml" kubernetes/apps` | Lists all HelmReleases so you can pick the right area. |
-| “Which manifests reference `${SECRET_DOMAIN}`?” | `rg -n "\${SECRET_DOMAIN}" -g"*.yaml" kubernetes/apps` | Finds every ingress/secret placeholder. |
-| “What does Taskfile do for Kubernetes?” | Read `Taskfile.yaml` + `.taskfiles/Kubernetes.yaml` | Shows render/validation tasks, dependencies, env vars. |
-| “How does Flux see this change?” | `flux diff kustomization <namespace> --path kubernetes/apps/<namespace>` | Simulates Flux apply like RepoQL verification. |
-| “How do I prove a claim?” | Combine `rg`, `sed -n`, file paths | Evidence tables require explicit references (e.g., ROMM HelmRelease). |
+| "Where is this service defined?" | `rg --files -g"helmrelease.yaml" kubernetes/apps` | Lists all HelmReleases so you can pick the right area. |
+| "Which manifests reference `${SECRET_DOMAIN}`?" | `rg -n "\${SECRET_DOMAIN}" -g"*.yaml" kubernetes/apps` | Finds every ingress/secret placeholder. |
+| "What does Taskfile do for Kubernetes?" | Read `Taskfile.yaml` + `.taskfiles/Kubernetes.yaml` | Shows render/validation tasks, dependencies, env vars. |
+| "How does Flux see this change?" | `flux diff kustomization <namespace> --path kubernetes/apps/<namespace>` | Simulates Flux apply like RepoQL verification. |
+| "How do I prove a claim?" | Combine `rg`, `sed -n`, file paths | Evidence tables require explicit references (e.g., ROMM HelmRelease). |
 
 ---
 
@@ -42,7 +42,7 @@ task --list | head -n 40
 sed -n '1,200p' Taskfile.yaml
 ```
 
-Use these to build the same “map before reading” habit that RepoQL provides.
+Use these to build the same "map before reading" habit that RepoQL provides.
 
 ---
 
@@ -64,10 +64,10 @@ ROMM (`kubernetes/apps/games/romm/app/helmrelease.yaml`) is the canonical exampl
 ---
 
 ## 🧪 Verification Protocol
-1. **Find the claim** – e.g., “Taskfile orchestrates rendering.”
+1. **Find the claim** – e.g., "Taskfile orchestrates rendering."
 2. **Locate the evidence** – `rg -n "configure" Taskfile.yaml`, `sed -n '1,160p' .taskfiles/Kubernetes.yaml`.
 3. **Run the command when necessary** – `task configure` / `task kubernetes:kubeconform` / `flux diff kustomization games` to ensure manifests render.
-4. **Record it** – Add to the evidence table in the doc you’re editing.
+4. **Record it** – Add to the evidence table in the doc you're editing.
 
 Missing data? Document it in `QUESTIONS.md` instead of guessing.
 

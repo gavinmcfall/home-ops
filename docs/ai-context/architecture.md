@@ -4,7 +4,7 @@
 **Pattern**: GitOps + templated manifest pipeline. Taskfile and Makejinja render values (`Taskfile.yaml`, `.taskfiles/*`, `makejinja.toml`), Flux applies the results under `kubernetes/apps/*`, and Talos controls node configuration locally.
 **Chosen Because**: Keeps every change traceable in Git, avoids manual `kubectl`, and lets Flux automatically roll out updates.
 **Trade-off**: Bundle of placeholders means deployments fail until secrets (placeholders like `${SECRET_DOMAIN}`) are resolved, so authors must update documents before merges.
-**Not Because**: This is not a multi-tenant SaaS platform—it’s tuned for a single homelab operator.
+**Not Because**: This is not a multi-tenant SaaS platform—it's tuned for a single homelab operator.
 
 ## Key Decisions
 ### Decision 1: Taskfile-driven render pipeline
