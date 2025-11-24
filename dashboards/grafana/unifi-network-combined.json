@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Combined UniFi Network Overview using SNMP (switches/router) and UnPoller (APs/clients)",
+  "description": "Combined UniFi Network Overview using SNMP (detailed port stats) and UnPoller (all devices, APs, clients)",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -32,7 +32,7 @@
       },
       "id": 100,
       "panels": [],
-      "title": "Network Overview",
+      "title": "Network Overview - All Devices (UnPoller)",
       "type": "row"
     },
     {
@@ -60,7 +60,7 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
+        "w": 3,
         "x": 0,
         "y": 1
       },
@@ -85,11 +85,11 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "count(up{job=\"snmp-exporter\"} == 1) + count(up{job=\"unpoller\"} == 1)",
+          "expr": "count(unpoller_device_info)",
           "refId": "A"
         }
       ],
-      "title": "Devices Online",
+      "title": "Total Devices",
       "type": "stat"
     },
     {
@@ -107,12 +107,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
-                "value": null
-              },
-              {
                 "color": "green",
-                "value": 1
+                "value": null
               }
             ]
           }
@@ -121,13 +117,13 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 4,
+        "w": 3,
+        "x": 3,
         "y": 1
       },
       "id": 2,
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -146,12 +142,11 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "up{job=\"snmp-exporter\",instance=\"10.90.254.1\"}",
-          "legendFormat": "UDM Pro",
+          "expr": "count(unpoller_device_info{type=\"uap\"})",
           "refId": "A"
         }
       ],
-      "title": "UDM Pro Status",
+      "title": "Access Points",
       "type": "stat"
     },
     {
@@ -169,12 +164,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
-                "value": null
-              },
-              {
                 "color": "green",
-                "value": 1
+                "value": null
               }
             ]
           }
@@ -183,13 +174,13 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 8,
+        "w": 3,
+        "x": 6,
         "y": 1
       },
       "id": 3,
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -208,12 +199,11 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "up{job=\"snmp-exporter\",instance=\"10.90.100.219\"}",
-          "legendFormat": "Main Switch",
+          "expr": "count(unpoller_device_info{type=\"usw\"})",
           "refId": "A"
         }
       ],
-      "title": "Main Switch (US48) Status",
+      "title": "Switches",
       "type": "stat"
     },
     {
@@ -231,12 +221,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
-                "value": null
-              },
-              {
                 "color": "green",
-                "value": 1
+                "value": null
               }
             ]
           }
@@ -245,13 +231,13 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 12,
+        "w": 3,
+        "x": 9,
         "y": 1
       },
       "id": 4,
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -270,12 +256,11 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "up{job=\"snmp-exporter\",instance=\"10.90.100.191\"}",
-          "legendFormat": "PoE Switch",
+          "expr": "sum(unpoller_device_radio_stations)",
           "refId": "A"
         }
       ],
-      "title": "PoE Switch (US24) Status",
+      "title": "Connected Clients",
       "type": "stat"
     },
     {
@@ -317,23 +302,22 @@
                 "value": 1
               }
             ]
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
       "gridPos": {
         "h": 4,
-        "w": 8,
-        "x": 16,
+        "w": 12,
+        "x": 12,
         "y": 1
       },
       "id": 5,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
-        "orientation": "auto",
+        "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -349,12 +333,13 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "count(up{job=\"unpoller\"} == 1)",
-          "legendFormat": "UnPoller Status",
+          "expr": "unpoller_device_info",
+          "format": "time_series",
+          "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
-      "title": "UniFi Controller Connection",
+      "title": "Device Status",
       "type": "stat"
     },
     {
@@ -367,7 +352,202 @@
       },
       "id": 101,
       "panels": [],
-      "title": "Network Traffic (SNMP)",
+      "title": "Access Points (UnPoller)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "unpoller_device_radio_channel_utilization_total_ratio{type=\"uap\"} * 100",
+          "legendFormat": "{{name}} - {{radio}}",
+          "refId": "A"
+        }
+      ],
+      "title": "AP Channel Utilization",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "unpoller_device_radio_stations{type=\"uap\"}",
+          "legendFormat": "{{name}} - {{radio}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Connected Clients per AP Radio",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 102,
+      "panels": [],
+      "title": "Network Traffic - SNMP (Detailed Port Stats)",
       "type": "row"
     },
     {
@@ -441,9 +621,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 6
+        "y": 14
       },
-      "id": 10,
+      "id": 20,
       "options": {
         "legend": {
           "calcs": [
@@ -479,7 +659,7 @@
           "refId": "B"
         }
       ],
-      "title": "UDM Pro - Interface Traffic",
+      "title": "UDM Pro - Interface Traffic (SNMP)",
       "type": "timeseries"
     },
     {
@@ -540,9 +720,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 6
+        "y": 14
       },
-      "id": 11,
+      "id": 21,
       "options": {
         "legend": {
           "calcs": [
@@ -569,7 +749,7 @@
           "refId": "A"
         }
       ],
-      "title": "Main Switch (US48) - Top 10 Ports by Traffic",
+      "title": "Main Switch (US48) - Top 10 Ports (SNMP)",
       "type": "timeseries"
     },
     {
@@ -630,9 +810,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 14
+        "y": 22
       },
-      "id": 12,
+      "id": 22,
       "options": {
         "legend": {
           "calcs": [
@@ -659,7 +839,7 @@
           "refId": "A"
         }
       ],
-      "title": "PoE Switch (US24) - Top 10 Ports by Traffic",
+      "title": "PoE Switch (US24) - Top 10 Ports (SNMP)",
       "type": "timeseries"
     },
     {
@@ -727,9 +907,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 14
+        "y": 22
       },
-      "id": 13,
+      "id": 23,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -740,7 +920,13 @@
           ],
           "show": false
         },
-        "showHeader": true
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Device"
+          }
+        ]
       },
       "targets": [
         {
@@ -754,7 +940,7 @@
           "refId": "A"
         }
       ],
-      "title": "Interface Status Summary",
+      "title": "Interface Status (SNMP)",
       "transformations": [
         {
           "id": "organize",
@@ -787,11 +973,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 30
       },
-      "id": 102,
+      "id": 103,
       "panels": [],
-      "title": "Interface Errors & Discards (SNMP)",
+      "title": "Device Health (UnPoller)",
       "type": "row"
     },
     {
@@ -835,30 +1021,37 @@
             }
           },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           },
-          "unit": "short"
+          "unit": "percent"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 7,
         "w": 12,
         "x": 0,
-        "y": 23
+        "y": 31
       },
-      "id": 20,
+      "id": 30,
       "options": {
         "legend": {
           "calcs": [
-            "sum"
+            "mean",
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -866,7 +1059,7 @@
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "desc"
+          "sort": "none"
         }
       },
       "targets": [
@@ -875,21 +1068,12 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(ifInErrors{job=\"snmp-exporter\"}[5m]) > 0",
-          "legendFormat": "{{instance}} - {{ifName}} In Errors",
+          "expr": "unpoller_device_cpu_utilization_ratio * 100",
+          "legendFormat": "{{name}}",
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "rate(ifOutErrors{job=\"snmp-exporter\"}[5m]) > 0",
-          "legendFormat": "{{instance}} - {{ifName}} Out Errors",
-          "refId": "B"
         }
       ],
-      "title": "Interface Errors",
+      "title": "CPU Utilization",
       "type": "timeseries"
     },
     {
@@ -933,30 +1117,37 @@
             }
           },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           },
-          "unit": "short"
+          "unit": "percent"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 7,
         "w": 12,
         "x": 12,
-        "y": 23
+        "y": 31
       },
-      "id": 21,
+      "id": 31,
       "options": {
         "legend": {
           "calcs": [
-            "sum"
+            "mean",
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -964,7 +1155,7 @@
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "desc"
+          "sort": "none"
         }
       },
       "targets": [
@@ -973,21 +1164,12 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(ifInDiscards{job=\"snmp-exporter\"}[5m]) > 0",
-          "legendFormat": "{{instance}} - {{ifName}} In Discards",
+          "expr": "unpoller_device_memory_utilization_ratio * 100",
+          "legendFormat": "{{name}}",
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "rate(ifOutDiscards{job=\"snmp-exporter\"}[5m]) > 0",
-          "legendFormat": "{{instance}} - {{ifName}} Out Discards",
-          "refId": "B"
         }
       ],
-      "title": "Interface Discards",
+      "title": "Memory Utilization",
       "type": "timeseries"
     }
   ],
@@ -997,7 +1179,8 @@
   "tags": [
     "network",
     "unifi",
-    "snmp"
+    "snmp",
+    "unpoller"
   ],
   "templating": {
     "list": []
@@ -1010,6 +1193,6 @@
   "timezone": "",
   "title": "UniFi Network - Combined Overview",
   "uid": "unifi-network-combined",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
