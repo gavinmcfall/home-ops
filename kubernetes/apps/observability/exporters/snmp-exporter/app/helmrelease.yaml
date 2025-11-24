@@ -42,8 +42,16 @@ spec:
       params:
         - name: udm-pro
           auth: ["unifi_v3"]
-          module: ["if_mib"]  # Use built-in if_mib module for standard network interface stats
-          target: ${SECRET_UNIFI_IP}
+          module: ["if_mib"]
+          target: ["10.90.254.1"]  # Dream Machine Pro
+        - name: main-switch
+          auth: ["unifi_v3"]
+          module: ["if_mib"]
+          target: ["10.90.100.219"]  # US48 Main Switch
+        - name: main-poe-switch
+          auth: ["unifi_v3"]
+          module: ["if_mib"]
+          target: ["10.90.100.191"]  # US 24 PoE 250W
       path: /snmp
       scrapeTimeout: 10s
       relabelings:
