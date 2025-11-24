@@ -69,30 +69,15 @@ graph TB
         end
 
         subgraph AppNamespaces["Application Namespaces"]
-            subgraph ObservabilityNS["observability"]
-                Grafana["Grafana Service<br/>Port 80"]
-                GrafanaRoute["HTTPRoute: grafana<br/>Parents: internal, tailscale<br/>Host: grafana.domain.com"]
+            subgraph RoutingPatterns["Service Routing Patterns"]
+                InternalOnly["Internal-Only Services<br/>(HTTPRoute: parent=internal)<br/>Examples: TrueNAS, UniFi, etc."]
+                ExternalOnly["External-Only Services<br/>(HTTPRoute: parent=external)<br/>Public-facing apps via Cloudflare"]
+                DualAccess["Internal + Tailscale Services<br/>(HTTPRoute: parents=internal,tailscale)<br/>Examples: Grafana, Paperless, Homepage<br/>Accessible from LAN & VPN"]
             end
 
-            subgraph HomeNS["home"]
-                Paperless["Paperless Service<br/>Port 8000"]
-                PaperlessRoute["HTTPRoute: paperless<br/>Parents: internal, tailscale<br/>Host: paperless.domain.com"]
-                Homepage["Homepage Service<br/>Port 3000"]
-                HomepageRoute["HTTPRoute: homepage<br/>Parents: internal, tailscale<br/>Host: homepage.domain.com"]
-                Filebrowser["Filebrowser Service"]
-                FilebrowserRoute["HTTPRoute: filebrowser<br/>Parents: internal, tailscale"]
-            end
-
-            subgraph HomeAutoNS["home-automation"]
-                Teslamate["Teslamate Service"]
-                TeslamateRoute["HTTPRoute: teslamate<br/>Parents: internal, tailscale"]
-            end
-
-            subgraph ExternalSvc["External Services<br/>(Non-K8s Resources)"]
-                TrueNAS["TrueNAS<br/>External Endpoint"]
-                TrueNASRoute["HTTPRoute: truenas<br/>Parent: internal"]
-                UniFi["UniFi Controller<br/>External Endpoint"]
-                UniFiRoute["HTTPRoute: unifi<br/>Parent: internal"]
+            subgraph AuthNS["Authentication"]
+                PocketID["PocketID Service<br/>(OIDC Provider)"]
+                PocketIDRoute["HTTPRoute: pocket-id<br/>Parents: internal, tailscale"]
             end
         end
     end
@@ -125,32 +110,17 @@ graph TB
     TSEnvoySvc --> TSEnvoyProxy
     TSEnvoyProxy -->|"HTTPRoute Matching"| TSGateway
 
-    %% HTTPRoute to Services
-    IntGateway -->|"Routes Traffic"| GrafanaRoute
-    TSGateway -->|"Routes Traffic"| GrafanaRoute
-    GrafanaRoute -->|"Backend Ref"| Grafana
+    %% HTTPRoute to Services by Pattern
+    ExtGateway -->|"Routes Traffic"| ExternalOnly
 
-    IntGateway --> PaperlessRoute
-    TSGateway --> PaperlessRoute
-    PaperlessRoute --> Paperless
+    IntGateway -->|"Routes Traffic"| InternalOnly
+    IntGateway -->|"Routes Traffic"| DualAccess
 
-    IntGateway --> HomepageRoute
-    TSGateway --> HomepageRoute
-    HomepageRoute --> Homepage
+    TSGateway -->|"Routes Traffic"| DualAccess
 
-    IntGateway --> FilebrowserRoute
-    TSGateway --> FilebrowserRoute
-    FilebrowserRoute --> Filebrowser
-
-    IntGateway --> TeslamateRoute
-    TSGateway --> TeslamateRoute
-    TeslamateRoute --> Teslamate
-
-    IntGateway --> TrueNASRoute
-    TrueNASRoute -->|"Backend<br/>External IP"| TrueNAS
-
-    IntGateway --> UniFiRoute
-    UniFiRoute -->|"Backend<br/>External IP"| UniFi
+    IntGateway -->|"Routes Traffic"| PocketIDRoute
+    TSGateway -->|"Routes Traffic"| PocketIDRoute
+    PocketIDRoute -->|"Backend Ref"| PocketID
 
     %% DNS Automation
     ExternalDNS -.->|"Watches HTTPRoutes<br/>Creates DNS Records"| K8sGateway
@@ -189,7 +159,7 @@ graph TB
     class TailscaleUser,TailscaleMagicDNS tailscale
     class LocalUser,Router local
     class ExtGateway,IntGateway,TSGateway gateway
-    class Grafana,Paperless,Homepage,Filebrowser,Teslamate,TrueNAS,UniFi service
+    class InternalOnly,ExternalOnly,DualAccess,PocketID service
     class K8sGateway,ExternalDNS,CoreDNS,ExternalDNSUnifi dns
     class Cilium,EnvoyController,TailscaleOp,OAuth2Proxy,Cloudflared infra
 ```
