@@ -27,10 +27,11 @@ spec:
       namespace: observability
   values:
     fullnameOverride: *app
-    # Use chart's built-in snmp.yml which includes if_mib module
-    # Only need to add our custom auth
+    # Load both default modules config and our custom auth
+    # v0.29 supports multiple --config.file arguments
     extraArgs:
-      - --config.file=/etc/snmp-auth/auth.yml
+      - --config.file=/etc/snmp_exporter/snmp.yml  # Default modules from chart
+      - --config.file=/etc/snmp-auth/auth.yml       # Our custom auth
     extraSecretMounts:
       - name: snmp-auth
         mountPath: /etc/snmp-auth
