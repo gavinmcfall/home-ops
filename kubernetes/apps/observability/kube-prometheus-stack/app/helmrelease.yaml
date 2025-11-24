@@ -194,9 +194,9 @@ spec:
         - pods=[*]
         - deployments=[*]
         - persistentvolumeclaims=[*]
-      collectors: []
-      extraArgs:
-        - --custom-resource-state-only=true
+      collectors:
+        - pods
+        - deployments
       rbac:
         extraRules:
           - apiGroups:
