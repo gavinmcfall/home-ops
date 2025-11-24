@@ -17,10 +17,6 @@ The following files contain comprehensive context about this repository. They ar
 
 MCP servers are configured in the root `.mcp.json` file (shared across VS Code and Claude Code).
 
-When using the Flux MCP server for troubleshooting:
-
-@docs/ai-context/flux-mcp.md
-
 ## Quick Reference
 
 - **Core Pattern**: GitOps + templated manifests via Taskfile and Makejinja
