@@ -12,7 +12,6 @@ All AI assistant context is centralized in **[`docs/ai-context/`](docs/ai-contex
 - [workflows.md](docs/ai-context/workflows.md) - Operational workflows and procedures
 - [tools.md](docs/ai-context/tools.md) - Tool usage patterns and discovery commands
 - [conventions.md](docs/ai-context/conventions.md) - Coding standards and project guidelines
-- [flux-mcp.md](docs/ai-context/flux-mcp.md) - Flux MCP server guidelines and troubleshooting
 
 This centralized approach provides:
 - ✅ Single source of truth for all AI tools
@@ -113,8 +112,7 @@ This is a Kubernetes homelab managed using:
 │       ├── domain.md
 │       ├── workflows.md
 │       ├── tools.md
-│       ├── conventions.md
-│       └── flux-mcp.md
+│       └── conventions.md
 │
 ├── .claude/
 │   └── CLAUDE.md                # Imports from docs/ai-context/

@@ -11,7 +11,6 @@ This directory contains the single source of truth for AI assistant context acro
 - [workflows.md](workflows.md) - Operational workflows and procedures
 - [tools.md](tools.md) - Tool usage patterns and discovery commands
 - [conventions.md](conventions.md) - Coding standards and project guidelines
-- [flux-mcp.md](flux-mcp.md) - Flux MCP server guidelines and troubleshooting
 
 ## Purpose
 
@@ -46,4 +45,3 @@ This follows a living documentation pattern:
 - **Workflows** - How to perform common operations
 - **Tools** - Which commands to use for discovery and validation
 - **Conventions** - Coding and project standards to follow
-- **Flux MCP** - Specific guidance for Flux troubleshooting

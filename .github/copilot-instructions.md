@@ -14,7 +14,6 @@ description: Instructions for GitHub Copilot when working with this homelab repo
 - [docs/ai-context/workflows.md](../docs/ai-context/workflows.md) - Operational workflows
 - [docs/ai-context/tools.md](../docs/ai-context/tools.md) - Discovery and validation commands
 - [docs/ai-context/conventions.md](../docs/ai-context/conventions.md) - Coding standards
-- [docs/ai-context/flux-mcp.md](../docs/ai-context/flux-mcp.md) - Flux MCP troubleshooting guide
 
 Please reference these files for complete context about the repository structure, workflows, and conventions.
 
@@ -164,17 +163,3 @@ Before merging any PR:
 - Review: `task configure` output
 
 **For detailed troubleshooting guides, see [docs/ai-context/](../docs/ai-context/).**
-
----
-
-## Flux MCP Server
-
-When using the Flux MCP server for troubleshooting, follow the guidelines in [docs/ai-context/flux-mcp.md](../docs/ai-context/flux-mcp.md).
-
-Key Flux resources:
-- **GitRepository/OCIRepository** - Source definitions
-- **Kustomization** - Builds and applies manifests
-- **HelmRelease** - Manages Helm charts
-- **HelmRepository/HelmChart** - Helm sources
-
-Always check resource status, events, and logs when troubleshooting.
