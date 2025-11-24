@@ -62,6 +62,8 @@ spec:
         readOnly: true
     serviceMonitor:
       enabled: true
+      auth: []  # Disable default auth - using module-level auth in v0.29
+      module: []  # Disable default module - using params instead
       params:
         - name: udm-pro
           module: ["unifi"]
