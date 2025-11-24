@@ -74,28 +74,28 @@ data:
             type: gauge
         - name: unifiRadioName
           oid: 1.3.6.1.4.1.41112.1.6.1.1.1.2
-          type: DisplayString
+        type: DisplayString
           help: ' - 1.3.6.1.4.1.41112.1.6.1.1.1.2'
           indexes:
           - labelname: unifiRadioIndex
             type: gauge
         - name: unifiRadioRadio
           oid: 1.3.6.1.4.1.41112.1.6.1.1.1.3
-          type: DisplayString
+        type: DisplayString
           help: ' - 1.3.6.1.4.1.41112.1.6.1.1.1.3'
           indexes:
           - labelname: unifiRadioIndex
             type: gauge
         - name: unifiRadioRxPackets
           oid: 1.3.6.1.4.1.41112.1.6.1.1.1.4
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.1.1.4'
           indexes:
           - labelname: unifiRadioIndex
             type: gauge
         - name: unifiRadioTxPackets
           oid: 1.3.6.1.4.1.41112.1.6.1.1.1.5
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.1.1.5'
           indexes:
           - labelname: unifiRadioIndex
@@ -137,7 +137,7 @@ data:
             type: gauge
         - name: unifiVapBssId
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.2
-          type: PhysAddress48
+        type: PhysAddress48
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.2'
           indexes:
           - labelname: unifiVapIndex
@@ -165,14 +165,14 @@ data:
             type: gauge
         - name: unifiVapEssId
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.6
-          type: DisplayString
+        type: DisplayString
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.6'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapName
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.7
-          type: DisplayString
+        type: DisplayString
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.7'
           indexes:
           - labelname: unifiVapIndex
@@ -186,84 +186,84 @@ data:
             type: gauge
         - name: unifiVapRadio
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.9
-          type: DisplayString
+        type: DisplayString
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.9'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapRxBytes
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.10
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.10'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapRxCrypts
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.11
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.11'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapRxDropped
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.12
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.12'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapRxErrors
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.13
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.13'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapRxFrags
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.14
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.14'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapRxPackets
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.15
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.15'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapTxBytes
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.16
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.16'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapTxDropped
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.17
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.17'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapTxErrors
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.18
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.18'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapTxPackets
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.19
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.19'
           indexes:
           - labelname: unifiVapIndex
             type: gauge
         - name: unifiVapTxRetries
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.20
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.20'
           indexes:
           - labelname: unifiVapIndex
@@ -284,7 +284,7 @@ data:
             type: gauge
         - name: unifiVapUsage
           oid: 1.3.6.1.4.1.41112.1.6.1.2.1.23
-          type: DisplayString
+        type: DisplayString
           help: ' - 1.3.6.1.4.1.41112.1.6.1.2.1.23'
           indexes:
           - labelname: unifiVapIndex
@@ -305,56 +305,56 @@ data:
             type: gauge
         - name: unifiIfIp
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.3
-          type: InetAddressIPv4
+        type: InetAddressIPv4
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.3'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfMac
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.4
-          type: PhysAddress48
+        type: PhysAddress48
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.4'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfName
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.5
-          type: DisplayString
+        type: DisplayString
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.5'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfRxBytes
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.6
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.6'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfRxDropped
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.7
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.7'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfRxError
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.8
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.8'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfRxMulticast
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.9
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.9'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfRxPackets
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.10
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.10'
           indexes:
           - labelname: unifiIfIndex
@@ -368,28 +368,28 @@ data:
             type: gauge
         - name: unifiIfTxBytes
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.12
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.12'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfTxDropped
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.13
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.13'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfTxError
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.14
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.14'
           indexes:
           - labelname: unifiIfIndex
             type: gauge
         - name: unifiIfTxPackets
           oid: 1.3.6.1.4.1.41112.1.6.2.1.1.15
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.2.1.1.15'
           indexes:
           - labelname: unifiIfIndex
@@ -403,21 +403,21 @@ data:
             type: gauge
         - name: unifiApSystemModel
           oid: 1.3.6.1.4.1.41112.1.6.3.1
-          type: DisplayString
+        type: DisplayString
           help: ' - 1.3.6.1.4.1.41112.1.6.3.1'
         - name: unifiApSystemVersion
           oid: 1.3.6.1.4.1.41112.1.6.3.2
-          type: DisplayString
+        type: DisplayString
           help: ' - 1.3.6.1.4.1.41112.1.6.3.2'
         - name: unifiApSystemUptime
           oid: 1.3.6.1.4.1.41112.1.6.3.3
-          type: counter
+        type: counter
           help: ' - 1.3.6.1.4.1.41112.1.6.3.3'
         - name: unifiApSystemIp
           oid: 1.3.6.1.4.1.41112.1.6.3.5
-          type: InetAddressIPv4
+        type: InetAddressIPv4
           help: ' - 1.3.6.1.4.1.41112.1.6.3.5'
         - name: unifiApSystemMac
           oid: 1.3.6.1.4.1.41112.1.6.3.6
-          type: PhysAddress48
+        type: PhysAddress48
           help: ' - 1.3.6.1.4.1.41112.1.6.3.6'
