@@ -11,15 +11,15 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # Ingress controller
+    # Envoy Gateway
     - from:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: network
           podSelector:
             matchLabels:
-              app.kubernetes.io/name: ingress-nginx
-              app.kubernetes.io/instance: nginx-internal
+              app.kubernetes.io/name: envoy
+              gateway.envoyproxy.io/owning-gateway-namespace: network
       ports:
         - port: &port 8080
           protocol: TCP

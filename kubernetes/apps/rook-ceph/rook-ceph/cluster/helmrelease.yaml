@@ -26,9 +26,6 @@ spec:
     monitoring:
       enabled: true
       createPrometheusRules: true
-    ingress:
-      dashboard:
-        enabled: false
     toolbox:
       enabled: true
     configOverride: |

@@ -35,8 +35,6 @@ spec:
       enabled: false
     cleanPrometheusOperatorObjectNames: true
     alertmanager:
-      ingress:
-        enabled: false
       alertmanagerSpec:
         useExistingSecret: true
         configSecret: alertmanager-secret
@@ -85,8 +83,6 @@ spec:
     kubeProxy:
       enabled: false
     prometheus:
-      ingress:
-        enabled: false
       thanosService:
         enabled: false
       thanosServiceMonitor:
