@@ -10,143 +10,16 @@
 
 **Network Flow: Users → Entry Points → Infrastructure → Authentication → Services**
 
-```mermaid
-graph TB
-    subgraph Title[" "]
-        TitleText["<b>Network Architecture: Three-Gateway Pattern</b><br/>Users → Entry Points → Gateways → Authentication → Services"]
-    end
+![Network Architecture Diagram](eraser.png)
 
-    subgraph Col1["Column 1: Users & Entry"]
-        subgraph Users["👥 Users"]
-            direction TB
-            PublicUser["Public User"]
-            LocalUser["Local User LAN"]
-            TailscaleUser["Remote User VPN"]
-        end
+*Rendered with [Eraser.io](https://eraser.io) | [View Mermaid Source](NETWORK_DIAGRAM_V2.md)*
 
-        subgraph Entry["🌐 Entry Points"]
-            direction TB
-            CloudflareEdge["Cloudflare Edge<br/>CDN + Proxy"]
-            LocalDNS["Local DNS Query"]
-            TailscaleDNS["Tailscale MagicDNS"]
-        end
-    end
+---
 
-    subgraph Col2["Column 2: Infrastructure"]
-        subgraph Ingress["Ingress"]
-            direction TB
-            Cloudflared["Cloudflared<br/>QUIC Tunnel"]
-        end
+## Alternative Renderings
 
-        subgraph DNS["DNS Services"]
-            direction TB
-            K8sGW["k8s-gateway<br/>10.90.3.200"]
-            ExtDNS["external-dns<br/>Cloudflare"]
-            ExtDNSUnifi["external-dns-unifi<br/>UniFi"]
-        end
-
-        subgraph Foundation["Foundation"]
-            direction TB
-            Cilium["Cilium IPAM<br/>10.90.3.200-210"]
-            TailscaleOp["Tailscale Operator"]
-        end
-    end
-
-    subgraph Col3["Column 3: Gateways"]
-        subgraph Gateways["Gateway Layer Envoy"]
-            direction TB
-            ExtGW["External Gateway<br/>envoy-external<br/>10.90.3.201"]
-            IntGW["Internal Gateway<br/>envoy-internal<br/>10.90.3.202"]
-            TSGW["Tailscale Gateway<br/>envoy-tailscale<br/>*.ts.net"]
-        end
-    end
-
-    subgraph Col4["Column 4: Auth & Services"]
-        subgraph Auth["Authentication"]
-            direction TB
-            OAuth2["OAuth2-Proxy<br/>/oauth2"]
-            PocketID["PocketID<br/>OIDC Provider"]
-        end
-
-        subgraph Services["🎯 Services"]
-            direction TB
-            ExternalOnly["External-Only<br/>via Cloudflare"]
-            InternalOnly["Internal-Only<br/>LAN"]
-            DualAccess["Dual Access<br/>Internal+Tailscale"]
-        end
-    end
-
-    subgraph ExternalSys["🌍 External Systems"]
-        direction TB
-        CloudflareDNS["Cloudflare DNS<br/>Public Records"]
-        UniFiUDM["UniFi UDM-Pro<br/>10.90.254.1"]
-    end
-
-    %% User to Entry
-    PublicUser --> CloudflareEdge
-    LocalUser --> LocalDNS
-    TailscaleUser --> TailscaleDNS
-
-    %% Entry to Infrastructure
-    CloudflareEdge --> Cloudflared
-    LocalDNS --> K8sGW
-    TailscaleDNS --> K8sGW
-
-    %% DNS responses
-    K8sGW -.-> LocalUser
-    K8sGW -.-> TailscaleUser
-
-    %% Infrastructure to Gateways
-    Cloudflared --> ExtGW
-    LocalUser --> IntGW
-    TailscaleUser --> TSGW
-
-    %% Foundation to Gateways
-    Cilium -.-> ExtGW
-    Cilium -.-> IntGW
-    Cilium -.-> K8sGW
-    TailscaleOp -.-> TSGW
-
-    %% Gateway to Auth
-    ExtGW --> OAuth2
-    OAuth2 --> PocketID
-    IntGW -.-> PocketID
-
-    %% Gateway to Services
-    ExtGW --> ExternalOnly
-    IntGW --> InternalOnly
-    IntGW --> DualAccess
-    TSGW --> DualAccess
-
-    %% DNS Management to External
-    ExtDNS --> CloudflareDNS
-    ExtDNSUnifi --> UniFiUDM
-
-    %% DNS watches
-    ExtDNS -.-> K8sGW
-    ExtDNSUnifi -.-> K8sGW
-
-    %% Styling
-    classDef users fill:#ffdddd,stroke:#cc0000,stroke-width:2px,color:#000
-    classDef entry fill:#ffe6cc,stroke:#ff8800,stroke-width:2px,color:#000
-    classDef gateway fill:#ffe6cc,stroke:#ff8800,stroke-width:3px,color:#000
-    classDef auth fill:#d4f1d4,stroke:#00aa00,stroke-width:2px,color:#000
-    classDef service fill:#e6e6ff,stroke:#6666cc,stroke-width:2px,color:#000
-    classDef dns fill:#cce6ff,stroke:#0066cc,stroke-width:2px,color:#000
-    classDef infra fill:#e6e6e6,stroke:#666666,stroke-width:2px,color:#000
-    classDef external fill:#fff4cc,stroke:#cc9900,stroke-width:2px,color:#000
-    classDef title fill:#ffffff,stroke:#ffffff,color:#000
-
-    class PublicUser,LocalUser,TailscaleUser users
-    class CloudflareEdge,LocalDNS,TailscaleDNS entry
-    class ExtGW,IntGW,TSGW gateway
-    class PocketID,OAuth2 auth
-    class ExternalOnly,InternalOnly,DualAccess service
-    class K8sGW,ExtDNS,ExtDNSUnifi dns
-    class Cilium,TailscaleOp,Cloudflared infra
-    class CloudflareDNS,UniFiUDM external
-    class TitleText title
-```
+For the full interactive Mermaid diagram with color-coded components, see:
+- **[Mermaid Source Code](NETWORK_DIAGRAM_V2.md)** - View on GitHub or copy to [Eraser.io](https://app.eraser.io/) for best results
 
 ---
 
@@ -605,5 +478,3 @@ kubectl logs -n network -l app.kubernetes.io/name=tailscale-operator
 
 ---
 
-**Maintained By:** Claude Code (AI Assistant)
-**Review Schedule:** Update when networking changes occur
