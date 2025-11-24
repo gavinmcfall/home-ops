@@ -3,6 +3,30 @@
     "repoql": {
       "command": "/home/gavin/repoql",
       "args": []
+    },
+    "mermaid-validator": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@rtuin/mcp-mermaid-validator@latest"
+      ]
+    },
+    "plantuml": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@infobip/plantuml-mcp-server"
+      ]
+    },
+    "eraser": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "eraser-io-mcp-server"
+      ],
+      "env": {
+        "ERASER_API_KEY": "${ERASER_API_KEY}"
+      }
     }
   }
 }
