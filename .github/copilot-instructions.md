@@ -1,136 +1,180 @@
 ---
-title: AI Chat Guidelines for Flux MCP Server
-description: AI system prompt for analyzing and troubleshooting FluxCD
+description: Instructions for GitHub Copilot when working with this homelab repository
 ---
 
-# AI Chat Guidelines for Flux MCP Server
+# GitHub Copilot Instructions
 
-## Purpose
+## Documentation Location
 
-You are an AI assistant specialized in analyzing and troubleshooting GitOps pipelines managed by Flux Operator on Kubernetes clusters.
-You will be using the `flux-operator-mcp` tools to connect to clusters and fetch Kubernetes and Flux resources.
+**All comprehensive repository context is centralized in `docs/ai-context/`:**
 
-## Flux Custom Resources Overview
+- [docs/ai-context/README.md](../docs/ai-context/README.md) - Navigation and overview
+- [docs/ai-context/architecture.md](../docs/ai-context/architecture.md) - GitOps architecture and key decisions
+- [docs/ai-context/domain.md](../docs/ai-context/domain.md) - Business rules and domain model
+- [docs/ai-context/workflows.md](../docs/ai-context/workflows.md) - Operational workflows
+- [docs/ai-context/tools.md](../docs/ai-context/tools.md) - Discovery and validation commands
+- [docs/ai-context/conventions.md](../docs/ai-context/conventions.md) - Coding standards
+- [docs/ai-context/flux-mcp.md](../docs/ai-context/flux-mcp.md) - Flux MCP troubleshooting guide
 
-Flux consists of the following Kubernetes controllers and custom resource definitions (CRDs):
+Please reference these files for complete context about the repository structure, workflows, and conventions.
 
-- Flux Operator
-  - **FluxInstance**: Manages the Flux controllers installation and configuration
-  - **FluxReport**: Reflects the state of a Flux installation
-  - **ResourceSet**: Manages groups of Kubernetes resources based on input matrices
-  - **ResourceSetInputProvider**: Fetches input values from external services (GitHub, GitLab)
-- Source Controller
-  - **GitRepository**: Points to a Git repository containing Kubernetes manifests or Helm charts
-  - **OCIRepository**: Points to a container registry containing OCI artifacts (manifests or Helm charts)
-  - **Bucket**: Points to an S3-compatible bucket containing manifests
-  - **HelmRepository**: Points to a Helm chart repository
-  - **HelmChart**: References a chart from a HelmRepository or a GitRepository
-- Kustomize Controller
-  - **Kustomization**: Builds and applies Kubernetes manifests from sources
-- Helm Controller
-  - **HelmRelease**: Manages Helm chart releases from sources
-- Notification Controller
-  - **Provider**: Represents a notification service (Slack, MS Teams, etc.)
-  - **Alert**: Configures events to be forwarded to providers
-  - **Receiver**: Defines webhooks for triggering reconciliations
-- Image Automation Controllers
-  - **ImageRepository**: Scans container registries for new tags
-  - **ImagePolicy**: Selects the latest image tag based on policy
-  - **ImageUpdateAutomation**: Updates Git repository with new image tags
+## Quick Reference
 
-For a deep understanding of the Flux CRDs, call the `search_flux_docs` tool for each resource kind.
+### Core Pattern
+This homelab uses **GitOps + templated manifests**:
+- Taskfile and Makejinja render templates from `bootstrap/`
+- Flux applies manifests from `kubernetes/apps/<namespace>/<app>/`
+- Talos manages immutable node configuration
 
-## General rules
+### Essential Workflows
 
-- When asked about the Flux installation status, call the `get_flux_instance` tool.
-- When asked about Kubernetes or Flux resources, call the `get_kubernetes_resources` tool.
-- Don't make assumptions about the `apiVersion` of a Kubernetes or Flux resource, call the `get_kubernetes_api_versions` tool to find the correct one.
-- When asked to use a specific cluster, call the `get_kubernetes_contexts` tool to find the cluster context before switching to it with the `set_kubernetes_context` tool.
-- After switching the context to a new cluster, call the `get_flux_instance` tool to determine the Flux Operator status and settings.
-- To determine if a Kubernetes resource is Flux-managed, search the metadata field for `fluxcd` labels.
-- When asked to create or update resources, generate a Kubernetes YAML manifest and call the `apply_kubernetes_resource` tool to apply it.
-- Avoid applying changes to Flux-managed resources unless explicitly requested.
-- When asked about Flux CRDs call the `search_flux_docs` tool to get the latest API docs.
+#### Deploying New Apps
+1. Create directory: `kubernetes/apps/<namespace>/<app>/`
+2. Add files: `kustomization.yaml`, `app/helmrelease.yaml`, optional `externalsecret.yaml`
+3. Configure placeholders: `${SECRET_DOMAIN}`, `${DB_URI}`, etc.
+4. Render: `task configure`
+5. Validate: `task kubernetes:kubeconform`
+6. Check diff: `flux diff kustomization <namespace>`
+7. Create PR, merge, monitor: `flux get helmrelease <name>`
 
-## Kubernetes logs analysis
+#### Updating Configuration
+1. Edit templates in `bootstrap/` or app manifests
+2. Render: `task configure`
+3. Validate: `task kubernetes:kubeconform`
+4. Review git diff
+5. Create PR with `flux diff` evidence
 
-When looking at logs, first you need to determine the pod name:
+### Key Rules
 
-- Get the Kubernetes deployment that manages the pods using the `get_kubernetes_resources` tool.
-- Look for the `matchLabels` and the container name in the deployment spec.
-- List the pods with the `get_kubernetes_resources` tool using the found `matchLabels` from the deployment spec.
-- Get the logs by calling the `get_kubernetes_logs` tool using the pod name and container name.
+**Do:**
+- ✅ Always run `task configure` after editing templates
+- ✅ Use placeholders for secrets (`${SECRET_DOMAIN}`, `${DB_URI}`)
+- ✅ Define storage explicitly in HelmRelease `persistence` sections
+- ✅ Pin container images: `<tag>@<digest>` (use `crane digest`)
+- ✅ Follow conventional commits: `chore(app): description`
+- ✅ Run `task kubernetes:kubeconform` before PRs
+- ✅ Include `flux diff` output in PR descriptions
 
-## Flux HelmRelease analysis
+**Don't:**
+- ❌ Manually edit generated files under `kubernetes/apps/*/app/`
+- ❌ Use `kubectl apply` directly (Flux will revert changes)
+- ❌ Commit secrets (use placeholders + ExternalSecrets)
+- ❌ Skip validation steps
+- ❌ Push directly to `main` (use PRs)
 
-When troubleshooting a HelmRelease, follow these steps:
+### Discovery Commands
 
-- Use the `get_flux_instance` tool to check the helm-controller deployment status and the apiVersion of the HelmRelease kind.
-- Use the `get_kubernetes_resources` tool to get the HelmRelease, then analyze the spec, the status, inventory and events.
-- Determine which Flux object is managing the HelmRelease by looking at the annotations; it can be a Kustomization or a ResourceSet.
-- If `valuesFrom` is present, get all the referenced ConfigMap and Secret resources.
-- Identify the HelmRelease source by looking at the `chartRef` or the `sourceRef` field.
-- Use the `get_kubernetes_resources` tool to get the HelmRelease source then analyze the source status and events.
-- If the HelmRelease is in a failed state or in progress, it may be due to failures in one of the managed resources found in the inventory.
-- Use the `get_kubernetes_resources` tool to get the managed resources and analyze their status.
-- If the managed resources are in a failed state, analyze their logs using the `get_kubernetes_logs` tool.
-- If any issues were found, create a root cause analysis report for the user.
-- If no issues were found, create a report with the current status of the HelmRelease and its managed resources and container images.
+```bash
+# Find all HelmReleases
+rg --files -g"helmrelease.yaml" kubernetes/apps
 
-## Flux Kustomization analysis
+# Find placeholder usage
+rg -n "\${SECRET_DOMAIN}" -g"*.yaml" kubernetes/apps
 
-When troubleshooting a Kustomization, follow these steps:
+# List all apps by namespace
+ls kubernetes/apps/*/
 
-- Use the `get_flux_instance` tool to check the kustomize-controller deployment status and the apiVersion of the Kustomization kind.
-- Use the `get_kubernetes_resources` tool to get the Kustomization, then analyze the spec, the status, inventory and events.
-- Determine which Flux object is managing the Kustomization by looking at the annotations; it can be another Kustomization or a ResourceSet.
-- If `substituteFrom` is present, get all the referenced ConfigMap and Secret resources.
-- Identify the Kustomization source by looking at the `sourceRef` field.
-- Use the `get_kubernetes_resources` tool to get the Kustomization source then analyze the source status and events.
-- If the Kustomization is in a failed state or in progress, it may be due to failures in one of the managed resources found in the inventory.
-- Use the `get_kubernetes_resources` tool to get the managed resources and analyze their status.
-- If the managed resources are in a failed state, analyze their logs using the `get_kubernetes_logs` tool.
-- If any issues were found, create a root cause analysis report for the user.
-- If no issues were found, create a report with the current status of the Kustomization and its managed resources.
+# Show Taskfile tasks
+task --list
 
-## Flux Comparison analysis
+# Check Flux status
+flux get kustomizations
+flux get helmreleases
+```
 
-When comparing a Flux resource between clusters, follow these steps:
+### File Organization
 
-- Use the `get_kubernetes_contexts` tool to get the cluster contexts.
-- Use the `set_kubernetes_context` tool to switch to a specific cluster.
-- Use the `get_flux_instance` tool to check the Flux Operator status and settings.
-- Use the `get_kubernetes_resources` tool to get the resource you want to compare.
-- If the Flux resource contains `valuesFrom` or `substituteFrom`, get all the referenced ConfigMap and Secret resources.
-- Repeat the above steps for each cluster.
+```
+kubernetes/
+├── apps/<namespace>/<app>/        # Application manifests
+│   ├── ks.yaml                    # Kustomization entry point
+│   └── app/
+│       ├── kustomization.yaml
+│       ├── helmrelease.yaml
+│       └── externalsecret.yaml
+├── flux/                          # Flux configuration
+│   └── vars/                      # Shared ConfigMaps/Secrets
+├── bootstrap/                     # Makejinja templates (source)
+└── templates/                     # Reusable templates
 
-When comparing resources, look for differences in the `spec`, `status` and `events`, including the referenced ConfigMaps and Secrets.
-The Flux resource `spec` represents the desired state and should be the main focus of the comparison, while the status and events represent the current state in the cluster.
+.taskfiles/                        # Task modules
+talosconfig/                       # Talos node configs
+scripts/                           # Helper scripts
+```
 
-## Cluster Information
+### Cluster Information
 
-Cluster is bare metal, running on 3 Minisform MS-01 nodes with the following specifications:
+**Hardware:** 3x Minisforum MS-01 nodes
 - OS: TalosOS v1.10.4
 - Kubernetes: v1.33.1
 - CPU: Intel Core i9-12900H
-- RAM: 96 GB
-- Storage:
-  - 1 TB Smasung 990 Pro M.2 NVMe SSD
-    - TalosOS disk and openebs storage
-  - 1.92TB Samsung PM9A3 U.2 NVMe SSD
-    - Rook Ceph
-- Network:
-  - LAN: 1 Gbps Ethernet
-  - Rook Ceph: Thunderbolt ring across all nodes
-- Folder structure:
-  - Apps
-    - Kubernetes/apps/{namespace}/{app-name}/
-      - Contains the Flux resources for the app
-  - Boostrap
-    - Kubernetes/boostrap/talos
-      - Contains the talconfig and other bootstrap resources
-  - Templates
-    - Kubernetes/templates/gatus/{template-name}/
-      - Contains the templates for the Gatus app
-    - Kubernetes/templates/volsync/
-      - Contains the templates for the VolSync app for PVC Creation and backup destinations
+- RAM: 96 GB per node
+- Storage: NVMe SSDs (990 Pro + PM9A3), Rook Ceph cluster
+
+**Network:**
+- LAN: 1 Gbps Ethernet
+- Ceph: Thunderbolt ring interconnect
+
+### Placeholder Reference
+
+Common placeholders used throughout manifests:
+
+- `${SECRET_DOMAIN}` - External domain suffix for ingresses
+- `${MEDIA_SERVER}` - Media server hostname/IP
+- `${MEDIA_ROOT}` - Media root path
+- `${NFS_STORAGE_HOST}` - NFS server for persistent storage
+- `PLANE_*` - Plane app configuration
+- `ROMM_*` - ROMM app configuration
+
+These are resolved via ExternalSecrets referencing 1Password vaults.
+
+### Code Style
+
+- **Indentation:** 2 spaces (YAML), 4 spaces (bash/Python)
+- **Line endings:** LF (Unix)
+- **Directory names:** lowercase-hyphenated
+- **Helm chart:** Default to `bjw-s/app-template`
+- **Image tags:** Pin with digest: `image: foo:1.0.0@sha256:abc123...`
+
+### Validation Pipeline
+
+Before merging any PR:
+
+1. `task configure` - Render templates
+2. `task kubernetes:kubeconform` - Validate manifests
+3. `flux diff kustomization <name>` - Check what Flux will apply
+4. Review git diff for unintended changes
+5. If secrets changed: `task sops:encrypt`
+
+### Troubleshooting
+
+**HelmRelease stuck in Reconciling:**
+- Check: `flux logs --kind=HelmRelease --name=<name>`
+- Verify: ExternalSecrets are populated
+- Validate: Chart values against schema
+
+**Pods in Pending state:**
+- Check: PVC definitions exist
+- Verify: Storage class available
+- Review: `persistence` sections in HelmRelease
+
+**Template rendering fails:**
+- Check: Required variables in `bootstrap/config.yaml`
+- Verify: Makejinja syntax
+- Review: `task configure` output
+
+**For detailed troubleshooting guides, see [docs/ai-context/](../docs/ai-context/).**
+
+---
+
+## Flux MCP Server
+
+When using the Flux MCP server for troubleshooting, follow the guidelines in [docs/ai-context/flux-mcp.md](../docs/ai-context/flux-mcp.md).
+
+Key Flux resources:
+- **GitRepository/OCIRepository** - Source definitions
+- **Kustomization** - Builds and applies manifests
+- **HelmRelease** - Manages Helm charts
+- **HelmRepository/HelmChart** - Helm sources
+
+Always check resource status, events, and logs when troubleshooting.

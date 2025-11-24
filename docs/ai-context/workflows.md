@@ -2,7 +2,7 @@
 
 ## Deploying a new HelmRelease-based app
 ### Overview
-Bring up new functionality by adding a HelmRelease to `kubernetes/apps/<namespace>/app` and wiring it into the area’s `kustomization`.
+Bring up new functionality by adding a HelmRelease to `kubernetes/apps/<namespace>/app` and wiring it into the area's `kustomization`.
 
 ### Flow Diagram
 ```mermaid

@@ -1,0 +1,77 @@
+---
+title: "Homelab Repository Rules"
+pattern: "**/*"
+type: "always"
+---
+
+# Homelab Repository Context
+
+This repository manages a Kubernetes homelab using GitOps principles with Flux, Talos, and Taskfile-driven workflows.
+
+## Core Documentation
+
+The following files contain comprehensive context about this repository. They are the single source of truth shared across all AI coding assistants:
+
+@docs/ai-context/README.md
+@docs/ai-context/architecture.md
+@docs/ai-context/domain.md
+@docs/ai-context/workflows.md
+@docs/ai-context/tools.md
+@docs/ai-context/conventions.md
+@docs/ai-context/flux-mcp.md
+
+## Quick Reference
+
+### Core Pattern
+GitOps + templated manifests via Taskfile and Makejinja. Flux applies results from `kubernetes/apps/*`, Talos controls nodes.
+
+### Key Workflows
+
+1. **Deploy New App**
+   - Create `kubernetes/apps/<namespace>/<app>/` with `kustomization.yaml`, `app/helmrelease.yaml`, `externalsecret.yaml`
+   - Run `task configure` → `task kubernetes:kubeconform` → `flux diff`
+   - Open PR, merge, monitor with `flux get helmrelease`
+
+2. **Update Configuration**
+   - Edit templates in `bootstrap/` or app manifests
+   - Run `task configure` to regenerate
+   - Validate with `task kubernetes:kubeconform`
+   - Check diff with `flux diff kustomization <namespace>`
+
+### Essential Rules
+
+- Never manually edit generated files under `kubernetes/apps/*/app/`
+- Always use `task configure` to render templates from `bootstrap/`
+- Use placeholders for secrets: `${SECRET_DOMAIN}`, `${DB_URI}`, etc.
+- Define storage explicitly in HelmRelease `persistence` sections
+- Pin container images as `<tag>@<digest>`
+- Follow conventional commits: `chore(app): description`
+- Run `task kubernetes:kubeconform` before opening PRs
+
+### Discovery Commands
+
+```bash
+# Find HelmReleases
+rg --files -g"helmrelease.yaml" kubernetes/apps
+
+# Find placeholder usage
+rg -n "\${SECRET_DOMAIN}" -g"*.yaml" kubernetes/apps
+
+# Validate manifests
+task configure && task kubernetes:kubeconform
+
+# Check Flux status
+flux get kustomizations
+flux diff kustomization <namespace>
+```
+
+### File Organization
+
+- `kubernetes/apps/<namespace>/<app>/` - Application manifests
+- `kubernetes/flux/` - Flux configuration
+- `bootstrap/` - Makejinja templates (source)
+- `.taskfiles/` - Task modules
+- `talosconfig/` - Talos node configs
+- `scripts/` - Helper scripts
+
+For complete details, see the imported documentation files above.
