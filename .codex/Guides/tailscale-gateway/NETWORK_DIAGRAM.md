@@ -12,14 +12,7 @@
 
 ![Network Architecture Diagram](eraser.png)
 
-*Rendered with [Eraser.io](https://eraser.io) | [View Mermaid Source](NETWORK_DIAGRAM_V2.md)*
-
----
-
-## Alternative Renderings
-
-For the full interactive Mermaid diagram with color-coded components, see:
-- **[Mermaid Source Code](NETWORK_DIAGRAM_V2.md)** - View on GitHub or copy to [Eraser.io](https://app.eraser.io/) for best results
+*Rendered with [Eraser.io](https://eraser.io) | [View Mermaid Source](MERMAID_SOURCE.md)*
 
 ---
 
