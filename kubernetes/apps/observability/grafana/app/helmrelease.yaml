@@ -229,6 +229,9 @@ spec:
         unifi-snmp-overview:
           url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/unifi-snmp-overview.json
           datasource: Prometheus
+        unifi-network-combined:
+          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/unifi-network-combined.json
+          datasource: Prometheus
       kubernetes:
         k8s-system-api-server:
           # renovate: dashboardName="Kubernetes / System / API Server"
