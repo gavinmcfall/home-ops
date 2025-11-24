@@ -36,13 +36,17 @@
       "command": "uvx",
       "args": [
         "mcp-shell-server"
-      ]
+      ],
+      "env": {
+        "ALLOW_COMMANDS": "ls,cat,pwd,grep,wc,find,head,tail,sort,uniq,cut,tr,sed,awk,jq,yq,kubectl,flux,talosctl,task,git,docker,helm"
+      }
     },
-    "mermaid-validator": {
+    "mermaid": {
       "command": "npx",
       "args": [
         "-y",
-        "@rtuin/mcp-mermaid-validator@latest"
+        "@probelabs/maid",
+        "mcp"
       ]
     },
     "eraser": {
