@@ -226,9 +226,6 @@ spec:
           url: https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/control-plane.json
           datasource: Prometheus
       infrastructure:
-        unifi-snmp-overview:
-          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/unifi-snmp-overview.json
-          datasource: Prometheus
         unifi-network-combined:
           url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/unifi-network-combined.json
           datasource: Prometheus
@@ -324,12 +321,14 @@ spec:
           # renovate: depName="External-dns"
           gnetId: 15038
           revision: 3
-          datasource: Prometheus
+          datasource:
+            - { name: DS_PROMETHEUS, value: Prometheus }
         speedtest:
           # renovate: depName="Speedtest Exporter"
           gnetId: 13665
           revision: 4
-          datasource: Prometheus
+          datasource:
+            - { name: DS_PROMETHEUS, value: Prometheus }
         unifi-insights:
           # renovate: depName="UniFi-Poller: Client Insights - Prometheus"
           gnetId: 11315
