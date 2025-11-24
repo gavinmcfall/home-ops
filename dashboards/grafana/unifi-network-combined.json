@@ -273,6 +273,13 @@
           "color": {
             "mode": "thresholds"
           },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
           "mappings": [
             {
               "options": {
@@ -304,7 +311,26 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Status"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 4,
@@ -314,18 +340,22 @@
       },
       "id": 5,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
           "fields": "",
-          "values": false
+          "reducer": [
+            "sum"
+          ],
+          "show": false
         },
-        "textMode": "value_and_name"
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Device"
+          }
+        ]
       },
       "targets": [
         {
@@ -334,13 +364,45 @@
             "uid": "prometheus"
           },
           "expr": "unpoller_device_info",
-          "format": "time_series",
-          "legendFormat": "{{name}}",
+          "format": "table",
+          "instant": true,
           "refId": "A"
         }
       ],
       "title": "Device Status",
-      "type": "stat"
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "__name__": true,
+              "Time": true,
+              "endpoint": true,
+              "instance": true,
+              "job": true,
+              "mac": true,
+              "namespace": true,
+              "pod": true,
+              "service": true,
+              "site_name": true,
+              "source": true
+            },
+            "indexByName": {
+              "name": 0,
+              "type": 1,
+              "model": 2,
+              "Value": 3
+            },
+            "renameByName": {
+              "Value": "Status",
+              "model": "Model",
+              "name": "Device",
+              "type": "Type"
+            }
+          }
+        }
+      ],
+      "type": "table"
     },
     {
       "collapsed": false,
@@ -439,7 +501,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "unpoller_device_radio_channel_utilization_total_ratio{type=\"uap\"} * 100",
+          "expr": "unpoller_device_radio_channel_utilization_total_ratio{name=~\"Living|Entrance|Hall\"} * 100",
           "legendFormat": "{{name}} - {{radio}}",
           "refId": "A"
         }
@@ -529,7 +591,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "unpoller_device_radio_stations{type=\"uap\"}",
+          "expr": "unpoller_device_radio_stations{name=~\"Living|Entrance|Hall\"}",
           "legendFormat": "{{name}} - {{radio}}",
           "refId": "A"
         }
