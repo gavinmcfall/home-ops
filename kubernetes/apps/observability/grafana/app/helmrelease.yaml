@@ -325,6 +325,11 @@ spec:
           gnetId: 15038
           revision: 3
           datasource: Prometheus
+        speedtest:
+          # renovate: depName="Speedtest Exporter"
+          gnetId: 13665
+          revision: 4
+          datasource: Prometheus
         unifi-insights:
           # renovate: depName="UniFi-Poller: Client Insights - Prometheus"
           gnetId: 11315
