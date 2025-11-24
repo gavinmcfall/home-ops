@@ -27,14 +27,10 @@ spec:
       namespace: observability
   values:
     fullnameOverride: *app
+    # Use chart's built-in snmp.yml which includes if_mib module
+    # Only need to add our custom auth
     extraArgs:
       - --config.file=/etc/snmp-auth/auth.yml
-      - --config.file=/etc/snmp-modules/modules.yml
-    extraConfigmapMounts:
-      - name: snmp-modules
-        mountPath: /etc/snmp-modules
-        configMap: snmp-exporter-modules
-        readOnly: true
     extraSecretMounts:
       - name: snmp-auth
         mountPath: /etc/snmp-auth
@@ -45,7 +41,7 @@ spec:
       params:
         - name: udm-pro
           auth: ["unifi_v3"]
-          module: ["udm_pro"]
+          module: ["if_mib"]  # Use built-in if_mib module for standard network interface stats
           target: ${SECRET_UNIFI_IP}
       path: /snmp
       scrapeTimeout: 10s
