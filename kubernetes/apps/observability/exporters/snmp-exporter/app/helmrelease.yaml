@@ -42,10 +42,9 @@ spec:
         readOnly: true
     serviceMonitor:
       enabled: true
-      auth: []  # Disable default auth - using module-level auth in v0.29
-      module: []  # Disable default module - using params instead
       params:
         - name: udm-pro
+          auth: ["unifi_v3"]
           module: ["unifi"]
           target: ${SECRET_UNIFI_IP}
       path: /snmp
