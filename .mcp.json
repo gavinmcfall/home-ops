@@ -1,17 +1,48 @@
 {
   "mcpServers": {
+    "kubernetes": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "kubernetes-mcp-server@latest"
+      ]
+    },
+    "flux": {
+      "command": "flux-operator-mcp"
+    },
+    "talos": {
+      "command": "~/mcp/talos/.venv/bin/python",
+      "args": [
+        "~/mcp/talos/src/talos_mcp/server.py"
+      ]
+    },
+    "helm": {
+      "command": "~/mcp/mcp-helm",
+      "args": [
+        "-mode=stdio"
+      ]
+    },
+    "grafana": {
+      "command": "~/go/bin/mcp-grafana"
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem"
+      ]
+    },
+    "shell": {
+      "command": "uvx",
+      "args": [
+        "mcp-shell-server"
+      ]
+    },
     "mermaid-validator": {
       "command": "npx",
       "args": [
         "-y",
         "@rtuin/mcp-mermaid-validator@latest"
-      ]
-    },
-    "plantuml": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@infobip/plantuml-mcp-server"
       ]
     },
     "eraser": {
@@ -23,6 +54,61 @@
       "env": {
         "ERASER_API_KEY": "${ERASER_API_KEY}"
       }
+    },
+    "github": {
+      "command": "~/mcp/github-mcp-server",
+      "args": [
+        "stdio"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "prometheus": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "prometheus-mcp@latest",
+        "stdio"
+      ],
+      "env": {
+        "PROMETHEUS_URL": "${PROMETHEUS_URL}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@henkey/postgres-mcp-server",
+        "--connection-string",
+        "${POSTGRES_CONNECTION_STRING}"
+      ]
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
+      }
+    },
+    "cloudflare-dns-analytics": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://dns-analytics.mcp.cloudflare.com/sse"
+      ]
+    },
+    "cloudflare-graphql": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://graphql.mcp.cloudflare.com/mcp"
+      ]
     }
   },
   "servers": {
@@ -32,6 +118,10 @@
       "args": [
         "mcp"
       ]
+    },
+    "cloudflare-docs": {
+      "type": "sse",
+      "url": "https://cloudflare-docs.mcp.run/sse"
     }
   }
 }
