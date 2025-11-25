@@ -38,16 +38,33 @@ spec:
           secretKeyRef:
             name: grafana-admin-secret
             key: TESLAMATE_DB_PASSWORD
+    envFromSecrets:
+      - name: grafana-admin-secret
     grafana.ini:
       analytics:
         check_for_updates: false
         check_for_plugin_updates: false
         reporting_enabled: false
+      auth:
+        oauth_auto_login: false
+        disable_login_form: false
       auth.anonymous:
         enabled: false
         org_id: 1
         org_name: Main Org.
         org_role: Viewer
+      auth.generic_oauth:
+        enabled: true
+        name: Pocket-ID
+        icon: signin
+        allow_sign_up: true
+        auto_login: false
+        scopes: openid profile email
+        auth_url: https://id.nerdz.cloud/authorize
+        token_url: https://id.nerdz.cloud/api/oidc/token
+        api_url: https://id.nerdz.cloud/api/oidc/userinfo
+        use_pkce: true
+        role_attribute_path: "contains(groups[*], 'admin') && 'Admin' || 'Viewer'"
       news:
         news_feed_enabled: false
     datasources:
