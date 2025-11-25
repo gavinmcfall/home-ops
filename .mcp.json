@@ -9,13 +9,18 @@
     },
     "flux": {
       "command": "flux-operator-mcp",
-      "args": ["serve"]
+      "args": [
+        "serve"
+      ]
     },
     "talos": {
       "command": "/home/gavin/mcp/talos/.venv/bin/python",
       "args": [
         "/home/gavin/mcp/talos/src/talos_mcp/server.py"
-      ]
+      ],
+      "env": {
+        "TALOSCONFIG": "/home/gavin/home-ops/talosconfig"
+      }
     },
     "helm": {
       "command": "/home/gavin/mcp/mcp-helm",
@@ -26,15 +31,9 @@
     "grafana": {
       "command": "/home/gavin/go/bin/mcp-grafana",
       "env": {
-        "GRAFANA_URL": "${GRAFANA_URL}"
+        "GRAFANA_URL": "${GRAFANA_URL}",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${GRAFANA_SERVICE_ACCOUNT_TOKEN}"
       }
-    },
-    "filesystem": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem"
-      ]
     },
     "shell": {
       "command": "uvx",
@@ -49,19 +48,18 @@
       "command": "npx",
       "args": [
         "-y",
-        "@probelabs/maid",
-        "mcp"
+        "@probelabs/maid-mcp"
       ]
     },
     "eraser": {
-      "command": "npx",
+      "command": "docker",
       "args": [
-        "-y",
-        "eraser-io-mcp-server"
-      ],
-      "env": {
-        "ERASER_API_KEY": "${ERASER_API_KEY}"
-      }
+        "run",
+        "-i",
+        "--rm",
+        "-e", "ERASER_API_KEY=${ERASER_API_KEY}",
+        "eraser-mcp:claude"
+      ]
     },
     "github": {
       "command": "/home/gavin/mcp/github-mcp-server",
@@ -89,7 +87,7 @@
         "database-mcp"
       ],
       "env": {
-        "DB_CONFIGS": "[{\"id\":\"postgres\",\"db_type\":\"pg\",\"configuration\":{\"host\":\"10.90.3.210\",\"port\":5432,\"user\":\"postgres\",\"password\":\"${CNPG_PASSWORD}\",\"dbname\":\"postgres\"},\"description\":\"CloudNative-PG Cluster\"},{\"id\":\"dragonfly\",\"db_type\":\"redis\",\"configuration\":{\"host\":\"10.90.3.207\",\"port\":6379},\"description\":\"DragonflyDB Cache\"},{\"id\":\"mariadb\",\"db_type\":\"mysql\",\"configuration\":{\"host\":\"10.96.201.49\",\"port\":3306,\"user\":\"root\",\"password\":\"${MARIADB_PASSWORD}\",\"database\":\"mysql\"},\"description\":\"MariaDB\"}]"
+        "DB_CONFIGS": "${DB_CONFIGS}"
       }
     },
     "firecrawl": {
@@ -104,7 +102,11 @@
     },
     "cloudflare-docs": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://docs.mcp.cloudflare.com/mcp"
+      ]
     }
   },
   "servers": {
