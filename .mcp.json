@@ -79,14 +79,14 @@
         "PROMETHEUS_URL": "${PROMETHEUS_URL}"
       }
     },
-    "postgres": {
-      "command": "npx",
+    "databases": {
+      "command": "uvx",
       "args": [
-        "-y",
-        "@henkey/postgres-mcp-server",
-        "--connection-string",
-        "${POSTGRES_CONNECTION_STRING}"
-      ]
+        "database-mcp"
+      ],
+      "env": {
+        "DB_CONFIGS": "[{\"id\":\"postgres\",\"db_type\":\"pg\",\"configuration\":{\"host\":\"10.90.3.210\",\"port\":5432,\"user\":\"postgres\",\"password\":\"${CNPG_PASSWORD}\",\"dbname\":\"postgres\"},\"description\":\"CloudNative-PG Cluster\"},{\"id\":\"dragonfly\",\"db_type\":\"redis\",\"configuration\":{\"host\":\"10.90.3.207\",\"port\":6379},\"description\":\"DragonflyDB Cache\"},{\"id\":\"mariadb\",\"db_type\":\"mysql\",\"configuration\":{\"host\":\"10.96.201.49\",\"port\":3306,\"user\":\"root\",\"password\":\"${MARIADB_PASSWORD}\",\"database\":\"mysql\"},\"description\":\"MariaDB\"}]"
+      }
     },
     "firecrawl": {
       "command": "npx",
@@ -97,22 +97,6 @@
       "env": {
         "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
       }
-    },
-    "cloudflare-dns-analytics": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://dns-analytics.mcp.cloudflare.com/sse"
-      ]
-    },
-    "cloudflare-graphql": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://graphql.mcp.cloudflare.com/mcp"
-      ]
     }
   },
   "servers": {
@@ -125,7 +109,7 @@
     },
     "cloudflare-docs": {
       "type": "sse",
-      "url": "https://cloudflare-docs.mcp.run/sse"
+      "url": "https://docs.mcp.cloudflare.com/sse"
     }
   }
 }
