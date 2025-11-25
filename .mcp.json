@@ -8,22 +8,23 @@
       ]
     },
     "flux": {
-      "command": "flux-operator-mcp"
+      "command": "flux-operator-mcp",
+      "args": ["serve"]
     },
     "talos": {
-      "command": "~/mcp/talos/.venv/bin/python",
+      "command": "/home/gavin/mcp/talos/.venv/bin/python",
       "args": [
-        "~/mcp/talos/src/talos_mcp/server.py"
+        "/home/gavin/mcp/talos/src/talos_mcp/server.py"
       ]
     },
     "helm": {
-      "command": "~/mcp/mcp-helm",
+      "command": "/home/gavin/mcp/mcp-helm",
       "args": [
         "-mode=stdio"
       ]
     },
     "grafana": {
-      "command": "~/go/bin/mcp-grafana"
+      "command": "/home/gavin/go/bin/mcp-grafana"
     },
     "filesystem": {
       "command": "npx",
@@ -60,7 +61,7 @@
       }
     },
     "github": {
-      "command": "~/mcp/github-mcp-server",
+      "command": "/home/gavin/mcp/github-mcp-server",
       "args": [
         "stdio"
       ],
@@ -97,19 +98,19 @@
       "env": {
         "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
       }
+    },
+    "cloudflare-docs": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
     }
   },
   "servers": {
     "repoql": {
       "type": "stdio",
-      "command": "~/mcp/repoql",
+      "command": "/home/gavin/mcp/repoql",
       "args": [
         "mcp"
       ]
-    },
-    "cloudflare-docs": {
-      "type": "sse",
-      "url": "https://docs.mcp.cloudflare.com/sse"
     }
   }
 }
