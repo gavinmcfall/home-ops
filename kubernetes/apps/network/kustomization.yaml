@@ -9,12 +9,13 @@ resources:
   - ./cloudflared/ks.yaml
   - ./cloudflare-ddns/ks.yaml
   - ./echo-server/ks.yaml
+  - ./envoy-gateway/ks.yaml
   - ./external-dns/ks.yaml
   - ./external-dns-unifi/ks.yaml
   - ./external-services/ks.yaml
   - ./gateway-api/ks.yaml
-  - ./envoy-gateway/ks.yaml
   - ./k8s-gateway/ks.yaml
   - ./multus/ks.yaml
+  - ./netvisor/ks.yaml
   - ./oauth2-proxy/ks.yaml
   - ./tailscale/ks.yaml
