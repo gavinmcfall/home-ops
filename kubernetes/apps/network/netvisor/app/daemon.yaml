@@ -18,7 +18,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: daemon
-          image: mayanayza/netvisor-daemon:v0.10.4@sha256:0c6abd30d50c53340bf06b2b371293adc77764f17ec71d9ef24e972a221974d3
+          image: mayanayza/netvisor-daemon:v1.0.0@sha256:41d49e7bf091194e437b8aec4bbe87429f56c873a2f1b8cb918f44dfcd5ab388
           securityContext:
             privileged: true
           env:
