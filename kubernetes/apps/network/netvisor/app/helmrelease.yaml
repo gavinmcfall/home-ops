@@ -39,7 +39,7 @@ spec:
           app:
             image:
               repository: mayanayza/netvisor-server
-              tag: v0.10.4@sha256:d65cb30d232119c811fddd21837a9ce305324663b279da4ff215e0199d82f93d
+              tag: v1.0.0@sha256:105a789e667929a2e1024f5c553bda1bbb346be9aaf454deb5d5bd1974866ae4
             env:
               TZ: ${TIMEZONE}
               NETVISOR_SERVER_PORT: &port 60072
