@@ -70,5 +70,13 @@ spec:
               memory: 128Mi
             limits:
               memory: 512Mi
+          volumeMounts:
+            - name: daemon-config
+              mountPath: /root/.config/daemon
+      volumes:
+        - name: daemon-config
+          hostPath:
+            path: /var/lib/netvisor-daemon
+            type: DirectoryOrCreate
       tolerations:
         - operator: Exists
