@@ -45,6 +45,7 @@ spec:
               NETVISOR_SERVER_PORT: &port 60072
               NETVISOR_LOG_LEVEL: info
               NETVISOR_PUBLIC_URL: https://netvisor.${SECRET_DOMAIN}
+              NETVISOR_WEB_EXTERNAL_PATH: /app/static
               NETVISOR_USE_SECURE_SESSION_COOKIES: "true"
               NETVISOR_DISABLE_REGISTRATION: "true"
               # OIDC (Pocket ID)
