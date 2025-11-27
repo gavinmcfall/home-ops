@@ -195,8 +195,49 @@ rg -n "\${SECRET_DOMAIN}" -g"*.yaml" kubernetes/apps
 - **Commits:** Follow conventional commits (`chore(app): description`)
 - **Secrets:** Use placeholders (`${SECRET_DOMAIN}`), never commit secrets
 - **Storage:** Define explicitly in HelmRelease `persistence` sections
-- **Images:** Pin with digest: `<tag>@<digest>`
+- **Images:** Pin with digest: `<tag>@sha256:<digest>` (see below)
 - **Validation:** Always run `task configure` → `task kubernetes:kubeconform` → `flux diff`
 - **PRs:** Include `flux diff` output, never push directly to `main`
+
+### Container Image Tags
+
+**Never use `latest` tag.** Always pin to a specific version with SHA256 digest.
+
+**Finding the latest tag and digest:**
+```bash
+# List available tags for an image
+crane ls <registry>/<image>
+
+# Get the digest for a specific tag
+crane digest <registry>/<image>:<tag>
+
+# Example workflow:
+crane ls mayanayza/netvisor-server
+# Output: latest, v0.10.4, v0.10.3, ...
+
+crane digest mayanayza/netvisor-server:v0.10.4
+# Output: sha256:d65cb30d232119c811fddd21837a9ce305324663b279da4ff215e0199d82f93d
+```
+
+**Important:** Verify against the source repository releases, not just registry tags. Container registries may contain orphaned, pre-release, or test tags that were never officially released.
+
+```bash
+# Check official releases (works for most projects)
+gh release list --repo <owner>/<repo> --limit 10
+
+# For projects not on GitHub, check their source repo's releases page
+```
+
+**Resulting image reference:**
+```yaml
+image:
+  repository: mayanayza/netvisor-server
+  tag: v0.10.4@sha256:d65cb30d232119c811fddd21837a9ce305324663b279da4ff215e0199d82f93d
+```
+
+This ensures:
+- Reproducible deployments (digest guarantees exact image)
+- Clear version tracking (tag shows semantic version)
+- No surprise updates from mutable tags like `latest`
 
 For complete details, see the documentation in [`docs/ai-context/`](docs/ai-context/).
