@@ -74,12 +74,23 @@ spec:
       global: &backupFlag
         compress-type: "bz2"
         compress-level: "9"
+        # NFS (TrueNAS)
+        repo1-retention-full: "14" # days
+        repo1-retention-full-type: time
+        # Backblaze B2
         repo2-block: "y"
         repo2-bundle: "y"
         repo2-path: /
         repo2-retention-full: "7" # days
         repo2-retention-full-type: time
         repo2-s3-uri-style: path
+        # Cloudflare R2
+        repo3-block: "y"
+        repo3-bundle: "y"
+        repo3-path: /
+        repo3-retention-full: "7" # days
+        repo3-retention-full-type: time
+        repo3-s3-uri-style: path
       jobs:
         ttlSecondsAfterFinished: 60
       manual:
@@ -90,14 +101,35 @@ spec:
         labels:
           app.kubernetes.io/name: "postgres-backup"
       repos:
+        - name: repo1
+          volume:
+            volumeClaimSpec:
+              storageClassName: ""
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 50Gi
+              volumeName: immich-postgres-backup-nfs
+          schedules:
+            full: "30 1 * * 0" # Sunday at 01:30
+            incremental: "30 1 * * 1-6" # Mon-Sat at 01:30
         - name: repo2
-          s3: &s3
-            bucket: ${IMMICH_PG_BACKUP_S3_BUCKET}
+          s3:
+            bucket: ${SECRET_B2_BUCKET}
             endpoint: s3.us-east-005.backblazeb2.com
             region: us-east-005
           schedules:
             full: "30 2 * * 0" # Sunday at 02:30
             incremental: "30 2 * * 1-6/2" # Mon-Sat at 02:30, every 2nd day
+        - name: repo3
+          s3:
+            bucket: ${SECRET_R2_BUCKET}
+            endpoint: ${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
+            region: auto
+          schedules:
+            full: "30 3 * * 0" # Sunday at 03:30
+            incremental: "30 3 * * 1-6/2" # Mon-Sat at 03:30, every 2nd day
       restore:
         enabled: false
         repoName: repo2

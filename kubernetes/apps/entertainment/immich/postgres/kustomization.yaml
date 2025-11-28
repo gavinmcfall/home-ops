@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./cluster.yaml
   - ./externalsecret.yaml
+  - ./nfs-pv.yaml
   - ./podmonitor.yaml
 configMapGenerator:
   - name: immich-postgres-init
