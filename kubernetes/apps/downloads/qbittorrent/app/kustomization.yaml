@@ -12,5 +12,11 @@ configMapGenerator:
   - name: qbittorrent-scripts
     files:
       - completed.sh=./resources/completed.sh
+  - name: qbittorrent-loki-rules
+    files:
+      - ./resources/lokirule.yaml
+    options:
+      labels:
+        loki_rule: "true"
 generatorOptions:
   disableNameSuffixHash: true
