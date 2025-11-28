@@ -16,6 +16,6 @@ resources:
   - ./gateway-api/ks.yaml
   - ./k8s-gateway/ks.yaml
   - ./multus/ks.yaml
-  - ./netvisor/ks.yaml
+  # - ./netvisor/ks.yaml  # Removed - doesn't support K8s workload discovery
   - ./oauth2-proxy/ks.yaml
   - ./tailscale/ks.yaml
