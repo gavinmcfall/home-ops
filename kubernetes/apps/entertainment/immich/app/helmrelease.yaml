@@ -168,7 +168,7 @@ spec:
       library:
         type: nfs
         server: citadel.internal
-        path: /mnt/storage0/media/Library/Images
+        path: /mnt/storage0/images
         globalMounts:
           - path: *mediaLocation
       cache:
