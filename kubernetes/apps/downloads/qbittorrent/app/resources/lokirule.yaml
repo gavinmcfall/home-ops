@@ -1,0 +1,14 @@
+---
+groups:
+  - name: qbittorrent
+    rules:
+      - alert: GluetunVPNUnhealthy
+        expr: |
+          sum by (pod) (count_over_time({app="qbittorrent", container="gluetun"} |~ "(?i)unhealthy"[10m])) > 5
+        for: 10m
+        labels:
+          severity: critical
+          category: logs
+        annotations:
+          pod: "{{ $labels.pod }}"
+          summary: "Gluetun VPN has been unhealthy for 10+ minutes"
