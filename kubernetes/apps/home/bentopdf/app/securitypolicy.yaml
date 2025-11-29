@@ -19,10 +19,4 @@ spec:
       headersToBackend:
         - Authorization
         - Cookie
-        - X-Forwarded-Host
-        - X-Forwarded-Proto
-        - X-Forwarded-Uri
-      headersToExtAuth:
-        - Cookie
-        - Authorization
       path: /oauth2/auth
