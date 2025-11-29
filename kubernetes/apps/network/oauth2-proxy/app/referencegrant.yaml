@@ -10,6 +10,9 @@ spec:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: home
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: home
   to:
     - group: ""
       kind: Service
