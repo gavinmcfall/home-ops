@@ -87,4 +87,5 @@ spec:
           bentopdf:
             app:
               - path: /tmp
-                subPath: tmp
+              - path: /var/cache/nginx
+              - path: /var/run
