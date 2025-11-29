@@ -129,6 +129,27 @@ spec:
               capabilities:
                 drop:
                   - ALL
+          seedboxapi:
+            image:
+              repository: myanonamouse/seedboxapi
+              tag: latest
+            env:
+              DEBUG: "1"
+              interval: "1"
+              mam_id:
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-secret
+                    key: MAM_ID
+            securityContext:
+              runAsUser: 568
+              runAsGroup: 568
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
     service:
       app:
         controller: qbittorrent
@@ -190,6 +211,12 @@ spec:
         advancedMounts:
           qbittorrent:
             port-forward:
+              - path: /config
+      mam-config:
+        type: emptyDir
+        advancedMounts:
+          qbittorrent:
+            seedboxapi:
               - path: /config
       media:
         type: nfs
