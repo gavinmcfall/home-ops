@@ -41,7 +41,7 @@ spec:
                 spec:
                   httpGet:
                     path: /
-                    port: &port 3000
+                    port: &port 8080
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
