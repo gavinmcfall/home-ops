@@ -89,3 +89,4 @@ spec:
               - path: /tmp
               - path: /var/cache/nginx
               - path: /var/run
+              - path: /etc/nginx/tmp
