@@ -7,6 +7,7 @@ resources:
 
   # Applications
   - ./atuin/ks.yaml
+  - ./bentopdf/ks.yaml
   - ./bookstack/ks.yaml
   - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
