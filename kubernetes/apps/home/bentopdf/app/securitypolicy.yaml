@@ -13,6 +13,8 @@ spec:
   oidc:
     provider:
       issuer: "https://id.${SECRET_DOMAIN}"
+      authorizationEndpoint: "https://id.${SECRET_DOMAIN}/authorize"
+      tokenEndpoint: "https://id.${SECRET_DOMAIN}/api/oidc/token"
       backendRefs:
         - name: pocket-id
           namespace: security
