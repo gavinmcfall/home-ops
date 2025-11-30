@@ -80,15 +80,6 @@ spec:
           - name: external
             namespace: network
             sectionName: https
-      internal:
-        annotations:
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        hostnames:
-          - "pdf.${SECRET_DOMAIN}"
-        parentRefs:
-          - name: internal
-            namespace: network
-            sectionName: https
     persistence:
       tmpfs:
         type: emptyDir
