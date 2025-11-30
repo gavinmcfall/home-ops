@@ -9,7 +9,7 @@ spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      name: *app
+      name: bentopdf-external
   oidc:
     provider:
       issuer: "https://id.${SECRET_DOMAIN}"
