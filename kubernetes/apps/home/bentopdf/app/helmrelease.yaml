@@ -74,6 +74,7 @@ spec:
       external:
         labels:
           k8s-gateway.dns/ignore: "true"
+          external-dns.alpha.kubernetes.io/exclude: "true"
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
