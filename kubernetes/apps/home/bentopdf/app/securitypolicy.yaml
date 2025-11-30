@@ -7,8 +7,8 @@ metadata:
 spec:
   endpoints:
     - fqdn:
-        hostname: id.${SECRET_DOMAIN}
-        port: 443
+        hostname: pocket-id.security.svc.cluster.local
+        port: 1411
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.envoyproxy.io/securitypolicy_v1alpha1.json
 apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -26,7 +26,7 @@ spec:
       issuer: "https://id.${SECRET_DOMAIN}"
       backendRef:
         name: pocketid-oidc
-        port: 443
+        port: 1411
     clientID: *app
     clientSecret:
       name: bentopdf-oidc-secret
