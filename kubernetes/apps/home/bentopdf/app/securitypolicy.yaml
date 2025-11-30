@@ -1,4 +1,15 @@
 ---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: pocketid-oidc
+  namespace: home
+spec:
+  endpoints:
+    - fqdn:
+        hostname: id.${SECRET_DOMAIN}
+        port: 443
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.envoyproxy.io/securitypolicy_v1alpha1.json
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
@@ -13,6 +24,9 @@ spec:
   oidc:
     provider:
       issuer: "https://id.${SECRET_DOMAIN}"
+      backendRef:
+        name: pocketid-oidc
+        port: 443
     clientID: *app
     clientSecret:
       name: bentopdf-oidc-secret
