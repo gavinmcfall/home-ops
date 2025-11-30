@@ -24,9 +24,9 @@ spec:
   oidc:
     provider:
       issuer: "https://id.${SECRET_DOMAIN}"
-      backendRef:
-        name: pocketid-oidc
-        port: 1411
+      backendRefs:
+        - name: pocketid-oidc
+          port: 1411
     clientID: *app
     clientSecret:
       name: bentopdf-oidc-secret
