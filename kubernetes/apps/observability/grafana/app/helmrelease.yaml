@@ -60,9 +60,9 @@ spec:
         allow_sign_up: true
         auto_login: false
         scopes: openid profile email
-        auth_url: https://id.nerdz.cloud/authorize
-        token_url: https://id.nerdz.cloud/api/oidc/token
-        api_url: https://id.nerdz.cloud/api/oidc/userinfo
+        auth_url: https://id.${SECRET_DOMAIN}/authorize
+        token_url: https://id.${SECRET_DOMAIN}/api/oidc/token
+        api_url: https://id.${SECRET_DOMAIN}/api/oidc/userinfo
         use_pkce: true
         role_attribute_path: "contains(groups[*], 'admin') && 'Admin' || 'Viewer'"
       news:

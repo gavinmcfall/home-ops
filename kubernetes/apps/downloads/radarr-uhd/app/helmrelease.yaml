@@ -103,7 +103,7 @@ spec:
           gethomepage.dev/widget.type: radarr
           gethomepage.dev/widget.url: http://radarr-uhd.downloads
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_RADARR_UHD_TOKEN}}` }}"
-          internal-dns.nerdz.cloud/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:

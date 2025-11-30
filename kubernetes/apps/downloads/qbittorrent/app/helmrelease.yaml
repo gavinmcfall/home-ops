@@ -176,7 +176,7 @@ spec:
           gethomepage.dev/widget.url: http://qbittorrent.downloads
           gethomepage.dev/widget.username: "{{ `{{HOMEPAGE_VAR_QBITTORRENT_USERNAME}}` }}"
           gethomepage.dev/widget.password: "{{ `{{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}` }}"
-          internal-dns.nerdz.cloud/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
           - qb.${SECRET_DOMAIN}
         parentRefs:

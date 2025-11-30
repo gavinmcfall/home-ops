@@ -62,7 +62,7 @@ spec:
           gethomepage.dev/app: *app
           gethomepage.dev/icon: calibre-web.png
           gethomepage.dev/description: Comic Downloads
-          internal-dns.nerdz.cloud/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:

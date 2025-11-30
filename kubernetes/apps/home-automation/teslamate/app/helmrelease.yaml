@@ -66,7 +66,7 @@ spec:
           gethomepage.dev/icon: teslamate.png
           gethomepage.dev/description: Tesla Analytics
           # gethomepage.dev/widget.type: REQUIRES teslamate-api by tobiasehlertr
-          internal-dns.nerdz.cloud/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
