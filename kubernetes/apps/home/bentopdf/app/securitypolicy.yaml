@@ -3,26 +3,19 @@
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
-  name: &app ${APP}
-  namespace: home
+  name: ${APP}-oidc
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      name: bentopdf-external
+      name: ${APP}
   oidc:
     provider:
       issuer: "https://id.${SECRET_DOMAIN}"
-      authorizationEndpoint: "https://id.${SECRET_DOMAIN}/authorize"
-      tokenEndpoint: "https://id.${SECRET_DOMAIN}/api/oidc/token"
-      backendRefs:
-        - group: ""
-          kind: Service
-          name: pocket-id
-          namespace: security
-          port: 1411
-    clientID: *app
+    clientIDRef:
+      name: "${APP}-oidc"
     clientSecret:
-      name: bentopdf-oidc-secret
+      name: "${APP}-oidc"
     redirectURL: "https://pdf.${SECRET_DOMAIN}/oauth2/callback"
-    logoutPath: "/logout"
+    logoutPath: "${LOGOUT_PATH:-/logout}"
+    scopes: ["openid", "profile", "email"]
