@@ -72,6 +72,8 @@ spec:
             port: *port
     route:
       external:
+        labels:
+          k8s-gateway.dns/ignore: "true"
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
