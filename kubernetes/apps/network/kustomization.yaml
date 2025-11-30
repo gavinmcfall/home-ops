@@ -16,5 +16,4 @@ resources:
   - ./gateway-api/ks.yaml
   - ./k8s-gateway/ks.yaml
   - ./multus/ks.yaml
-  # - ./oauth2-proxy/ks.yaml
   - ./tailscale/ks.yaml
