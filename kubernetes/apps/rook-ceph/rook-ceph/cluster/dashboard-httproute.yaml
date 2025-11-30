@@ -6,7 +6,7 @@ metadata:
   name: rook-ceph-dashboard
   namespace: rook-ceph
   annotations:
-    internal-dns.nerdz.cloud/target: internal.${SECRET_DOMAIN}
+    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
 spec:
   parentRefs:
     - name: internal

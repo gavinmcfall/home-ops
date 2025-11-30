@@ -77,7 +77,7 @@
 
 ### Dashboards
 - Grafana dashboards configured via `dashboards/` and exposed by Flux.
-- Status badges referenced in `README.md` (e.g., `https://status.nerdz.cloud`).
+- Status badges referenced in `README.md` (e.g., `https://status.${SECRET_DOMAIN}`).
 
 ## Technology Stack
 - **Runtime**: Kubernetes (Talos) with Helm + Flux.
