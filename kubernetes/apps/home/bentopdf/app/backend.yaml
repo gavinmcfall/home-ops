@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.envoyproxy.io/backend_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: ${APP}-oidc-provider
+spec:
+  endpoints:
+    - fqdn:
+        hostname: pocket-id.security.svc.cluster.local
+        port: 1411
