@@ -25,6 +25,9 @@ spec:
   values:
     fullnameOverride: *app
     # logLevel: debug
+    image:
+      repository: registry.k8s.io/external-dns/external-dns
+      tag: v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7
     provider:
       name: webhook
       webhook:
@@ -60,6 +63,7 @@ spec:
           timeoutSeconds: 5
     extraArgs:
       - --ignore-ingress-tls-spec
+      - --annotation-filter=internal-dns.nerdz.cloud/target
     policy: sync
     sources:
       - gateway-httproute

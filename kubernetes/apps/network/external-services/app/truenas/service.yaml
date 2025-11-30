@@ -5,7 +5,7 @@ metadata:
   name: truenas
   annotations:
     external-dns.alpha.kubernetes.io/hostname: citadel.${SECRET_DOMAIN}
-    external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+    internal-dns.nerdz.cloud/target: internal.${SECRET_DOMAIN}
 spec:
   type: ClusterIP
   ports:

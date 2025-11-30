@@ -61,7 +61,7 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.nerdz.cloud/target: internal.${SECRET_DOMAIN}
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
