@@ -25,7 +25,9 @@ spec:
     provider:
       issuer: "https://id.${SECRET_DOMAIN}"
       backendRefs:
-        - name: pocketid-oidc
+        - group: gateway.envoyproxy.io
+          kind: Backend
+          name: pocketid-oidc
           port: 1411
     clientID: *app
     clientSecret:
