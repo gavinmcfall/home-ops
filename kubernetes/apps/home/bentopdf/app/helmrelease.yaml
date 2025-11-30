@@ -71,13 +71,22 @@ spec:
           http:
             port: *port
     route:
-      app:
+      external:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
           - "pdf.${SECRET_DOMAIN}"
         parentRefs:
           - name: external
+            namespace: network
+            sectionName: https
+      internal:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "pdf.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
             namespace: network
             sectionName: https
     persistence:
