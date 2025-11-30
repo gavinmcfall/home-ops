@@ -3,20 +3,18 @@
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
-  name: bentopdf-oauth2
+  name: &app ${APP}
   namespace: home
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      name: bentopdf
-  extAuth:
-    http:
-      backendRefs:
-        - name: oauth2-proxy
-          namespace: network
-          port: 4180
-      headersToBackend:
-        - Authorization
-        - Cookie
-      path: /oauth2/auth
+      name: *app
+  oidc:
+    provider:
+      issuer: "https://id.${SECRET_DOMAIN}"
+    clientID: *app
+    clientSecret:
+      name: bentopdf-oidc-secret
+    redirectURL: "https://pdf.${SECRET_DOMAIN}/oauth2/callback"
+    logoutPath: "/logout"
