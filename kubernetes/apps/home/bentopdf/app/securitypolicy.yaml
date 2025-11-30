@@ -16,7 +16,9 @@ spec:
       authorizationEndpoint: "https://id.${SECRET_DOMAIN}/authorize"
       tokenEndpoint: "https://id.${SECRET_DOMAIN}/api/oidc/token"
       backendRefs:
-        - name: pocket-id
+        - group: ""
+          kind: Service
+          name: pocket-id
           namespace: security
           port: 1411
     clientID: *app
