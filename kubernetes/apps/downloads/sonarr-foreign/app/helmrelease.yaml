@@ -103,7 +103,7 @@ spec:
           gethomepage.dev/widget.type: sonarr
           gethomepage.dev/widget.url: http://sonarr-foreign.downloads
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_SONARR_FOREIGN_TOKEN}}` }}"
-          external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.nerdz.cloud/target: internal.${SECRET_DOMAIN}
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
