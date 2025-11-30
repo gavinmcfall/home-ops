@@ -1,15 +1,4 @@
 ---
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: Backend
-metadata:
-  name: pocketid-oidc
-  namespace: home
-spec:
-  endpoints:
-    - fqdn:
-        hostname: pocket-id.security.svc.cluster.local
-        port: 1411
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.envoyproxy.io/securitypolicy_v1alpha1.json
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
@@ -25,9 +14,8 @@ spec:
     provider:
       issuer: "https://id.${SECRET_DOMAIN}"
       backendRefs:
-        - group: gateway.envoyproxy.io
-          kind: Backend
-          name: pocketid-oidc
+        - name: pocket-id
+          namespace: security
           port: 1411
     clientID: *app
     clientSecret:
