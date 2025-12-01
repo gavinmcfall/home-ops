@@ -21,7 +21,7 @@ spec:
               app.kubernetes.io/name: envoy
               gateway.envoyproxy.io/owning-gateway-namespace: network
       ports:
-        - port: &port 8080
+        - port: &port 80
           protocol: TCP
     # autobrr
     - from:
@@ -63,11 +63,11 @@ spec:
       ports:
         - port: *port
           protocol: TCP
-    # qbtools
+    # qui
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: qbtools
+              app.kubernetes.io/name: qui
       ports:
         - port: *port
           protocol: TCP
@@ -100,6 +100,14 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: sonarr-uhd
+      ports:
+        - port: *port
+          protocol: TCP
+    # tqm
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: tqm
       ports:
         - port: *port
           protocol: TCP
