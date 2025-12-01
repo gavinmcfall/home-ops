@@ -1,0 +1,10 @@
+---
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: home-subnet
+spec:
+  hostname: home-subnet-router
+  subnetRouter:
+    advertiseRoutes:
+      - 10.90.0.0/16
