@@ -5,6 +5,7 @@ Thumbs.db
 kubeconfig
 talosconfig
 .decrypted~*.yaml
+.decrypted~*.md
 .config.env
 *.agekey
 *.pub
