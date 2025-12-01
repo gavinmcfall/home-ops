@@ -1,0 +1,51 @@
+{
+  "mcpServers": {
+    "grafana": {
+      "command": "/home/gavin/go/bin/mcp-grafana",
+      "env": {
+        "GRAFANA_URL": "${GRAFANA_URL}",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${GRAFANA_SERVICE_ACCOUNT_TOKEN}"
+      },
+      "disabled": true
+    },
+    "shell": {
+      "command": "uvx",
+      "args": [
+        "mcp-shell-server"
+      ],
+      "env": {
+        "ALLOW_COMMANDS": "ls,cat,pwd,grep,wc,find,head,tail,sort,uniq,cut,tr,sed,awk,jq,yq,kubectl,flux,talosctl,task,git,docker,helm"
+      }
+    },
+    "github": {
+      "command": "/home/gavin/mcp/github-mcp-server",
+      "args": [
+        "stdio"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
+      "disabled": true
+    },
+    "prometheus": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "prometheus-mcp@latest",
+        "stdio"
+      ],
+      "env": {
+        "PROMETHEUS_URL": "${PROMETHEUS_URL}"
+      },
+      "disabled": true
+    },
+    "cloudflare-docs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://docs.mcp.cloudflare.com/mcp"
+      ]
+    }
+  }
+}
