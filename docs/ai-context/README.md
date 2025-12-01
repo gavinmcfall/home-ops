@@ -1,16 +1,89 @@
+---
+description: Navigation hub for AI context documentation with philosophy overview and document structure
+tags: ["Navigation", "DocumentStructure", "AIContext"]
+audience: ["LLMs", "Humans"]
+categories: ["Documentation[100%]", "Navigation[95%]"]
+---
+
 # AI Context Documentation
 
 This directory contains the single source of truth for AI assistant context across multiple tools (Claude Code, Cursor, GitHub Copilot, and Gemini).
 
-## Navigation
+## Read These First
 
-### Core Documentation
+**New to this repository?** Read in order:
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) - GitOps architecture, key decisions, and constraints
-- [DOMAIN.md](DOMAIN.md) - Business rules, entity relationships, and invariants
-- [WORKFLOWS.md](WORKFLOWS.md) - Operational workflows and procedures
-- [TOOLS.md](TOOLS.md) - Tool usage patterns and discovery commands
-- [CONVENTIONS.md](CONVENTIONS.md) - Coding standards and project guidelines
+1. **[Ethos.md](Ethos.md)** - Documentation philosophy (hard rules, strong guidance, values)
+2. **[ARCHITECTURE.md](ARCHITECTURE.md)** - GitOps architecture and key decisions
+3. **[DOMAIN.md](DOMAIN.md)** - Business rules and invariants
+
+**Writing documentation?** Read:
+
+1. **[writing-documentation.md](writing-documentation.md)** - Wisdom triggers philosophy
+2. **[writing-capsules.md](writing-capsules.md)** - Capsule format specification
+3. **[mermaid-diagram-guide.md](mermaid-diagram-guide.md)** - Diagram best practices
+
+---
+
+## Document Map
+
+### Foundation (Philosophy)
+
+| Document | Purpose |
+|----------|---------|
+| [Ethos.md](Ethos.md) | Hard rules, strong guidance, values for documentation |
+| [writing-documentation.md](writing-documentation.md) | Wisdom triggers, token economics, two-tier architecture |
+| [writing-capsules.md](writing-capsules.md) | Invariant->Example->Depth format specification |
+| [mermaid-diagram-guide.md](mermaid-diagram-guide.md) | Diagram types, accessibility, universal rules |
+
+### System Context
+
+| Document | Purpose |
+|----------|---------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | GitOps architecture, key decisions, constraints |
+| [NETWORKING.md](NETWORKING.md) | Traffic flows, DNS, gateways, OIDC authentication |
+| [DOMAIN.md](DOMAIN.md) | Business rules, entity relationships, state machines |
+| [WORKFLOWS.md](WORKFLOWS.md) | Operational workflows and procedures |
+| [TOOLS.md](TOOLS.md) | MCP servers, CLI commands, discovery patterns |
+| [CONVENTIONS.md](CONVENTIONS.md) | Coding standards, commit guidelines, project structure |
+| [PERSONAS.md](PERSONAS.md) | User access personas for Internal and Externall application access |
+
+---
+
+## Documentation Philosophy
+
+This knowledge base follows the **wisdom triggers** approach:
+
+### Hard Rules (Never Violate)
+- **Only record what you can verify** - Wrong information is worse than missing
+- **When in doubt, omit** - Missing prompts questions; wrong causes failures
+
+### Strong Guidance
+- **Document shape, not detail** - Patterns over implementations
+- **Focus on why, not just what** - Principles over procedures
+- **Provide trails, not destinations** - Link to manifests, don't duplicate
+
+### Capsule Format
+
+Distill concepts into stable, minimal truths:
+
+```markdown
+### Capsule: ConceptName
+
+**Invariant**
+Core truth in <=30 tokens, timeless, no versions
+
+**Example**
+Concrete instance in <=5 lines
+
+**Depth**
+- Distinction: How this differs from similar concepts
+- Trade-off: What you gain vs lose
+- NotThis: Common misconceptions
+- SeeAlso: Related capsule names
+```
+
+---
 
 ## Purpose
 
@@ -18,30 +91,50 @@ This centralized documentation:
 - Eliminates duplication across `.claude/`, `.cursor/`, `.codex/`, and `.github/` directories
 - Provides consistent context to all AI coding assistants
 - Makes updates easier - change once, propagate to all tools
-- Maintains version control and team collaboration
+- Optimizes for AI comprehension with capsules and frontmatter
 
 ## Tool-Specific Configurations
 
 Each AI tool references these files using their native import mechanism:
 
-- **Claude Code**: `.claude/CLAUDE.md` imports files with `@docs/ai-context/filename.md`
-- **Cursor**: `.cursor/rules/index.mdc` references files with `@docs/ai-context/filename.md`
-- **GitHub Copilot**: `.github/copilot-instructions.md` links to files manually
-- **Gemini**: Reads project files through IDE integration
+| Tool | Config Location | Import Syntax |
+|------|-----------------|---------------|
+| Claude Code | `.claude/CLAUDE.md` | `@docs/ai-context/filename.md` |
+| Cursor | `.cursor/rules/index.mdc` | `@docs/ai-context/filename.md` |
+| GitHub Copilot | `.github/copilot-instructions.md` | Manual links |
+| Gemini | IDE integration | Reads project files |
 
-## Adding New Context
+---
+
+## Adding New Documentation
 
 When adding new documentation:
-1. Create or update markdown files in this directory
-2. Tool-specific configs will automatically see the changes through their import mechanisms
-3. Commit changes to version control
-4. All team members and AI assistants benefit immediately
 
-## Structure Philosophy
+1. **Read [Ethos.md](Ethos.md)** - Understand the philosophy
+2. **Read [writing-documentation.md](writing-documentation.md)** - Understand the format
+3. **Add frontmatter** - description, tags, audience, categories
+4. **Use capsules** for key concepts
+5. **Follow [mermaid-diagram-guide.md](mermaid-diagram-guide.md)** for diagrams
+6. **Link, don't duplicate** - Point to manifests and configs
 
-This follows a living documentation pattern:
-- **Architecture** - Why the system is designed this way
-- **Domain** - What the business rules and invariants are
-- **Workflows** - How to perform common operations
-- **Tools** - Which commands to use for discovery and validation
-- **Conventions** - Coding and project standards to follow
+### Frontmatter Template
+
+```yaml
+---
+description: One-sentence value proposition
+tags: ["CamelCaseConcepts", "MoreTags"]
+audience: ["LLMs", "Humans"]
+categories: ["PrimaryType[100%]", "SecondaryType[85%]"]
+---
+```
+
+---
+
+## Success Metrics
+
+Documentation succeeds when:
+
+- Readers grasp concepts in seconds, not minutes
+- AI finds and extracts exactly what's needed
+- New contributors understand where things fit
+- Updates preserve meaning while adding detail

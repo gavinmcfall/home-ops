@@ -1,50 +1,68 @@
 # Homelab Repository Context
 
-This repository manages a Kubernetes homelab using GitOps principles with Flux, Talos, and Taskfile-driven workflows.
+GitOps-managed Kubernetes homelab using Flux, Talos, and Makejinja templates.
 
-## Core Documentation
+## Read First
 
-The following files contain comprehensive context about this repository. They are the single source of truth shared across all AI coding assistants:
+1. **@docs/ai-context/Ethos.md** - Documentation philosophy
+2. **@docs/ai-context/ARCHITECTURE.md** - System architecture
+3. **@docs/ai-context/CONVENTIONS.md** - Coding standards
 
-@docs/ai-context/README.md
-@docs/ai-context/ARCHITECTURE.md
-@docs/ai-context/DOMAIN.md
-@docs/ai-context/WORKFLOWS.md
-@docs/ai-context/TOOLS.md
-@docs/ai-context/CONVENTIONS.md
+## Documentation
 
-## MCP Configuration
+### System Context
+- @docs/ai-context/ARCHITECTURE.md - Architecture, capsules, patterns
+- @docs/ai-context/NETWORKING.md - Traffic flows, DNS, gateways, OIDC
+- @docs/ai-context/DOMAIN.md - Rules, state machines, glossary
+- @docs/ai-context/WORKFLOWS.md - How to deploy, update, troubleshoot
+- @docs/ai-context/TOOLS.md - MCP servers, CLI commands
+- @docs/ai-context/CONVENTIONS.md - Naming, structure, style
 
-MCP servers are configured in the root `.mcp.json` file (shared across VS Code and Claude Code).
+### Writing Guides
+- @docs/ai-context/Ethos.md - Hard rules, guidance, values
+- @docs/ai-context/writing-documentation.md - Wisdom triggers
+- @docs/ai-context/writing-capsules.md - Capsule format
+- @docs/ai-context/mermaid-diagram-guide.md - Diagram rules
+
+## Critical Invariants
+
+### Capsule: GitOpsReconciliation
+
+**Invariant**: Cluster state converges to match Git; Flux reverts manual changes.
+
+### Capsule: MakejinjaTemplates
+
+**Invariant**: Edit templates in `bootstrap/templates/`, run `task configure`; don't edit generated files.
+
+### Capsule: SopsEncryption
+
+**Invariant**: Secrets are SOPS-encrypted in Git; Flux decrypts at runtime.
+
+### Capsule: AppTemplateChart
+
+**Invariant**: Apps use `bjw-s/app-template` chart; vendor charts are exceptions.
 
 ## Quick Reference
 
-- **Core Pattern**: GitOps + templated manifests via Taskfile and Makejinja
-- **Directory Structure**: `kubernetes/apps/<namespace>/<app>/` contains HelmRelease, ExternalSecret, and kustomization
-- **Secret Management**: Placeholders (`${SECRET_DOMAIN}`, `${DB_URI}`) resolved via ExternalSecrets
-- **Validation**: Always run `task configure` → `task kubernetes:kubeconform` → `flux diff` before merging
+| Task | Command |
+|------|---------|
+| Render templates | `task configure` |
+| Validate | `task kubernetes:kubeconform` |
+| Check status | `flux get helmreleases -A` |
+| Force sync | `task flux:reconcile` |
+| Find apps | `ls kubernetes/apps/<namespace>/` |
 
-## Key Commands
+## Directory Structure
 
-```bash
-# Render templates and validate
-task configure
-task kubernetes:kubeconform
-
-# Check Flux status
-flux get kustomizations
-flux get helmreleases
-flux diff kustomization <namespace>
-
-# Find resources
-rg --files -g"helmrelease.yaml" kubernetes/apps
-rg -n "\${SECRET_DOMAIN}" -g"*.yaml" kubernetes/apps
+```
+bootstrap/templates/    # SOURCE - Jinja2 templates
+kubernetes/apps/        # OUTPUT - Generated manifests
+config.yaml             # SECRET - Template variables (not committed)
 ```
 
-## Important Notes
+## Non-Obvious Truths
 
-- Never manually edit generated files under `kubernetes/apps/*/app/`
-- Always use `task configure` to render templates
-- Placeholders must be documented before use
-- Storage (PVCs/NFS) must be explicitly defined
-- Follow conventional commits: `chore(app): description`
+- **Makejinja delimiters**: `#{var}#` not `{{var}}` (avoids Helm conflicts)
+- **Gateway API routing**: Use `route` not `ingress` for main traffic
+- **Image pinning**: Always include `@sha256:` digest
+- **SOPS files**: End in `.sops.yaml`, encrypted before commit

@@ -1,95 +1,245 @@
+---
+description: GitOps architecture overview covering the template pipeline, routing patterns, and operational constraints
+tags: ["GitOps", "FluxReconciliation", "MakejinjaTemplates", "GatewayAPI", "TailscaleIngress"]
+audience: ["LLMs", "Humans"]
+categories: ["Architecture[100%]", "Reference[90%]"]
+---
+
 # Homelab Architecture Overview
 
 ## Core Pattern
-**Pattern**: GitOps + templated manifest pipeline. Taskfile and Makejinja render values (`Taskfile.yaml`, `.taskfiles/*`, `makejinja.toml`), Flux applies the results under `kubernetes/apps/*`, and Talos controls node configuration locally.
-**Chosen Because**: Keeps every change traceable in Git, avoids manual `kubectl`, and lets Flux automatically roll out updates.
-**Trade-off**: Bundle of placeholders means deployments fail until secrets (placeholders like `${SECRET_DOMAIN}`) are resolved, so authors must update documents before merges.
-**Not Because**: This is not a multi-tenant SaaS platform—it's tuned for a single homelab operator.
 
-## Key Decisions
-### Decision 1: Taskfile-driven render pipeline
-**Context**: Need reproducible templates for configs used by Flux and Talos.
-**Decision**: Use `Taskfile.yaml` to orchestrate `makejinja`, flux checks, and `kubeconform` validation.[Taskfile.yaml:1-80]
-**Consequences**:
-- ✅ Every developer runs the same `task configure` command so manifests match what Flux will apply.
-- ⚠️ Taskfile adds indirection; you must keep vars in sync (e.g., `bootstrap/config.yaml`, `scripts/`).
-- ❌ Manual `kubectl apply` is discouraged because it bypasses GitOps.
+### Capsule: GitOpsReconciliation
 
-### Decision 2: Flux + HelmRelease per app
-**Context**: Desire flexible service ownership while keeping the cluster consistent.
-**Decision**: Each app (games, plane, etc.) lives in its own `kubernetes/apps/<namespace>` folder with HelmRelease, ExternalSecret, and kustomization manifests.[kubernetes/apps/games/romm/app/helmrelease.yaml]
-**Impact**:
-- ✅ Dependencies/lifecycle captured via `dependsOn`, `remediation`, and pinned chart versions.
-- ⚠️ You need to wire the HelmRelease into the area `kustomization.yaml` or Flux will skip it.
-- ❌ Rolling out ephemeral workloads requires new directories or careful cleanup.
+**Invariant**
+Cluster state converges to match Git; Flux reverts manual changes on next sync.
 
-### Decision 3: Placeholder-first secret management
-**Context**: Repo is public; sensitive values must not leak.
-**Decision**: Use placeholder names (`${SECRET_DOMAIN}`, `${NFS_STORAGE_HOST}`, `PLANE_*`) and resolve them through ExternalSecrets or manual replacements before deployment.[kubernetes/apps/games/romm/app/helmrelease.yaml:90-140]
-**Alternatives Considered**: Inline secrets, sealed secrets.
-**Why This Won**: Placeholders keep reviewers confident nothing secret is checked in while still documenting required keys.
+**Example**
+Push HelmRelease to `kubernetes/apps/downloads/prowlarr/`; Flux detects within 5 minutes; cluster deploys. `kubectl edit` gets overwritten on reconciliation.
 
-## Constraints
-### Must Always Be True
-1. Flux only applies what `task configure` renders; never directly edit generated artifacts under `kubernetes/apps/*`.
-2. Placeholder values such as `${SECRET_DOMAIN}` and `${MEDIA_SERVER}` must be documented before use.
-3. Storage-heavy workloads should explicitly define PVCs/NFS mounts to avoid missing resources at runtime.
-
-### Performance Targets
-- **Designed For**: A handful of Flux reconcilable workloads (games, plane, observability) with moderate traffic.
-- **Not Designed For**: Public-facing, high-throughput APIs with sub-100ms guarantees.
-- **Scaling Strategy**: Add nodes via `talosconfig/` updates and `task configure`, then let Flux redeploy.
-
-## Operational Limits
-### Resource Limits
-| Resource | Limit | What Happens When Exceeded |
-|----------|-------|---------------------------|
-| Flux reconciliation interval | ~5m | Delay in deployment; `flux get kustomizations` shows `Reconciling` until fixed. |
-| PVC capacity | Defined per workload | Apps like ROMM fail with `Pending` pods if claim is missing. |
-| Template vars | Taskfile variables | Missing placeholders stop `makejinja` rendering.
-
-### Circuit Breakers
-- **Secrets placeholder mismatch**: Flux fails; check `${SECRET_DOMAIN}` usage in `kubernetes/apps/*/app/helmrelease.yaml`.
-- **Storage path misconfig**: ROMM's `media` mount references `${MEDIA_SERVER}` and requires the `romm-data` claim, documented in `kubernetes/apps/games/romm/app/helmrelease.yaml`.
-
-## Common Failures
-### Flux can't render HelmRelease
-**Symptoms**: `helm` hook errors in Flux status.
-**Cause**: Missing placeholder, invalid value, or unrendered template from `.taskfiles/Kubernetes`.
-**Immediate Fix**: Run `task configure` locally, check `kubernetes/apps/<namespace>/app` output for errors.
-**Long-term Fix**: Document required placeholders in `TEMPLATE_GUIDE.md` and evidence table.
-
-### Secrets unresolved
-**Symptoms**: Pods crash with missing env entries or fail `envFrom`.
-**Cause**: ExternalSecret not populated from vault yet.
-**Fix**: Trigger vault sync (ExternalSecrets logs) and ensure login to private 1Password before pushing.
-
-### Storage claim missing
-**Symptoms**: Pods stay `Pending` waiting for `romm-data` or other PVCs.
-**Cause**: PVC definition absent or claim mismatch.
-**Fix**: Create PVC or update HelmRelease to use existing claim, then rerun `flux diff`.
-
-## Monitoring
-### Key Metrics
-- `flux_kustomization_status` – ensures overlays are healthy.
-- `${SERVICE}_request_duration_seconds` – tracked via dashboards referenced in `README.md`.
-- `external_secrets_sync_success_total` – watch for missing secrets before deployments.
-
-### Dashboards
-- Grafana dashboards configured via `dashboards/` and exposed by Flux.
-- Status badges referenced in `README.md` (e.g., `https://status.${SECRET_DOMAIN}`).
-
-## Technology Stack
-- **Runtime**: Kubernetes (Talos) with Helm + Flux.
-- **Provisioning**: Taskfile/Makejinja templates, `bootstrap/` scripts, `talosconfig/` configs.
-- **Secrets**: ExternalSecrets + placeholder names (see `TEMPLATE_GUIDE.md`).
-- **Storage**: PVCs and NFS mounts defined in HelmRelease values (ROMM example). Adjust via `kubernetes/apps/*/app/helmrelease.yaml`.
-- **Validation**: `task kubernetes:kubeconform`, `flux diff`, `flux reconcile`.
+**Depth**
+- Distinction: GitOps is declarative (desired state in Git); `kubectl` is imperative
+- Trade-off: Consistency and auditability vs immediate manual changes
+- NotThis: `kubectl apply` bypasses GitOps and creates drift
+- SeeAlso: `MakejinjaTemplates`, `FluxBootstrap`
 
 ---
+
+### Capsule: MakejinjaTemplates
+
+**Invariant**
+Jinja2 templates in `bootstrap/templates/` render to `kubernetes/` via Makejinja; edit templates, not output.
+
+**Example**
+Edit `bootstrap/templates/kubernetes/apps/network/cloudflared/app/helmrelease.yaml.j2` -> run `task configure` -> generates `kubernetes/apps/network/cloudflared/app/helmrelease.yaml` -> commit and push.
+//BOUNDARY: Editing generated files directly loses changes on next `task configure`.
+
+**Depth**
+- Distinction: Templates use `#{variable}#` syntax (not `{{`); generated files are plain YAML
+- Trade-off: Extra local step but enables config-driven generation
+- NotThis: Hand-editing files in `kubernetes/apps/` when a template exists
+- SeeAlso: `GitOpsReconciliation`, `SopsEncryption`
+
+---
+
+### Capsule: SopsEncryption
+
+**Invariant**
+Secrets are encrypted with SOPS+age in Git; decrypted at runtime by Flux.
+
+**Example**
+`secret.sops.yaml.j2` template -> `task configure` renders it -> `task sops:encrypt` encrypts -> Flux decrypts in cluster.
+//BOUNDARY: Unencrypted secrets in Git expose credentials publicly.
+
+**Depth**
+- Distinction: SOPS encrypts the file; age provides the key; Flux decrypts
+- Trade-off: Secure storage but requires age key management
+- NotThis: Using plain secrets or committing unencrypted values
+- SeeAlso: `MakejinjaTemplates`
+
+---
+
+## Routing Patterns
+
+### Capsule: GatewayAPIRouting
+
+**Invariant**
+External/internal traffic routes via Gateway API `HTTPRoute`; ingress-nginx is legacy.
+
+**Example**
+```yaml
+route:
+  app:
+    annotations:
+      external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+    hostnames:
+      - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+    parentRefs:
+      - name: external
+        namespace: network
+        sectionName: https
+```
+//BOUNDARY: Missing `parentRefs` breaks routing entirely.
+
+**Depth**
+- Distinction: `external` gateway for public; `internal` gateway for private
+- Trade-off: More explicit but requires gateway infrastructure
+- SeeAlso: `TailscaleIngress`, `ExternalDNS`
+
+---
+
+### Capsule: TailscaleIngress
+
+**Invariant**
+Tailscale VPN access uses `className: tailscale` ingress separately from Gateway API.
+
+**Example**
+```yaml
+ingress:
+  tailscale:
+    enabled: true
+    className: tailscale
+    hosts:
+      - host: "{{ .Release.Name }}"
+```
+
+**Depth**
+- Distinction: Tailscale ingress is for VPN access; Gateway API is for DNS-based access
+- Trade-off: Two routing systems but enables secure remote access
+- SeeAlso: `GatewayAPIRouting`
+
+---
+
+## Application Patterns
+
+### Capsule: AppTemplateChart
+
+**Invariant**
+Apps use `bjw-s/app-template` chart; vendor charts are exceptions, not defaults.
+
+**Example**
+```yaml
+chart:
+  spec:
+    chart: app-template
+    version: 4.4.0
+    sourceRef:
+      kind: HelmRepository
+      name: bjw-s
+      namespace: flux-system
+```
+
+**Depth**
+- Distinction: app-template provides consistent structure; vendor charts vary
+- Trade-off: Learning curve but consistent patterns across all apps
+- NotThis: Using random Helm charts without checking if app-template works
+- SeeAlso: `HelmReleaseStructure`
+
+---
+
+### Capsule: SecretReference
+
+**Invariant**
+Secrets are referenced via `secretRef`; actual values come from SOPS-encrypted files or ExternalSecrets.
+
+**Example**
+```yaml
+envFrom:
+  - secretRef:
+      name: prowlarr-secret
+```
+Secret `prowlarr-secret` is created by SOPS decryption or ExternalSecret sync.
+
+**Depth**
+- Distinction: HelmRelease references secrets; doesn't define them inline
+- Trade-off: Indirection but keeps secrets out of HelmRelease
+- SeeAlso: `SopsEncryption`
+
+---
+
+## Directory Structure
+
+```
+home-ops/
+├── bootstrap/
+│   ├── templates/           # Jinja2 templates (SOURCE)
+│   │   └── kubernetes/apps/ # App templates
+│   ├── scripts/             # Makejinja plugins
+│   └── overrides/           # Template overrides
+├── kubernetes/              # GENERATED output
+│   ├── apps/                # Rendered app manifests
+│   │   ├── cert-manager/
+│   │   ├── database/
+│   │   ├── downloads/
+│   │   ├── entertainment/
+│   │   ├── home/
+│   │   ├── network/
+│   │   ├── observability/
+│   │   └── ...
+│   ├── bootstrap/           # Flux bootstrap
+│   └── flux/                # Flux configuration
+├── config.yaml              # Template variables (SECRET - not committed)
+├── Taskfile.yaml            # Task runner
+└── makejinja.toml           # Template engine config
+```
+
+**Key Insight**: `bootstrap/templates/` contains some apps; `kubernetes/apps/` contains all apps (both generated and hand-created).
+
+---
+
+## Namespaces
+
+| Namespace | Purpose | Key Apps |
+|-----------|---------|----------|
+| cert-manager | TLS certificates | cert-manager |
+| database | Data stores | postgres, mariadb, dragonfly, mosquitto |
+| downloads | Media acquisition | prowlarr, radarr, sonarr, qbittorrent |
+| entertainment | Media serving | plex, jellyfin, audiobookshelf |
+| external-secrets | Secret sync | external-secrets operator |
+| flux-system | GitOps | flux, weave-gitops |
+| games | Gaming | romm |
+| home | Home apps | homepage, linkwarden |
+| home-automation | IoT | home-assistant |
+| kube-system | Core k8s | cilium, coredns, metrics-server |
+| network | Networking | cloudflared, external-dns, gateways |
+| observability | Monitoring | prometheus, grafana |
+| openebs-system | Storage | openebs |
+| rook-ceph | Distributed storage | ceph cluster |
+| security | Auth | pocket-id |
+
+---
+
+## Operational Limits
+
+| Resource | Behavior |
+|----------|----------|
+| Flux reconciliation | Every 30m or on Git push |
+| HelmRelease retry | 3 retries with rollback on failure |
+| Secret sync | SOPS decrypts on Flux reconcile |
+
+---
+
+## Common Failures
+
+### HelmRelease stuck Reconciling
+**Cause**: Missing secret, invalid values, or chart error
+**Fix**: Check `flux logs`, ensure secrets exist, validate values
+
+### Pod Pending on storage
+**Cause**: PVC not bound or missing
+**Fix**: Create PVC or check rook-ceph cluster health
+
+### Route not working
+**Cause**: Missing gateway, wrong `parentRefs`, or DNS not configured
+**Fix**: Verify gateway exists in `network` namespace, check external-dns logs
+
+---
+
 ## Evidence
-| Claim | Source | Confidence | Details |
-|-------|:------:|:----------:|---------|
-| Taskfile orchestrates rendering/validation | `Taskfile.yaml` | 🟢 | Includes `.taskfiles/Kubernetes`, `.taskfiles/Talos`, `.taskfiles/Flux`, etc., plus renders via `makejinja`. |
-| Fluent HelmRelease layout per area | `kubernetes/apps/games/romm/app/helmrelease.yaml` | 🟢 | Shows values, env placeholders, dependencies, storage definitions. |
-| Secrets handled through placeholders | `kubernetes/apps/games/romm/app/helmrelease.yaml:65-140` | 🟢 | `${SECRET_DOMAIN}`, ExternalSecret references, `envFrom`. |
+
+| Claim | Source | Confidence |
+|-------|--------|------------|
+| Apps use bjw-s/app-template | `kubernetes/apps/*/helmrelease.yaml` | Verified |
+| Gateway API routing pattern | `kubernetes/apps/downloads/prowlarr/app/helmrelease.yaml:90-108` | Verified |
+| SOPS encryption for secrets | `Taskfile.yaml:59`, `.taskfiles/Sops/` | Verified |
+| Makejinja template pipeline | `makejinja.toml`, `bootstrap/templates/` | Verified |
