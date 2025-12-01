@@ -1,67 +1,257 @@
-# Setting up the Tailscale Operator
+# Tailscale Operator
 
-> [!IMPORTANT]
-> I set this up so I have a way to remotely manage my cluster. I am not using Tailscale for anything else
-> My setup is using app template, not the official helmchart
-> My setup is using a 1password connect server for external secret storage, yours might be different. Adjustments may need to be made
-> Ensure you have a tailscale account setup. You only need the free one
-> Setup the tailscale app on at least two devices (phone, laptop, etc)
+This operator provides two main capabilities:
 
-## Tailscale Account Setup
+1. **API Server Proxy** — Remote `kubectl` access to the cluster via Tailscale
+2. **Subnet Router (Connector)** — Expose cluster networks to the Tailnet for Split DNS remote access
 
-We are going to start on [tailscale.com](https://login.tailscale.com/)
+> [!NOTE]
+> We use Split DNS + Connector for app access instead of per-app Tailscale ingresses.
+> This means one Connector pod instead of 23+ proxy pods.
 
-1. Login to Tailscale
-2. Click on the [Access controls](https://login.tailscale.com/admin/acls/file) tab
-3. Look for the section called: `// Define the tags which can be applied to devices and by which users.``
-4. Edit this section to look like this:
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     Tailscale Remote Access                         │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   Remote Device                                                     │
+│       │                                                             │
+│       │ 1. DNS: paperless.${SECRET_DOMAIN}                          │
+│       ▼                                                             │
+│   ┌─────────────────┐                                               │
+│   │ Tailscale Client│  2. Split DNS forwards to k8s-gateway         │
+│   └────────┬────────┘     via WireGuard tunnel                      │
+│            │                                                        │
+│            ▼                                                        │
+│   ┌─────────────────┐                                               │
+│   │   k8s-gateway   │  3. Returns: 10.90.3.202 (internal gateway)   │
+│   │   10.90.3.200   │                                               │
+│   └────────┬────────┘                                               │
+│            │                                                        │
+│            ▼                                                        │
+│   ┌─────────────────┐                                               │
+│   │    Connector    │  4. Subnet route makes 10.90.x.x reachable    │
+│   │ (home-subnet)   │     via WireGuard mesh                        │
+│   └────────┬────────┘                                               │
+│            │                                                        │
+│            ▼                                                        │
+│   ┌─────────────────┐                                               │
+│   │ Internal Gateway│  5. HTTPRoute serves the app                  │
+│   │   10.90.3.202   │                                               │
+│   └─────────────────┘                                               │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+## Prerequisites
+
+- Tailscale account (free tier works)
+- Tailscale app on at least two devices (phone, laptop, etc.)
+- 1Password Connect (or your secret store of choice)
+
+---
+
+## Part 1: Operator Setup
+
+### Tailscale Account Configuration
+
+1. Login to [Tailscale](https://login.tailscale.com/)
+
+2. Go to [Access Controls](https://login.tailscale.com/admin/acls/file) and add these tags:
+
+    ```json
+    "tagOwners": {
+        "tag:k8s-operator": [],
+        "tag:k8s":          ["tag:k8s-operator"],
+    },
     ```
-        "tagOwners": {
-            "tag:k8s-operator": [],
-            "tag:k8s":          ["tag:k8s-operator"],
-        },
-    ```
-5. Ensure you click **Save**
-6. Next, click [DNS](https://login.tailscale.com/admin/dns) and scroll down to **MagicDNS** 
-7. Select **Settings** from the top meny and click on [OAuth Clients](https://login.tailscale.com/admin/settings/oauth)
-8. Click the button on the right called: **Generate OAuth client...**
-9. Set the following settings
-    - Description: Anything you like
-    - Device:
-        - Read: :white_check_mark:
-        - Write: :white_check_mark:
-    - Click **Add tags** and select `k8s-operator`
-    - <img src="https://raw.githubusercontent.com/gavinmcfall/home-ops/main/docs/src/assets/Tailscale_01.png"/>
-10. Click `Generate client`
-11. You will be presented with:
-    - Client ID
-    - Secret
-12. Open up one password and go into the vault you have configured for your kubernetes external secret stores
-13. Create a new password entry and call it `tailscale`
-14. Add two new password fields called:
+
+3. Click **Save**
+
+4. Go to **Settings** → [OAuth Clients](https://login.tailscale.com/admin/settings/oauth)
+
+5. Click **Generate OAuth client...** with these settings:
+    - Description: `k8s-operator`
+    - Device: Read ✓, Write ✓
+    - Add tag: `k8s-operator`
+
+6. Save the **Client ID** and **Secret** to 1Password:
     - `TAILSCALE_OATH_CLIENT_ID`
     - `TAILSCALE_OAUTH_CLIENT_SECRET`
-15. Copy the `Client ID` and `Secret` from Tailscale into these fields and save
-16. Back in Tailscale, go to **Settings** then [Device management](https://login.tailscale.com/admin/settings/device-management)
-17. Follow the provided [Tailscale guide](https://tailscale.com/kb/1226/tailnet-lock) to setup **Tailnet lock**
-18. Now you can copy the files from this repo into your own kubernetes cluster
-19. Ensure you add `  - ./tailscale/ks.yaml` to your root `kustomization.yaml` for that namespace
-    > [!IMPORTANT]
-    > Comment out the line you added for right now. This way you can commit to git as you go along without fear of it installing before you are ready
-20. If you built your cluster using the [Flux Cluster Template](https://github.com/onedr0p/flux-cluster-template) you are going to want to go to your CLI and run the following:
-    ```
-    sops ~/<path to your repo>/kubernetes/flux/vars/cluster-secrets.sops.yaml
-    ```
-21. Add another variable in here called `TAILSCALE_EMAIL` and set it to the email address used in your Tailscale Account
-22. Push your changes to git :ferry:
-23. Verify that your changes are safely in git and then uncomment out the line from setp 19
-24. Watch your cluster and see the files roll out. **NOTE**: This won't be working just yet
-25. Once your pod is up and running you need to go back into Tailscales Web Dashboard
-26. In the top menu click on [Machines](https://login.tailscale.com/admin/machines)
-27. You should see the `tailscale operator` listed. Click on it's name
-28. Click **Sign Node** and follow the prompts to sign the node
-29. Back in the CLI. Run the following command: `tailscale configure kubeconfig tailscale-operator`
-30. A new KUBECONFIG will have been added to the path `~/.kube/config` You will need to copy the contents of that into your KUBECONFIG (where ever you store that)
-31. You can now execute `Kubectl` against your remote cluster
 
+7. Go to **Settings** → [Device Management](https://login.tailscale.com/admin/settings/device-management) and set up [Tailnet Lock](https://tailscale.com/kb/1226/tailnet-lock)
 
+### Deploy the Operator
+
+1. Add to your cluster secrets:
+    ```bash
+    sops ~/home-ops/kubernetes/flux/vars/cluster-secrets.sops.yaml
+    ```
+    Add: `TAILSCALE_EMAIL: your-tailscale-email@example.com`
+
+2. Uncomment `./tailscale/ks.yaml` in the network namespace kustomization
+
+3. Push to git and wait for Flux to reconcile
+
+4. Once the operator pod is running, go to [Machines](https://login.tailscale.com/admin/machines)
+
+5. Find `tailscale-operator`, click it, and **Sign Node**
+
+### Configure kubectl Access
+
+```bash
+tailscale configure kubeconfig tailscale-operator
+```
+
+This adds a new context to `~/.kube/config`. Merge it with your main kubeconfig to use `kubectl` remotely.
+
+---
+
+## Part 2: Connector (Subnet Router)
+
+The Connector advertises cluster subnets to your Tailnet, making internal IPs reachable from any Tailscale device.
+
+### Deploy the Connector
+
+The Connector is defined in `connector.yaml`:
+
+```yaml
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: home-subnet
+spec:
+  hostname: home-subnet-router
+  subnetRouter:
+    advertiseRoutes:
+      - 10.90.0.0/16
+```
+
+After deployment, verify it's running:
+
+```bash
+kubectl get connector -n network
+# NAME          SUBNETROUTES   STATUS             AGE
+# home-subnet   10.90.0.0/16   ConnectorCreated   5m
+```
+
+### Approve Subnet Routes
+
+1. Go to [Machines](https://login.tailscale.com/admin/machines)
+2. Find `home-subnet-router`
+3. Click **Edit route settings**
+4. Approve the `10.90.0.0/16` route
+
+---
+
+## Part 3: Split DNS Configuration
+
+Split DNS routes `*.${SECRET_DOMAIN}` queries through Tailscale to your internal DNS.
+
+### Configure in Tailscale Admin
+
+1. Go to [DNS Settings](https://login.tailscale.com/admin/dns)
+
+2. Under **Nameservers**, click **Add nameserver** → **Custom...**
+
+3. Configure:
+    - **Nameserver**: `10.90.3.200` (k8s-gateway)
+    - Check **Restrict to domain**
+    - **Domain**: `${SECRET_DOMAIN}`
+
+4. Enable **Override local DNS** (recommended)
+
+### Verify It Works
+
+From a Tailscale-connected device (remote):
+
+```bash
+dig paperless.${SECRET_DOMAIN}
+# Should return: 10.90.3.202
+```
+
+Now `paperless.${SECRET_DOMAIN}` works the same whether you're on LAN or remote via Tailscale.
+
+---
+
+## App Configuration
+
+Apps only need an internal HTTPRoute. No Tailscale ingress required.
+
+```yaml
+route:
+  app:
+    annotations:
+      internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+    hostnames:
+      - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+    parentRefs:
+      - name: internal
+        namespace: network
+```
+
+### Legacy: Per-App Tailscale Ingress (Deprecated)
+
+The old approach created a proxy pod per app:
+
+```yaml
+# DON'T USE THIS - creates unnecessary proxy pods
+ingress:
+  tailscale:
+    enabled: true
+    className: tailscale
+    hosts:
+      - host: paperless
+```
+
+This is no longer needed with Split DNS. Remove these blocks from your HelmReleases.
+
+---
+
+## Troubleshooting
+
+### DNS not resolving via Tailscale
+
+1. Check the Connector is running:
+   ```bash
+   kubectl get connector -n network
+   ```
+
+2. Verify subnet routes are approved in Tailscale admin
+
+3. Test DNS resolution:
+   ```bash
+   tailscale status
+   dig @10.90.3.200 paperless.${SECRET_DOMAIN}
+   ```
+
+### Can't reach internal gateway IP
+
+The Connector must advertise a route that includes `10.90.3.202`. Check:
+
+```bash
+kubectl get connector home-subnet -n network -o yaml | grep advertiseRoutes -A5
+```
+
+### Apps not accessible
+
+Ensure the app has an internal HTTPRoute with the correct hostname. The internal gateway must have a matching route.
+
+---
+
+## Components
+
+| Component | Purpose |
+|-----------|---------|
+| `helmrelease.yaml` | Tailscale Operator deployment |
+| `connector.yaml` | Subnet router advertising `10.90.0.0/16` |
+| `externalsecret.yaml` | OAuth credentials from 1Password |
+| `rbac.yaml` | RBAC for API server proxy (commented out) |
+
+## References
+
+- [Tailscale Kubernetes Operator](https://tailscale.com/kb/1236/kubernetes-operator)
+- [Tailscale Subnet Routers](https://tailscale.com/kb/1019/subnets)
+- [Tailscale Split DNS](https://tailscale.com/kb/1054/dns)
