@@ -13,6 +13,7 @@ This guide documents the access patterns for exposing applications in a home Kub
 - [Reference Implementations](#reference-implementations)
 - [Deep Dive: Why Persona 6 Requires Route Separation](#deep-dive-why-persona-6-requires-route-separation)
 - [What Would Need to Be True](#what-would-need-to-be-true)
+- [Deep Dive: Persona 7 - Tailscale Access](#deep-dive-persona-7---tailscale-access)
 
 ---
 
@@ -704,3 +705,316 @@ Use network topology (split-horizon DNS) to route requests to different gateways
 4. **Scalable** - same pattern works for any app
 
 If Envoy Gateway adds `bypassCIDRs` to SecurityPolicy OIDC configuration in the future, migration would be straightforward: remove internal route, add bypass config to SecurityPolicy.
+
+---
+
+## Deep Dive: Persona 7 - Tailscale Remote Access
+
+Persona 7 provides remote access to internal applications via Tailscale VPN, extending the "trusted LAN" concept to anywhere in the world.
+
+### The Problem Tailscale Solves
+
+Without Tailscale, remote access requires one of:
+1. **VPN to home network** - Complex setup, single point of failure
+2. **Expose apps externally** - Security risk, requires OIDC for everything
+3. **Port forwarding** - Security nightmare, no encryption
+
+Tailscale provides:
+- **Zero-config mesh VPN** - Devices connect directly via WireGuard
+- **Identity-based access** - Device authentication replaces network location trust
+- **No exposed ports** - NAT traversal handles connectivity
+- **Split DNS** - Route DNS queries through the VPN for internal resolution
+
+### The Goal: Same URL Everywhere
+
+The ideal experience:
+- Type `radarr.nerdz.cloud` from anywhere
+- If on LAN → resolves to internal gateway, works
+- If on Tailscale → resolves to internal gateway via WireGuard, works
+- If on internet (no VPN) → no access (app is internal-only)
+
+**This is achieved with Split DNS, not separate Tailscale ingresses.**
+
+### Recommended Architecture: Split DNS + Internal Gateway
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                 Persona 7: Split DNS Architecture                       │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Remote Device (Tailscale connected)                                   │
+│       │                                                                 │
+│       │ 1. Browser: radarr.nerdz.cloud                                 │
+│       │ 2. OS DNS query                                                 │
+│       ▼                                                                 │
+│   ┌─────────────────┐                                                   │
+│   │ Tailscale Client│  3. Intercepts DNS (Split DNS configured)        │
+│   │                 │     for *.nerdz.cloud                            │
+│   └────────┬────────┘                                                   │
+│            │                                                            │
+│            │ 4. Forward DNS query via WireGuard tunnel                 │
+│            ▼                                                            │
+│   ┌─────────────────┐                                                   │
+│   │   k8s-gateway   │  5. Resolves radarr.nerdz.cloud                  │
+│   │   10.90.3.200   │     Returns: 10.90.3.202 (internal gateway)      │
+│   └────────┬────────┘                                                   │
+│            │                                                            │
+│            │ 6. Response travels back via WireGuard                    │
+│            ▼                                                            │
+│   ┌─────────────────┐                                                   │
+│   │ Tailscale Client│  7. Browser now knows IP: 10.90.3.202            │
+│   └────────┬────────┘                                                   │
+│            │                                                            │
+│            │ 8. HTTPS request to 10.90.3.202 via WireGuard             │
+│            ▼                                                            │
+│   ┌─────────────────┐                                                   │
+│   │ Internal Gateway│  9. Matches HTTPRoute, serves request            │
+│   │   10.90.3.202   │                                                   │
+│   └─────────────────┘                                                   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key insight**: The internal gateway (10.90.3.202) is reachable from Tailscale clients via the WireGuard mesh. No separate Tailscale gateway or per-app ingress needed!
+
+### Why This is Simpler Than Tailscale Ingress
+
+| Approach | Components | New Pods | Complexity |
+|----------|------------|----------|------------|
+| **Tailscale Ingress** (legacy) | 23 per-app proxy pods | 23 | High |
+| **BYOD Gateway** (over-engineered) | New Envoy gateway + Split DNS | 3+ | Medium |
+| **Split DNS + Internal Gateway** | Just DNS config | **0** | **Low** |
+
+The Split DNS approach:
+- Reuses existing internal gateway
+- No new pods or infrastructure
+- Same URL works on LAN and Tailscale
+- Apps only need internal routes (which most already have)
+
+---
+
+## Configuring Tailscale Split DNS
+
+### Step 1: Access Tailscale DNS Settings
+
+1. Log in to [Tailscale Admin Console](https://login.tailscale.com/admin/dns)
+2. Navigate to the **DNS** tab
+
+**Reference**: [Tailscale DNS Documentation](https://tailscale.com/kb/1054/dns)
+
+### Step 2: Add Custom Nameserver with Domain Restriction
+
+1. In the **Nameservers** section, click **Add nameserver**
+2. Select **Custom...**
+3. Configure:
+   - **Nameserver**: `10.90.3.200` (your k8s-gateway IP)
+   - Check **Restrict to domain**
+   - **Domain**: `nerdz.cloud` (your domain, without wildcard)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Add nameserver                                           [x]   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Nameserver                                                     │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ 10.90.3.200                                             │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ☑ Restrict to domain                                          │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ nerdz.cloud                                             │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  This nameserver will only be used for DNS queries matching    │
+│  *.nerdz.cloud                                                 │
+│                                                                 │
+│                                        [Cancel]  [Save]         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Step 3: Enable Override Local DNS (Recommended)
+
+In the DNS settings, enable **Override local DNS** to ensure Tailscale's DNS settings take precedence when connected.
+
+This forces all `*.nerdz.cloud` queries through your k8s-gateway, regardless of the device's local DNS configuration.
+
+### Step 4: Ensure Subnet Router is Configured
+
+For Split DNS to work, your k8s-gateway (10.90.3.200) must be reachable from Tailscale. This requires a **subnet router** that advertises your cluster network.
+
+**Check if subnet routes exist:**
+```bash
+# On your Tailscale node
+tailscale status
+
+# Should show advertised routes like:
+# 10.90.0.0/16
+```
+
+**If not configured**, on a node in your cluster:
+```bash
+tailscale up --advertise-routes=10.90.0.0/16 --accept-routes
+```
+
+Then approve the routes in [Tailscale Admin → Machines](https://login.tailscale.com/admin/machines).
+
+**Reference**: [Tailscale Subnet Routers](https://tailscale.com/kb/1019/subnets)
+
+### Step 5: Verify Configuration
+
+**From a Tailscale-connected device (away from home):**
+
+```bash
+# Check Tailscale DNS status
+tailscale status
+tailscale debug dns
+
+# Test DNS resolution
+dig radarr.nerdz.cloud
+
+# Expected result:
+# radarr.nerdz.cloud.    0    IN    A    10.90.3.202
+```
+
+**From LAN (without Tailscale):**
+
+```bash
+dig radarr.nerdz.cloud
+
+# Expected result (via UDM DNS):
+# radarr.nerdz.cloud.    0    IN    A    10.90.3.202
+```
+
+Both should return the internal gateway IP - **same URL, same destination**.
+
+---
+
+## Migration: Removing Tailscale Ingresses
+
+Once Split DNS is configured, Tailscale Ingress resources become redundant and can be removed.
+
+### Before (per-app Tailscale proxy):
+```yaml
+# Each app has its own Tailscale ingress
+ingress:
+  tailscale:
+    enabled: true
+    className: tailscale
+    hosts:
+      - host: radarr  # MagicDNS name only
+```
+
+### After (Split DNS, internal route only):
+```yaml
+# Just the internal route - works for both LAN and Tailscale
+route:
+  app:
+    annotations:
+      internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+    hostnames:
+      - radarr.${SECRET_DOMAIN}
+    parentRefs:
+      - name: internal
+        namespace: network
+
+# No ingress.tailscale block needed!
+```
+
+### Migration Steps
+
+1. **Configure Split DNS** in Tailscale admin (Steps 1-4 above)
+2. **Verify subnet routes** are working
+3. **Test access** via `radarr.nerdz.cloud` on a Tailscale-connected device
+4. **Remove Tailscale ingress** blocks from HelmReleases
+5. **Clean up** orphaned Tailscale devices in admin console
+
+### Apps to Migrate (23 total)
+
+| Namespace | Apps |
+|-----------|------|
+| downloads | qbittorrent, sonarr, sonarr-uhd, sonarr-foreign, radarr, radarr-uhd, prowlarr, bazarr, readarr, whisparr, sabnzbd, autobrr, dashbrr, kapowarr, metube, qui |
+| home | paperless, paperless-ai, filebrowser, homepage |
+| home-automation | teslamate |
+| cortex | whisper, open-webui |
+
+---
+
+## Authentication Model: Tailscale Trust
+
+**Key Insight**: Tailscale authentication replaces network-location trust.
+
+| Traditional Model | Tailscale Model |
+|-------------------|-----------------|
+| "If you're on LAN, you're trusted" | "If you're on Tailnet, you're trusted" |
+| Physical network boundary | Cryptographic identity boundary |
+| IP-based access control | Device-based access control |
+
+**Why this is secure:**
+1. **Device authentication** - Each device has unique WireGuard keys
+2. **User authentication** - Devices tied to authenticated users
+3. **ACLs** - Tailscale ACLs can restrict access per-service
+4. **No network exposure** - Internal gateway never exposed to internet
+
+---
+
+## Persona 7 Interaction with Other Personas
+
+| Scenario | Result |
+|----------|--------|
+| Tailscale + Internal-only app (P3) | ✅ Works - Same internal route serves both |
+| Tailscale + OIDC-native app (P4) | ✅ Works - App still requires OIDC login |
+| Tailscale + Dual-homed app (P5) | ✅ Works - Tailscale uses internal route |
+| Tailscale + Gateway-protected (P6) | ✅ Works - Internal route has no OIDC |
+
+**The beauty**: Personas 3, 5, 6, and 7 all use the **same internal gateway**. Split DNS just determines how remote users reach it.
+
+---
+
+## Why Not Use Tailscale for Everything?
+
+**Limitations of Tailscale-only:**
+1. **No external access** - Family/friends would need Tailscale accounts
+2. **Device limits** - Free tier has device limits
+3. **Mobile apps** - Some apps have deep links expecting public URLs
+
+**Best Practice**: Use Tailscale (via Split DNS) for:
+- Internal/sensitive apps (downloads, admin interfaces)
+- Apps that shouldn't be exposed externally
+
+Use External Gateway for:
+- Shared apps (Plex, Jellyfin for family)
+- Apps with native OIDC
+- Public-facing services
+
+---
+
+## Summary: Persona 7 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    Persona 7: Tailscale Remote Access                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Trust Model:     Device identity (Tailscale WireGuard keys)          │
+│   Network Path:    WireGuard mesh → Internal Gateway → Service          │
+│   DNS:             Split DNS forwards *.nerdz.cloud to k8s-gateway     │
+│   TLS:             cert-manager wildcard (same as LAN)                  │
+│   Authentication:  None beyond Tailscale (device = identity)            │
+│   URL:             Same as LAN (radarr.nerdz.cloud)                     │
+│                                                                         │
+│   Key Insight:     Split DNS + WireGuard mesh = LAN from anywhere       │
+│                    No separate gateway or per-app ingress needed        │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## References
+
+- [Tailscale DNS Documentation](https://tailscale.com/kb/1054/dns) - Official Split DNS guide
+- [What is Split DNS?](https://tailscale.com/learn/why-split-dns) - Conceptual overview
+- [Tailscale Subnet Routers](https://tailscale.com/kb/1019/subnets) - Making internal networks reachable
+- [Homelab Split DNS Guide](https://aottr.dev/posts/2024/08/homelab-using-the-same-local-domain-to-access-my-services-via-tailscale-vpn/) - Real-world example
+- [SplitDNS Magic with Tailscale](https://blog.ktz.me/splitdns-magic-with-tailscale/) - Detailed walkthrough
