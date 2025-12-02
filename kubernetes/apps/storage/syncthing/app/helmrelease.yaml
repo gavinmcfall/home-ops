@@ -92,7 +92,7 @@ spec:
     route:
       app:
         hostnames:
-          - sync.${SECRET_DOMAIN}
+          - sync.nerdz.cloud
         parentRefs:
           - name: internal
             namespace: network
