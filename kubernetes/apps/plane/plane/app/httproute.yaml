@@ -6,13 +6,13 @@ metadata:
   name: plane
   namespace: plane
   annotations:
-    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+    external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
 spec:
   parentRefs:
     - name: external
       namespace: network
       sectionName: https
-  hostnames: ["plane.${SECRET_DOMAIN}"]
+  hostnames: ["plane.nerdz.cloud"]
   rules:
     - matches:
         - path:
