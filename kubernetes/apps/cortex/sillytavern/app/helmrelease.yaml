@@ -37,7 +37,7 @@ spec:
               repository: ghcr.io/sillytavern/sillytavern
               tag: 1.13.5@sha256:12090436211f3380136fb0adbcd1c986519a1e6903055d9736ae14d0e5c0b6a8
             env: &env
-              TZ: "${TIMEZONE}"
+              TZ: "Pacific/Auckland"
               SILLYTAVERN_LISTEN: "true"
               SILLYTAVERN_WHITELIST: '["127.0.0.1", "::1", "0.0.0.0/0"]'
             resources:
@@ -68,9 +68,9 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         hostnames:
-          - tavern.${SECRET_DOMAIN}
+          - tavern.nerdz.cloud
         parentRefs:
           - name: internal
             namespace: network

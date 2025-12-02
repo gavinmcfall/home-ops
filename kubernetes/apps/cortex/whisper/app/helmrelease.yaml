@@ -96,9 +96,9 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         hostnames:
-          - whisper.${SECRET_DOMAIN}
+          - whisper.nerdz.cloud
         parentRefs:
           - name: internal
             namespace: network

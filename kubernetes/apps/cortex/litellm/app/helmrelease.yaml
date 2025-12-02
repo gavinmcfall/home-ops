@@ -47,7 +47,7 @@ spec:
               repository: ghcr.io/berriai/litellm-non_root
               tag: main-v1.75.8-stable@sha256:eaa381bfd39b56c89e4a61be15ed87e7af02b65bd82a3f50d923e08a5f6d6027
             env:
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
               LITELLM_LOG: "DEBUG"
               LITELLM_MODE: "production"
               LITELLM_DONT_SHOW_FEEDBACK_BOX: "True"
@@ -111,9 +111,9 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
         hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.nerdz.cloud"
         parentRefs:
           - name: external
             namespace: network
