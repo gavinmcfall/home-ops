@@ -29,5 +29,5 @@ task bootstrap:secrets
 
 | Secret | Namespace | Purpose |
 |--------|-----------|---------|
-| `sops-age-secret` | `flux-system` | SOPS decryption key for Flux |
+| `sops-age` | `flux-system` | SOPS decryption key for Flux |
 | `onepassword-secret` | `external-secrets` | 1Password Connect credentials |

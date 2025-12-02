@@ -5,7 +5,9 @@ resources:
   # Namespace
   - ./namespace.yaml
 
+  # Flux Operator
+  - ./flux-operator/ks.yaml
+  - ./flux-instance/ks.yaml
+
   # Applications
-  - ./webhooks/ks.yaml
   - ./weave-gitops/ks.yaml
-  - ./monitoring/ks.yaml
