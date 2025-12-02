@@ -6,6 +6,7 @@ metadata:
   name: flux-instance
   namespace: flux-system
 spec:
+  targetNamespace: flux-system
   dependsOn:
     - name: flux-operator
   interval: 1h
