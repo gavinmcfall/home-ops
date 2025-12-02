@@ -25,6 +25,7 @@ env:
   VIRTUAL_ENV: "{{.ROOT_DIR}}/.venv"
 
 includes:
+  bootstrap: .taskfiles/Bootstrap
   kubernetes: .taskfiles/Kubernetes
   flux: .taskfiles/Flux
   repository: .taskfiles/Repository

@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+
+  secrets:
+    desc: Apply bootstrap secrets from 1Password
+    cmds:
+      - op inject -i {{.BOOTSTRAP_DIR}}/resources.yaml | kubectl apply --server-side -f -
+    preconditions:
+      - msg: Missing 1Password CLI
+        sh: which op
+      - msg: Missing bootstrap resources file
+        sh: test -f {{.BOOTSTRAP_DIR}}/resources.yaml
+      - msg: Not signed into 1Password CLI (run 'op signin')
+        sh: op account get &>/dev/null
+
+  secrets:dry-run:
+    desc: Preview bootstrap secrets (values hidden)
+    cmds:
+      - |
+        echo "=== Bootstrap secrets to be applied ==="
+        echo ""
+        cat {{.BOOTSTRAP_DIR}}/resources.yaml | grep -E "^(---|apiVersion|kind|metadata|  name:|  namespace:)" | head -20
+        echo ""
+        echo "=== op:// references that will be resolved ==="
+        grep -o 'op://[^[:space:]]*' {{.BOOTSTRAP_DIR}}/resources.yaml | sort -u
+    preconditions:
+      - msg: Missing bootstrap resources file
+        sh: test -f {{.BOOTSTRAP_DIR}}/resources.yaml
