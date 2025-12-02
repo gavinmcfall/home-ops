@@ -14,8 +14,7 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: flux-system
-    namespace: flux-system
+    name: home-kubernetes
   wait: false
   postBuild:
     substituteFrom:
@@ -42,7 +41,7 @@ spec:
           deletionPolicy: WaitForTermination
           sourceRef:
             kind: GitRepository
-            name: flux-system
+            name: home-kubernetes
           postBuild:
             substituteFrom:
               - kind: ConfigMap
