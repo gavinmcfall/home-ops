@@ -6,5 +6,4 @@ resources:
   - ./namespace.yaml
 
   # Applications
-  - ./snapshot-controller/ks.yaml
   - ./volsync/ks.yaml

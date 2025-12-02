@@ -22,6 +22,8 @@ talosconfig
 Brewfile.lock.json
 # intellij
 .idea
+# Scratchpad
+.scratch/
 # wiki
 wiki
 # Bootstrap
@@ -29,3 +31,4 @@ wiki
 #
 /tmp
 # RepoQL
+.repoql/
