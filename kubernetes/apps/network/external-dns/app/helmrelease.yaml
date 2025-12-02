@@ -42,7 +42,7 @@ spec:
     sources: ["crd", "gateway-httproute"]
     txtPrefix: k8s.
     txtOwnerId: default
-    domainFilters: ["${SECRET_DOMAIN}"]
+    domainFilters: ["nerdz.cloud"]
     serviceMonitor:
       enabled: true
     podAnnotations:

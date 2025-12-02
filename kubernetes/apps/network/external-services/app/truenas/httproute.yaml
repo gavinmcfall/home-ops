@@ -7,14 +7,14 @@ metadata:
     app.kubernetes.io/name: truenas
     app.kubernetes.io/instance: truenas
   annotations:
-    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+    internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
 spec:
   parentRefs:
     - name: internal
       namespace: network
       sectionName: https
   hostnames:
-    - citadel.${SECRET_DOMAIN}
+    - citadel.nerdz.cloud
   rules:
     - matches:
         - path:

@@ -7,14 +7,14 @@ metadata:
     app.kubernetes.io/name: voron
     app.kubernetes.io/instance: voron
   annotations:
-    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+    internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
 spec:
   parentRefs:
     - name: internal
       namespace: network
       sectionName: https
   hostnames:
-    - voron.${SECRET_DOMAIN}
+    - voron.nerdz.cloud
   rules:
     - matches:
         - path:
