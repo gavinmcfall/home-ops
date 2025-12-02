@@ -29,7 +29,7 @@ spec:
     - name: mariadb
       namespace: database
     - name: volsync
-      namespace: volsync-system
+      namespace: storage
   values:
     controllers:
       bookstack:

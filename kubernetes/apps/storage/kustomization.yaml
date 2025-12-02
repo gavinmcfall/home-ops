@@ -8,3 +8,4 @@ resources:
   # Applications
   - ./snapshot-controller/ks.yaml
   - ./syncthing/ks.yaml
+  - ./volsync/ks.yaml

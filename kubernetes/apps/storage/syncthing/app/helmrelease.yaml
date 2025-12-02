@@ -18,7 +18,7 @@ spec:
     - name: rook-ceph-cluster
       namespace: rook-ceph
     - name: volsync
-      namespace: volsync-system
+      namespace: storage
   install:
     remediation:
       retries: 3
