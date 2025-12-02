@@ -131,10 +131,10 @@ spec:
             gethomepage.dev/description: Monitoring Scrape Service
             gethomepage.dev/widget.type: prometheus
             gethomepage.dev/widget.url: http://kube-prometheus-stack-prometheus.observability:9090
-            internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+            internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         spec:
           hostnames:
-            - "alertmanager.${SECRET_DOMAIN}"
+            - "alertmanager.nerdz.cloud"
           parentRefs:
             - name: internal
               namespace: network
@@ -155,10 +155,10 @@ spec:
           name: kube-prometheus-stack-prometheus
           namespace: "{{ .Release.Namespace }}"
           annotations:
-            internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+            internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         spec:
           hostnames:
-            - "prometheus.${SECRET_DOMAIN}"
+            - "prometheus.nerdz.cloud"
           parentRefs:
             - name: internal
               namespace: network
