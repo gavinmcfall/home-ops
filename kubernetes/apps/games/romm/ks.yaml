@@ -11,7 +11,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cluster-apps-rook-ceph
-    - name: cluster-apps-volsync
+    - name: volsync
   prune: true
   interval: 30m
   path: "./kubernetes/apps/games/romm/app"
