@@ -143,7 +143,7 @@ spec:
         type: LoadBalancer
         metadata:
           annotations:
-            external-dns.alpha.kubernetes.io/hostname: postgres.${SECRET_DOMAIN}
+            external-dns.alpha.kubernetes.io/hostname: postgres.nerdz.cloud
             lbipam.cilium.io/ips: 10.0.20.100
       topologySpreadConstraints:
         - maxSkew: 1
