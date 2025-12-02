@@ -38,7 +38,7 @@ spec:
               repository: ghcr.io/wizarrrr/wizarr
               tag: v2025.11.2
             env:
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
             resources:
               requests:
                 cpu: 15m
@@ -71,9 +71,9 @@ spec:
           # gethomepage.dev/widget.type: wizarr
           # gethomepage.dev/widget.url: http://wizarr.media.svc.cluster.local:5690
           # gethomepage.dev/widget.key: ${WIZARR_TOKEN}
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
         hostnames:
-          - join.${SECRET_DOMAIN}
+          - join.nerdz.cloud
         parentRefs:
           - name: external
             namespace: network

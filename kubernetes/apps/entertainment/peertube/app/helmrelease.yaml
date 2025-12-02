@@ -47,7 +47,7 @@ spec:
               tag: v7.3.0-bookworm@sha256:b5192b927011def45f0588de5aa7d44f6ef28b7b8b16713264a98d45665f6bf7
             env:
               NODE_ENV: production
-              PEERTUBE_WEBSERVER_HOSTNAME: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+              PEERTUBE_WEBSERVER_HOSTNAME: "{{ .Release.Name }}.nerdz.cloud"
               PEERTUBE_SMTP_ACTIVE: "false"
               PEERTUBE_SIGNUP_ENABLED: "false"
               NODE_CONFIG_DIR: /config
@@ -92,9 +92,9 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
         hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.nerdz.cloud"
         parentRefs:
           - name: external
             namespace: network

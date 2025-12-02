@@ -33,7 +33,7 @@ spec:
               repository: remirigal/plex-auto-languages
               tag: v1.2.3
             env:
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
               PLEX_URL: "http://plex.entertainment.svc.cluster.local:32400"
             envFrom:
               - secretRef:
