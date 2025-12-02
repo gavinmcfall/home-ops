@@ -1,10 +1,10 @@
 ---
 originRequest:
-  originServerName: "external.${SECRET_DOMAIN}"
+  originServerName: "external.nerdz.cloud"
 
 ingress:
-  - hostname: "${SECRET_DOMAIN}"
+  - hostname: "nerdz.cloud"
     service: https://envoy-external.network.svc.cluster.local:443
-  - hostname: "*.${SECRET_DOMAIN}"
+  - hostname: "*.nerdz.cloud"
     service: https://envoy-external.network.svc.cluster.local:443
   - service: http_status:404
