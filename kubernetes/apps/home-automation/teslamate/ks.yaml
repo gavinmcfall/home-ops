@@ -13,7 +13,7 @@ spec:
   path: ./kubernetes/apps/home-automation/teslamate/app
   sourceRef:
     kind: GitRepository
-    name: home-kubernetes
+    name: flux-system
   prune: true
   wait: false
   interval: 30m

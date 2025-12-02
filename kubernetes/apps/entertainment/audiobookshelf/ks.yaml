@@ -13,7 +13,7 @@ spec:
   path: ./kubernetes/apps/entertainment/audiobookshelf/app
   sourceRef:
     kind: GitRepository
-    name: home-kubernetes
+    name: flux-system
   prune: true
   wait: false
   interval: 30m
