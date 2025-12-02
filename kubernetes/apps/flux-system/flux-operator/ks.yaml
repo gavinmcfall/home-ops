@@ -6,6 +6,7 @@ metadata:
   name: flux-operator
   namespace: flux-system
 spec:
+  targetNamespace: flux-system
   interval: 1h
   path: ./kubernetes/apps/flux-system/flux-operator/app
   prune: true
