@@ -45,31 +45,31 @@
           url: https://api.uptimerobot.com
           key: {{HOMEPAGE_VAR_UPTIMEROBOT_TOKEN}}
     - Unifi:
-        href: https://unifi.${SECRET_DOMAIN}
+        href: https://unifi.nerdz.cloud
         icon: unifi.png
         description: Unifi Dashboard
         widget:
           type: unifi
-          url: https://unifi.${SECRET_DOMAIN}
+          url: https://unifi.nerdz.cloud
           username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
           password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
     - Truenas:
-        href: https://citadel.${SECRET_DOMAIN}
+        href: https://citadel.nerdz.cloud
         icon: truenas.png
         description: TrueNAS Dashboard
         widget:
           type: truenas
-          url: https://citadel.${SECRET_DOMAIN}
+          url: https://citadel.nerdz.cloud
           key: {{HOMEPAGE_VAR_TRUENAS_TOKEN}}
           enablePools: true
           nasType: scale
     - Rook:
-        href: https://rook.${SECRET_DOMAIN}
+        href: https://rook.nerdz.cloud
         icon: ceph.png
         description: Ceph storage dashboard
 - Downloads:
     - Sonarr:
-        href: https://sonarr.${SECRET_DOMAIN}
+        href: https://sonarr.nerdz.cloud
         icon: sonarr.png
         description: HD TV automation
         widget:
@@ -77,7 +77,7 @@
           url: http://sonarr.downloads
           key: {{HOMEPAGE_VAR_SONARR_TOKEN}}
     - Sonarr UHD:
-        href: https://sonarr-uhd.${SECRET_DOMAIN}
+        href: https://sonarr-uhd.nerdz.cloud
         icon: sonarr.png
         description: 4K TV automation
         widget:
@@ -85,7 +85,7 @@
           url: http://sonarr-uhd.downloads
           key: {{HOMEPAGE_VAR_SONARR_UHD_TOKEN}}
     - Sonarr-Foreign:
-        href: https://sonarr-foreign.${SECRET_DOMAIN}
+        href: https://sonarr-foreign.nerdz.cloud
         icon: sonarr.png
         description: Foreign language TV automation
         widget:
@@ -93,7 +93,7 @@
           url: http://sonarr-foreign.downloads
           key: {{HOMEPAGE_VAR_SONARR_FOREIGN_TOKEN}}
     - Radarr:
-        href: https://radarr.${SECRET_DOMAIN}
+        href: https://radarr.nerdz.cloud
         icon: radarr.png
         description: HD movie automation
         widget:
@@ -101,7 +101,7 @@
           url: http://radarr.downloads
           key: {{HOMEPAGE_VAR_RADARR_TOKEN}}
     - Radarr UHD:
-        href: https://radarr-uhd.${SECRET_DOMAIN}
+        href: https://radarr-uhd.nerdz.cloud
         icon: radarr.png
         description: 4K movie automation
         widget:
@@ -109,7 +109,7 @@
           url: http://radarr-uhd.downloads
           key: {{HOMEPAGE_VAR_RADARR_UHD_TOKEN}}
     - Readarr:
-        href: https://readarr.${SECRET_DOMAIN}
+        href: https://readarr.nerdz.cloud
         icon: readarr.png
         description: eBook downloads
         widget:
@@ -117,7 +117,7 @@
           url: http://readarr.downloads
           key: {{HOMEPAGE_VAR_READARR_TOKEN}}
     - Bazarr:
-        href: https://bazarr.${SECRET_DOMAIN}
+        href: https://bazarr.nerdz.cloud
         icon: bazarr.png
         description: Subtitle management
         widget:
@@ -125,7 +125,7 @@
           url: http://bazarr.downloads:6767
           key: {{HOMEPAGE_VAR_BAZARR_TOKEN}}
     - Prowlarr:
-        href: https://prowlarr.${SECRET_DOMAIN}
+        href: https://prowlarr.nerdz.cloud
         icon: prowlarr.png
         description: Indexer manager
         widget:
@@ -133,7 +133,7 @@
           url: http://prowlarr.downloads:9696
           key: {{HOMEPAGE_VAR_PROWLARR_TOKEN}}
     - qBittorrent:
-        href: https://qb.${SECRET_DOMAIN}
+        href: https://qb.nerdz.cloud
         icon: qbittorrent.png
         description: BitTorrent client
         widget:
@@ -142,7 +142,7 @@
           username: {{HOMEPAGE_VAR_QBITTORRENT_USERNAME}}
           password: {{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}
     - SABnzbd:
-        href: https://sab.${SECRET_DOMAIN}
+        href: https://sab.nerdz.cloud
         icon: sabnzbd.png
         description: Usenet downloader
         widget:
@@ -151,7 +151,7 @@
           key: {{HOMEPAGE_VAR_SABNZBD_TOKEN}}
 - Entertainment:
     - Plex:
-        href: https://plex.${SECRET_DOMAIN}
+        href: https://plex.nerdz.cloud
         icon: plex.png
         description: Plex Media Server
         widget:
@@ -159,11 +159,11 @@
           url: http://plex.entertainment:32400
           key: {{HOMEPAGE_VAR_PLEX_TOKEN}}
     - Jellyfin:
-        href: https://jellyfin.${SECRET_DOMAIN}
+        href: https://jellyfin.nerdz.cloud
         icon: jellyfin.png
         description: Jellyfin streaming
     - Overseerr:
-        href: https://requests.${SECRET_DOMAIN}
+        href: https://requests.nerdz.cloud
         icon: overseerr.png
         description: Media request portal
         widget:
@@ -171,7 +171,7 @@
           url: http://overseerr.entertainment:5055
           key: {{HOMEPAGE_VAR_OVERSEERR_TOKEN}}
     - Tautulli:
-        href: https://tautulli.${SECRET_DOMAIN}
+        href: https://tautulli.nerdz.cloud
         icon: tautulli.png
         description: Plex activity monitoring
         widget:
@@ -179,7 +179,7 @@
           url: http://tautulli.entertainment
           key: {{HOMEPAGE_VAR_TAUTULLI_TOKEN}}
     - Audiobookshelf:
-        href: https://audiobookshelf.${SECRET_DOMAIN}
+        href: https://audiobookshelf.nerdz.cloud
         icon: audiobookshelf.png
         description: Audiobook library
         widget:
@@ -187,7 +187,7 @@
           url: http://audiobookshelf-app.entertainment.svc.cluster.local
           key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF_TOKEN}}
     - Kavita:
-        href: https://kavita.${SECRET_DOMAIN}
+        href: https://kavita.nerdz.cloud
         icon: kavita.png
         description: Comics and manga server
         widget:
@@ -196,12 +196,12 @@
           username: {{HOMEPAGE_VAR_KAVITA_USERNAME}}
           password: {{HOMEPAGE_VAR_KAVITA_PASSWORD}}
     - Wizarr:
-        href: https://join.${SECRET_DOMAIN}
+        href: https://join.nerdz.cloud
         icon: wizarr.png
         description: Plex invite management
 - Observability:
     - Grafana:
-        href: https://grafana.${SECRET_DOMAIN}
+        href: https://grafana.nerdz.cloud
         icon: grafana.png
         description: Dashboards and metrics
         widget:
@@ -210,62 +210,62 @@
           username: {{HOMEPAGE_VAR_GRAFANA_USERNAME}}
           password: {{HOMEPAGE_VAR_GRAFANA_PASSWORD}}
     - Gatus:
-        href: https://status.${SECRET_DOMAIN}
+        href: https://status.nerdz.cloud
         icon: gatus.png
         description: Synthetic monitoring
         widget:
           type: gatus
           url: http://gatus.observability
     - Prometheus:
-        href: https://prometheus.${SECRET_DOMAIN}
+        href: https://prometheus.nerdz.cloud
         icon: prometheus.png
         description: Metrics scrape service
         widget:
           type: prometheus
           url: http://kube-prometheus-stack-prometheus.observability:9090
     - Redis Insight:
-        href: https://redisinsight.${SECRET_DOMAIN}
+        href: https://redisinsight.nerdz.cloud
         icon: https://raw.githubusercontent.com/RedisInsight/RedisInsight/main/resources/logo.svg
         description: Redis developer GUI
     - Kromgo:
-        href: https://kromgo.${SECRET_DOMAIN}
+        href: https://kromgo.nerdz.cloud
         icon: prometheus.png
         description: Thanos SLO explorer
 - Home:
     - File Browser:
-        href: https://filebrowser.${SECRET_DOMAIN}
+        href: https://filebrowser.nerdz.cloud
         icon: filebrowser.png
         description: Media file explorer
     - Bookstack:
-        href: https://bookstack.${SECRET_DOMAIN}
+        href: https://bookstack.nerdz.cloud
         icon: bookstack.png
         description: Personal wiki
     - Linkwarden:
-        href: https://linkwarden.${SECRET_DOMAIN}
+        href: https://linkwarden.nerdz.cloud
         icon: mdi-link
         description: Bookmark archiver
     - Paperless:
-        href: https://paperless.${SECRET_DOMAIN}
+        href: https://paperless.nerdz.cloud
         icon: paperless-ngx.png
         description: Document management
     - Manyfold:
-        href: https://manyfold.${SECRET_DOMAIN}
+        href: https://manyfold.nerdz.cloud
         icon: mdi-printer-3d
         description: STL library
     - SearXNG:
-        href: https://searxng.${SECRET_DOMAIN}
+        href: https://searxng.nerdz.cloud
         icon: searxng.png
         description: Privacy-friendly search
     - The Lounge:
-        href: https://irc.${SECRET_DOMAIN}
+        href: https://irc.nerdz.cloud
         icon: thelounge.png
         description: IRC web client
 - Home Automation:
     - Home-Assistant:
-        href: https://hass.${SECRET_DOMAIN}
+        href: https://hass.nerdz.cloud
         icon: home-assistant.png
         description: Home automation software
         widget:
           type: homeassistant
-          url: https://hass.${SECRET_DOMAIN}
+          url: https://hass.nerdz.cloud
           key: {{HOMEPAGE_VAR_HASS_TOKEN}}

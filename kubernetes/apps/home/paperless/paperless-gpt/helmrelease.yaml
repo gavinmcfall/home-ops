@@ -41,7 +41,7 @@ spec:
             env:
               #App
               PAPERLESS_BASE_URL: "http://paperless.home.svc.cluster.local:8000" #needs quoting or YAML munges the port
-              PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
+              PAPERLESS_PUBLIC_URL: https://paperless.nerdz.cloud
               LOG_LEVEL: "debug"
               #LLM Config
               LLM_PROVIDER: openai
@@ -66,9 +66,9 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         hostnames:
-          - paperless-gpt.${SECRET_DOMAIN}
+          - paperless-gpt.nerdz.cloud
         parentRefs:
           - name: internal
             namespace: network

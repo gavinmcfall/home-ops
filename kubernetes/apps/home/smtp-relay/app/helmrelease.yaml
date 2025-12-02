@@ -72,7 +72,7 @@ spec:
         controller: smtp-relay
         type: LoadBalancer
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: smtp-relay.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/hostname: smtp-relay.nerdz.cloud
           io.cilium/lb-ipam-ips: 10.90.3.204
         ports:
           http:
