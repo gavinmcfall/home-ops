@@ -15,6 +15,12 @@ spec:
     - apiVersion: source.toolkit.fluxcd.io/v1
       kind: GitRepository
       name: flux-system
+    - apiVersion: source.toolkit.fluxcd.io/v1
+      kind: GitRepository
+      name: home-kubernetes
     - apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
       name: flux-system
+    - apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      name: cluster
