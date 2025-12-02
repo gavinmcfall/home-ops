@@ -34,7 +34,7 @@ spec:
               repository: ghcr.io/linkwarden/linkwarden
               tag: v2.13.1@sha256:54271afa4fc34107f98d9ba580e320e3bd5b3e02339f7d68947d01a375ea7bb3
             env:
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
               STORAGE_FOLDER: "config" # Will always end up as /data/STOREAGE_FOLDER so eg /data/config
               HOME: /data/config
               NEXT_PUBLIC_DISABLE_REGISTRATION: "true"
@@ -56,9 +56,9 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
         hostnames:
-          - links.${SECRET_DOMAIN}
+          - links.nerdz.cloud
         parentRefs:
           - name: external
             namespace: network

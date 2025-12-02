@@ -41,7 +41,7 @@ spec:
               repository: ghcr.io/linuxserver/bookstack
               tag: v24.05.4-ls166
             env:
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
               PUID: 568
               PGID: 568
               AUTH_METHOD: "oidc"
@@ -64,9 +64,9 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.nerdz.cloud"
         parentRefs:
           - name: internal
             namespace: network
