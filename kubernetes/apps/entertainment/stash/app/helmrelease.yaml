@@ -34,7 +34,7 @@ spec:
               repository: stashapp/stash
               tag: v0.29.3@sha256:a62f2d8afadbe029403777d18f54b2455b209a223aa28c6d3985c3cf9df2e08a
             env:
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
               STASH_STASH: /media/
               STASH_BLOBS_PATH: /blobs
               STASH_BLOBS_STORAGE: FILESYSTEM
@@ -84,9 +84,9 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
         hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.nerdz.cloud"
         parentRefs:
           - name: external
             namespace: network
