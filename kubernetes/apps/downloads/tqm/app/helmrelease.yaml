@@ -27,7 +27,7 @@ spec:
         type: cronjob
         cronjob:
           schedule: "@hourly"
-          timeZone: &timeZone ${TIMEZONE}
+          timeZone: &timeZone Pacific/Auckland
           concurrencyPolicy: Forbid
           successfulJobsHistory: 1
           failedJobsHistory: 3

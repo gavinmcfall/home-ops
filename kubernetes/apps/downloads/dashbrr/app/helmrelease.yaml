@@ -57,7 +57,7 @@ spec:
               DASHBRR__DB_PATH: /cache/._ # cache path is derived from DASHBRR__DB_PATH
               DASHBRR__LISTEN_ADDR: 0.0.0.0:8080
               GIN_MODE: debug
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
             envFrom: *envFrom
             probes:
               liveness: &probes
@@ -101,9 +101,9 @@ spec:
           # gethomepage.dev/widget.type: dashbrr
           # gethomepage.dev/widget.url: http://dashbrr.downloads
           # gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_DASHBRR_TOKEN}}` }}"
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.nerdz.cloud"
         parentRefs:
           - name: internal
             namespace: network
