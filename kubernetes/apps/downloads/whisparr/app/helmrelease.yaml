@@ -52,7 +52,7 @@ spec:
               WHISPARR__INSTANCE_NAME: Whisparr
               WHISPARR__LOG_LEVEL: info
               WHISPARR__PORT: &port 6969
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
             envFrom: *envFrom
             probes:
               liveness: &probes
@@ -95,9 +95,9 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.nerdz.cloud"
         parentRefs:
           - name: internal
             namespace: network

@@ -52,7 +52,7 @@ spec:
               RADARR__LOG__LEVEL: info
               RADARR__SERVER__PORT: &port 80
               RADARR__UPDATE__BRANCH: develop
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
             envFrom: *envFrom
             probes:
               liveness: &probes
@@ -103,9 +103,9 @@ spec:
           gethomepage.dev/widget.type: radarr
           gethomepage.dev/widget.url: http://radarr-uhd.downloads
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_RADARR_UHD_TOKEN}}` }}"
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "{{ .Release.Name }}.nerdz.cloud"
         parentRefs:
           - name: internal
             namespace: network

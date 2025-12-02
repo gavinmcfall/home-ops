@@ -38,7 +38,7 @@ spec:
               repository: ghcr.io/home-operations/sabnzbd
               tag: 4.5.5@sha256:da57e01cdebc547852b6df85c8df8c0e4d87792742c7608c5590dc653b184e8c
             env:
-              TZ: ${TIMEZONE}
+              TZ: Pacific/Auckland
               SABNZBD__PORT: &port 80
               SABNZBD__HOST_WHITELIST_ENTRIES: >-
                 sabnzbd,
@@ -46,8 +46,8 @@ spec:
                 sabnzbd.downloads.svc,
                 sabnzbd.downloads.svc.cluster,
                 sabnzbd.downloads.svc.cluster.local,
-                sab.${SECRET_DOMAIN},
-                sabnzbd.${SECRET_DOMAIN},
+                sab.nerdz.cloud,
+                sabnzbd.nerdz.cloud,
                 sab.tail21dd8.ts.net
             envFrom:
               - secretRef:
@@ -101,9 +101,9 @@ spec:
           gethomepage.dev/widget.type: sabnzbd
           gethomepage.dev/widget.url: http://sabnzbd.downloads:80
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_SABNZBD_TOKEN}}` }}"
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
         hostnames:
-          - sab.${SECRET_DOMAIN}
+          - sab.nerdz.cloud
         parentRefs:
           - name: internal
             namespace: network
