@@ -31,4 +31,5 @@ spec:
       VOLSYNC_CLAIM: romm-data
       GATUS_PATH: /
       GATUS_STATUS: "200"
+    substituteFrom: []
 
