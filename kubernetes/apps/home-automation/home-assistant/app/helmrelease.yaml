@@ -36,7 +36,7 @@ spec:
               repository: ghcr.io/home-operations/home-assistant
               tag: 2025.11.1@sha256:36619b3746910f9b3d21e02c4e8090b837be4bacf88987755d09988cec2dfb1f
             env:
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
               HASS_HTTP_TRUSTED_PROXY_1: ${LOCAL_CIDR}
               HASS_HTTP_TRUSTED_PROXY_2: ${CLUSTER_POD_CIDR}
               HASS_HTTP_TRUSTED_PROXY_3: ${CLUSTER_SERVICE_CIDR}
@@ -92,9 +92,9 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - hass.nerdz.cloud
+          - hass.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network
@@ -105,9 +105,9 @@ spec:
                 port: *httpPort
       tesla-key:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - hass.nerdz.cloud
+          - hass.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network
@@ -122,9 +122,9 @@ spec:
                 port: *httpPort
       code-server:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - hass-code.nerdz.cloud
+          - hass-code.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network

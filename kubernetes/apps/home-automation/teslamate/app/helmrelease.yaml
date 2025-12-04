@@ -44,7 +44,7 @@ spec:
               repository: teslamate/teslamate
               tag: 2.2.0
             env:
-              TZ: &tz Pacific/Auckland
+              TZ: &tz ${TIMEZONE}
               DISABLE_MQTT: "false"
               MQTT_HOST: mosquitto-app.database.svc.cluster.local
             envFrom: *envFrom
@@ -66,9 +66,9 @@ spec:
           gethomepage.dev/icon: teslamate.png
           gethomepage.dev/description: Tesla Analytics
           # gethomepage.dev/widget.type: REQUIRES teslamate-api by tobiasehlertr
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.nerdz.cloud"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
           - name: internal
             namespace: network
