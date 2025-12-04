@@ -12,11 +12,11 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
-      namespace: flux-system
+      namespace: rook-ceph
     - name: dragonfly-cluster
-      namespace: flux-system
+      namespace: database
     - name: cloudnative-pg-cluster17
-      namespace: flux-system
+      namespace: database
   path: ./kubernetes/apps/plane/plane/app
   prune: true
   sourceRef:

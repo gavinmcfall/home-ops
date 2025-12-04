@@ -12,9 +12,9 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: volsync
-      namespace: flux-system
+      namespace: storage
     - name: cluster-apps-rook-ceph
-      namespace: flux-system
+      namespace: rook-ceph
   path: ./kubernetes/apps/security/pocket-id/app
   prune: true
   sourceRef:
