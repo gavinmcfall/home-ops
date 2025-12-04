@@ -4,20 +4,23 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app mariadb
-  namespace: flux-system
+  namespace: &namespace database
 spec:
-  targetNamespace: database
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: volsync
+      namespace: storage
     - name: cluster-apps-rook-ceph-cluster
+      namespace: rook-ceph
   path: ./kubernetes/apps/database/mariadb/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m
