@@ -10,6 +10,7 @@ metrics: true
 debug: true
 ui:
   title: Status | Gatus
+  default-group-sort-by: group
   header: Status
   custom-css: |
     /* Adjust status colors for better color-blind accessibility */
