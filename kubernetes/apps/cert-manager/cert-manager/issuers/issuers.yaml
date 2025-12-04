@@ -16,7 +16,7 @@ spec:
               key: api-token
         selector:
           dnsZones:
-            - "nerdz.cloud"
+            - "${SECRET_DOMAIN}"
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -36,4 +36,4 @@ spec:
               key: api-token
         selector:
           dnsZones:
-            - "nerdz.cloud"
+            - "${SECRET_DOMAIN}"
