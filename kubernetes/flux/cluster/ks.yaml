@@ -8,6 +8,8 @@ metadata:
 spec:
   decryption:
     provider: sops
+    secretRef:
+      name: sops-age
   deletionPolicy: WaitForTermination
   interval: 30m
   path: ./kubernetes/apps
@@ -38,6 +40,8 @@ spec:
         spec:
           decryption:
             provider: sops
+            secretRef:
+              name: sops-age
           deletionPolicy: WaitForTermination
           sourceRef:
             kind: GitRepository

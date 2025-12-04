@@ -61,7 +61,7 @@ spec:
               PLAYMATCH_API_ENABLED: true
               ENABLE_SCHEDULED_UPDATE_LAUNCHBOX_METADATA: "true" #chron set to 5m by default
               LAUNCHBOX_API_ENABLED: "true"
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             envFrom: *envFrom
             resources:
               requests:
@@ -89,9 +89,9 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.nerdz.cloud"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
           - name: external
             namespace: network
