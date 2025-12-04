@@ -6,13 +6,13 @@ metadata:
   name: rook-ceph-dashboard
   namespace: rook-ceph
   annotations:
-    internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
 spec:
   parentRefs:
     - name: internal
       namespace: network
       sectionName: https
-  hostnames: ["rook.nerdz.cloud"]
+  hostnames: ["rook.${SECRET_DOMAIN}"]
   rules:
     - matches:
         - path:
