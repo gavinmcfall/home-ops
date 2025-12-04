@@ -67,14 +67,14 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           gethomepage.dev/enabled: "true"
           gethomepage.dev/group: Entertainment
           gethomepage.dev/name: Calibre Web
           gethomepage.dev/icon: calibre.png
           gethomepage.dev/description: eBook Library
         hostnames:
-          - ebooks.nerdz.cloud
+          - ebooks.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network

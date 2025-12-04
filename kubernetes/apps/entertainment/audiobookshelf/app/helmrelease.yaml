@@ -101,9 +101,9 @@ spec:
           gethomepage.dev/widget.type: audiobookshelf
           gethomepage.dev/widget.url: http://audiobookshelf-app.entertainment.svc.cluster.local
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_AUDIOBOOKSHELF_TOKEN}}` }}"
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - audiobookshelf.nerdz.cloud
+          - audiobookshelf.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network

@@ -58,7 +58,7 @@ spec:
               repository: ghcr.io/aclerici38/fileflows
               tag: 25.11.1.6039@sha256:6277e6ec51e28266b87f348177c9f03711b9052320123657e9896c62d728cf7e
             env:
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
               PORT: &port 5000
             probes:
               liveness: &probes
@@ -100,9 +100,9 @@ spec:
     route:
       server:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.nerdz.cloud"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
           - name: internal
             namespace: network
