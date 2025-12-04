@@ -7,7 +7,7 @@ metadata:
   labels:
     external-dns.home.arpa/enabled: "true"
   annotations:
-    external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
     gatus.home-operations.com/endpoint: |-
       client:
         dns-resolver: tcp://1.1.1.1:53
@@ -19,7 +19,7 @@ spec:
       value: "10.90.3.201"
   infrastructure:
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: external.nerdz.cloud
+      external-dns.alpha.kubernetes.io/hostname: external.${SECRET_DOMAIN}
       io.cilium/lb-ipam-ips: "10.90.3.201"
     parametersRef:
       group: gateway.envoyproxy.io

@@ -34,9 +34,9 @@ spec:
               tag: v1.1.1@sha256:ea8923d49d265913102e603fbc1c799c6576b89a3455f465a863121a22df5879
             args:
               - --zone-name
-              - nerdz.cloud
+              - ${SECRET_DOMAIN}
               - --record-name
-              - ipv4.nerdz.cloud
+              - ipv4.${SECRET_DOMAIN}
               - --provider
               - random
             envFrom:
@@ -83,7 +83,7 @@ spec:
     route:
       app:
         hostnames:
-          - ddns.nerdz.cloud
+          - ddns.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network
