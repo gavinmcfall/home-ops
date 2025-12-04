@@ -4,9 +4,9 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app peertube
-  namespace: flux-system
+  namespace: &namespace entertainment
 spec:
-  targetNamespace: entertainment
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
@@ -14,6 +14,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   prune: true
   wait: false
   interval: 30m
