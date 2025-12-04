@@ -37,8 +37,8 @@ spec:
               repository: ghcr.io/gethomepage/homepage
               tag: v1.5.0
             env:
-              TZ: Pacific/Auckland
-              HOMEPAGE_ALLOWED_HOSTS: &host "{{ .Release.Name }}.nerdz.cloud"
+              TZ: ${TIMEZONE}
+              HOMEPAGE_ALLOWED_HOSTS: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
               LOG_LEVEL: debug
             envFrom:
               - secretRef:
@@ -58,7 +58,7 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
           - *host
         parentRefs:

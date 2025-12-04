@@ -57,11 +57,11 @@ spec:
             env:
               USERMAP_UID: 568
               USERMAP_GID: 568
-              PAPERLESS_TIME_ZONE: Pacific/Auckland
+              PAPERLESS_TIME_ZONE: ${TIMEZONE}
               PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
 
               PAPERLESS_PORT: &port 8000
-              PAPERLESS_URL: https://paperless.nerdz.cloud
+              PAPERLESS_URL: https://paperless.${SECRET_DOMAIN}
               PAPERLESS_ENABLE_HTTP_REMOTE_USER: 'true'
               PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
               PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS: "true"
@@ -116,9 +116,9 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - paperless.nerdz.cloud
+          - paperless.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network

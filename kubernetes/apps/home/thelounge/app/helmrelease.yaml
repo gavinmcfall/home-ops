@@ -75,9 +75,9 @@ spec:
           gethomepage.dev/name: The Lounge
           gethomepage.dev/icon: thelounge.png
           gethomepage.dev/description: IRC Web Client
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - irc.nerdz.cloud
+          - irc.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network

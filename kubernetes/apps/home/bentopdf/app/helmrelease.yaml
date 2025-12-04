@@ -33,7 +33,7 @@ spec:
               repository: ghcr.io/alam00000/bentopdf
               tag: v1.9.0@sha256:a4ed090f29823da5e296e2c2f8603664da71676156ea47c3f186cc73eec38db0
             env:
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             probes:
               liveness: &probes
                 enabled: true
@@ -73,9 +73,9 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - "pdf.nerdz.cloud"
+          - "pdf.${SECRET_DOMAIN}"
         parentRefs:
           - name: external
             namespace: network

@@ -65,7 +65,7 @@ spec:
               DATABASE_ADAPTER: postgresql
               PORTS: &port 3214
               MULTIUSER: enabled
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             envFrom: *envFrom
             probes:
               liveness: &probes
@@ -110,9 +110,9 @@ spec:
           gethomepage.dev/app: *app
           gethomepage.dev/icon: manyfold
           gethomepage.dev/description: STL Library
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - 3d.nerdz.cloud
+          - 3d.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network
