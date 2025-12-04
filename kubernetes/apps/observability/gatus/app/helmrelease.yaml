@@ -64,7 +64,7 @@ spec:
               repository: ghcr.io/twin/gatus
               tag: v5.32.0@sha256:d848d9a767f64bb7b972a30b2c8a3cd2818c4d289ddad1032a5941c2d0af5a35
             env:
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
               GATUS_CONFIG_PATH: /config
               GATUS_DELAY_START_SECONDS: 5
               WEB_PORT: &port 80
@@ -123,9 +123,9 @@ spec:
           gethomepage.dev/description: Status Page
           gethomepage.dev/widget.type: gatus
           gethomepage.dev/widget.url: http://gatus.observability
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - status.nerdz.cloud
+          - status.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network
