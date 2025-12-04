@@ -3,21 +3,24 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app romm
-  namespace: flux-system
+  namespace: &namespace games
 spec:
-  targetNamespace: games
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cluster-apps-rook-ceph
+      namespace: flux-system
     - name: volsync
+      namespace: flux-system
   prune: true
   interval: 30m
   path: "./kubernetes/apps/games/romm/app"
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   retryInterval: 1m
   timeout: 5m
