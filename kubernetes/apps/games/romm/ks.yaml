@@ -10,10 +10,10 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: cluster-apps-rook-ceph
-      namespace: flux-system
+    - name: cluster-apps-rook-ceph-cluster
+      namespace: rook-ceph
     - name: volsync
-      namespace: flux-system
+      namespace: storage
   prune: true
   interval: 30m
   path: "./kubernetes/apps/games/romm/app"

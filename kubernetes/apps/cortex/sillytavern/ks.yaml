@@ -12,7 +12,9 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: volsync
+      namespace: storage
     - name: cluster-apps-rook-ceph-cluster
+      namespace: rook-ceph
   path: ./kubernetes/apps/cortex/sillytavern/app
   prune: true
   sourceRef:

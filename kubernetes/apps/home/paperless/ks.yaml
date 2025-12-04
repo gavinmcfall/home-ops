@@ -11,9 +11,9 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
-      namespace: flux-system
+      namespace: rook-ceph
     - name: volsync
-      namespace: flux-system
+      namespace: storage
   path: ./kubernetes/apps/home/paperless/app
   prune: true
   sourceRef:
