@@ -16,13 +16,13 @@ spec:
           kind: Backend
           name: ${APP}-oidc-provider
           port: 1411
-      issuer: "https://id.nerdz.cloud"
-      authorizationEndpoint: "https://id.nerdz.cloud/authorize"
-      tokenEndpoint: "https://id.nerdz.cloud/api/oidc/token"
+      issuer: "https://id.${SECRET_DOMAIN}"
+      authorizationEndpoint: "https://id.${SECRET_DOMAIN}/authorize"
+      tokenEndpoint: "https://id.${SECRET_DOMAIN}/api/oidc/token"
     clientIDRef:
       name: "${APP}-oidc"
     clientSecret:
       name: "${APP}-oidc"
-    redirectURL: "https://pdf.nerdz.cloud/oauth2/callback"
+    redirectURL: "https://pdf.${SECRET_DOMAIN}/oauth2/callback"
     logoutPath: "${LOGOUT_PATH:-/logout}"
     scopes: ["openid", "profile", "email"]

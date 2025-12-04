@@ -34,9 +34,9 @@ spec:
               tag: 2025.4.3-4452358e8@sha256:89022adeacc9d6d023f32e961b6100f7dae16b75b2489501783c7564e945726e
             command: ["uwsgi", "--master", "--http-socket", "0.0.0.0:8080", "/usr/local/searxng/dockerfiles/uwsgi.ini"]
             env:
-              TZ: Pacific/Auckland
-              SEARXNG_BASE_URL: https://search.nerdz.cloud}
-              SEARXNG_URL: https://search.nerdz.cloud}
+              TZ: ${TIMEZONE}
+              SEARXNG_BASE_URL: https://search.${SECRET_DOMAIN}}
+              SEARXNG_URL: https://search.${SECRET_DOMAIN}}
               SEARXNG_PORT: &httpPort 8080
               UWSGI_WORKERS: &cpu
                 valueFrom:
@@ -105,9 +105,9 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - search.nerdz.cloud
+          - search.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network

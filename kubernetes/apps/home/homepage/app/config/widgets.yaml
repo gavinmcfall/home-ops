@@ -103,7 +103,7 @@
         description: A.I Frontend
         widget:
           type: customapi
-          url: http://open-webui.nerdz.cloud:8080/api/models
+          url: http://open-webui.${SECRET_DOMAIN}:8080/api/models
           headers:
             Authorization: "Bearer {{HOMEPAGE_VAR_OPENWEBUI_KEY}}"
           mappings:

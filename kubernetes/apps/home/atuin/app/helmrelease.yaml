@@ -101,9 +101,9 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - sh.nerdz.cloud
+          - sh.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network
