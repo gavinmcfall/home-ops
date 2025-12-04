@@ -4,8 +4,8 @@ kind: Service
 metadata:
   name: truenas
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: citadel.nerdz.cloud
-    internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+    external-dns.alpha.kubernetes.io/hostname: citadel.${SECRET_DOMAIN}
+    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
 spec:
   type: ClusterIP
   ports:

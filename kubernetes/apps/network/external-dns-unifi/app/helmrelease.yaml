@@ -74,7 +74,7 @@ spec:
       - service
     txtOwnerId: main
     txtPrefix: k8s.main.
-    domainFilters: ["nerdz.cloud"]
+    domainFilters: ["${SECRET_DOMAIN}"]
     serviceMonitor:
       enabled: true
     podAnnotations:
