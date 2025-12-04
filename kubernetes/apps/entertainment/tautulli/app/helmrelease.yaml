@@ -38,7 +38,7 @@ spec:
               repository: ghcr.io/tautulli/tautulli
               tag: v2.16.0@sha256:7e6ede32f7923e01899db906aa6a96d978a4a8df8e2ef0dcf44c92b2d0206221
             env:
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             command: ["/usr/local/bin/python", "Tautulli.py"]
             args:
               [
@@ -97,9 +97,9 @@ spec:
           gethomepage.dev/widget.type: tautulli
           gethomepage.dev/widget.url: http://tautulli.entertainment
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_TAUTULLI_TOKEN}}` }}"
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.nerdz.cloud"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
           - name: external
             namespace: network

@@ -6,14 +6,14 @@ metadata:
   name: pasta
   namespace: entertainment
   annotations:
-    external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   parentRefs:
     - name: external
       namespace: network
       sectionName: https
   hostnames:
-    - pasta.nerdz.cloud
+    - pasta.${SECRET_DOMAIN}
   rules:
     - matches:
         - path:

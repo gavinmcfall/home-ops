@@ -40,8 +40,8 @@ spec:
               repository: ghcr.io/jellyfin/jellyfin
               tag: 10.11.3@sha256:fab30d85f4ec3e19556ca1d91b82b12329fc4a6d2a4b330673354af9218e1d28
             env:
-              TZ: Pacific/Auckland
-              JELLYFIN_PublishedServerUrl: https://jellyfin.nerdz.cloud
+              TZ: ${TIMEZONE}
+              JELLYFIN_PublishedServerUrl: https://jellyfin.${SECRET_DOMAIN}
               DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "false"
             probes:
               liveness: &probes
@@ -99,9 +99,9 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.nerdz.cloud"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
           - name: external
             namespace: network

@@ -40,7 +40,7 @@ spec:
               repository: ghcr.io/kareadita/kavita
               tag: 0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0
             env:
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             resources:
               requests:
                 cpu: 15m
@@ -66,9 +66,9 @@ spec:
           gethomepage.dev/widget.url: http://kavita.entertainment:5000
           gethomepage.dev/widget.username: "{{ `{{HOMEPAGE_VAR_KAVITA_USERNAME}}` }}"
           gethomepage.dev/widget.password: "{{ `{{HOMEPAGE_VAR_KAVITA_PASSWORD}}` }}"
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - comics.nerdz.cloud
+          - comics.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network
