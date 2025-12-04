@@ -6,13 +6,13 @@ metadata:
   name: weave-gitops
   namespace: flux-system
   annotations:
-    internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
 spec:
   parentRefs:
     - name: internal
       namespace: network
       sectionName: https
-  hostnames: ["gitops.nerdz.cloud"]
+  hostnames: ["gitops.${SECRET_DOMAIN}"]
   rules:
     - backendRefs:
         - name: weave-gitops
