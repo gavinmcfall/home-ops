@@ -4,19 +4,21 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app plex
-  namespace: flux-system
+  namespace: &namespace entertainment
 spec:
-  targetNamespace: entertainment
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets-stores
+      namespace: flux-system
   path: ./kubernetes/apps/entertainment/plex/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -32,19 +34,21 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app plex-auto-languages
-  namespace: flux-system
+  namespace: &namespace entertainment
 spec:
-  targetNamespace: entertainment
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: plex
+      namespace: entertainment
   path: ./kubernetes/apps/entertainment/plex/plex-auto-languages
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false # no flux ks dependents
   interval: 30m
   retryInterval: 1m
@@ -55,20 +59,23 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app plex-image-cleanup
-  namespace: flux-system
+  namespace: &namespace entertainment
 spec:
-  targetNamespace: entertainment
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: plex
+      namespace: entertainment
     - name: external-secrets-stores
+      namespace: flux-system
   path: ./kubernetes/apps/entertainment/plex/plex-image-cleanup
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false # no flux ks dependents
   interval: 30m
   retryInterval: 1m
@@ -83,23 +90,29 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app kometa
-  namespace: flux-system
+  namespace: &namespace entertainment
 spec:
-  targetNamespace: entertainment
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: plex
+      namespace: entertainment
     - name: tautulli
+      namespace: entertainment
     - name: radarr
+      namespace: downloads
     - name: sonarr
+      namespace: downloads
     - name: external-secrets-stores
+      namespace: flux-system
   path: ./kubernetes/apps/entertainment/plex/kometa
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false # no flux ks dependents
   interval: 30m
   retryInterval: 1m
