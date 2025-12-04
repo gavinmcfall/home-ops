@@ -3,20 +3,23 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app paperless-ngx
-  namespace: flux-system
+  namespace: &namespace home
 spec:
-  targetNamespace: home
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
+      namespace: flux-system
     - name: volsync
+      namespace: flux-system
   path: ./kubernetes/apps/home/paperless/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -30,19 +33,21 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app paperless-gpt
-  namespace: flux-system
+  namespace: &namespace home
 spec:
-  targetNamespace: home
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: paperless-ngx
+      namespace: home
   path: ./kubernetes/apps/home/paperless/paperless-gpt
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -56,19 +61,21 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app paperless-ai
-  namespace: flux-system
+  namespace: &namespace home
 spec:
-  targetNamespace: home
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: paperless-ngx
+      namespace: home
   path: ./kubernetes/apps/home/paperless/paperless-ai
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m

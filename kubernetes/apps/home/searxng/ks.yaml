@@ -4,9 +4,9 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app searxng
-  namespace: flux-system
+  namespace: &namespace home
 spec:
-  targetNamespace: home
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
@@ -15,6 +15,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m
@@ -22,6 +23,3 @@ spec:
   postBuild:
     substitute:
       APP: *app
-    substituteFrom:
-      - kind: Secret
-        name: cluster-secrets
