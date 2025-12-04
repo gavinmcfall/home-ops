@@ -117,7 +117,7 @@ spec:
         controller: mosquitto
         type: LoadBalancer
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: mosquitto.nerdz.cloud
+          external-dns.alpha.kubernetes.io/hostname: mosquitto.${SECRET_DOMAIN}
         ports:
           http:
             port: 1883
