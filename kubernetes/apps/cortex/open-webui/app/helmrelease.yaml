@@ -102,9 +102,9 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - chat.nerdz.cloud
+          - chat.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network
