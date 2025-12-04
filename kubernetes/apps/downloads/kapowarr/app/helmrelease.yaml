@@ -40,7 +40,7 @@ spec:
               repository: mrcas/kapowarr
               tag: v1.0.0-beta-4
             env:
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             resources:
               requests:
                 cpu: 15m
@@ -62,9 +62,9 @@ spec:
           gethomepage.dev/app: *app
           gethomepage.dev/icon: calibre-web.png
           gethomepage.dev/description: Comic Downloads
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.nerdz.cloud"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
           - name: internal
             namespace: network

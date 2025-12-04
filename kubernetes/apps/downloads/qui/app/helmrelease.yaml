@@ -40,7 +40,7 @@ spec:
               QUI__METRICS_ENABLED: "true"
               QUI__METRICS_HOST: "0.0.0.0"
               QUI__METRICS_PORT: &metricsPort 9074
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             envFrom:
               - secretRef:
                   name: qui-secret
@@ -88,9 +88,9 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.nerdz.cloud"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
           - name: internal
             namespace: network
