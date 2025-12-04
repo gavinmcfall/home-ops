@@ -12,7 +12,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets-stores
-      namespace: flux-system
+      namespace: external-secrets
   path: ./kubernetes/apps/entertainment/plex/app
   prune: true
   sourceRef:
@@ -69,7 +69,7 @@ spec:
     - name: plex
       namespace: entertainment
     - name: external-secrets-stores
-      namespace: flux-system
+      namespace: external-secrets
   path: ./kubernetes/apps/entertainment/plex/plex-image-cleanup
   prune: true
   sourceRef:
@@ -106,7 +106,7 @@ spec:
     - name: sonarr
       namespace: downloads
     - name: external-secrets-stores
-      namespace: flux-system
+      namespace: external-secrets
   path: ./kubernetes/apps/entertainment/plex/kometa
   prune: true
   sourceRef:

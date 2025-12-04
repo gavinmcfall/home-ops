@@ -12,9 +12,9 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cloudnative-pg-cluster17
-      namespace: flux-system
+      namespace: database
     - name: external-secrets-stores
-      namespace: flux-system
+      namespace: external-secrets
   path: ./kubernetes/apps/downloads/whisparr/app
   prune: true
   sourceRef:

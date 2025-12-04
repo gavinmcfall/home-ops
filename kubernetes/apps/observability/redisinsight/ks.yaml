@@ -12,9 +12,9 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: dragonfly-operator
-      namespace: flux-system
+      namespace: database
     - name: volsync
-      namespace: flux-system
+      namespace: storage
   path: ./kubernetes/apps/observability/redisinsight/app
   prune: true
   sourceRef:

@@ -12,7 +12,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: mariadb
-      namespace: flux-system
+      namespace: database
   path: ./kubernetes/apps/observability/exporters/mariadb-exporter/app
   prune: true
   sourceRef:

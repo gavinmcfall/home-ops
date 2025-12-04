@@ -12,7 +12,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets-stores
-      namespace: flux-system
+      namespace: external-secrets
   path: ./kubernetes/apps/entertainment/jellyfin/app
   prune: true
   sourceRef:
