@@ -1,28 +1,27 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app tqm
-  namespace: flux-system
+  namespace: &namespace downloads
 spec:
-  targetNamespace: downloads
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: qbittorrent
+      namespace: downloads
   path: ./kubernetes/apps/downloads/tqm/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   interval: 30m
   timeout: 5m
   postBuild:
-    substitute: {}
-    substituteFrom:
-      - kind: ConfigMap
-        name: cluster-settings
-      - kind: Secret
-        name: cluster-secrets
+    substitute:
+      APP: *app

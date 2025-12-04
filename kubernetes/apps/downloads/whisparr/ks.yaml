@@ -4,20 +4,23 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app whisparr
-  namespace: flux-system
+  namespace: &namespace downloads
 spec:
-  targetNamespace: downloads
+  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cloudnative-pg-cluster17
+      namespace: flux-system
     - name: external-secrets-stores
+      namespace: flux-system
   path: ./kubernetes/apps/downloads/whisparr/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: false
   interval: 30m
   retryInterval: 1m

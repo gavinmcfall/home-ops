@@ -1,18 +1,24 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app qui
-  namespace: flux-system
+  namespace: &namespace downloads
 spec:
-  targetNamespace: downloads
+  targetNamespace: *namespace
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
   dependsOn:
     - name: external-secrets-stores
+      namespace: flux-system
   path: ./kubernetes/apps/downloads/qui/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   wait: true
   interval: 30m
   retryInterval: 1m
