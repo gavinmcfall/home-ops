@@ -56,7 +56,7 @@ spec:
               READARR__LOG__LEVEL: info
               READARR__SERVER__PORT: &port 80
               READARR__UPDATE__BRANCH: develop
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             envFrom: *envFrom
             resources:
               requests:
@@ -90,9 +90,9 @@ spec:
           gethomepage.dev/widget.type: readarr
           gethomepage.dev/widget.url: http://readarr.downloads
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_READARR_TOKEN}}` }}"
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.nerdz.cloud"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
           - name: internal
             namespace: network

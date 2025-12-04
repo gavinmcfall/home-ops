@@ -49,7 +49,7 @@ spec:
               PROWLARR__LOG_LEVEL: info
               PROWLARR__UPDATE__BRANCH: develop
               PROWLARR__SERVER__PORT: &port 9696
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             envFrom: *envFrom
             probes:
               liveness: &probes
@@ -99,9 +99,9 @@ spec:
           gethomepage.dev/widget.type: prowlarr
           gethomepage.dev/widget.url: http://prowlarr.downloads:9696
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_PROWLARR_TOKEN}}` }}"
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.nerdz.cloud"
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
           - name: internal
             namespace: network
