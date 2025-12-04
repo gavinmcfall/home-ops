@@ -8,7 +8,7 @@ service:
   clusterIP: "10.96.0.10"
 servers:
   - zones:
-      - zone: nerdz.cloud
+      - zone: ${SECRET_DOMAIN}
         scheme: dns://
     port: 53
     plugins:
