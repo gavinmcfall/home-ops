@@ -43,9 +43,9 @@ spec:
               DB_PROVIDER: postgres
               PUID: 568
               PGID: 568
-              APP_URL: https://id.nerdz.cloud
+              APP_URL: https://id.${SECRET_DOMAIN}
               TRUST_PROXY: true
-              TZ: Pacific/Auckland
+              TZ: ${TIMEZONE}
             envFrom:
               - secretRef:
                   name: pocket-id-secret
@@ -90,18 +90,18 @@ spec:
     route:
       external:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.nerdz.cloud
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - id.nerdz.cloud
+          - id.${SECRET_DOMAIN}
         parentRefs:
           - name: external
             namespace: network
             sectionName: https
       internal:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.nerdz.cloud
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - id.nerdz.cloud
+          - id.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network
