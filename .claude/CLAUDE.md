@@ -20,6 +20,7 @@ GitOps-managed Kubernetes homelab using Flux, Talos, and Makejinja templates.
 
 ### Writing Guides
 - @docs/ai-context/Ethos.md - Hard rules, guidance, values
+- @docs/ai-context/PLANNING.md - Collaborative planning lifecycle
 - @docs/ai-context/writing-documentation.md - Wisdom triggers
 - @docs/ai-context/writing-capsules.md - Capsule format
 - @docs/ai-context/mermaid-diagram-guide.md - Diagram rules
