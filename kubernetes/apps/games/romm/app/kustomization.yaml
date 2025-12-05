@@ -5,7 +5,6 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   # - ./pvc.yaml
-  - ../../../../templates/volsync
   - ../../../../templates/gatus/external
 configMapGenerator:
 - name: romm-config
