@@ -10,8 +10,13 @@ metrics: true
 debug: true
 ui:
   title: Status | Gatus
-  default-group-sort-by: group
   header: Status
+  groups:
+    - name: external
+    - name: guarded
+    - name: infrastructure
+  default-group-sort-by: group
+  group-by-status: false
   # custom-css: |
   #   /* Adjust status colors for better color-blind accessibility */
   #   #app .bg-green-500,
