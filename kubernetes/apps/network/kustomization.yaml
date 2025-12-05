@@ -17,6 +17,5 @@ resources:
   - ./external-dns-unifi/ks.yaml
   - ./external-services/ks.yaml
   - ./gateway-api/ks.yaml
-  - ./k8s-gateway/ks.yaml
   - ./multus/ks.yaml
   - ./tailscale/ks.yaml

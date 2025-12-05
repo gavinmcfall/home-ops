@@ -19,7 +19,6 @@ categories: ["Architecture[100%]", "Networking[100%]"]
 
 | IP | Service | Purpose |
 |----|---------|---------|
-| 10.90.3.200 | k8s-gateway | Internal DNS server for cluster |
 | 10.90.3.201 | external gateway | Public traffic ingress (via Cloudflare) |
 | 10.90.3.202 | internal gateway | Private traffic ingress (LAN direct) |
 
@@ -64,10 +63,10 @@ These A records are manually configured in the UDM Pro:
 
 **Components**:
 
-| Component | Annotation Filter | Creates Records In |
-|-----------|-------------------|-------------------|
-| external-dns | `external-dns.alpha.kubernetes.io/target` | Cloudflare |
-| external-dns-unifi | `internal-dns.alpha.kubernetes.io/target` | UDM Pro |
+| Component | Creates Records In | What It Watches |
+|-----------|-------------------|-----------------|
+| external-dns | Cloudflare | HTTPRoutes with `external-dns.alpha.kubernetes.io/target` annotation |
+| external-dns-unifi | UDM Pro | ALL HTTPRoutes (no annotation filter) |
 
 **Why This Avoids Hairpin NAT**:
 - Without split-horizon: LAN client → Cloudflare → tunnel → cluster (hairpin)
@@ -290,18 +289,18 @@ spec:
 
 | Component | IP | Role |
 |-----------|-----|------|
-| CoreDNS | 10.96.0.10 | Cluster DNS, forwards `${SECRET_DOMAIN}` queries to k8s-gateway |
-| k8s-gateway | 10.90.3.200 | Watches HTTPRoutes, returns appropriate gateway IP |
+| CoreDNS | 10.96.0.10 | Cluster DNS, forwards non-cluster queries to upstream (UDM) |
 | external-dns | N/A | Watches HTTPRoutes with external annotation, creates CNAME in Cloudflare |
-| external-dns-unifi | N/A | Watches HTTPRoutes with internal annotation, creates A record in UDM |
+| external-dns-unifi | N/A | Watches ALL HTTPRoutes, creates A records in UDM |
 | Cloudflare DNS | N/A | Public authoritative DNS, returns Cloudflare edge IPs (proxied) |
-| UDM Pro DNS | 10.90.254.1 | Local DNS resolver for LAN clients |
+| UDM Pro DNS | 10.90.254.1 | Local DNS resolver for LAN, pods, and Tailscale clients |
 
 ### DNS Record Creation Flow
 
-When an app is deployed with routing annotations, DNS records are created automatically:
+When an app is deployed, DNS records are created automatically:
 
-![claude_network_dns_creation_flow](./images/claude_network_dns_creation_flow.png)
+- **external-dns-unifi** watches ALL HTTPRoutes and creates A records in UDM pointing to the internal gateway (10.90.3.202)
+- **external-dns** watches HTTPRoutes with `external-dns.alpha.kubernetes.io/target` annotation and creates CNAMEs in Cloudflare
 
 ### DNS Resolution by Client Location
 
@@ -314,7 +313,7 @@ When an app is deployed with routing annotations, DNS records are created automa
 4. Cloudflare routes via tunnel to cluster
 ```
 
-#### LAN Client → Dual-Homed App (has both internal and external routes)
+#### LAN Client → Any App
 
 ```
 1. Client queries: app.${SECRET_DOMAIN}
@@ -324,23 +323,22 @@ When an app is deployed with routing annotations, DNS records are created automa
 4. No hairpin, no tunnel traversal
 ```
 
-#### LAN Client → External-Only App (no internal route)
-
-```
-1. Client queries: app.${SECRET_DOMAIN}
-2. UDM DNS has no record → forwards to upstream (Cloudflare)
-3. Cloudflare responds: Cloudflare edge IP
-4. Client connects to Cloudflare → tunnel → cluster
-   └── This is the "hairpin" path, but via tunnel not NAT
-```
-
-#### Pod → Cluster Service
+#### Pod → App in Cluster
 
 ```
 1. Pod queries: app.${SECRET_DOMAIN}
-2. CoreDNS forwards to k8s-gateway (10.96.100.130)
-3. k8s-gateway checks HTTPRoutes, returns gateway IP
+2. CoreDNS forwards to /etc/resolv.conf (UDM: 10.90.254.1)
+3. UDM DNS responds: 10.90.3.202 (internal gateway)
 4. Pod connects to gateway → service
+```
+
+#### Tailscale Client → Internal App
+
+```
+1. Client queries: app.${SECRET_DOMAIN}
+2. Tailscale Split DNS forwards to UDM (10.90.254.1)
+3. UDM DNS responds: 10.90.3.202 (internal gateway)
+4. Client connects via WireGuard mesh to internal gateway
 ```
 
 ### CoreDNS Configuration
@@ -349,18 +347,20 @@ When an app is deployed with routing annotations, DNS records are created automa
 # kubernetes/apps/kube-system/coredns/app/helm-values.yaml
 servers:
   - zones:
-      - zone: ${SECRET_DOMAIN}
-    plugins:
-      - name: forward
-        parameters: . 10.96.100.130  # k8s-gateway ClusterIP
-  - zones:
       - zone: .
+        scheme: dns://
+        use_tcp: true
+    port: 53
     plugins:
       - name: kubernetes
         parameters: cluster.local in-addr.arpa ip6.arpa
       - name: forward
-        parameters: . /etc/resolv.conf
+        parameters: . /etc/resolv.conf  # Forwards to UDM (10.90.254.1)
+      - name: cache
+        parameters: 30
 ```
+
+This simplified configuration forwards all non-cluster DNS queries to the upstream resolver (UDM), which has authoritative records for all cluster apps created by external-dns-unifi.
 
 ---
 
@@ -537,12 +537,11 @@ kubectl get pods -n network -l app.kubernetes.io/name=cloudflared
 |-------|--------|-----------|------------|
 | External gateway at 10.90.3.201 | [`envoy-gateway/app/external/gateway.yaml:19`](../../kubernetes/apps/network/envoy-gateway/app/external/gateway.yaml#L19) | network | Verified |
 | Internal gateway at 10.90.3.202 | [`envoy-gateway/app/internal/gateway.yaml:19`](../../kubernetes/apps/network/envoy-gateway/app/internal/gateway.yaml#L19) | network | Verified |
-| k8s-gateway at 10.90.3.200 | [`k8s-gateway/app/helmrelease.yaml`](../../kubernetes/apps/network/k8s-gateway/app/helmrelease.yaml) | network | Verified |
 | Cilium LB-IPAM pool 10.90.3.0/16 | [`cilium/config/cilium-l2.yaml:24`](../../kubernetes/apps/kube-system/cilium/config/cilium-l2.yaml#L24) | kube-system | Verified |
 | Cilium socketLB enabled | [`cilium/app/helm-values.yaml:42`](../../kubernetes/apps/kube-system/cilium/app/helm-values.yaml#L42) | kube-system | Verified |
 | external-dns filters by annotation | [`external-dns/app/helmrelease.yaml:40`](../../kubernetes/apps/network/external-dns/app/helmrelease.yaml#L40) | network | Verified |
-| external-dns-unifi filters by annotation | [`external-dns-unifi/app/helmrelease.yaml:66`](../../kubernetes/apps/network/external-dns-unifi/app/helmrelease.yaml#L66) | network | Verified |
-| CoreDNS forwards to k8s-gateway | [`coredns/app/helm-values.yaml:22`](../../kubernetes/apps/kube-system/coredns/app/helm-values.yaml#L22) | kube-system | Verified |
+| external-dns-unifi creates records for all routes | [`external-dns-unifi/app/helmrelease.yaml`](../../kubernetes/apps/network/external-dns-unifi/app/helmrelease.yaml) | network | Verified |
+| CoreDNS forwards to upstream (UDM) | [`coredns/app/helm-values.yaml`](../../kubernetes/apps/kube-system/coredns/app/helm-values.yaml) | kube-system | Verified |
 | bentopdf OIDC via SecurityPolicy | [`bentopdf/app/securitypolicy.yaml`](../../kubernetes/apps/home/bentopdf/app/securitypolicy.yaml) | home | Verified |
 | Pocket-ID dual-homed (both gateways) | [`pocket-id/app/helmrelease.yaml:90-108`](../../kubernetes/apps/security/pocket-id/app/helmrelease.yaml#L90) | security | Verified |
 
