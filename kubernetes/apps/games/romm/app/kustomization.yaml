@@ -6,6 +6,14 @@ resources:
   - ./helmrelease.yaml
   - ../../../../templates/gatus/external
   - ../../../../templates/volsync
+patches:
+  # Remove dataSourceRef since PVC already exists with data from migration
+  - target:
+      kind: PersistentVolumeClaim
+      name: romm
+    patch: |-
+      - op: remove
+        path: /spec/dataSourceRef
 configMapGenerator:
 - name: romm-config
   files:
