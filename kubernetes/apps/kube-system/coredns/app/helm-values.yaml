@@ -19,7 +19,7 @@ servers:
       - name: cache
         parameters: 30
       - name: forward
-        parameters: . k8s-gateway.network.svc.cluster.local
+        parameters: . 10.96.121.61
   - zones:
       - zone: .
         scheme: dns://
