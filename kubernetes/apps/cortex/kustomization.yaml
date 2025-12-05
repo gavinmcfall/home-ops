@@ -6,9 +6,10 @@ namespace: cortex
 components:
   - ../../components/common
 
+# Applications (uncomment to deploy)
 resources: []
-  # Applications
   # - ./litellm/ks.yaml
   # - ./open-webui/ks.yaml
   # - ./qdrant/ks.yaml
+  # - ./sillytavern/ks.yaml
   # - ./whisper/ks.yaml
