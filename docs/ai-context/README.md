@@ -32,6 +32,7 @@ This directory contains the single source of truth for AI assistant context acro
 | Document | Purpose |
 |----------|---------|
 | [Ethos.md](Ethos.md) | Hard rules, strong guidance, values for documentation |
+| [PLANNING.md](PLANNING.md) | Collaborative planning lifecycle: Idea → Planning → Risk → Execution → Incident |
 | [writing-documentation.md](writing-documentation.md) | Wisdom triggers, token economics, two-tier architecture |
 | [writing-capsules.md](writing-capsules.md) | Invariant->Example->Depth format specification |
 | [mermaid-diagram-guide.md](mermaid-diagram-guide.md) | Diagram types, accessibility, universal rules |
