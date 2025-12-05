@@ -291,7 +291,7 @@ spec:
 |-----------|-----|------|
 | CoreDNS | 10.96.0.10 | Cluster DNS, forwards non-cluster queries to upstream (UDM) |
 | external-dns | N/A | Watches HTTPRoutes with external annotation, creates CNAME in Cloudflare |
-| external-dns-unifi | N/A | Watches ALL HTTPRoutes, creates A records in UDM |
+| external-dns-unifi | N/A | Watches HTTPRoutes with internal annotation, creates A records in UDM |
 | Cloudflare DNS | N/A | Public authoritative DNS, returns Cloudflare edge IPs (proxied) |
 | UDM Pro DNS | 10.90.254.1 | Local DNS resolver for LAN, pods, and Tailscale clients |
 
@@ -508,8 +508,8 @@ kubectl logs -n network -l app.kubernetes.io/name=envoy-gateway
 # From internet perspective
 dig app.${SECRET_DOMAIN} @1.1.1.1
 
-# From cluster (should return gateway IP)
-kubectl run -it --rm debug --image=alpine -- nslookup app.${SECRET_DOMAIN} 10.90.3.200
+# From cluster (should return internal gateway IP via UDM)
+kubectl run -it --rm debug --image=alpine -- nslookup app.${SECRET_DOMAIN} 10.90.254.1
 
 # Check what external-dns created
 kubectl logs -n network -l app.kubernetes.io/name=external-dns
@@ -542,7 +542,7 @@ kubectl get pods -n network -l app.kubernetes.io/name=cloudflared
 | Cilium LB-IPAM pool 10.90.3.0/16 | [`cilium/config/cilium-l2.yaml:24`](../../kubernetes/apps/kube-system/cilium/config/cilium-l2.yaml#L24) | kube-system | Verified |
 | Cilium socketLB enabled | [`cilium/app/helm-values.yaml:42`](../../kubernetes/apps/kube-system/cilium/app/helm-values.yaml#L42) | kube-system | Verified |
 | external-dns filters by annotation | [`external-dns/app/helmrelease.yaml:40`](../../kubernetes/apps/network/external-dns/app/helmrelease.yaml#L40) | network | Verified |
-| external-dns-unifi creates records for all routes | [`external-dns-unifi/app/helmrelease.yaml`](../../kubernetes/apps/network/external-dns-unifi/app/helmrelease.yaml) | network | Verified |
+| external-dns-unifi filters by internal annotation | [`external-dns-unifi/app/helmrelease.yaml`](../../kubernetes/apps/network/external-dns-unifi/app/helmrelease.yaml) | network | Verified |
 | CoreDNS forwards to upstream (UDM) | [`coredns/app/helm-values.yaml`](../../kubernetes/apps/kube-system/coredns/app/helm-values.yaml) | kube-system | Verified |
 | bentopdf OIDC via SecurityPolicy | [`bentopdf/app/securitypolicy.yaml`](../../kubernetes/apps/home/bentopdf/app/securitypolicy.yaml) | home | Verified |
 | Pocket-ID dual-homed (both gateways) | [`pocket-id/app/helmrelease.yaml:90-108`](../../kubernetes/apps/security/pocket-id/app/helmrelease.yaml#L90) | security | Verified |
