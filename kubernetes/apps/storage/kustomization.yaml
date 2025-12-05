@@ -9,6 +9,7 @@ components:
 
 resources:
   # Applications
+  - ./kopia/ks.yaml
   - ./snapshot-controller/ks.yaml
   - ./syncthing/ks.yaml
   - ./volsync/ks.yaml
