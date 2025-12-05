@@ -30,10 +30,10 @@ spec:
               - /bin/sh
               - -c
               - |
-                # Initialize repository if it doesn't exist
-                if ! kopia repository connect filesystem --path=/repository --password="${KOPIA_PASSWORD}" 2>/dev/null; then
+                # Initialize repository if it doesn't exist (KOPIA_PASSWORD env var is read automatically)
+                if ! kopia repository connect filesystem --path=/repository 2>/dev/null; then
                   echo "Initializing new Kopia repository..."
-                  kopia repository create filesystem --path=/repository --password="${KOPIA_PASSWORD}"
+                  kopia repository create filesystem --path=/repository
                 fi
                 # Start the server
                 exec kopia server start --address=0.0.0.0:80 --without-password --insecure
