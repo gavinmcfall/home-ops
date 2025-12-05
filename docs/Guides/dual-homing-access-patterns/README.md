@@ -103,8 +103,7 @@ Seven distinct access patterns describe how users reach applications based on th
 |-----------|-----|---------|
 | External Gateway | 10.90.3.201 | Cloudflare tunnel ingress, OIDC enforcement |
 | Internal Gateway | 10.90.3.202 | Direct LAN access, optional auth bypass |
-| k8s-gateway | 10.90.3.200 | Cluster DNS for pods |
-| UDM Pro | 10.90.254.1 | LAN DNS resolver, split-horizon records |
+| UDM Pro | 10.90.254.1 | LAN DNS resolver, split-horizon records, upstream DNS for pods |
 | Pocket-ID | id.${SECRET_DOMAIN} | OIDC provider (dual-homed) |
 
 ---
@@ -128,12 +127,12 @@ Split-horizon DNS enables the same hostname to resolve to different IPs based on
 
 ### DNS Record Creation
 
-Two external-dns instances watch for different annotations:
+Two external-dns instances manage DNS records:
 
-| Instance | Annotation | Creates Records In |
-|----------|------------|-------------------|
-| external-dns | `external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}` | Cloudflare |
-| external-dns-unifi | `internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}` | UDM Pro |
+| Instance | What It Watches | Creates Records In |
+|----------|-----------------|-------------------|
+| external-dns | HTTPRoutes with `external-dns.alpha.kubernetes.io/target` annotation | Cloudflare |
+| external-dns-unifi | ALL HTTPRoutes (no filter) | UDM Pro |
 
 ### Benefits
 
@@ -755,9 +754,9 @@ The ideal experience:
 │            │ 4. Forward DNS query via WireGuard tunnel                 │
 │            ▼                                                            │
 │   ┌─────────────────┐                                                   │
-│   │   k8s-gateway   │  5. Resolves radarr.nerdz.cloud                  │
-│   │   10.90.3.200   │     Returns: 10.90.3.202 (internal gateway)      │
-│   └────────┬────────┘                                                   │
+│   │    UDM Pro      │  5. Resolves radarr.nerdz.cloud                  │
+│   │   10.90.254.1   │     Returns: 10.90.3.202 (internal gateway)      │
+│   └────────┬────────┘     (record created by external-dns-unifi)       │
 │            │                                                            │
 │            │ 6. Response travels back via WireGuard                    │
 │            ▼                                                            │
@@ -775,7 +774,7 @@ The ideal experience:
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Key insight**: The internal gateway (10.90.3.202) is reachable from Tailscale clients via the WireGuard mesh. No separate Tailscale gateway or per-app ingress needed!
+**Key insight**: The internal gateway (10.90.3.202) is reachable from Tailscale clients via the WireGuard mesh. UDM serves the same DNS records to LAN clients, pods, and Tailscale clients. No separate gateway or per-app ingress needed!
 
 ### Why This is Simpler Than Tailscale Ingress
 
@@ -807,7 +806,7 @@ The Split DNS approach:
 1. In the **Nameservers** section, click **Add nameserver**
 2. Select **Custom...**
 3. Configure:
-   - **Nameserver**: `10.90.3.200` (your k8s-gateway IP)
+   - **Nameserver**: `10.90.254.1` (your UDM Pro IP)
    - Check **Restrict to domain**
    - **Domain**: `nerdz.cloud` (your domain, without wildcard)
 
@@ -818,7 +817,7 @@ The Split DNS approach:
 │                                                                 │
 │  Nameserver                                                     │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │ 10.90.3.200                                             │   │
+│  │ 10.90.254.1                                             │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
 │  ☑ Restrict to domain                                          │
@@ -837,11 +836,11 @@ The Split DNS approach:
 
 In the DNS settings, enable **Override local DNS** to ensure Tailscale's DNS settings take precedence when connected.
 
-This forces all `*.nerdz.cloud` queries through your k8s-gateway, regardless of the device's local DNS configuration.
+This forces all `*.nerdz.cloud` queries through your UDM, regardless of the device's local DNS configuration.
 
 ### Step 4: Ensure Subnet Router is Configured
 
-For Split DNS to work, your k8s-gateway (10.90.3.200) must be reachable from Tailscale. This requires a **subnet router** that advertises your cluster network.
+For Split DNS to work, your UDM (10.90.254.1) must be reachable from Tailscale. This requires a **subnet router** that advertises your home network.
 
 **Check if subnet routes exist:**
 ```bash
@@ -998,12 +997,13 @@ Use External Gateway for:
 │                                                                         │
 │   Trust Model:     Device identity (Tailscale WireGuard keys)          │
 │   Network Path:    WireGuard mesh → Internal Gateway → Service          │
-│   DNS:             Split DNS forwards *.nerdz.cloud to k8s-gateway     │
+│   DNS:             Split DNS forwards *.nerdz.cloud to UDM (10.90.254.1)│
 │   TLS:             cert-manager wildcard (same as LAN)                  │
 │   Authentication:  None beyond Tailscale (device = identity)            │
 │   URL:             Same as LAN (radarr.nerdz.cloud)                     │
 │                                                                         │
 │   Key Insight:     Split DNS + WireGuard mesh = LAN from anywhere       │
+│                    UDM serves same DNS to LAN, pods, and Tailscale      │
 │                    No separate gateway or per-app ingress needed        │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘

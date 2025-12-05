@@ -63,7 +63,6 @@ spec:
           timeoutSeconds: 5
     extraArgs:
       - --ignore-ingress-tls-spec
-      - --annotation-filter=internal-dns.alpha.kubernetes.io/target
     policy: sync
     sources:
       - gateway-httproute
