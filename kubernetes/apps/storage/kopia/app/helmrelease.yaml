@@ -79,8 +79,9 @@ spec:
         hostnames:
           - kopia.${SECRET_DOMAIN}
         parentRefs:
-          - name: envoy-internal
+          - name: internal
             namespace: network
+            sectionName: https
     configMaps:
       config:
         data:
