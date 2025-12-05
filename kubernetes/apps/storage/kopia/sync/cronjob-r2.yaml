@@ -1,0 +1,66 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kopia-sync-r2
+spec:
+  schedule: "0 3 * * *"
+  suspend: true
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+            - name: kopia-sync
+              image: ghcr.io/home-operations/kopia:0.22.3@sha256:eeebd12fd4b3a9c25b9f711fff32454f62e2d5e2d431ab6806ad21c52f414807
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  echo "Connecting to source repository..."
+                  kopia repository connect filesystem --path=/repository --password="${KOPIA_PASSWORD}"
+                  echo "Syncing to Cloudflare R2..."
+                  kopia repository sync-to s3 \
+                    --bucket="${BUCKET}" \
+                    --endpoint="${ENDPOINT}" \
+                    --access-key="${ACCESS_KEY}" \
+                    --secret-access-key="${SECRET_KEY}" \
+                    --parallel=4 \
+                    --delete
+                  echo "Sync complete!"
+              envFrom:
+                - secretRef:
+                    name: kopia-sync-r2-secret
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 256Mi
+                limits:
+                  memory: 1Gi
+              volumeMounts:
+                - name: repository
+                  mountPath: /repository
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: repository
+              nfs:
+                server: citadel.internal
+                path: /mnt/storage0/backups/VolsyncKopia
+            - name: tmp
+              emptyDir: {}
