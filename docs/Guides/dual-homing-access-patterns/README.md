@@ -132,7 +132,7 @@ Two external-dns instances manage DNS records:
 | Instance | What It Watches | Creates Records In |
 |----------|-----------------|-------------------|
 | external-dns | HTTPRoutes with `external-dns.alpha.kubernetes.io/target` annotation | Cloudflare |
-| external-dns-unifi | ALL HTTPRoutes (no filter) | UDM Pro |
+| external-dns-unifi | HTTPRoutes with `internal-dns.alpha.kubernetes.io/target` annotation | UDM Pro |
 
 ### Benefits
 
