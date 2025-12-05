@@ -99,11 +99,11 @@ spec:
     route:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
-          - name: external
+          - name: internal
             namespace: network
             sectionName: https
     persistence:
