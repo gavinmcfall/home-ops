@@ -2,4 +2,4 @@ cluster:
   apiServer:
     extraArgs:
       feature-gates: ImageVolume=true,MutatingAdmissionPolicy=true
-      runtime-config: admissionregistration.k8s.io/v1beta1=true
+      runtime-config: admissionregistration.k8s.io/v1alpha1=true
