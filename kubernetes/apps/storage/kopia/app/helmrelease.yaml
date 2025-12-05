@@ -89,7 +89,7 @@ spec:
     persistence:
       config-file:
         type: configMap
-        name: kopia-config
+        name: kopia
         globalMounts:
           - path: /config/repository.config
             subPath: repository.config
