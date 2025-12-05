@@ -109,21 +109,6 @@ spec:
           - name: external
             namespace: network
             sectionName: https
-
-    ingress: #tailscale
-      tailscale:
-        enabled: true
-        className: tailscale
-        hosts:
-          - host: &app "chat"
-            paths: &paths
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - hosts:
-              - *app
     persistence:
       config:
         existingClaim: open-webui-config
