@@ -21,13 +21,13 @@ This operator provides two main capabilities:
 │       │ 1. DNS: paperless.${SECRET_DOMAIN}                          │
 │       ▼                                                             │
 │   ┌─────────────────┐                                               │
-│   │ Tailscale Client│  2. Split DNS forwards to k8s-gateway         │
+│   │ Tailscale Client│  2. Split DNS forwards to UDM Pro             │
 │   └────────┬────────┘     via WireGuard tunnel                      │
 │            │                                                        │
 │            ▼                                                        │
 │   ┌─────────────────┐                                               │
-│   │   k8s-gateway   │  3. Returns: 10.90.3.202 (internal gateway)   │
-│   │   10.90.3.200   │                                               │
+│   │    UDM Pro      │  3. Returns: 10.90.3.202 (internal gateway)   │
+│   │   10.90.254.1   │     (record created by external-dns-unifi)    │
 │   └────────┬────────┘                                               │
 │            │                                                        │
 │            ▼                                                        │
@@ -157,7 +157,7 @@ Split DNS routes `*.${SECRET_DOMAIN}` queries through Tailscale to your internal
 2. Under **Nameservers**, click **Add nameserver** → **Custom...**
 
 3. Configure:
-    - **Nameserver**: `10.90.3.200` (k8s-gateway)
+    - **Nameserver**: `10.90.254.1` (UDM Pro)
     - Check **Restrict to domain**
     - **Domain**: `${SECRET_DOMAIN}`
 
@@ -224,7 +224,7 @@ This is no longer needed with Split DNS. Remove these blocks from your HelmRelea
 3. Test DNS resolution:
    ```bash
    tailscale status
-   dig @10.90.3.200 paperless.${SECRET_DOMAIN}
+   dig @10.90.254.1 paperless.${SECRET_DOMAIN}
    ```
 
 ### Can't reach internal gateway IP
@@ -248,7 +248,7 @@ Ensure the app has an internal HTTPRoute with the correct hostname. The internal
 | `helmrelease.yaml` | Tailscale Operator deployment |
 | `connector.yaml` | Subnet router advertising `10.90.0.0/16` |
 | `externalsecret.yaml` | OAuth credentials from 1Password |
-| `rbac.yaml` | RBAC for API server proxy (commented out) |
+| `rbac.yaml` | ClusterRoleBinding for remote kubectl access |
 
 ## References
 
