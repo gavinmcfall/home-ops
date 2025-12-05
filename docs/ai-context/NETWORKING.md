@@ -66,7 +66,7 @@ These A records are manually configured in the UDM Pro:
 | Component | Creates Records In | What It Watches |
 |-----------|-------------------|-----------------|
 | external-dns | Cloudflare | HTTPRoutes with `external-dns.alpha.kubernetes.io/target` annotation |
-| external-dns-unifi | UDM Pro | ALL HTTPRoutes (no annotation filter) |
+| external-dns-unifi | UDM Pro | HTTPRoutes with `internal-dns.alpha.kubernetes.io/target` annotation |
 
 **Why This Avoids Hairpin NAT**:
 - Without split-horizon: LAN client → Cloudflare → tunnel → cluster (hairpin)
@@ -297,10 +297,12 @@ spec:
 
 ### DNS Record Creation Flow
 
-When an app is deployed, DNS records are created automatically:
+When an app is deployed with routing annotations, DNS records are created automatically:
 
-- **external-dns-unifi** watches ALL HTTPRoutes and creates A records in UDM pointing to the internal gateway (10.90.3.202)
+- **external-dns-unifi** watches HTTPRoutes with `internal-dns.alpha.kubernetes.io/target` annotation and creates A records in UDM pointing to the internal gateway (10.90.3.202)
 - **external-dns** watches HTTPRoutes with `external-dns.alpha.kubernetes.io/target` annotation and creates CNAMEs in Cloudflare
+
+Apps without the internal annotation have no UDM record, so LAN clients fall through to Cloudflare DNS and access via the tunnel.
 
 ### DNS Resolution by Client Location
 
