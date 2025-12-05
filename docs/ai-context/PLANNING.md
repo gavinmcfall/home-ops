@@ -231,6 +231,77 @@ The first instinct after an incident is to fix it immediately. Resist this:
 
 ---
 
+## Lessons Learned: Kopia Migration (Dec 2025)
+
+Real-world example of planning failures and recovery during the Volsync Kopia migration.
+
+### Wrong Assumptions Made
+
+| Assumption | Reality | Impact |
+|------------|---------|--------|
+| MutatingAdmissionPolicy feature gate "just works" | Requires Talos patch for apiServer extraArgs + runtime-config | Had to create patch, regenerate configs, roll out to all nodes |
+| K8s 1.33 uses MutatingAdmissionPolicy v1beta1 | Uses **v1alpha1** (v1beta1 is K8s 1.34+) | API server crash, had to fix and reapply |
+| ClusterSecretStore named `onepassword` | Named `onepassword-connect` | ExternalSecrets failed to sync |
+| app-template creates ConfigMap as `kopia-config` | Creates as `kopia` | Pod stuck in ContainerCreating |
+| `task talos:apply` exists | Doesn't exist - use `talosctl apply-config` | Had to look up correct commands |
+| Kopia repository pre-exists | NFS path was empty | Kopia server crashed on startup |
+| Reference patterns from docs/guides were tested | They were aspirational, not validated | Multiple fixes needed |
+
+### What Would Have Helped
+
+1. **Check feature gate requirements before planning**
+   - Search for "how to enable X on Talos/K8s" first
+   - Check if alpha features need runtime-config in addition to feature-gates
+   - Look at reference repos (Devin, Jory, Kashall) for existing patches
+
+2. **Verify API versions before implementing**
+   ```bash
+   kubectl api-resources --api-group=admissionregistration.k8s.io
+   kubectl api-versions | grep admission
+   ```
+
+4. **Check existing resource names**
+   ```bash
+   kubectl get clustersecretstore
+   kubectl get configmaps -n <namespace>
+   ```
+
+5. **Look at working implementations first**
+   - Check Devin's, Jory's, Kashall's repos for patterns
+   - Don't assume docs/guides are tested
+
+6. **Dry-run everything**
+   - `talosctl apply-config --dry-run`
+   - `kubectl apply --dry-run=server`
+
+7. **Test feature gates on one node first**
+   - Rolling upgrade approach saved the cluster
+
+### Capsule: VerifyBeforeImplement
+
+**Invariant**
+Check that APIs, resources, and patterns exist before writing manifests.
+
+**Example**
+```bash
+# Before using MutatingAdmissionPolicy
+kubectl api-resources | grep -i mutating
+
+# Before referencing ClusterSecretStore
+kubectl get clustersecretstore
+
+# Before referencing ConfigMap by name
+helm template <release> | grep -i configmap
+```
+
+**Depth**
+- Documentation may be outdated or aspirational
+- Feature gates have version-specific API versions
+- Chart behavior differs from intuition (naming, structure)
+- Always cross-reference with working implementations
+
+---
+
 ## Sources
 
 - [Atlassian Pre-Mortem Play](https://www.atlassian.com/team-playbook/plays/pre-mortem) - Risk identification methodology
