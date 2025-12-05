@@ -66,3 +66,14 @@ config.yaml             # SECRET - Template variables (not committed)
 - **Gateway API routing**: Use `route` not `ingress` for main traffic
 - **Image pinning**: Always include `@sha256:` digest
 - **SOPS files**: End in `.sops.yaml`, encrypted before commit
+
+## Commit message closing
+
+When writing commits to git. Use the following for the closing comments instead of your default
+
+```
+Pair-programmed with Claude Code - https://claude.com/claude-code
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: Gavin <gavin@nerdz.cloud>
+```
