@@ -73,21 +73,6 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
-
-    ingress: #tailscale
-      tailscale:
-        enabled: true
-        className: tailscale
-        hosts:
-          - host: &app "{{ .Release.Name }}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - hosts:
-              - *app
     resources:
       requests:
         memory: 250Mi

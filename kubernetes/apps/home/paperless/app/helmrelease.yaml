@@ -123,22 +123,6 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
-
-    ingress: #tailscale
-      tailscale:
-        enabled: true
-        className: tailscale
-        hosts:
-          - host: &app "{{ .Release.Name }}"
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - hosts:
-              - *app
     persistence:
       config:
         enabled: true

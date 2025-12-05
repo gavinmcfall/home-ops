@@ -173,24 +173,6 @@ spec:
                   kind: Service
                   name: kube-prometheus-stack-prometheus
                   port: 9090
-      - apiVersion: networking.k8s.io/v1
-        kind: Ingress
-        metadata:
-          name: prometheus-tailscale
-          namespace: "{{ .Release.Namespace }}"
-        spec:
-          ingressClassName: tailscale
-          rules:
-            - host: prometheus
-              http:
-                paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: kube-prometheus-stack-prometheus
-                        port:
-                          number: 9090
     nodeExporter:
       enabled: true
     prometheus-node-exporter:
