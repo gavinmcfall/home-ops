@@ -30,6 +30,8 @@ spec:
               - /bin/sh
               - -c
               - |
+                export HOME=/tmp
+                export USER=kopia
                 # Initialize repository if it doesn't exist (KOPIA_PASSWORD env var is read automatically)
                 if ! kopia repository connect filesystem --path=/repository 2>/dev/null; then
                   echo "Initializing new Kopia repository..."
