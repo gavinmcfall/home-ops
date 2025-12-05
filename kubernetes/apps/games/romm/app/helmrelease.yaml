@@ -105,7 +105,7 @@ spec:
             subPath: config.yml
             readOnly: true
       data:
-        existingClaim: romm-data
+        existingClaim: romm
         advancedMounts:
           romm:
             app:
