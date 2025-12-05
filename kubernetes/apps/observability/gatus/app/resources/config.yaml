@@ -12,63 +12,63 @@ ui:
   title: Status | Gatus
   default-group-sort-by: group
   header: Status
-  custom-css: |
-    /* Adjust status colors for better color-blind accessibility */
-    #app .bg-green-500,
-    #app .bg-green-700,
-    #app .bg-green-400 {
-      background-color: #1f7a8c !important;
-    }
-    #app .text-green-500,
-    #app .text-green-400 {
-      color: #1f7a8c !important;
-    }
+  # custom-css: |
+  #   /* Adjust status colors for better color-blind accessibility */
+  #   #app .bg-green-500,
+  #   #app .bg-green-700,
+  #   #app .bg-green-400 {
+  #     background-color: #1f7a8c !important;
+  #   }
+  #   #app .text-green-500,
+  #   #app .text-green-400 {
+  #     color: #1f7a8c !important;
+  #   }
 
-    #app .bg-red-500,
-    #app .bg-red-700,
-    #app .bg-red-400 {
-      background-color: #d1495b !important;
-    }
-    #app .text-red-500,
-    #app .text-red-400 {
-      color: #d1495b !important;
-    }
+  #   #app .bg-red-500,
+  #   #app .bg-red-700,
+  #   #app .bg-red-400 {
+  #     background-color: #d1495b !important;
+  #   }
+  #   #app .text-red-500,
+  #   #app .text-red-400 {
+  #     color: #d1495b !important;
+  #   }
 
-    #app .bg-yellow-500,
-    #app .bg-yellow-400 {
-      background-color: #edae49 !important;
-    }
-    #app .text-yellow-500,
-    #app .text-yellow-400 {
-      color: #edae49 !important;
-    }
+  #   #app .bg-yellow-500,
+  #   #app .bg-yellow-400 {
+  #     background-color: #edae49 !important;
+  #   }
+  #   #app .text-yellow-500,
+  #   #app .text-yellow-400 {
+  #     color: #edae49 !important;
+  #   }
 
-    #app .bg-green-500:hover,
-    #app .bg-green-700:hover {
-      background-color: #145865 !important;
-    }
+  #   #app .bg-green-500:hover,
+  #   #app .bg-green-700:hover {
+  #     background-color: #145865 !important;
+  #   }
 
-    #app .bg-red-500:hover,
-    #app .bg-red-700:hover {
-      background-color: #a03a46 !important;
-    }
+  #   #app .bg-red-500:hover,
+  #   #app .bg-red-700:hover {
+  #     background-color: #a03a46 !important;
+  #   }
 
-    #app .bg-yellow-500:hover,
-    #app .bg-yellow-400:hover {
-      background-color: #c68d29 !important;
-    }
+  #   #app .bg-yellow-500:hover,
+  #   #app .bg-yellow-400:hover {
+  #     background-color: #c68d29 !important;
+  #   }
 
-    #app .border-green-500 {
-      border-color: #1f7a8c !important;
-    }
+  #   #app .border-green-500 {
+  #     border-color: #1f7a8c !important;
+  #   }
 
-    #app .border-red-500 {
-      border-color: #d1495b !important;
-    }
+  #   #app .border-red-500 {
+  #     border-color: #d1495b !important;
+  #   }
 
-    #app .border-yellow-500 {
-      border-color: #edae49 !important;
-    }
+  #   #app .border-yellow-500 {
+  #     border-color: #edae49 !important;
+  #   }
 alerting:
   pushover:
     title: Gatus
