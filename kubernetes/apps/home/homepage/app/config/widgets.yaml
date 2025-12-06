@@ -39,6 +39,37 @@
     url: https://10.90.254.1:443
     username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
     password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
+- A.I Services:
+    - Kopia TrueNAS Scale:
+        icon: kopia.png
+        description: Kopia Backup Management
+        widget:
+          type: kopia
+          url: http://kopia.storage.svc.cluster.local
+          username: kopia
+          password: "{{HOMEPAGE_VAR_KOPIA_PASSWORD}}"
+          snapshotHost: hostname # optional
+          snapshotPath: path # optional
+    - Kopia Backblaze B2:
+        icon: kopia.png
+        description: Kopia Backup Management
+        widget:
+          type: kopia
+          url: http://kopia.storage.svc.cluster.local
+          username: kopia
+          password: "{{HOMEPAGE_VAR_KOPIA_PASSWORD}}"
+          snapshotHost: hostname # optional
+          snapshotPath: path # optional
+    - Kopia Cloudflare R2:
+        icon: kopia.png
+        description: Kopia Backup Management
+        widget:
+          type: kopia
+          url: http://kopia.storage.svc.cluster.local
+          username: kopia
+          password: "{{HOMEPAGE_VAR_KOPIA_PASSWORD}}"
+          snapshotHost: hostname # optional
+          snapshotPath: path # optional
 # - Tesla: REQUIRES teslamate-api by tobiasehlert
 #     - Teslamate:
 #         icon: teslamate.png
@@ -79,34 +110,35 @@
 #               label: Range
 #               format: number # optional - defaults to text
 #               suffix: mi
-- A.I Services:
-    - Ollama:
-        icon: sh-ollama-light.png
-        description: A.I Backend
-        widget:
-          type: customapi
-          url: http://ollama:11434/api/ps
-          method: GET
-          mappings:
-            - field: models[0].name
-              label: "Running Model"
-              format: text
-            - field: models[0].size
-              label: "Model Size"
-              format: bytes
-            - field: models[0].size_vram
-              label: "VRAM Used"
-              format: bytes
-    - Open WebUI:
-        icon: open-webui-light.png
-        href: http://open-webui:8080
-        description: A.I Frontend
-        widget:
-          type: customapi
-          url: http://open-webui.${SECRET_DOMAIN}:8080/api/models
-          headers:
-            Authorization: "Bearer {{HOMEPAGE_VAR_OPENWEBUI_KEY}}"
-          mappings:
-            - field: data
-              label: Total Models
-              format: size
+# - A.I Services:
+#     - Ollama:
+#         icon: sh-ollama-light.png
+#         description: A.I Backend
+#         widget:
+#           type: customapi
+#           url: http://ollama:11434/api/ps
+#           method: GET
+#           mappings:
+#             - field: models[0].name
+#               label: "Running Model"
+#               format: text
+#             - field: models[0].size
+#               label: "Model Size"
+#               format: bytes
+#             - field: models[0].size_vram
+#               label: "VRAM Used"
+#               format: bytes
+#     - Open WebUI:
+#         icon: open-webui-light.png
+#         href: http://open-webui:8080
+#         description: A.I Frontend
+#         widget:
+#           type: customapi
+#           url: http://open-webui.${SECRET_DOMAIN}:8080/api/models
+#           headers:
+#             Authorization: "Bearer {{HOMEPAGE_VAR_OPENWEBUI_KEY}}"
+#           mappings:
+#             - field: data
+#               label: Total Models
+#               format: size
+
