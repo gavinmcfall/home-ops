@@ -260,6 +260,14 @@
         href: https://irc.${SECRET_DOMAIN}
         icon: thelounge.png
         description: IRC web client
+- Storage:
+    - Kopia:
+        href: https://kopia.${SECRET_DOMAIN}
+        icon: kopia.png
+        description: Backup repository (NFS)
+        widget:
+          type: kopia
+          url: http://kopia.storage
 - Home Automation:
     - Home-Assistant:
         href: https://hass.${SECRET_DOMAIN}
