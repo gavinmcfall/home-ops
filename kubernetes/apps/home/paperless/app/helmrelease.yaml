@@ -47,7 +47,7 @@ spec:
           tika:
             image:
               repository: docker.io/apache/tika
-              tag: 2.9.2.1-full
+              tag: 3.2.3.0-full
               pullPolicy: IfNotPresent
           app:
             image:
