@@ -43,3 +43,7 @@ layout:
     style: column
     columns: 2
     icon: mdi-home-automation
+  Storage:
+    style: column
+    columns: 2
+    icon: mdi-cloud-upload
