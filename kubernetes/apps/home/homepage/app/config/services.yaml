@@ -63,10 +63,6 @@
           key: {{HOMEPAGE_VAR_TRUENAS_TOKEN}}
           enablePools: true
           nasType: scale
-    - Rook:
-        href: https://rook.${SECRET_DOMAIN}
-        icon: ceph.png
-        description: Ceph storage dashboard
 - Downloads:
     - Sonarr:
         href: https://sonarr.${SECRET_DOMAIN}
@@ -268,6 +264,10 @@
         widget:
           type: kopia
           url: http://kopia.storage
+    - Rook:
+        href: https://rook.${SECRET_DOMAIN}
+        icon: ceph.png
+        description: Ceph storage dashboard
 - Home Automation:
     - Home-Assistant:
         href: https://hass.${SECRET_DOMAIN}
