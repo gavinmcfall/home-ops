@@ -31,7 +31,7 @@ spec:
           main:
             image:
               repository: ghcr.io/gavinmcfall/kait
-              tag: 1.0.0@sha256:213087959c74d8314f11e31e7405121a58a8bb7f82445ccd30227daae3eafcab
+              tag: 1.0.0@sha256:fdc0fe3446bc2c0b27f185bd312a18fd2e53200107ff38a469b6de5ffd9985f3
             env:
               WEBHOOK__PORT: "9000"
               DRY_RUN: "true"  # Set to "false" after testing
