@@ -117,6 +117,54 @@ data:
         kube_api PATCH "/apis/kustomize.toolkit.fluxcd.io/v1/namespaces/$${KUSTOMIZATION_NS}/kustomizations/$${KUSTOMIZATION_NAME}" "$$patch_data"
     }
 
+    restart_osd_deployments() {
+        log "Restarting OSD deployments to apply network change..."
+
+        # Get all OSD deployments
+        local deployments
+        deployments=$$(kube_api GET "/apis/apps/v1/namespaces/rook-ceph/deployments?labelSelector=app=rook-ceph-osd" \
+            | jq -r '.items[].metadata.name')
+
+        local restart_timestamp
+        restart_timestamp=$$(date -Iseconds)
+
+        for deploy in $$deployments; do
+            log "Restarting deployment: $$deploy"
+            local patch_data
+            patch_data=$$(jq -n --arg ts "$$restart_timestamp" \
+                '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":$$ts}}}}}')
+
+            kube_api PATCH "/apis/apps/v1/namespaces/rook-ceph/deployments/$$deploy" "$$patch_data" > /dev/null
+        done
+
+        log "OSD restart initiated for $$(echo "$$deployments" | wc -w) deployments"
+    }
+
+    wait_for_osds_ready() {
+        log "Waiting for OSDs to become ready..."
+        local max_wait=300  # 5 minutes
+        local interval=10
+        local elapsed=0
+
+        while [[ $$elapsed -lt $$max_wait ]]; do
+            local not_ready
+            not_ready=$$(kube_api GET "/api/v1/namespaces/rook-ceph/pods?labelSelector=app=rook-ceph-osd" \
+                | jq '[.items[] | select(.status.phase != "Running" or (.status.containerStatuses[]?.ready != true))] | length')
+
+            if [[ "$$not_ready" == "0" ]]; then
+                log "All OSDs are ready"
+                return 0
+            fi
+
+            log "Waiting for $$not_ready OSD pods to become ready..."
+            sleep $$interval
+            elapsed=$$((elapsed + interval))
+        done
+
+        log "WARNING: Timeout waiting for OSDs, $$not_ready still not ready"
+        return 1
+    }
+
     failover_to_lan() {
         log "FAILOVER: Switching Ceph cluster network to LAN ($$LAN_CIDR)"
 
@@ -127,12 +175,16 @@ data:
         fi
 
         if [[ "$${DRY_RUN:-false}" == "true" ]]; then
-            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $$LAN_CIDR"
+            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $$LAN_CIDR and restart OSDs"
             return 0
         fi
 
         patch_configmap "$$LAN_CIDR" > /dev/null
         trigger_reconcile > /dev/null
+        log "ConfigMap patched, waiting for Flux to reconcile CephCluster..."
+        sleep 30  # Give Flux time to reconcile
+        restart_osd_deployments
+        wait_for_osds_ready
         set_cooldown
         log "Failover complete - CEPH_CLUSTER_CIDR changed from $$current to $$LAN_CIDR"
     }
@@ -147,12 +199,16 @@ data:
         fi
 
         if [[ "$${DRY_RUN:-false}" == "true" ]]; then
-            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $$TB_CIDR"
+            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $$TB_CIDR and restart OSDs"
             return 0
         fi
 
         patch_configmap "$$TB_CIDR" > /dev/null
         trigger_reconcile > /dev/null
+        log "ConfigMap patched, waiting for Flux to reconcile CephCluster..."
+        sleep 30  # Give Flux time to reconcile
+        restart_osd_deployments
+        wait_for_osds_ready
         set_cooldown
         log "Restore complete - CEPH_CLUSTER_CIDR changed from $$current to $$TB_CIDR"
     }
