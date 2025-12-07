@@ -1,0 +1,47 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: thunderbolt-network-rules
+spec:
+  groups:
+    - name: thunderbolt.recording
+      rules:
+        # Count TB interfaces up per node (node label from node-exporter)
+        - record: thunderbolt:interfaces_up:by_node
+          expr: |
+            count by (node) (node_network_up{device=~"enx.*"} == 1)
+            or
+            (count by (node) (node_network_up{device=~"enx.*"}) * 0)
+        # Total TB interfaces up across cluster
+        - record: thunderbolt:interfaces_up:total
+          expr: count(node_network_up{device=~"enx.*"} == 1) or vector(0)
+
+    - name: thunderbolt.alerts
+      rules:
+        # Alert when ANY node has BOTH TB interfaces down (node isolation)
+        - alert: ThunderboltNodeIsolated
+          expr: |
+            (
+              count by (node) (node_network_up{device=~"enx.*"})
+              -
+              count by (node) (node_network_up{device=~"enx.*"} == 1)
+            ) == 2
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Node {{ $labels.node }} isolated - both TB interfaces down"
+            description: "Initiating Ceph failover to LAN network. Both Thunderbolt interfaces on node {{ $labels.node }} have been down for more than 10 minutes."
+
+        # Alert when ALL nodes have at least 1 TB interface up (recovered)
+        - alert: ThunderboltNetworkRecovered
+          expr: |
+            min(count by (node) (node_network_up{device=~"enx.*"} == 1)) >= 1
+          for: 30m
+          labels:
+            severity: info
+          annotations:
+            summary: "Thunderbolt network recovered on all nodes"
+            description: "Restoring Ceph to Thunderbolt network. All nodes have at least one Thunderbolt interface up for 30 minutes."

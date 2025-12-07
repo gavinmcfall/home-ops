@@ -9,6 +9,7 @@ components:
 
 resources:
   # Applications
+  - ./ceph-network-controller/ks.yaml
   - ./gatus/ks.yaml
   - ./grafana/ks.yaml
   - ./kromgo/ks.yaml
