@@ -118,6 +118,11 @@ jobs:
       - name: Generate Diff
         id: diff
         run: |
+          if [ ! -f diff.patch ]; then
+            echo "No diff.patch file generated (no changes detected)"
+            echo "bytes=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           cat diff.patch
           bytes=$(wc -c < diff.patch)
           echo "bytes=$bytes" >> $GITHUB_OUTPUT
