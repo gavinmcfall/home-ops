@@ -118,17 +118,18 @@ jobs:
       - name: Generate Diff
         id: diff
         run: |
-          if [ ! -f diff.patch ]; then
+          DIFF_FILE="${GITHUB_WORKSPACE}/diff.patch"
+          if [ ! -f "$DIFF_FILE" ]; then
             echo "No diff.patch file generated (no changes detected)"
             echo "bytes=0" >> $GITHUB_OUTPUT
             exit 0
           fi
-          cat diff.patch
-          bytes=$(wc -c < diff.patch)
+          cat "$DIFF_FILE"
+          bytes=$(wc -c < "$DIFF_FILE")
           echo "bytes=$bytes" >> $GITHUB_OUTPUT
           if [ "$bytes" -lt 60000 ]; then
             echo "diff<<EOF" >> $GITHUB_OUTPUT
-            cat diff.patch >> $GITHUB_OUTPUT
+            cat "$DIFF_FILE" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
           fi
 
@@ -137,7 +138,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: flux-local-diff-${{ matrix.paths }}-${{ matrix.resources }}
-          path: diff.patch
+          path: ${{ github.workspace }}/diff.patch
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Add comment
