@@ -7,3 +7,4 @@ resources:
   - ./ocirepository.yaml
   - ./dashboard-httproute.yaml
   - ./objectstore-httproute.yaml
+  - ./servicemonitor.yaml
