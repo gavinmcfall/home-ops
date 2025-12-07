@@ -182,6 +182,14 @@ spec:
             allowUiUpdates: true
             options:
               path: /var/lib/grafana/dashboards/teslamate
+          - name: entertainment
+            orgId: 1
+            folder: Entertainment
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/entertainment
 
     dashboards:
       default:
@@ -452,6 +460,25 @@ spec:
         visited:
           url: https://raw.githubusercontent.com/teslamate-org/teslamate/master/grafana/dashboards/visited.json
           datasource: TeslaMate
+      entertainment:
+        # TechnoTim's custom Plex dashboards
+        plex-dashboard:
+          url: https://raw.githubusercontent.com/timothystewart6/plex-monitoring-stack/main/grafana/provisioning/dashboards/plex.json
+          datasource: Prometheus
+        plex-streaming:
+          url: https://raw.githubusercontent.com/timothystewart6/plex-monitoring-stack/main/grafana/provisioning/dashboards/plex-streaming.json
+          datasource: Prometheus
+        # Exportarr dashboards for arr apps
+        sonarr-exportarr:
+          # renovate: depName="Exportarr"
+          gnetId: 12530
+          revision: 2
+          datasource: Prometheus
+        radarr-exportarr:
+          # renovate: depName="Exportarr"
+          gnetId: 12896
+          revision: 1
+          datasource: Prometheus
 
     sidecar:
       dashboards:
