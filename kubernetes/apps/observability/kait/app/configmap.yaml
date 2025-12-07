@@ -45,7 +45,7 @@ data:
     LAN_CIDR="10.90.0.0/16"
     CONFIGMAP_NS="flux-system"
     CONFIGMAP_NAME="cluster-settings"
-    KUSTOMIZATION_NS="flux-system"
+    KUSTOMIZATION_NS="rook-ceph"
     KUSTOMIZATION_NAME="cluster-apps-rook-ceph-cluster"
 
     # Kubernetes API configuration
