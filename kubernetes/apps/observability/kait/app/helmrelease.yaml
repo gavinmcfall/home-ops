@@ -12,6 +12,8 @@ spec:
   values:
     controllers:
       kait:
+        serviceAccount:
+          name: kait
         replicas: 1
         strategy: Recreate
         containers:
@@ -51,9 +53,6 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         runAsNonRoot: true
-    serviceAccount:
-      create: false
-      name: kait
     service:
       app:
         controller: kait
