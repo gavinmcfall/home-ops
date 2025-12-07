@@ -33,9 +33,9 @@ data:
     #!/bin/bash
     set -euo pipefail
 
-    # Arguments from webhook: $1=status, $2=alertname
-    STATUS="${1:-unknown}"
-    ALERT_NAME="${2:-unknown}"
+    # Arguments from webhook: $$1=status, $$2=alertname
+    STATUS="$${1:-unknown}"
+    ALERT_NAME="$${2:-unknown}"
 
     COOLDOWN_FILE="/tmp/ceph-network-controller.cooldown"
     COOLDOWN_SECONDS=3600  # 1 hour between actions
@@ -49,42 +49,42 @@ data:
     KUSTOMIZATION_NAME="cluster-apps-rook-ceph-cluster"
 
     # Kubernetes API configuration
-    KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+    KUBE_TOKEN=$$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
     KUBE_CA=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     KUBE_API="https://kubernetes.default.svc"
 
     log() {
-        echo "$LOG_PREFIX $(date '+%Y-%m-%d %H:%M:%S') $*"
+        echo "$$LOG_PREFIX $$(date '+%Y-%m-%d %H:%M:%S') $$*"
     }
 
     kube_api() {
-        local method="$1"
-        local path="$2"
-        local data="${3:-}"
+        local method="$$1"
+        local path="$$2"
+        local data="$${3:-}"
 
         local args=(
             -s
-            --cacert "$KUBE_CA"
-            -H "Authorization: Bearer $KUBE_TOKEN"
+            --cacert "$$KUBE_CA"
+            -H "Authorization: Bearer $$KUBE_TOKEN"
             -H "Content-Type: application/json"
-            -X "$method"
+            -X "$$method"
         )
 
-        if [[ -n "$data" ]]; then
-            args+=(-d "$data")
+        if [[ -n "$$data" ]]; then
+            args+=(-d "$$data")
         fi
 
-        curl "${args[@]}" "${KUBE_API}${path}"
+        curl "$${args[@]}" "$${KUBE_API}$${path}"
     }
 
     check_cooldown() {
-        if [[ -f "$COOLDOWN_FILE" ]]; then
-            last_action=$(cat "$COOLDOWN_FILE")
-            now=$(date +%s)
-            elapsed=$((now - last_action))
-            if [[ $elapsed -lt $COOLDOWN_SECONDS ]]; then
-                remaining=$((COOLDOWN_SECONDS - elapsed))
-                log "Cooldown active, $remaining seconds remaining. Skipping action."
+        if [[ -f "$$COOLDOWN_FILE" ]]; then
+            last_action=$$(cat "$$COOLDOWN_FILE")
+            now=$$(date +%s)
+            elapsed=$$((now - last_action))
+            if [[ $$elapsed -lt $$COOLDOWN_SECONDS ]]; then
+                remaining=$$((COOLDOWN_SECONDS - elapsed))
+                log "Cooldown active, $$remaining seconds remaining. Skipping action."
                 return 1
             fi
         fi
@@ -92,90 +92,90 @@ data:
     }
 
     set_cooldown() {
-        date +%s > "$COOLDOWN_FILE"
+        date +%s > "$$COOLDOWN_FILE"
     }
 
     get_current_cidr() {
-        kube_api GET "/api/v1/namespaces/${CONFIGMAP_NS}/configmaps/${CONFIGMAP_NAME}" \
+        kube_api GET "/api/v1/namespaces/$${CONFIGMAP_NS}/configmaps/$${CONFIGMAP_NAME}" \
             | jq -r '.data.CEPH_CLUSTER_CIDR // ""'
     }
 
     patch_configmap() {
-        local new_cidr="$1"
+        local new_cidr="$$1"
         local patch_data
-        patch_data=$(jq -n --arg cidr "$new_cidr" '{"data":{"CEPH_CLUSTER_CIDR":$cidr}}')
+        patch_data=$$(jq -n --arg cidr "$$new_cidr" '{"data":{"CEPH_CLUSTER_CIDR":$$cidr}}')
 
-        kube_api PATCH "/api/v1/namespaces/${CONFIGMAP_NS}/configmaps/${CONFIGMAP_NAME}" "$patch_data"
+        kube_api PATCH "/api/v1/namespaces/$${CONFIGMAP_NS}/configmaps/$${CONFIGMAP_NAME}" "$$patch_data"
     }
 
     trigger_reconcile() {
         local timestamp
-        timestamp=$(date +%s)
+        timestamp=$$(date +%s)
         local patch_data
-        patch_data=$(jq -n --arg ts "$timestamp" '{"metadata":{"annotations":{"reconcile.fluxcd.io/requestedAt":$ts}}}')
+        patch_data=$$(jq -n --arg ts "$$timestamp" '{"metadata":{"annotations":{"reconcile.fluxcd.io/requestedAt":$$ts}}}')
 
-        kube_api PATCH "/apis/kustomize.toolkit.fluxcd.io/v1/namespaces/${KUSTOMIZATION_NS}/kustomizations/${KUSTOMIZATION_NAME}" "$patch_data"
+        kube_api PATCH "/apis/kustomize.toolkit.fluxcd.io/v1/namespaces/$${KUSTOMIZATION_NS}/kustomizations/$${KUSTOMIZATION_NAME}" "$$patch_data"
     }
 
     failover_to_lan() {
-        log "FAILOVER: Switching Ceph cluster network to LAN ($LAN_CIDR)"
+        log "FAILOVER: Switching Ceph cluster network to LAN ($$LAN_CIDR)"
 
-        current=$(get_current_cidr)
-        if [[ "$current" == "$LAN_CIDR" ]]; then
+        current=$$(get_current_cidr)
+        if [[ "$$current" == "$$LAN_CIDR" ]]; then
             log "Already on LAN network, skipping"
             return 0
         fi
 
-        if [[ "${DRY_RUN:-false}" == "true" ]]; then
-            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $LAN_CIDR"
+        if [[ "$${DRY_RUN:-false}" == "true" ]]; then
+            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $$LAN_CIDR"
             return 0
         fi
 
-        patch_configmap "$LAN_CIDR" > /dev/null
+        patch_configmap "$$LAN_CIDR" > /dev/null
         trigger_reconcile > /dev/null
         set_cooldown
-        log "Failover complete - CEPH_CLUSTER_CIDR changed from $current to $LAN_CIDR"
+        log "Failover complete - CEPH_CLUSTER_CIDR changed from $$current to $$LAN_CIDR"
     }
 
     restore_to_thunderbolt() {
-        log "RESTORE: Switching Ceph cluster network to Thunderbolt ($TB_CIDR)"
+        log "RESTORE: Switching Ceph cluster network to Thunderbolt ($$TB_CIDR)"
 
-        current=$(get_current_cidr)
-        if [[ "$current" == "$TB_CIDR" ]]; then
+        current=$$(get_current_cidr)
+        if [[ "$$current" == "$$TB_CIDR" ]]; then
             log "Already on Thunderbolt network, skipping"
             return 0
         fi
 
-        if [[ "${DRY_RUN:-false}" == "true" ]]; then
-            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $TB_CIDR"
+        if [[ "$${DRY_RUN:-false}" == "true" ]]; then
+            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $$TB_CIDR"
             return 0
         fi
 
-        patch_configmap "$TB_CIDR" > /dev/null
+        patch_configmap "$$TB_CIDR" > /dev/null
         trigger_reconcile > /dev/null
         set_cooldown
-        log "Restore complete - CEPH_CLUSTER_CIDR changed from $current to $TB_CIDR"
+        log "Restore complete - CEPH_CLUSTER_CIDR changed from $$current to $$TB_CIDR"
     }
 
     # Main logic
-    log "Received alert: $ALERT_NAME (status: $STATUS)"
+    log "Received alert: $$ALERT_NAME (status: $$STATUS)"
 
     if ! check_cooldown; then
         exit 0
     fi
 
-    case "$ALERT_NAME" in
+    case "$$ALERT_NAME" in
         ThunderboltNodeIsolated)
-            if [[ "$STATUS" == "firing" ]]; then
+            if [[ "$$STATUS" == "firing" ]]; then
                 failover_to_lan
             fi
             ;;
         ThunderboltNetworkRecovered)
-            if [[ "$STATUS" == "firing" ]]; then
+            if [[ "$$STATUS" == "firing" ]]; then
                 restore_to_thunderbolt
             fi
             ;;
         *)
-            log "Unknown alert: $ALERT_NAME, ignoring"
+            log "Unknown alert: $$ALERT_NAME, ignoring"
             ;;
     esac
