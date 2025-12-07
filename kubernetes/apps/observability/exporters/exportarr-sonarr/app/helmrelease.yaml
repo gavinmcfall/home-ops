@@ -24,18 +24,18 @@ spec:
       retries: 3
   values:
     controllers:
-      sonarr:
+      exportarr-sonarr:
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          app:
+          sonarr:
             image:
               repository: ghcr.io/onedr0p/exportarr
               tag: v2.0.1
             args: ["sonarr"]
             env:
-              PORT: &port 9707
+              PORT: &port-sonarr 9707
               URL: http://sonarr.downloads.svc.cluster.local
               APIKEY:
                 valueFrom:
@@ -43,18 +43,28 @@ spec:
                     name: exportarr-sonarr-secret
                     key: SONARR_API_KEY
             probes:
-              liveness: &probes
+              liveness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
                     path: /healthz
-                    port: *port
+                    port: *port-sonarr
                   initialDelaySeconds: 10
                   periodSeconds: 30
                   timeoutSeconds: 10
                   failureThreshold: 3
-              readiness: *probes
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port-sonarr
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
             securityContext: &securityContext
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -65,18 +75,13 @@ spec:
                 memory: 32Mi
               limits:
                 memory: 64Mi
-      sonarr-uhd:
-        strategy: RollingUpdate
-        annotations:
-          reloader.stakater.com/auto: "true"
-        containers:
-          app:
+          sonarr-uhd:
             image:
               repository: ghcr.io/onedr0p/exportarr
               tag: v2.0.1
             args: ["sonarr"]
             env:
-              PORT: *port
+              PORT: &port-sonarr-uhd 9710
               URL: http://sonarr-uhd.downloads.svc.cluster.local
               APIKEY:
                 valueFrom:
@@ -84,22 +89,37 @@ spec:
                     name: exportarr-sonarr-secret
                     key: SONARR_UHD_API_KEY
             probes:
-              liveness: *probes
-              readiness: *probes
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port-sonarr-uhd
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port-sonarr-uhd
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
             securityContext: *securityContext
             resources: *resources
-      sonarr-foreign:
-        strategy: RollingUpdate
-        annotations:
-          reloader.stakater.com/auto: "true"
-        containers:
-          app:
+          sonarr-foreign:
             image:
               repository: ghcr.io/onedr0p/exportarr
               tag: v2.0.1
             args: ["sonarr"]
             env:
-              PORT: *port
+              PORT: &port-sonarr-foreign 9711
               URL: http://sonarr-foreign.downloads.svc.cluster.local
               APIKEY:
                 valueFrom:
@@ -107,8 +127,28 @@ spec:
                     name: exportarr-sonarr-secret
                     key: SONARR_FOREIGN_API_KEY
             probes:
-              liveness: *probes
-              readiness: *probes
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port-sonarr-foreign
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port-sonarr-foreign
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
             securityContext: *securityContext
             resources: *resources
     defaultPodOptions:
@@ -120,18 +160,12 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile: { type: RuntimeDefault }
     service:
-      sonarr:
-        controller: sonarr
+      app:
+        controller: exportarr-sonarr
         ports:
-          metrics:
-            port: *port
-      sonarr-uhd:
-        controller: sonarr-uhd
-        ports:
-          metrics:
-            port: *port
-      sonarr-foreign:
-        controller: sonarr-foreign
-        ports:
-          metrics:
-            port: *port
+          sonarr:
+            port: *port-sonarr
+          sonarr-uhd:
+            port: *port-sonarr-uhd
+          sonarr-foreign:
+            port: *port-sonarr-foreign

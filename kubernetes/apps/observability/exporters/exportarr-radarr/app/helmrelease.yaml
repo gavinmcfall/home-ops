@@ -24,18 +24,18 @@ spec:
       retries: 3
   values:
     controllers:
-      radarr:
+      exportarr-radarr:
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          app:
+          radarr:
             image:
               repository: ghcr.io/onedr0p/exportarr
               tag: v2.0.1
             args: ["radarr"]
             env:
-              PORT: &port 9708
+              PORT: &port-radarr 9708
               URL: http://radarr.downloads.svc.cluster.local
               APIKEY:
                 valueFrom:
@@ -43,18 +43,28 @@ spec:
                     name: exportarr-radarr-secret
                     key: RADARR_API_KEY
             probes:
-              liveness: &probes
+              liveness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
                     path: /healthz
-                    port: *port
+                    port: *port-radarr
                   initialDelaySeconds: 10
                   periodSeconds: 30
                   timeoutSeconds: 10
                   failureThreshold: 3
-              readiness: *probes
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port-radarr
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
             securityContext: &securityContext
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -65,18 +75,13 @@ spec:
                 memory: 32Mi
               limits:
                 memory: 64Mi
-      radarr-uhd:
-        strategy: RollingUpdate
-        annotations:
-          reloader.stakater.com/auto: "true"
-        containers:
-          app:
+          radarr-uhd:
             image:
               repository: ghcr.io/onedr0p/exportarr
               tag: v2.0.1
             args: ["radarr"]
             env:
-              PORT: *port
+              PORT: &port-radarr-uhd 9709
               URL: http://radarr-uhd.downloads.svc.cluster.local
               APIKEY:
                 valueFrom:
@@ -84,8 +89,28 @@ spec:
                     name: exportarr-radarr-secret
                     key: RADARR_UHD_API_KEY
             probes:
-              liveness: *probes
-              readiness: *probes
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port-radarr-uhd
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port-radarr-uhd
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
             securityContext: *securityContext
             resources: *resources
     defaultPodOptions:
@@ -97,13 +122,10 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile: { type: RuntimeDefault }
     service:
-      radarr:
-        controller: radarr
+      app:
+        controller: exportarr-radarr
         ports:
-          metrics:
-            port: *port
-      radarr-uhd:
-        controller: radarr-uhd
-        ports:
-          metrics:
-            port: *port
+          radarr:
+            port: *port-radarr
+          radarr-uhd:
+            port: *port-radarr-uhd
