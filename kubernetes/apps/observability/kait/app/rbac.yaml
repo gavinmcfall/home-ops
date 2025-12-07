@@ -18,6 +18,14 @@ rules:
   - apiGroups: ["kustomize.toolkit.fluxcd.io"]
     resources: ["kustomizations"]
     verbs: ["get", "patch"]
+  # Restart OSD deployments after network change
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch"]
+  # Watch pods for OSD restart completion
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
   # Audit trail via events
   - apiGroups: [""]
     resources: ["events"]
