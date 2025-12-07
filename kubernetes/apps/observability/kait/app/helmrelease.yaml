@@ -25,6 +25,7 @@ spec:
               TZ: ${TIMEZONE}
               WEBHOOK__PORT: &port 9000
               DRY_RUN: "true"  # Set to "false" after testing
+              TALOSCONFIG: /talos/talosconfig
             probes:
               liveness: &probes
                 enabled: true
@@ -75,3 +76,8 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
+      talosconfig:
+        type: secret
+        name: kait-talosconfig
+        globalMounts:
+          - path: /talos
