@@ -1,40 +1,39 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: ceph-network-controller
+  name: kait
 spec:
-  interval: 30m
-  chart:
-    spec:
-      chart: app-template
-      version: 3.7.3
-      sourceRef:
-        kind: HelmRepository
-        name: bjw-s-charts
-        namespace: flux-system
-  install:
-    remediation:
-      retries: 3
-  upgrade:
-    cleanupOnFail: true
-    remediation:
-      strategy: rollback
-      retries: 3
+  chartRef:
+    kind: OCIRepository
+    name: kait
+  interval: 1h
   values:
     controllers:
-      main:
+      kait:
         replicas: 1
         strategy: Recreate
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/gavinmcfall/kait
               tag: 1.0.0@sha256:fdc0fe3446bc2c0b27f185bd312a18fd2e53200107ff38a469b6de5ffd9985f3
             env:
-              WEBHOOK__PORT: "9000"
+              TZ: ${TIMEZONE}
+              WEBHOOK__PORT: &port 9000
               DRY_RUN: "true"  # Set to "false" after testing
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *port
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+              readiness: *probes
             resources:
               requests:
                 cpu: 10m
@@ -47,32 +46,29 @@ spec:
               capabilities:
                 drop:
                   - ALL
-        pod:
-          securityContext:
-            runAsUser: 65534
-            runAsGroup: 65534
-            runAsNonRoot: true
-
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
     serviceAccount:
       create: false
-      name: ceph-network-controller
-
+      name: kait
     service:
-      main:
-        controller: main
+      app:
+        controller: kait
         ports:
           http:
-            port: 9000
-
+            port: *port
     persistence:
       hooks:
         type: configMap
-        name: ceph-network-controller-hooks
+        name: kait-hooks
         globalMounts:
           - path: /config
       scripts:
         type: configMap
-        name: ceph-network-controller-scripts
+        name: kait-scripts
         defaultMode: 0755
         globalMounts:
           - path: /scripts
