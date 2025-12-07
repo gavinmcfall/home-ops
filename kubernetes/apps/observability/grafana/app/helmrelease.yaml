@@ -47,7 +47,9 @@ spec:
         reporting_enabled: false
       auth:
         oauth_auto_login: true
-        disable_login_form: true
+        disable_login_form: false
+      auth.basic:
+        enabled: false
       auth.anonymous:
         enabled: false
         org_id: 1
