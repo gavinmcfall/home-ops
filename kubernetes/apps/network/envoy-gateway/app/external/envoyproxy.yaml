@@ -17,6 +17,9 @@ spec:
     type: Kubernetes
     kubernetes:
       envoyDeployment:
+        pod:
+          nodeSelector:
+            kubernetes.io/hostname: stanton-02
         container:
           resources:
             requests:

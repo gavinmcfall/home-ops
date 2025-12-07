@@ -6,6 +6,14 @@ metadata:
   name: l2-policy
 spec:
   loadBalancerIPs: true
+  # Exclude gateway services - they have their own L2 policy with nodeSelector
+  # to colocate L2 announcements with the gateway pods (avoids hairpin issue)
+  serviceSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/managed-by
+        operator: NotIn
+        values:
+          - envoy-gateway
   # NOTE: interfaces might need to be set if you have more than one active NIC on your hosts
   # interfaces:
   #   - ^eno[0-9]+
