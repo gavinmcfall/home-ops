@@ -11,6 +11,8 @@ resources:
   # Applications
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
+  - ./bazarr-foreign/ks.yaml
+  - ./bazarr-uhd/ks.yaml
   - ./cross-seed/ks.yaml
   - ./dashbrr/ks.yaml
   - ./flaresolverr/ks.yaml
