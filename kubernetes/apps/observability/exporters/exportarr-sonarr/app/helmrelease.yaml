@@ -37,6 +37,7 @@ spec:
             env:
               PORT: &port-sonarr 9707
               URL: http://sonarr.downloads.svc.cluster.local
+              ENABLE_ADDITIONAL_METRICS: "true"
               APIKEY:
                 valueFrom:
                   secretKeyRef:
@@ -83,6 +84,7 @@ spec:
             env:
               PORT: &port-sonarr-uhd 9710
               URL: http://sonarr-uhd.downloads.svc.cluster.local
+              ENABLE_ADDITIONAL_METRICS: "true"
               APIKEY:
                 valueFrom:
                   secretKeyRef:
@@ -121,6 +123,7 @@ spec:
             env:
               PORT: &port-sonarr-foreign 9711
               URL: http://sonarr-foreign.downloads.svc.cluster.local
+              ENABLE_ADDITIONAL_METRICS: "true"
               APIKEY:
                 valueFrom:
                   secretKeyRef:
