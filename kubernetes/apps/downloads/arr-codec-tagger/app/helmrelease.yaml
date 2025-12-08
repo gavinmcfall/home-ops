@@ -35,8 +35,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/home-operations/alpine
-              tag: 3.21.3@sha256:f6a8e27232789d63f8b3b4cc50aebc5c1656ebdb2ff2c34a72d81a98998dad53
+              repository: ghcr.io/gavinmcfall/kait
+              tag: 1.0.0@sha256:fdc0fe3446bc2c0b27f185bd312a18fd2e53200107ff38a469b6de5ffd9985f3
             command: ["/bin/bash", "/scripts/codec-tagger.sh"]
             env:
               SONARR_URL: http://sonarr.downloads.svc.cluster.local
