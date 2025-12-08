@@ -814,6 +814,6 @@
   },
   "timezone": "",
   "title": "Radarr",
-  "uid": "F2vfZUNGz",
-  "version": 3
+  "uid": "radarr-dynamic-exportarr",
+  "version": 1
 }
