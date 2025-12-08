@@ -1,0 +1,819 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "This is a dashboard for Radarr v3 (based off https://grafana.com/grafana/dashboards/12896 from madchr1st ). \n\nYou will need to install exportarr (https://github.com/onedr0p/exportarr) in order to use this dashboard.\n\nYou will also need the following plugin for the more advanced panels: https://grafana.com/grafana/plugins/gapit-htmlgraphics-panel/",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 72,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 30,
+      "panels": [],
+      "repeat": "endpoint",
+      "title": "${endpoint}",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 31,
+      "options": {
+        "SVGBaseFix": true,
+        "add100Percentage": true,
+        "calcsMutation": "standard",
+        "centerAlignContent": true,
+        "codeData": "{\n  \"text\": \"Random text\"\n}",
+        "css": ".radarr-header {\n  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n  border-radius: 14px;\n  padding: 16px 22px;\n  box-shadow: 0 8px 20px rgba(0,0,0,0.35);\n  border: 1px solid rgba(255,255,255,0.06);\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  color: #f9fafb;\n}\n\n/* Background per endpoint */\n.radarr-header--radarr {\n  background: radial-gradient(circle at top left, #4db3ff 0, #151515 45%);\n}\n.radarr-header--radarr-uhd {\n  background: radial-gradient(circle at top left, #f97316 0, #151515 45%);\n}\n\n/* Logo */\n.radarr-logo {\n  width: 42px;\n  height: 42px;\n  border-radius: 9px;\n  background-image: url(\"https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/256.png\");\n  background-size: cover;\n  background-position: center;\n  box-shadow: 0 0 10px rgba(0,0,0,0.6);\n  flex-shrink: 0;\n}\n\n.radarr-main {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  min-width: 0;\n}\n\n.radarr-title-row {\n  font-size: 20px;\n  font-weight: 700;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.radarr-slash {\n  opacity: 0.6;\n}\n\n.radarr-badge {\n  padding: 2px 8px;\n  border-radius: 999px;\n  background: rgba(17,24,39,0.9);\n  font-size: 12px;\n  font-weight: 600;\n  letter-spacing: 0.08em;\n}\n\n/* Badge text: HD vs UHD */\n.radarr-badge::after {\n  content: \"HD\";\n}\n.radarr-header--radarr-uhd .radarr-badge::after {\n  content: \"UHD\";\n}\n\n/* Subtitle text */\n.radarr-subtitle {\n  font-size: 13px;\n  color: rgba(249,250,251,0.75);\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n/* Subtitle per endpoint */\n.radarr-subtitle::after {\n  content: \"1080p & 720p movie monitoring, queue & health overview\";\n}\n.radarr-header--radarr-uhd .radarr-subtitle::after {\n  content: \"4K movie monitoring, queue & health overview\";\n}\n\n/* Pills on the right */\n.radarr-pills {\n  margin-left: auto;\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  font-size: 11px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.radarr-pill {\n  padding: 3px 9px;\n  border-radius: 999px;\n  border: 1px solid rgba(148,163,184,0.6);\n}\n\n.radarr-pill--mode {\n  background: rgba(59,130,246,0.18);\n  color: #93c5fd;\n  border-color: rgba(147,197,253,0.5);\n}\n.radarr-pill--mode::after {\n  content: \"Movies\";\n}\n\n.radarr-pill--quality {\n  background: rgba(17,94,89,0.2);\n  color: #6ee7b7;\n  border-color: rgba(45,212,191,0.5);\n}\n.radarr-pill--quality::after {\n  content: \"HD Only\";\n}\n.radarr-header--radarr-uhd .radarr-pill--quality::after {\n  content: \"4K Only\";\n}\n\n.radarr-pill--k8s {\n  background: rgba(15,23,42,0.9);\n  color: #e5e7eb;\n}\n.radarr-pill--k8s::after {\n  content: \"Kubernetes\";\n}\n",
+        "dynamicData": true,
+        "dynamicFieldDisplayValues": true,
+        "dynamicHtmlGraphics": true,
+        "dynamicProps": true,
+        "html": "<div class=\"radarr-header radarr-header--$endpoint\">\n  <div class=\"radarr-logo\"></div>\n\n  <div class=\"radarr-main\">\n    <div class=\"radarr-title-row\">\n      <span>Radarr</span>\n      <span class=\"radarr-slash\">/</span>\n      <span class=\"radarr-badge\"></span>\n    </div>\n\n    <div class=\"radarr-subtitle\"></div>\n  </div>\n\n  <div class=\"radarr-pills\">\n    <span class=\"radarr-pill radarr-pill--mode\"></span>\n    <span class=\"radarr-pill radarr-pill--quality\"></span>\n    <span class=\"radarr-pill radarr-pill--k8s\"></span>\n  </div>\n</div>\n",
+        "onInit": "htmlNode.innerHTML = htmlGraphics.props.replaceVariables(htmlNode.innerHTML);\n",
+        "onInitOnResize": true,
+        "onRender": "",
+        "overflow": "visible",
+        "panelupdateOnMount": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull",
+            "last",
+            "firstNotNull",
+            "first",
+            "min",
+            "max",
+            "mean",
+            "sum",
+            "count",
+            "range",
+            "delta",
+            "step",
+            "diff",
+            "logmin",
+            "allIsZero",
+            "allIsNull",
+            "diffperc"
+          ]
+        },
+        "renderOnMount": true,
+        "rootCSS": "",
+        "useGrafanaScrollbar": true
+      },
+      "pluginVersion": "2.2.3",
+      "targets": [
+        {
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "gapit-htmlgraphics-panel"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(255, 255, 255)",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 0,
+        "y": 4
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (endpoint) (radarr_queue_total{endpoint=\"$endpoint\"})\r\nOR on (endpoint)\r\n(0 * exportarr_app_info{endpoint=\"$endpoint\"})",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Queued",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "radarr_history_total{endpoint=\"$endpoint\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Completed",
+          "refId": "B"
+        }
+      ],
+      "title": "Downloads",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(255, 255, 255)",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 4,
+        "y": 4
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (endpoint) (radarr_movie_missing_total{endpoint=\"$endpoint\"})",
+          "interval": "",
+          "legendFormat": "Missing",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (endpoint) (radarr_movie_monitored_total{endpoint=\"$endpoint\"})",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Monitored",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (endpoint) (radarr_movie_total{endpoint=\"$endpoint\"})",
+          "interval": "",
+          "legendFormat": "Total",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Movies",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "applyToRow": true,
+              "mode": "gradient",
+              "type": "color-background"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "h264": {
+                  "color": "yellow",
+                  "index": 1
+                },
+                "h265": {
+                  "color": "green",
+                  "index": 0
+                },
+                "vc1": {
+                  "color": "orange",
+                  "index": 2
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "pattern": "^(?!.*(?:h265|h264|vc1)).*$",
+                "result": {
+                  "color": "red",
+                  "index": 3
+                }
+              },
+              "type": "regex"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Codec"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 82
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 8,
+        "y": 4
+      },
+      "id": 28,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum by (codec, order) (\r\n  # h265\r\n  label_replace(\r\n    label_replace(\r\n      radarr_movie_tag_total{endpoint=\"$endpoint\", tag=~\".*codec.*h.?265.*\"},\r\n      \"codec\", \"h265\", \"tag\", \".*\"\r\n    ),\r\n    \"order\", \"1\", \"tag\", \".*\"\r\n  )\r\nor\r\n  # h264\r\n  label_replace(\r\n    label_replace(\r\n      radarr_movie_tag_total{endpoint=\"$endpoint\", tag=~\".*codec.*h.?264.*\"},\r\n      \"codec\", \"h264\", \"tag\", \".*\"\r\n    ),\r\n    \"order\", \"2\", \"tag\", \".*\"\r\n  )\r\nor\r\n  # vc1\r\n  label_replace(\r\n    label_replace(\r\n      radarr_movie_tag_total{endpoint=\"$endpoint\", tag=~\".*codec.*vc1.*\"},\r\n      \"codec\", \"vc1\", \"tag\", \".*\"\r\n    ),\r\n    \"order\", \"3\", \"tag\", \".*\"\r\n  )\r\nor\r\n  # everything else (still codec-tagged)\r\n  label_replace(\r\n    label_replace(\r\n      radarr_movie_tag_total{endpoint=\"$endpoint\", tag=~\".*codec.*\"}\r\n        unless radarr_movie_tag_total{endpoint=\"$endpoint\", tag=~\".*codec.*(h.?26[45]|vc1).*\"},\r\n      \"codec\", \"$1\", \"tag\", \".*codec[-= ]?([^, ]+).*\"\r\n    ),\r\n    \"order\", \"4\", \"tag\", \".*\"\r\n  )\r\n)\r\n",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "Codec"
+        }
+      ],
+      "title": "Codecs",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "order_scaled",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "order"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "1000000"
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "sort_key",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "order_scaled"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Value"
+                }
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "order": false
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "orderByMode": "manual",
+            "renameByName": {
+              "Value": "Movies",
+              "codec": "Codec",
+              "codec_group": "Codec"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": false,
+                "field": "sort_key"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "order": true,
+              "order_scaled": true,
+              "sort_key": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 4
+      },
+      "id": 23,
+      "maxDataPoints": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sort_desc(\r\n  sum by (quality) (\r\n    radarr_movie_quality_total{endpoint=\"$endpoint\"}\r\n  )\r\n)\r\n",
+          "interval": "",
+          "legendFormat": "{{ quality }}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Episode Quality: ${endpoint}",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 10
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "max by (deployment) (\r\n  kube_deployment_status_condition{\r\n    namespace=\"downloads\",\r\n    deployment=\"$endpoint\",\r\n    condition=\"Available\",\r\n    status=\"true\"\r\n  }\r\n)",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Status: ${endpoint}",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "dtdurations"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 4,
+        "y": 10
+      },
+      "id": 21,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "time() - kube_deployment_created{deployment=\"$endpoint\"}",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Uptime: ${endpoint}",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(255, 255, 255)",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 8,
+        "y": 10
+      },
+      "id": 24,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (endpoint)(radarr_movie_filesize_total{endpoint=\"$endpoint\"})",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Storage Used: ${endpoint}",
+      "type": "stat"
+    }
+  ],
+  "preload": false,
+  "refresh": "5s",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": [
+            "radarr",
+            "radarr-uhd"
+          ],
+          "value": [
+            "radarr",
+            "radarr-uhd"
+          ]
+        },
+        "definition": "query_result(exportarr_app_info{job=\"exportarr-radarr\"})",
+        "multi": true,
+        "name": "endpoint",
+        "options": [],
+        "query": {
+          "qryType": 3,
+          "query": "query_result(exportarr_app_info{job=\"exportarr-radarr\"})",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "/.*endpoint=\"([^\"]+)\".*/",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Radarr",
+  "uid": "F2vfZUNGz",
+  "version": 3
+}
