@@ -15,24 +15,25 @@ normalize_codec() {
     local codec=$1
     codec=$(echo "$codec" | tr '[:upper:]' '[:lower:]')
 
+    # Use hyphen instead of colon for Radarr compatibility (only allows a-z, 0-9, -)
     case "$codec" in
         avc|divx|h264|x264|mpeg4)
-            echo "codec:h264"
+            echo "codec-h264"
             ;;
         hevc|h265|x265)
-            echo "codec:h265"
+            echo "codec-h265"
             ;;
         av1)
-            echo "codec:av1"
+            echo "codec-av1"
             ;;
         vc1|vc-1)
-            echo "codec:vc1"
+            echo "codec-vc1"
             ;;
         mpeg2|mpeg-2)
-            echo "codec:mpeg2"
+            echo "codec-mpeg2"
             ;;
         *)
-            echo "codec:other"
+            echo "codec-other"
             ;;
     esac
 }
@@ -117,7 +118,7 @@ process_sonarr() {
         for tag_id in $(echo "$${series_tags}" | jq --raw-output '.[]'); do
             local tag_label
             tag_label=$(echo "$${existing_tags}" | jq --raw-output ".[] | select(.id == $${tag_id}) | .label")
-            if [[ "$${tag_label}" == codec:* ]]; then
+            if [[ "$${tag_label}" == codec-* ]]; then
                 local should_keep=false
                 for keep_tag in "$${normalized_tags[@]}"; do
                     if [[ "$${tag_label}" == "$${keep_tag}" ]]; then
@@ -225,7 +226,7 @@ process_radarr() {
         for existing_tag_id in $(echo "$${movie_tags}" | jq --raw-output '.[]'); do
             local tag_label
             tag_label=$(echo "$${existing_tags}" | jq --raw-output ".[] | select(.id == $${existing_tag_id}) | .label")
-            if [[ "$${tag_label}" == codec:* && "$${tag_label}" != "$${normalized_tag}" ]]; then
+            if [[ "$${tag_label}" == codec-* && "$${tag_label}" != "$${normalized_tag}" ]]; then
                 tags_to_remove+=("$existing_tag_id")
             fi
         done
