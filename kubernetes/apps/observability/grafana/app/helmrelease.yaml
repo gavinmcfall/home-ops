@@ -49,7 +49,7 @@ spec:
         oauth_auto_login: false
         disable_login_form: false
       auth.basic:
-        enabled: false
+        enabled: true
       auth.anonymous:
         enabled: false
         org_id: 1
@@ -61,12 +61,12 @@ spec:
         icon: signin
         allow_sign_up: true
         auto_login: false
-        scopes: openid profile email
+        scopes: openid profile email groups
         auth_url: https://id.${SECRET_DOMAIN}/authorize
         token_url: https://id.${SECRET_DOMAIN}/api/oidc/token
         api_url: https://id.${SECRET_DOMAIN}/api/oidc/userinfo
         use_pkce: true
-        role_attribute_path: "contains(groups[*], 'admin') && 'Admin' || 'Viewer'"
+        role_attribute_path: "contains(groups[*], 'nerdz_admins') && 'Admin' || 'Viewer'"
       news:
         news_feed_enabled: false
     datasources:
