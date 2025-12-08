@@ -9,6 +9,7 @@ components:
 
 resources:
   # Applications
+  - ./arr-codec-tagger/ks.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
   - ./bazarr-foreign/ks.yaml
