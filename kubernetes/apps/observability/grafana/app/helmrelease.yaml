@@ -481,6 +481,9 @@ spec:
           gnetId: 12896
           revision: 1
           datasource: Prometheus
+        radarr-dynamic-exportarr:
+          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/dynamic-radarr.json
+          datasource: Prometheus
 
     sidecar:
       dashboards:
