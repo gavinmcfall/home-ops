@@ -37,6 +37,7 @@ spec:
             env:
               PORT: &port-radarr 9708
               URL: http://radarr.downloads.svc.cluster.local
+              ENABLE_ADDITIONAL_METRICS: "true"
               APIKEY:
                 valueFrom:
                   secretKeyRef:
@@ -83,6 +84,7 @@ spec:
             env:
               PORT: &port-radarr-uhd 9709
               URL: http://radarr-uhd.downloads.svc.cluster.local
+              ENABLE_ADDITIONAL_METRICS: "true"
               APIKEY:
                 valueFrom:
                   secretKeyRef:
