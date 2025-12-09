@@ -16,11 +16,11 @@ spec:
   gatewayClassName: envoy-external
   addresses:
     - type: IPAddress
-      value: "10.90.3.201"
+      value: &address "10.90.3.201"
   infrastructure:
     annotations:
       external-dns.alpha.kubernetes.io/hostname: external.${SECRET_DOMAIN}
-      io.cilium/lb-ipam-ips: "10.90.3.201"
+      io.cilium/lb-ipam-ips: *address
     parametersRef:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
