@@ -191,10 +191,12 @@ spec:
     kube-state-metrics:
       fullnameOverride: kube-state-metrics
       metricLabelsAllowlist:
+        - nodes=[*]
         - pods=[*]
         - deployments=[*]
         - persistentvolumeclaims=[*]
       collectors:
+        - nodes
         - pods
         - deployments
       rbac:
