@@ -75,13 +75,13 @@
         "calcsMutation": "standard",
         "centerAlignContent": true,
         "codeData": "{\n  \"text\": \"Random text\"\n}",
-        "css": "/* ===== Layout wrapper ===== */\n.radarr-wrapper {\n  box-sizing: border-box;\n  width: 100%;\n  height: 100%;\n  padding: 6px 8px;  /* gap between header and panel frame */\n}\n\n/* ===== Header card ===== */\n.radarr-header {\n  position: relative;\n  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n  border-radius: 10px;\n  overflow: hidden;            /* clip gradient & glow to rounded corners */\n  padding: 16px 22px;\n  box-shadow: 0 8px 20px rgba(0,0,0,0.35);\n  border: none;                /* let the panel keep its own frame */\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  color: #f9fafb;\n}\n\n/* HD header */\n.radarr-header--radarr {\n  background: linear-gradient(\n    90deg,\n    #4db3ff 0%,\n    #1d4ed8 45%,\n    #111827 100%\n  );\n}\n\n/* UHD header */\n.radarr-header--radarr-uhd {\n  background: linear-gradient(\n    90deg,\n    #f97316 0%,\n    #ea580c 45%,\n    #111827 100%\n  );\n}\n\n/* ===== Logo + shimmer ===== */\n.radarr-logo {\n  position: relative;\n  width: 42px;\n  height: 42px;\n  border-radius: 9px;\n  background-image: url(\"https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/256.png\");\n  background-size: cover;\n  background-position: center;\n  box-shadow: 0 0 10px rgba(0,0,0,0.6);\n  flex-shrink: 0;\n}\n\n/* Base glow pseudo-element */\n.radarr-logo::before {\n  content: \"\";\n  position: absolute;\n  inset: -18px;\n  border-radius: inherit;\n  pointer-events: none;\n  filter: blur(20px);\n  opacity: 0;\n  background: rgba(56, 189, 248, 0.5);   /* default HD-ish color */\n}\n\n/* Override glow color for UHD */\n.radarr-header--radarr-uhd .radarr-logo::before {\n  background: rgba(251, 146, 60, 0.5);\n}\n\n/* Shimmer style from Loveable */\n.radarr-logo--shimmer::before {\n  animation: shimmer 2s ease-in-out infinite;\n  background: linear-gradient(\n    90deg,\n    transparent,\n    rgba(255, 255, 255, 0.4),\n    transparent\n  ) !important;\n  filter: blur(10px);\n}\n\n/* Moving shimmer stripe */\n@keyframes shimmer {\n  0% {\n    transform: translateX(-100%);\n    opacity: 0;\n  }\n  50% {\n    opacity: 1;\n  }\n  100% {\n    transform: translateX(100%);\n    opacity: 0;\n  }\n}\n\n/* ===== Main text block ===== */\n.radarr-main {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  min-width: 0;\n}\n\n.radarr-title-row {\n  font-size: 20px;\n  font-weight: 700;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.radarr-slash {\n  opacity: 0.6;\n}\n\n.radarr-badge {\n  padding: 2px 8px;\n  border-radius: 999px;\n  background: rgba(17,24,39,0.9);\n  font-size: 12px;\n  font-weight: 600;\n  letter-spacing: 0.08em;\n}\n\n/* Badge text: HD vs UHD */\n.radarr-badge::after {\n  content: \"HD\";\n}\n.radarr-header--radarr-uhd .radarr-badge::after {\n  content: \"UHD\";\n}\n\n/* Subtitle text */\n.radarr-subtitle {\n  font-size: 13px;\n  color: rgba(249,250,251,0.75);\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n/* Subtitle per endpoint */\n.radarr-subtitle::after {\n  content: \"1080p & 720p movie monitoring, queue & health overview\";\n}\n.radarr-header--radarr-uhd .radarr-subtitle::after {\n  content: \"4K movie monitoring, queue & health overview\";\n}\n\n/* ===== Pills on the right ===== */\n.radarr-pills {\n  margin-left: auto;\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  font-size: 11px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.radarr-pill {\n  padding: 3px 9px;\n  border-radius: 999px;\n  border: 1px solid rgba(148,163,184,0.6);\n}\n\n/* Movies pill */\n.radarr-pill--mode {\n  background: rgba(59,130,246,0.18);\n  color: #93c5fd;\n  border-color: rgba(147,197,253,0.5);\n}\n.radarr-pill--mode::after {\n  content: \"Movies\";\n}\n\n/* HD/4K pill */\n.radarr-pill--quality {\n  background: rgba(17,94,89,0.2);\n  color: #6ee7b7;\n  border-color: rgba(45,212,191,0.5);\n}\n.radarr-pill--quality::after {\n  content: \"HD Only\";\n}\n.radarr-header--radarr-uhd .radarr-pill--quality::after {\n  content: \"4K Only\";\n}\n\n/* Kubernetes pill */\n.radarr-pill--k8s {\n  background: rgba(15,23,42,0.9);\n  color: #e5e7eb;\n}\n.radarr-pill--k8s::after {\n  content: \"Kubernetes\";\n}\n",
+        "css": ".radarr-wrapper {\n  box-sizing: border-box;\n  width: 100%;\n  height: 100%;\n  padding: 0px 0px;\n  display: flex;\n  align-items: flex-start;\n}\n\n.radarr-header {\n  position: relative;\n  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n  border-radius: 10px;\n  overflow: hidden;\n  padding: 19px 20px;\n  box-shadow: 0 8px 20px rgba(0,0,0,0.35);\n  border: none;\n  display: flex;\n  align-items: center;\n  gap: 14px;\n  color: #f9fafb;\n  flex: 1 1 auto;\n  min-width: 0;\n}\n\n.radarr-header--radarr {\n  background: linear-gradient(90deg, #4db3ff 0%, #1d4ed8 45%, #111827 100%);\n}\n\n.radarr-header--radarr-uhd {\n  background: linear-gradient(90deg, #f97316 0%, #ea580c 45%, #111827 100%);\n}\n\n.radarr-header--bar-shimmer {\n  position: relative;\n}\n\n.radarr-header--bar-shimmer::before {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n  pointer-events: none;\n  border-radius: inherit;\n  opacity: 0;\n  background: linear-gradient(\n    120deg,\n    transparent 0%,\n    rgba(255, 255, 255, 0.0) 30%,\n    rgba(255, 255, 255, 0.35) 50%,\n    rgba(255, 255, 255, 0.0) 70%,\n    transparent 100%\n  );\n  transform: translateX(-130%);\n  mix-blend-mode: screen;\n  animation: radarrBarShimmer 6s ease-in-out infinite;\n}\n\n.radarr-header--radarr-uhd.radarr-header--bar-shimmer::before {\n  background: linear-gradient(\n    120deg,\n    transparent 0%,\n    rgba(255, 255, 255, 0.0) 30%,\n    rgba(255, 248, 240, 0.45) 50%,\n    rgba(255, 255, 255, 0.0) 70%,\n    transparent 100%\n  );\n}\n\n@keyframes radarrBarShimmer {\n  0% {\n    transform: translateX(-130%);\n    opacity: 0;\n  }\n  15% {\n    opacity: 1;\n  }\n  85% {\n    opacity: 1;\n  }\n  100% {\n    transform: translateX(130%);\n    opacity: 0;\n  }\n}\n\n.radarr-logo {\n  position: relative;\n  width: 36px;\n  height: 36px;\n  border-radius: 8px;\n  background-image: url(\"https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/256.png\");\n  background-size: cover;\n  background-position: center;\n  box-shadow: 0 0 10px rgba(0,0,0,0.6);\n  flex-shrink: 0;\n}\n\n.radarr-main {\n  display: flex;\n  flex-direction: column;\n  gap: 3px;\n  min-width: 0;\n}\n\n.radarr-title-row {\n  font-size: 18px;\n  font-weight: 700;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n\n.radarr-slash {\n  opacity: 0.6;\n}\n\n.radarr-badge {\n  padding: 1px 7px;\n  border-radius: 999px;\n  background: rgba(17,24,39,0.9);\n  font-size: 11px;\n  font-weight: 600;\n  letter-spacing: 0.08em;\n}\n\n.radarr-badge::after {\n  content: \"HD\";\n}\n\n.radarr-header--radarr-uhd .radarr-badge::after {\n  content: \"UHD\";\n}\n\n.radarr-subtitle {\n  font-size: 12px;\n  color: rgba(249,250,251,0.75);\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n.radarr-subtitle::after {\n  content: \"1080p & 720p movie monitoring, queue & health overview\";\n}\n\n.radarr-header--radarr-uhd .radarr-subtitle::after {\n  content: \"4K movie monitoring, queue & health overview\";\n}\n\n.radarr-pills {\n  margin-left: auto;\n  display: flex;\n  flex-wrap: wrap;\n  gap: 6px;\n  font-size: 11px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.radarr-pill {\n  padding: 2px 8px;\n  border-radius: 999px;\n  border: 1px solid rgba(148,163,184,0.6);\n}\n\n.radarr-pill--mode {\n  background: rgba(59,130,246,0.18);\n  color: #93c5fd;\n  border-color: rgba(147,197,253,0.5);\n}\n\n.radarr-pill--mode::after {\n  content: \"Movies\";\n}\n\n.radarr-pill--quality {\n  background: rgba(17,94,89,0.2);\n  color: #6ee7b7;\n  border-color: rgba(45,212,191,0.5);\n}\n\n.radarr-pill--quality::after {\n  content: \"HD Only\";\n}\n\n.radarr-header--radarr-uhd .radarr-pill--quality::after {\n  content: \"4K Only\";\n}\n\n.radarr-pill--k8s {\n  background: rgba(15,23,42,0.9);\n  color: #e5e7eb;\n}\n\n.radarr-pill--k8s::after {\n  content: \"Kubernetes\";\n}\n",
         "dynamicData": true,
         "dynamicFieldDisplayValues": true,
         "dynamicHtmlGraphics": true,
         "dynamicProps": true,
-        "html": "<div class=\"radarr-wrapper\">\n  <div class=\"radarr-header radarr-header--$endpoint\">\n    <div class=\"radarr-logo radarr-logo--shimmer\"></div>\n\n    <div class=\"radarr-main\">\n      <div class=\"radarr-title-row\">\n        <span>Radarr</span>\n        <span class=\"radarr-slash\">/</span>\n        <span class=\"radarr-badge\"></span>\n      </div>\n\n      <div class=\"radarr-subtitle\"></div>\n    </div>\n\n    <div class=\"radarr-pills\">\n      <span class=\"radarr-pill radarr-pill--mode\"></span>\n      <span class=\"radarr-pill radarr-pill--quality\"></span>\n      <span class=\"radarr-pill radarr-pill--k8s\"></span>\n    </div>\n  </div>\n</div>\n",
-        "onInit": "htmlNode.innerHTML = htmlGraphics.props.replaceVariables(htmlNode.innerHTML);\n",
+        "html": "<div class=\"radarr-wrapper\">\n  <div class=\"radarr-header radarr-header--$endpoint radarr-header--bar-shimmer\">\n    <div class=\"radarr-logo\"></div>\n\n    <div class=\"radarr-main\">\n      <div class=\"radarr-title-row\">\n        <span>Radarr</span>\n        <span class=\"radarr-slash\">/</span>\n        <span class=\"radarr-badge\"></span>\n      </div>\n\n      <div class=\"radarr-subtitle\"></div>\n    </div>\n\n    <div class=\"radarr-pills\">\n      <span class=\"radarr-pill radarr-pill--mode\"></span>\n      <span class=\"radarr-pill radarr-pill--quality\"></span>\n      <span class=\"radarr-pill radarr-pill--k8s\"></span>\n    </div>\n  </div>\n</div>\n",
+        "onInit": "htmlNode.innerHTML = htmlGraphics.props.replaceVariables(htmlNode.innerHTML);\r\n",
         "onInitOnResize": true,
         "onRender": "",
         "overflow": "visible",
@@ -126,6 +126,99 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 32,
+      "options": {
+        "SVGBaseFix": true,
+        "add100Percentage": true,
+        "calcsMutation": "standard",
+        "centerAlignContent": true,
+        "codeData": "{\n  \"text\": \"Random text\"\n}",
+        "css": "/* === Layout wrapper (matches Radarr header wrapper) === */\r\n.quality-wrapper {\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  height: 100%;\r\n  padding: 0px 0px;\r\n  display: flex;\r\n  align-items: flex-start;\r\n}\r\n\r\n/* === Base card === */\r\n.quality-bar-chart {\r\n  position: relative;\r\n  flex: 1 1 auto;\r\n  min-width: 0;\r\n  box-sizing: border-box;\r\n  padding: 10px 18px;\r\n  border-radius: 16px;\r\n  background: #1b1c22;            /* <- same for all endpoints */\r\n  color: #e2e8f0;\r\n  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 10px;\r\n}\r\n\r\n/* === Header === */\r\n.quality-bar-chart__header {\r\n  display: flex;\r\n  align-items: baseline;\r\n  justify-content: space-between;\r\n  gap: 8px;\r\n  margin-bottom: 6px;\r\n}\r\n\r\n.quality-bar-chart__title {\r\n  font-size: 15px;\r\n  font-weight: 600;\r\n  letter-spacing: 0.02em;\r\n}\r\n\r\n.quality-bar-chart__meta {\r\n  font-size: 11px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 4px;\r\n}\r\n\r\n.quality-bar-chart__total-label {\r\n  opacity: 0.55;\r\n}\r\n\r\n.quality-bar-chart__total-value {\r\n  font-weight: 600;\r\n}\r\n\r\n/* === Rows === */\r\n.quality-bar-chart__rows {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 8px;\r\n}\r\n\r\n.bar-row {\r\n  display: grid;\r\n  grid-template-columns: 1.4fr 3fr auto;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 12px;\r\n}\r\n\r\n.bar-label {\r\n  white-space: nowrap;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n.bar-track {\r\n  width: 100%;\r\n  height: 10px;\r\n  border-radius: 999px;\r\n  background: #111827;\r\n  overflow: hidden;\r\n}\r\n\r\n.bar-fill {\r\n  height: 100%;\r\n  border-radius: inherit;\r\n  width: 0;\r\n  transition: width 0.35s ease-out;\r\n}\r\n\r\n.bar-value {\r\n  font-variant-numeric: tabular-nums;\r\n  font-size: 12px;\r\n  white-space: nowrap;\r\n}\r\n\r\n.bar-percent {\r\n  opacity: 0.6;\r\n  font-size: 11px;\r\n  margin-left: 4px;\r\n}\r\n\r\n/* === EDGE-LIT BORDER =================================== */\r\n/* Base styles */\r\n.quality-bar-chart--edge-lit {\r\n  position: relative;\r\n  overflow: hidden;\r\n}\r\n\r\n/* Only draw the glowing outline, not a solid fill */\r\n.quality-bar-chart--edge-lit::before {\r\n  content: '';\r\n  position: absolute;\r\n  inset: 0;\r\n  border-radius: 16px;\r\n  padding: 1px;\r\n  background-size: 300% 100%;\r\n  -webkit-mask:\r\n    linear-gradient(#fff 0 0) content-box,\r\n    linear-gradient(#fff 0 0);\r\n  -webkit-mask-composite: xor;\r\n          mask-composite: exclude;\r\n  pointer-events: none;\r\n  opacity: 0.4;\r\n}\r\n\r\n/* Breathe animation */\r\n.quality-bar-chart--edge-breathe::before {\r\n  animation: edge-breathe 4s ease-in-out infinite;\r\n}\r\n\r\n@keyframes edge-breathe {\r\n  0%, 100% {\r\n    opacity: 0.25;\r\n    filter: blur(0px);\r\n  }\r\n  50% {\r\n    opacity: 1;\r\n    filter: blur(1px);\r\n  }\r\n}\r\n\r\n/* === Endpoint-specific edge gradients ================== */\r\n/* HD / default (radarr) */\r\n.quality-bar-chart.quality-theme-hd.quality-bar-chart--edge-lit::before {\r\n  background: linear-gradient(\r\n    90deg,\r\n    #4db3ff,\r\n    #60a5fa,\r\n    #a78bfa,\r\n    #4db3ff\r\n  );\r\n}\r\n\r\n/* UHD / 4K (radarr-uhd) */\r\n.quality-bar-chart.quality-theme-uhd.quality-bar-chart--edge-lit::before {\r\n  background: linear-gradient(\r\n    90deg,\r\n    #f97316,\r\n    #fb923c,\r\n    #fde68a,\r\n    #f97316\r\n  );\r\n}\r\n/* Wrapper fills the panel */\r\n.quality-wrapper {\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  height: 100%;         /* <- important */\r\n  padding: 4px 8px;\r\n  display: flex;\r\n  align-items: flex-start;\r\n}\r\n\r\n/* Card fills wrapper vertically */\r\n.quality-bar-chart {\r\n  position: relative;\r\n  flex: 1 1 auto;\r\n  min-width: 0;\r\n  height: 100%;         /* <- fill full Grafana panel height */\r\n  box-sizing: border-box;\r\n  padding: 14px 18px;\r\n  border-radius: 16px;\r\n  background: #1b1c22;\r\n  color: #e2e8f0;\r\n  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 10px;\r\n}\r\n\r\n/* Header stays fixed at top */\r\n.quality-bar-chart__header {\r\n  display: flex;\r\n  align-items: baseline;\r\n  justify-content: space-between;\r\n  gap: 8px;\r\n  margin-bottom: 6px;\r\n  flex: 0 0 auto;\r\n}\r\n\r\n/* Rows take the rest of the height and scroll */\r\n.quality-bar-chart__rows {\r\n  flex: 1 1 auto;       /* <- grow to use remaining height */\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 8px;\r\n  overflow-y: auto;     /* <- INTERNAL SCROLL */\r\n  padding-right: 8px;   /* little space for scrollbar */\r\n}\r\n\r\n/* Optional: nicer thin scrollbar (only in WebKit / Blink) */\r\n.quality-bar-chart__rows::-webkit-scrollbar {\r\n  width: 6px;\r\n}\r\n\r\n.quality-bar-chart__rows::-webkit-scrollbar-track {\r\n  background: transparent;\r\n}\r\n\r\n.quality-bar-chart__rows::-webkit-scrollbar-thumb {\r\n  border-radius: 999px;\r\n  background: rgba(148, 163, 184, 0.4);\r\n}\r\n/* When the rows area is scrollable, we add this class via JS */\r\n.quality-bar-chart__rows--scrollable {\r\n  position: relative;\r\n}\r\n\r\n/* Scrollable area already has overflow-y:auto in your CSS */\r\n\r\n.scroll-hint {\r\n  position: absolute;\r\n  left: 0;\r\n  right: 0;\r\n  display: none;              /* JS toggles this */\r\n  justify-content: center;\r\n  padding: 4px 0;\r\n  pointer-events: none;\r\n  z-index: 10;\r\n}\r\n\r\n.scroll-hint--top {\r\n  top: 0;\r\n  background: linear-gradient(\r\n    to bottom,\r\n    rgba(27, 28, 34, 0.95) 0%,\r\n    transparent 100%\r\n  );\r\n  padding-top: 8px;\r\n}\r\n\r\n.scroll-hint--bottom {\r\n  bottom: 0;\r\n  background: linear-gradient(\r\n    to top,\r\n    rgba(27, 28, 34, 0.95) 0%,\r\n    transparent 100%\r\n  );\r\n  padding-bottom: 8px;\r\n}\r\n\r\n.scroll-hint-icon {\r\n  font-size: 14px;\r\n  color: rgba(255, 255, 255, 0.7);\r\n  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));\r\n}\r\n\r\n.scroll-hint--bottom .scroll-hint-icon {\r\n  animation: bounce-chevron-down 1s ease-in-out infinite;\r\n}\r\n\r\n.scroll-hint--top .scroll-hint-icon {\r\n  animation: bounce-chevron-up 1s ease-in-out infinite;\r\n}\r\n\r\n@keyframes bounce-chevron-down {\r\n  0%, 100% { transform: translateY(0); }\r\n  50%      { transform: translateY(4px); }\r\n}\r\n\r\n@keyframes bounce-chevron-up {\r\n  0%, 100% { transform: translateY(0); }\r\n  50%      { transform: translateY(-4px); }\r\n}\r\n",
+        "dynamicData": true,
+        "dynamicFieldDisplayValues": true,
+        "dynamicHtmlGraphics": true,
+        "dynamicProps": true,
+        "html": "<div class=\"quality-wrapper\">\r\n  <div class=\"quality-bar-chart quality-bar-chart--edge-lit quality-bar-chart--edge-breathe\">\r\n    <div class=\"quality-bar-chart__header\">\r\n      <div class=\"quality-bar-chart__title\">$endpoint Quality Breakdown</div>\r\n      <div class=\"quality-bar-chart__meta\">\r\n        <span class=\"quality-bar-chart__total-label\">TOTAL:</span>\r\n        <span class=\"quality-bar-chart__total-value\" id=\"quality-total\">–</span>\r\n      </div>\r\n    </div>\r\n\r\n    <div class=\"quality-bar-chart__rows\" id=\"quality-rows\"></div>\r\n\r\n    <!-- scroll hints (top & bottom) -->\r\n    <div class=\"scroll-hint scroll-hint--top\" id=\"scroll-hint-top\">\r\n      <div class=\"scroll-hint-icon\">▲</div>\r\n    </div>\r\n    <div class=\"scroll-hint scroll-hint--bottom\" id=\"scroll-hint-bottom\">\r\n      <div class=\"scroll-hint-icon\">▼</div>\r\n    </div>\r\n  </div>\r\n</div>",
+        "onInit": "// onInit\r\n\r\n// 1) Apply Grafana variables (so $endpoint becomes \"radarr\", \"radarr-uhd\", etc.)\r\nhtmlNode.innerHTML = htmlGraphics.props.replaceVariables(htmlNode.innerHTML);\r\n\r\n// ---------- PALETTES ----------\r\nconst PALETTE_COOL = [\r\n  \"#60a5fa\", // sky blue\r\n  \"#3b82f6\", // blue\r\n  \"#6366f1\", // indigo\r\n  \"#8b5cf6\", // violet\r\n  \"#22c55e\", // green accent\r\n  \"#facc15\"  // warm accent\r\n];\r\n\r\nconst PALETTE_WARM = [\r\n  \"#fdba74\", // light orange\r\n  \"#fb923c\", // orange\r\n  \"#f97316\", // deeper orange\r\n  \"#ea580c\", // burnt orange\r\n  \"#facc15\", // amber\r\n  \"#f97373\"  // soft red\r\n];\r\n\r\nlet CURRENT_PALETTE = PALETTE_COOL;\r\n\r\n// ---------- HELPERS ----------\r\nfunction prettyEndpoint(str) {\r\n  if (!str || typeof str !== \"string\") return \"\";\r\n\r\n  const parts = str.split(/[-_]/g).filter(Boolean);\r\n\r\n  return parts\r\n    .map((p) => {\r\n      const l = p.toLowerCase();\r\n      if (l === \"uhd\") return \"UHD\";\r\n      if (l === \"hd\")  return \"HD\";\r\n      if (l === \"sd\")  return \"SD\";\r\n      if (l === \"4k\")  return \"4K\";\r\n      return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();\r\n    })\r\n    .join(\" \");\r\n}\r\n\r\nfunction getPaletteColor(i) {\r\n  const p = CURRENT_PALETTE || PALETTE_COOL;\r\n  return p[i % p.length];\r\n}\r\n\r\nfunction getDataObject() {\r\n  if (typeof data !== \"undefined\" && data && data.series) return data;\r\n  if (htmlGraphics?.data?.series) return htmlGraphics.data;\r\n  return null;\r\n}\r\n\r\n// ---------- TITLE + ENDPOINT + PALETTE + THEME ----------\r\nlet endpointRaw = null;\r\nlet epLower = \"\";\r\n\r\n(function () {\r\n  const titleEl = htmlNode.querySelector(\".quality-bar-chart__title\");\r\n  if (!titleEl) return;\r\n\r\n  const txt = titleEl.textContent.trim(); // e.g. \"radarr Quality Breakdown\"\r\n  const match = txt.match(/^(\\S+)\\s+Quality Breakdown/i);\r\n  if (!match) return;\r\n\r\n  endpointRaw = match[1];\r\n  epLower = endpointRaw.toLowerCase();\r\n  const nice = prettyEndpoint(endpointRaw);\r\n\r\n  // Choose palette based on endpoint\r\n  if (epLower.includes(\"uhd\") || epLower.includes(\"4k\")) {\r\n    CURRENT_PALETTE = PALETTE_WARM;\r\n  } else {\r\n    CURRENT_PALETTE = PALETTE_COOL;\r\n  }\r\n\r\n  // Update title text\r\n  titleEl.textContent = `${nice} Quality Breakdown`;\r\n})();\r\n\r\n// Apply background theme class to the card (for edge-lit gradient)\r\n(function () {\r\n  const card = htmlNode.querySelector(\".quality-bar-chart\");\r\n  if (!card) return;\r\n\r\n  if (epLower.includes(\"uhd\") || epLower.includes(\"4k\")) {\r\n    card.classList.add(\"quality-theme-uhd\");\r\n  } else {\r\n    card.classList.add(\"quality-theme-hd\");\r\n  }\r\n})();\r\n\r\n// ---------- QUALITY NAME RESOLUTION ----------\r\nfunction resolveQualityLabel(frame, field) {\r\n  // Field-level labels\r\n  if (field?.labels?.quality) return String(field.labels.quality);\r\n  if (field?.labels) {\r\n    for (const k in field.labels) {\r\n      if (k.toLowerCase().includes(\"quality\")) return field.labels[k];\r\n    }\r\n  }\r\n\r\n  // Frame-level labels\r\n  if (frame?.labels?.quality) return String(frame.labels.quality);\r\n  if (frame?.labels) {\r\n    for (const k in frame.labels) {\r\n      if (k.toLowerCase().includes(\"quality\")) return frame.labels[k];\r\n    }\r\n  }\r\n\r\n  // Display names from config\r\n  if (field?.config?.displayName) return field.config.displayName;\r\n  if (field?.config?.displayNameFromDS) return field.config.displayNameFromDS;\r\n\r\n  // Series name / Prom series text\r\n  if (frame?.name) {\r\n    const m = frame.name.match(/quality=\"([^\"]+)\"/);\r\n    return m ? m[1] : frame.name;\r\n  }\r\n\r\n  return \"Unknown\";\r\n}\r\n\r\n// ---------- SCROLL HINTS (up/down chevrons) ----------\r\nconst HINT_REAPPEAR_DELAY = 10000; // 10s\r\nlet scrollTimeoutId = null;\r\nlet scrollHandlersAttached = false;\r\n\r\nfunction getRowsContainer() {\r\n  return htmlNode.querySelector(\"#quality-rows\");\r\n}\r\nfunction getTopHintEl() {\r\n  return htmlNode.querySelector(\"#scroll-hint-top\");\r\n}\r\nfunction getBottomHintEl() {\r\n  return htmlNode.querySelector(\"#scroll-hint-bottom\");\r\n}\r\n\r\nfunction hideScrollHints() {\r\n  const top = getTopHintEl();\r\n  const bottom = getBottomHintEl();\r\n  if (top) top.style.display = \"none\";\r\n  if (bottom) bottom.style.display = \"none\";\r\n}\r\n\r\nfunction showTopHint() {\r\n  const top = getTopHintEl();\r\n  const bottom = getBottomHintEl();\r\n  if (bottom) bottom.style.display = \"none\";\r\n  if (top) {\r\n    top.style.display = \"flex\";\r\n  }\r\n}\r\n\r\nfunction showBottomHint() {\r\n  const top = getTopHintEl();\r\n  const bottom = getBottomHintEl();\r\n  if (top) top.style.display = \"none\";\r\n  if (bottom) {\r\n    bottom.style.display = \"flex\";\r\n  }\r\n}\r\n\r\nfunction checkScrollPosition() {\r\n  const container = getRowsContainer();\r\n  if (!container) return;\r\n\r\n  const { scrollTop, scrollHeight, clientHeight } = container;\r\n  const isAtTop = scrollTop < 10;\r\n  const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;\r\n  const canScroll = scrollHeight > clientHeight + 1;\r\n\r\n  if (scrollTimeoutId) {\r\n    clearTimeout(scrollTimeoutId);\r\n    scrollTimeoutId = null;\r\n  }\r\n\r\n  hideScrollHints();\r\n\r\n  if (!canScroll) return;\r\n\r\n  scrollTimeoutId = setTimeout(() => {\r\n    if (isAtTop) {\r\n      showBottomHint();\r\n    } else if (isAtBottom) {\r\n      showTopHint();\r\n    }\r\n  }, HINT_REAPPEAR_DELAY);\r\n}\r\n\r\nfunction attachScrollHandlersIfNeeded() {\r\n  const container = getRowsContainer();\r\n  if (!container || scrollHandlersAttached) return;\r\n\r\n  container.addEventListener(\"scroll\", checkScrollPosition);\r\n  window.addEventListener(\"resize\", checkScrollPosition);\r\n  scrollHandlersAttached = true;\r\n}\r\n\r\nfunction updateScrollHintInitial() {\r\n  const container = getRowsContainer();\r\n  if (!container) return;\r\n\r\n  const canScroll = container.scrollHeight > container.clientHeight + 1;\r\n\r\n  hideScrollHints();\r\n\r\n  if (canScroll) {\r\n    showBottomHint(); // first-time affordance: \"scroll down\"\r\n  }\r\n}\r\n\r\n// ---------- MAIN RENDER ----------\r\nfunction buildQualityChart() {\r\n  const dataObj = getDataObject();\r\n  const rowsEl = htmlNode.querySelector(\"#quality-rows\");\r\n  const totalEl = htmlNode.querySelector(\"#quality-total\");\r\n\r\n  if (!rowsEl) return;\r\n\r\n  if (!dataObj?.series?.length) {\r\n    rowsEl.innerHTML = '<div style=\"opacity:0.6;font-size:11px;\">No data</div>';\r\n    if (totalEl) totalEl.textContent = \"0\";\r\n    hideScrollHints();\r\n    return;\r\n  }\r\n\r\n  const frames = dataObj.series;\r\n  const rows = [];\r\n\r\n  frames.forEach((frame) => {\r\n    if (!frame?.fields?.length) return;\r\n\r\n    // Prefer numeric field\r\n    let valueField =\r\n      frame.fields.find((f) => f.type === \"number\") || frame.fields[1];\r\n    if (!valueField?.values) return;\r\n\r\n    const len = valueField.values.length;\r\n    if (!len) return;\r\n\r\n    const raw = valueField.values.get\r\n      ? valueField.values.get(len - 1)\r\n      : valueField.values[len - 1];\r\n\r\n    const value = Number(raw);\r\n    if (!isFinite(value)) return;\r\n\r\n    const quality = resolveQualityLabel(frame, valueField);\r\n\r\n    rows.push({ quality, value });\r\n  });\r\n\r\n  if (!rows.length) {\r\n    rowsEl.innerHTML = '<div style=\"opacity:0.6;font-size:11px;\">No data</div>';\r\n    if (totalEl) totalEl.textContent = \"0\";\r\n    hideScrollHints();\r\n    return;\r\n  }\r\n\r\n  // Sort by value desc\r\n  rows.sort((a, b) => b.value - a.value);\r\n\r\n  // Assign palette colors AFTER sorting\r\n  rows.forEach((row, i) => {\r\n    row.color = getPaletteColor(i);\r\n  });\r\n\r\n  const total = rows.reduce((s, r) => s + r.value, 0);\r\n  const max = rows[0].value;\r\n\r\n  if (totalEl) totalEl.textContent = String(total);\r\n\r\n  rowsEl.innerHTML = rows\r\n    .map((r) => {\r\n      const pctWidth = max ? (r.value / max) * 100 : 0;\r\n      const pctTotal = total ? (r.value / total) * 100 : 0;\r\n\r\n      return `\r\n        <div class=\"bar-row\">\r\n          <div class=\"bar-label\" title=\"${r.quality}\">${r.quality}</div>\r\n          <div class=\"bar-track\">\r\n            <div class=\"bar-fill\"\r\n              style=\"width:${pctWidth.toFixed(2)}%;background:${r.color};\">\r\n            </div>\r\n          </div>\r\n          <div class=\"bar-value\">\r\n            ${r.value}\r\n            <span class=\"bar-percent\">(${pctTotal.toFixed(1)}%)</span>\r\n          </div>\r\n        </div>\r\n      `;\r\n    })\r\n    .join(\"\");\r\n\r\n  // Scroll hints\r\n  attachScrollHandlersIfNeeded();\r\n  updateScrollHintInitial();\r\n}\r\n\r\n// Initial render\r\nbuildQualityChart();\r\n\r\n// Re-render on data refresh\r\nhtmlNode.addEventListener(\"panelupdate\", () => {\r\n  try {\r\n    buildQualityChart();\r\n  } catch (e) {\r\n    console.error(\"quality bar chart panelupdate error\", e);\r\n  }\r\n});\r\n",
+        "onInitOnResize": true,
+        "onRender": "",
+        "overflow": "hidden",
+        "panelupdateOnMount": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull",
+            "last",
+            "firstNotNull",
+            "first",
+            "min",
+            "max",
+            "mean",
+            "sum",
+            "count",
+            "range",
+            "delta",
+            "step",
+            "diff",
+            "logmin",
+            "allIsZero",
+            "allIsNull",
+            "diffperc"
+          ]
+        },
+        "renderOnMount": true,
+        "rootCSS": "",
+        "useGrafanaScrollbar": true
+      },
+      "pluginVersion": "2.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sort_desc(\r\n  sum by (quality) (\r\n    radarr_movie_quality_total{endpoint=\"$endpoint\"}\r\n  )\r\n)",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "transparent": true,
+      "type": "gapit-htmlgraphics-panel"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -145,7 +238,7 @@
       "gridPos": {
         "h": 6,
         "w": 4,
-        "x": 0,
+        "x": 12,
         "y": 4
       },
       "id": 16,
@@ -221,7 +314,7 @@
       "gridPos": {
         "h": 6,
         "w": 4,
-        "x": 4,
+        "x": 16,
         "y": 4
       },
       "id": 17,
@@ -363,7 +456,7 @@
       "gridPos": {
         "h": 6,
         "w": 4,
-        "x": 8,
+        "x": 20,
         "y": 4
       },
       "id": 28,
@@ -486,80 +579,6 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "decimals": 0,
-          "mappings": [],
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 8,
-        "x": 16,
-        "y": 4
-      },
-      "id": 23,
-      "maxDataPoints": 1,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true,
-          "values": [
-            "value"
-          ]
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.3.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "sort_desc(\r\n  sum by (quality) (\r\n    radarr_movie_quality_total{endpoint=\"$endpoint\"}\r\n  )\r\n)\r\n",
-          "interval": "",
-          "legendFormat": "{{ quality }}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Episode Quality: ${endpoint}",
-      "type": "piechart"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
             "mode": "thresholds"
           },
           "mappings": [
@@ -592,9 +611,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 4,
-        "x": 0,
+        "x": 12,
         "y": 10
       },
       "id": 19,
@@ -662,9 +681,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 4,
-        "x": 4,
+        "x": 16,
         "y": 10
       },
       "id": 21,
@@ -722,9 +741,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 4,
-        "x": 8,
+        "x": 20,
         "y": 10
       },
       "id": 24,
@@ -816,5 +835,5 @@
   "timezone": "",
   "title": "Radarr",
   "uid": "radarr-dynamic-exportarr",
-  "version": 3
+  "version": 1
 }
