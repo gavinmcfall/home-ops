@@ -117,6 +117,7 @@ spec:
         controller: mosquitto
         type: LoadBalancer
         annotations:
+          io.cilium/lb-ipam-ips: 10.90.3.203
           external-dns.alpha.kubernetes.io/hostname: mosquitto.${SECRET_DOMAIN}
         ports:
           http:
