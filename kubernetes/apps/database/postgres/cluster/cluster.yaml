@@ -144,7 +144,7 @@ spec:
         metadata:
           annotations:
             external-dns.alpha.kubernetes.io/hostname: postgres.${SECRET_DOMAIN}
-            io.cilium/lb-ipam-ips: 10.90.3.212
+            io.cilium/lb-ipam-ips: 10.90.3.209
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname

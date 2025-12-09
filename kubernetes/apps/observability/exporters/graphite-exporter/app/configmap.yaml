@@ -1,0 +1,133 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: graphite-exporter-config
+data:
+  graphite_mapping.yaml: |
+    # TrueNAS Scale Graphite Metrics Mapping
+    # Reference: https://github.com/prometheus/graphite_exporter
+    mappings:
+      # CPU metrics
+      - match: "servers.*.cpu-*.cpu-*"
+        name: "truenas_cpu_percent"
+        labels:
+          host: "$1"
+          cpu: "$2"
+          mode: "$3"
+
+      # Memory metrics
+      - match: "servers.*.memory.memory-*"
+        name: "truenas_memory_bytes"
+        labels:
+          host: "$1"
+          type: "$2"
+
+      # Disk metrics
+      - match: "servers.*.disk-*.disk_octets.*"
+        name: "truenas_disk_bytes_per_second"
+        labels:
+          host: "$1"
+          device: "$2"
+          direction: "$3"
+
+      - match: "servers.*.disk-*.disk_ops.*"
+        name: "truenas_disk_ops_per_second"
+        labels:
+          host: "$1"
+          device: "$2"
+          direction: "$3"
+
+      # Network interface metrics
+      - match: "servers.*.interface-*.if_octets.*"
+        name: "truenas_network_bytes_per_second"
+        labels:
+          host: "$1"
+          interface: "$2"
+          direction: "$3"
+
+      - match: "servers.*.interface-*.if_packets.*"
+        name: "truenas_network_packets_per_second"
+        labels:
+          host: "$1"
+          interface: "$2"
+          direction: "$3"
+
+      - match: "servers.*.interface-*.if_errors.*"
+        name: "truenas_network_errors_per_second"
+        labels:
+          host: "$1"
+          interface: "$2"
+          direction: "$3"
+
+      # ZFS ARC metrics
+      - match: "servers.*.zfs_arc.cache_*"
+        name: "truenas_zfs_arc_${3}"
+        labels:
+          host: "$1"
+
+      - match: "servers.*.zfs_arc-*.cache_*"
+        name: "truenas_zfs_arc_${3}"
+        labels:
+          host: "$1"
+          pool: "$2"
+
+      # Load average
+      - match: "servers.*.load.load.*"
+        name: "truenas_load_average"
+        labels:
+          host: "$1"
+          period: "$2"
+
+      # Uptime
+      - match: "servers.*.uptime.uptime"
+        name: "truenas_uptime_seconds"
+        labels:
+          host: "$1"
+
+      # Temperature sensors
+      - match: "servers.*.cputemp-*.temperature"
+        name: "truenas_cpu_temperature_celsius"
+        labels:
+          host: "$1"
+          sensor: "$2"
+
+      # Disk temperature
+      - match: "servers.*.disktemp-*.temperature"
+        name: "truenas_disk_temperature_celsius"
+        labels:
+          host: "$1"
+          device: "$2"
+
+      # Swap
+      - match: "servers.*.swap.swap-*"
+        name: "truenas_swap_bytes"
+        labels:
+          host: "$1"
+          type: "$2"
+
+      # Process metrics
+      - match: "servers.*.processes.ps_state-*"
+        name: "truenas_processes_count"
+        labels:
+          host: "$1"
+          state: "$2"
+
+      # df (filesystem) metrics
+      - match: "servers.*.df-*.df_complex-*"
+        name: "truenas_filesystem_bytes"
+        labels:
+          host: "$1"
+          mountpoint: "$2"
+          type: "$3"
+
+      # Catch-all for unmapped metrics (useful for debugging)
+      - match: "servers.*.*.*"
+        name: "truenas_${2}_${3}"
+        labels:
+          host: "$1"
+
+      - match: "servers.*.*.*.*"
+        name: "truenas_${2}_${3}_${4}"
+        labels:
+          host: "$1"

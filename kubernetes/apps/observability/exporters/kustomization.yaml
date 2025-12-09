@@ -6,6 +6,7 @@ resources:
   - ./blackbox-exporter/ks.yaml
   - ./exportarr-radarr/ks.yaml
   - ./exportarr-sonarr/ks.yaml
+  - ./graphite-exporter/ks.yaml
   - ./intel-gpu-exporter/ks.yaml
   - ./mariadb-exporter/ks.yaml
   - ./nut-exporter/ks.yaml
