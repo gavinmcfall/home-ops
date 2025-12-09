@@ -20,7 +20,7 @@ spec:
   infrastructure:
     annotations:
       external-dns.alpha.kubernetes.io/hostname: *hostname
-      lbipam.cilium.io/ips: *address
+      io.cilium/lb-ipam-ips: *address
     parametersRef:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
