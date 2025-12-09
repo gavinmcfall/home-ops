@@ -15,7 +15,7 @@ data:
 
     - match: 'truenas\.(.*)\.system\.ram\.(.*)'
       match_type: "regex"
-      name: "physical_memory"
+      name: "truenas_physical_memory"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -23,7 +23,7 @@ data:
 
     - match: 'truenas\.(.*)\.mem\.(.*)\.(.*)'
       match_type: "regex"
-      name: "memory_$${2}"
+      name: "truenas_memory_$${2}"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -31,7 +31,7 @@ data:
 
     - match: 'truenas\.(.*)\.system\.swap\.(.*)'
       match_type: "regex"
-      name: "swap"
+      name: "truenas_swap"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -43,7 +43,7 @@ data:
 
     - match: 'truenas\.(.*)\.services\.cpu\.(.*)'
       match_type: "regex"
-      name: "services_cpu"
+      name: "truenas_services_cpu"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -51,7 +51,7 @@ data:
 
     - match: 'truenas\.(.*)\.services\.io_ops_read\.(.*)'
       match_type: "regex"
-      name: "services_iops"
+      name: "truenas_services_iops"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -60,7 +60,7 @@ data:
 
     - match: 'truenas\.(.*)\.services\.io_ops_write\.(.*)'
       match_type: "regex"
-      name: "services_iops"
+      name: "truenas_services_iops"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -69,7 +69,7 @@ data:
 
     - match: 'truenas\.(.*)\.services\.io_read\.(.*)'
       match_type: "regex"
-      name: "services_io"
+      name: "truenas_services_io"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -78,7 +78,7 @@ data:
 
     - match: 'truenas\.(.*)\.services\.io_write\.(.*)'
       match_type: "regex"
-      name: "services_io"
+      name: "truenas_services_io"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -87,7 +87,7 @@ data:
 
     - match: 'truenas\.(.*)\.services\.mem_usage\.(.*)'
       match_type: "regex"
-      name: "services_mem"
+      name: "truenas_services_mem"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -99,7 +99,7 @@ data:
 
     - match: 'truenas\.(.*)\.smart\.log\.smart\.disktemp\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_temperature"
+      name: "truenas_disk_temperature"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -107,7 +107,7 @@ data:
 
     - match: 'truenas\.(.*)\.smart_log_smart\.disktemp\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_temperature"
+      name: "truenas_disk_temperature"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -119,7 +119,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_io"
+      name: "truenas_disk_io"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -128,7 +128,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_ops\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_io_ops"
+      name: "truenas_disk_io_ops"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -137,7 +137,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_ext\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_io"
+      name: "truenas_disk_io"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -146,7 +146,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_ext_ops\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_io_ops"
+      name: "truenas_disk_io_ops"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -155,7 +155,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_backlog\.(.*)\.backlog'
       match_type: "regex"
-      name: "disk_io_backlog"
+      name: "truenas_disk_io_backlog"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -163,7 +163,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_busy\.(.*)\.busy'
       match_type: "regex"
-      name: "disk_busy"
+      name: "truenas_disk_busy"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -171,7 +171,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_util\.(.*)\.utilization'
       match_type: "regex"
-      name: "disk_utilization"
+      name: "truenas_disk_utilization"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -179,7 +179,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_mops\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_io"
+      name: "truenas_disk_io"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -188,7 +188,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_ext_mops\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_io"
+      name: "truenas_disk_io"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -197,7 +197,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_iotime\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_iotime"
+      name: "truenas_disk_iotime"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -206,7 +206,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_ext_iotime\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_iotime"
+      name: "truenas_disk_iotime"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -215,7 +215,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_qops\.(.*)\.operations'
       match_type: "regex"
-      name: "disk_qops"
+      name: "truenas_disk_qops"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -223,7 +223,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_await\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_await"
+      name: "truenas_disk_await"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -232,7 +232,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_ext_await\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_await"
+      name: "truenas_disk_await"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -241,7 +241,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_avgsz\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_io_size"
+      name: "truenas_disk_io_size"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -250,7 +250,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_ext_avgsz\.(.*)\.(.*)'
       match_type: "regex"
-      name: "disk_io_size"
+      name: "truenas_disk_io_size"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -259,7 +259,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_svctm\.(.*)\.svctm'
       match_type: "regex"
-      name: "disk_svctm"
+      name: "truenas_disk_svctm"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -267,7 +267,7 @@ data:
 
     - match: 'truenas\.(.*)\.system\.io\.(.*)'
       match_type: "regex"
-      name: "system_io"
+      name: "truenas_system_io"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -279,7 +279,7 @@ data:
 
     - match: 'truenas\.(.*)\.system\.intr\.interrupts'
       match_type: "regex"
-      name: "interrupts"
+      name: "truenas_interrupts"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -287,7 +287,7 @@ data:
 
     - match: 'truenas\.(.*)\.system\.cpu\.softirq'
       match_type: "regex"
-      name: "interrupts"
+      name: "truenas_interrupts"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -295,7 +295,7 @@ data:
 
     - match: 'truenas\.(.*)\.cpu\.(.*)\.softirq'
       match_type: "regex"
-      name: "cpu_softirq"
+      name: "truenas_cpu_softirq"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -303,14 +303,14 @@ data:
 
     - match: 'truenas\.(.*)\.system\.ctxt\.switches'
       match_type: "regex"
-      name: "context_switches"
+      name: "truenas_context_switches"
       labels:
         job: "truenas"
         instance: "$${1}"
 
     - match: 'truenas\.(.*)\.system\.cpu\.(.*)'
       match_type: "regex"
-      name: "cpu_total"
+      name: "truenas_cpu_total"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -318,7 +318,7 @@ data:
 
     - match: 'truenas\.(.*)\.cputemp\.temperatures\.(.*)'
       match_type: "regex"
-      name: "cpu_temperature"
+      name: "truenas_cpu_temperature"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -326,7 +326,7 @@ data:
 
     - match: 'truenas\.(.*)\.cpu\.core_throttling\.(.*)'
       match_type: "regex"
-      name: "cpu_throttling"
+      name: "truenas_cpu_throttling"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -334,7 +334,7 @@ data:
 
     - match: 'truenas\.(.*)\.cpu\.cpufreq\.(.*)'
       match_type: "regex"
-      name: "cpu_frequency"
+      name: "truenas_cpu_frequency"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -342,7 +342,7 @@ data:
 
     - match: 'truenas\.(.*)\.cpu\.(.*)_cpuidle\.(.*)'
       match_type: "regex"
-      name: "cpu_idlestate"
+      name: "truenas_cpu_idlestate"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -351,7 +351,7 @@ data:
 
     - match: 'truenas\.(.*)\.cpu\.(.*)\.(.*)'
       match_type: "regex"
-      name: "cpu_usage"
+      name: "truenas_cpu_usage"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -364,14 +364,14 @@ data:
 
     - match: 'truenas\.(.*)\.system\.forks\.started'
       match_type: "regex"
-      name: "processes_forks"
+      name: "truenas_processes_forks"
       labels:
         job: "truenas"
         instance: "$${1}"
 
     - match: 'truenas\.(.*)\.system\.processes\.(.*)'
       match_type: "regex"
-      name: "processes"
+      name: "truenas_processes"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -379,7 +379,7 @@ data:
 
     - match: 'truenas\.(.*)\.system\.active_processes\.(.*)'
       match_type: "regex"
-      name: "processes"
+      name: "truenas_processes"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -391,21 +391,21 @@ data:
 
     - match: 'truenas\.(.*)\.system\.uptime\.uptime'
       match_type: "regex"
-      name: "uptime"
+      name: "truenas_uptime"
       labels:
         job: "truenas"
         instance: "$${1}"
 
     - match: 'truenas\.(.*)\.system\.clock_sync_state\.state'
       match_type: "regex"
-      name: "clock_synced"
+      name: "truenas_clock_synced"
       labels:
         job: "truenas"
         instance: "$${1}"
 
     - match: 'truenas\.(.*)\.system\.clock_status\.(.*)'
       match_type: "regex"
-      name: "clock_status"
+      name: "truenas_clock_status"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -413,7 +413,7 @@ data:
 
     - match: 'truenas\.(.*)\.system\.clock_sync_offset\.offset'
       match_type: "regex"
-      name: "clock_offset"
+      name: "truenas_clock_offset"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -424,7 +424,7 @@ data:
 
     - match: 'truenas\.(.*)\.system\.load\.(.*)'
       match_type: "regex"
-      name: "system_load"
+      name: "truenas_system_load"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -436,7 +436,7 @@ data:
 
     - match: 'truenas\.(.*)\.nfsd\.(.*)\.(.*)'
       match_type: "regex"
-      name: "nfs_$${2}"
+      name: "truenas_nfs_$${2}"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -448,7 +448,7 @@ data:
 
     - match: 'truenas\.(.*)\.zfs\.(.*)\.(.*)'
       match_type: "regex"
-      name: "zfs_$${2}"
+      name: "truenas_zfs_$${2}"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -456,7 +456,7 @@ data:
 
     - match: 'truenas\.(.*)\.zfspool\.state_(.*)\.(.*)'
       match_type: "regex"
-      name: "zfs_pool"
+      name: "truenas_zfs_pool"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -469,7 +469,7 @@ data:
 
     - match: 'truenas\.(.*)\.net\.(.*)\.(.*)'
       match_type: "regex"
-      name: "interface_io"
+      name: "truenas_interface_io"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -478,7 +478,7 @@ data:
 
     - match: 'truenas\.(.*)\.net_speed\.(.*)\.speed'
       match_type: "regex"
-      name: "interface_speed"
+      name: "truenas_interface_speed"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -486,7 +486,7 @@ data:
 
     - match: 'truenas\.(.*)\.net_duplex\.(.*)\.(.*)'
       match_type: "regex"
-      name: "interface_duplex"
+      name: "truenas_interface_duplex"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -495,7 +495,7 @@ data:
 
     - match: 'truenas\.(.*)\.net_operstate\.(.*)\.(.*)'
       match_type: "regex"
-      name: "interface_operationstate"
+      name: "truenas_interface_operationstate"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -504,7 +504,7 @@ data:
 
     - match: 'truenas\.(.*)\.net_carrier\.(.*)\.(.*)'
       match_type: "regex"
-      name: "interface_carrierstate"
+      name: "truenas_interface_carrierstate"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -513,7 +513,7 @@ data:
 
     - match: 'truenas\.(.*)\.net_mtu\.(.*)\.mtu'
       match_type: "regex"
-      name: "interface_mtu"
+      name: "truenas_interface_mtu"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -521,7 +521,7 @@ data:
 
     - match: 'truenas\.(.*)\.net_packets\.(.*)\.(.*)'
       match_type: "regex"
-      name: "interface_packets"
+      name: "truenas_interface_packets"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -530,7 +530,7 @@ data:
 
     - match: 'truenas\.(.*)\.net_errors\.(.*)\.(.*)'
       match_type: "regex"
-      name: "interface_errors"
+      name: "truenas_interface_errors"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -539,7 +539,7 @@ data:
 
     - match: 'truenas\.(.*)\.net_drops\.(.*)\.(.*)'
       match_type: "regex"
-      name: "interface_drops"
+      name: "truenas_interface_drops"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -548,7 +548,7 @@ data:
 
     - match: 'truenas\.(.*)\.system\.net\.(.*)'
       match_type: "regex"
-      name: "system_net_io"
+      name: "truenas_system_net_io"
       labels:
         job: "truenas"
         instance: "$${1}"
@@ -573,7 +573,7 @@ data:
 
     - match: 'truenas\.(.*)\.truenas_disk_stats\.(.*)\.(reads|writes)'
       match_type: "regex"
-      name: "disk_io"
+      name: "truenas_disk_io"
       labels:
         job: "truenas"
         disk: "$${2}"
@@ -583,7 +583,7 @@ data:
 
     - match: 'truenas\.(.*)\.truenas_disk_stats\.ops\.(.*)\.(read_ops|write_ops)'
       match_type: "regex"
-      name: "disk_io_ops"
+      name: "truenas_disk_io_ops"
       labels:
         job: "truenas"
         disk: "$${2}"
@@ -593,7 +593,7 @@ data:
 
     - match: 'truenas\.(.*)\.truenas_disk_stats\.busy\.(.*)\.busy'
       match_type: "regex"
-      name: "disk_busy"
+      name: "truenas_disk_busy"
       labels:
         job: "truenas"
         disk: "$${2}"
@@ -606,7 +606,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_space\.(.*)\.used'
       match_type: "regex"
-      name: "disk_bytes_used"
+      name: "truenas_disk_bytes_used"
       labels:
         job: "truenas"
         mountpoint: "$${2}"
@@ -615,7 +615,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_space\.(.*)\.avail'
       match_type: "regex"
-      name: "disk_bytes_avail"
+      name: "truenas_disk_bytes_avail"
       labels:
         job: "truenas"
         mountpoint: "$${2}"
@@ -624,7 +624,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_space\.(.*)\.reserved_for_root'
       match_type: "regex"
-      name: "disk_bytes_reserved_for_root"
+      name: "truenas_disk_bytes_reserved_for_root"
       labels:
         job: "truenas"
         mountpoint: "$${2}"
@@ -633,7 +633,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_inodes\.(.*)\.used'
       match_type: "regex"
-      name: "disk_inodes_used"
+      name: "truenas_disk_inodes_used"
       labels:
         job: "truenas"
         mountpoint: "$${2}"
@@ -642,7 +642,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_inodes\.(.*)\.avail'
       match_type: "regex"
-      name: "disk_inodes_avail"
+      name: "truenas_disk_inodes_avail"
       labels:
         job: "truenas"
         mountpoint: "$${2}"
@@ -651,7 +651,7 @@ data:
 
     - match: 'truenas\.(.*)\.disk_inodes\.(.*)\.reserved_for_root'
       match_type: "regex"
-      name: "disk_inodes_reserved_for_root"
+      name: "truenas_disk_inodes_reserved_for_root"
       labels:
         job: "truenas"
         mountpoint: "$${2}"
