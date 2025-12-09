@@ -1,0 +1,18 @@
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: audiobookshelf-backend
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: audiobookshelf-app
+  timeout:
+    http:
+      requestTimeout: 0s
+      connectionIdleTimeout: 3600s
+  tcpKeepalive:
+    probes: 3
+    idleTime: 60s
+    interval: 60s
