@@ -10,6 +10,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  dependsOn:
+    - name: volsync
+      namespace: storage
   path: ./kubernetes/apps/downloads/kapowarr/app
   prune: true
   sourceRef:

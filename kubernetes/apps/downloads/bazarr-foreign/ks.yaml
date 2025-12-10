@@ -13,6 +13,8 @@ spec:
   dependsOn:
     - name: external-secrets-stores
       namespace: external-secrets
+    - name: volsync
+      namespace: storage
   path: ./kubernetes/apps/downloads/bazarr-foreign/app
   prune: true
   sourceRef:
