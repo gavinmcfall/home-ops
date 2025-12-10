@@ -10,6 +10,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  dependsOn:
+    - name: volsync
+      namespace: storage
   path: ./kubernetes/apps/home/filebrowser/app
   prune: true
   sourceRef:
@@ -23,3 +26,7 @@ spec:
   postBuild:
     substitute:
       APP: *app
+      VOLSYNC_CAPACITY: 2Gi
+      VOLSYNC_STORAGECLASS: ceph-filesystem
+      VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
+      VOLSYNC_ACCESSMODES: ReadWriteMany
