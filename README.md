@@ -97,7 +97,8 @@ The way Flux works for me here is it will recursively search the `kubernetes/app
 
 This is a high-level look at how Flux deploys applications with dependencies. A `HelmRelease` can depend on other `HelmRelease`s, a `Kustomization` can depend on other `Kustomization`s, or an app can depend on both. Below shows that `atuin` won't deploy until `rook-ceph-cluster` is healthy.
 
-![Flux Workflow](/src/assets/graphics/flux-workflow.png)
+![Flux Workflow](./docs/src/assets/graphics/flux-workflow.png)
+
 
 ### Directories
 
@@ -122,7 +123,7 @@ This Git repository contains the following directories:
 
 ### Network Topology
 
-![Network Topology](/src/assets/graphics/network-topology.png)
+![Network Topology](./docs/src/assets/graphics/network-topology.png)
 
 ### Key Concepts
 
