@@ -153,7 +153,7 @@ spec:
                 drop:
                   - ALL
     service:
-      app:
+      qbittorrent:
         primary: true
         controller: qbittorrent
         type: LoadBalancer
@@ -201,7 +201,7 @@ spec:
             sectionName: https
         rules:
           - backendRefs:
-              - identifier: app
+              - identifier: qbittorrent
                 port: 80
     persistence:
       config:
