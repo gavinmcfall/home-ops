@@ -154,6 +154,7 @@ spec:
                   - ALL
     service:
       app:
+        primary: true
         controller: qbittorrent
         type: LoadBalancer
         annotations:
