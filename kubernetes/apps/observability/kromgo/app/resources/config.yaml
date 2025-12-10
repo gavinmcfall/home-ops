@@ -58,3 +58,14 @@ metrics:
       - { color: "green", min: 0, max: 180 }
       - { color: "orange", min: 181, max: 360 }
       - { color: "red", min: 361, max: 9999 }
+
+  - name: flux_version
+    query: gotk_reconcile_condition{kind="GitRepository",name="flux-system",status="True",type="Ready"}
+    label: app_version
+
+  - name: cluster_alert_count
+    query: count(ALERTS{alertstate="firing"}) OR vector(0)
+    colors:
+      - { color: "green", min: 0, max: 0 }
+      - { color: "orange", min: 1, max: 5 }
+      - { color: "red", min: 6, max: 9999 }
