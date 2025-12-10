@@ -60,11 +60,12 @@ metrics:
       - { color: "red", min: 361, max: 9999 }
 
   - name: flux_version
-    query: gotk_reconcile_condition{kind="GitRepository",name="flux-system",status="True",type="Ready"}
-    label: app_version
+    query: label_replace(flux_instance_info, "revision", "$1", "revision", "v(.+)@sha256:(.+)")
+    label: revision
 
   - name: cluster_alert_count
-    query: count(ALERTS{alertstate="firing"}) OR vector(0)
+    # Only count critical and warning alerts; excludes info, none (Watchdog, InfoInhibitor)
+    query: count(ALERTS{alertstate="firing", severity=~"critical|warning"}) OR vector(0)
     colors:
       - { color: "green", min: 0, max: 0 }
       - { color: "orange", min: 1, max: 5 }
