@@ -99,7 +99,7 @@ spec:
               VPN_PORT_FORWARDING_PROVIDER: protonvpn
               DOT: off
               DOT_IPV6: off
-              FIREWALL_INPUT_PORTS: 80
+              FIREWALL_INPUT_PORTS: 80,9000
               FIREWALL_OUTBOUND_SUBNETS: 10.69.0.0/16,10.96.0.0/16 # Allow access to k8s subnets
             envFrom:
               - secretRef:
@@ -132,11 +132,12 @@ spec:
                   - ALL
           seedboxapi:
             image:
-              repository: myanonamouse/seedboxapi
-              tag: latest
+              repository: ghcr.io/gavinmcfall/seedboxapi
+              tag: v1.0.1@sha256:680794a87fa6c74a8d5b8918647929a5418cedeb74f88083f766eeebf6980c06
             env:
               DEBUG: "1"
               interval: "1"
+              METRICS_PORT: "9000"
               mam_id:
                 valueFrom:
                   secretKeyRef:
@@ -164,6 +165,19 @@ spec:
           #   enabled: true
           #   port: *bittorrentPort
           #   protocol: TCP
+      seedboxapi-metrics:
+        controller: qbittorrent
+        ports:
+          metrics:
+            port: 9000
+    serviceMonitor:
+      seedboxapi:
+        serviceName: qbittorrent-seedboxapi-metrics
+        endpoints:
+          - port: metrics
+            scheme: http
+            path: /metrics
+            interval: 1m
     route:
       app:
         annotations:
