@@ -11,11 +11,8 @@ debug: true
 ui:
   title: Status | Gatus
   header: Status
-  groups:
-    - name: external
-    - name: guarded
-    - name: infrastructure
-  default-group-sort-by: group
+  default-sort-by: group
+  default-filter-by: none
   group-by-status: false
   # custom-css: |
   #   /* Adjust status colors for better color-blind accessibility */
