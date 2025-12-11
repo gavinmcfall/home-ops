@@ -4,5 +4,4 @@ resources:
   - ./helmrelease.yaml
   - ./pvc.yaml
 components:
-  - ../../../../components/keda/nfs-scaler
   - ../../../../components/volsync
