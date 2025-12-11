@@ -5,7 +5,9 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+  - ./pvc.yaml
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/guarded
-  - ../../../../components/volsync
+  # TODO: Re-enable volsync after updating backup prefix from paperless-ngx to paperless
+  # - ../../../../components/volsync
