@@ -6,5 +6,6 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
 components:
+  - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/guarded
   - ../../../../components/volsync

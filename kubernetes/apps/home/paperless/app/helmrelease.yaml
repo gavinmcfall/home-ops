@@ -126,7 +126,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: paperless-ngx
+        existingClaim: paperless
         globalMounts:
           - path: /data
           - path: /convert-tmp
