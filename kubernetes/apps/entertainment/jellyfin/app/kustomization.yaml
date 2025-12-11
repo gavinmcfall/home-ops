@@ -5,5 +5,6 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
 components:
+  - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/guarded
   - ../../../../components/volsync
