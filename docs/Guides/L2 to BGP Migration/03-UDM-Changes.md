@@ -62,7 +62,6 @@ router bgp 65001
   neighbor k8s peer-group
   neighbor k8s remote-as 65010
   neighbor k8s description Kubernetes Cluster Nodes
-  neighbor k8s ebgp-multihop 2
   !
   neighbor 10.90.3.101 peer-group k8s
   neighbor 10.90.3.102 peer-group k8s
@@ -75,7 +74,7 @@ router bgp 65001
   exit-address-family
 !
 ! Accept routes from Kubernetes LB pool only
-ip prefix-list K8S-LB-POOL seq 10 permit 10.90.3.0/24 le 32
+ip prefix-list K8S-LB-POOL seq 10 permit 10.99.8.0/24 le 32
 !
 ! Accept routes matching our LB pool
 route-map K8S-IN permit 10
@@ -117,7 +116,7 @@ All three nodes share the same configuration via peer group `k8s`.
 ### Prefix List
 
 ```
-ip prefix-list K8S-LB-POOL seq 10 permit 10.90.3.0/24 le 32
+ip prefix-list K8S-LB-POOL seq 10 permit 10.99.8.0/24 le 32
 ```
 
 Only accept routes within the LoadBalancer IP range. The `le 32` allows individual /32 routes (single IPs).
