@@ -6,7 +6,8 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./rbac.yaml
-  - ../../../../templates/gatus/guarded
+components:
+  - ../../../../components/gatus/guarded
 configMapGenerator:
   - name: dashbrr-config
     files:

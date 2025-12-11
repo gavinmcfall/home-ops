@@ -6,6 +6,6 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./oci-mariadb.yaml
-  - ../../../../templates/gatus/guarded
 components:
+  - ../../../../components/gatus/guarded
   - ../../../../components/volsync

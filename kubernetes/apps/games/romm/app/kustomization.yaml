@@ -4,8 +4,8 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  - ../../../../templates/gatus/external
 components:
+  - ../../../../components/gatus/external
   - ../../../../components/volsync
 configMapGenerator:
 - name: romm-config

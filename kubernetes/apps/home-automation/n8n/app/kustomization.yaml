@@ -6,6 +6,6 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./servicemonitor.yaml
-  - ../../../../templates/gatus/external
 components:
+  - ../../../../components/gatus/external
   - ../../../../components/volsync

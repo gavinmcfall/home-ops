@@ -5,7 +5,8 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./externalsecret.yaml
-  - ../../../../templates/gatus/guarded
+components:
+  - ../../../../components/gatus/guarded
 configMapGenerator:
   - name: searxng-config
     files:

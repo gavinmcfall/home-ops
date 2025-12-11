@@ -6,8 +6,8 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   # - ./networkpolicy.yaml
-  - ../../../../templates/gatus/guarded
 components:
+  - ../../../../components/gatus/guarded
   - ../../../../components/volsync
 configMapGenerator:
   - name: qbittorrent-scripts

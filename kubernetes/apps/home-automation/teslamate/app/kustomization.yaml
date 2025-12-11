@@ -4,7 +4,8 @@ kind: Kustomization
 resources:
   - externalsecret.yaml
   - helmrelease.yaml
-  - ../../../../templates/gatus/guarded
+components:
+  - ../../../../components/gatus/guarded
 configMapGenerator:
   - name: teslamate-datasource-tpl
     files:

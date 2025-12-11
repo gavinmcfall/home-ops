@@ -7,4 +7,5 @@ resources:
   - ./scheduledbackup.yaml
   - ./prometheusrule.yaml
   - ./service.yaml
-  - ../../../../templates/gatus/infrastructure
+components:
+  - ../../../../components/gatus/infrastructure
