@@ -11,6 +11,8 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
+    - name: volsync
+      namespace: storage
     - name: external-secrets-stores
       namespace: external-secrets
   path: ./kubernetes/apps/entertainment/jellyfin/app
