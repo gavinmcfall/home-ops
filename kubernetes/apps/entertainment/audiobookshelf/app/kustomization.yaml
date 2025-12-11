@@ -6,5 +6,6 @@ resources:
   - ./helmrelease.yaml
   - ./backendtrafficpolicy.yaml
 components:
+  - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
   - ../../../../components/volsync

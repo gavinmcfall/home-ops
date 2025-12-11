@@ -6,6 +6,7 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
 components:
+  - ../../../../components/keda/nfs-scaler
   - ../../../../components/volsync
 configMapGenerator:
   - name: radarr-configmap

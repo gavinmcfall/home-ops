@@ -6,4 +6,5 @@ resources:
   - ./securitypolicy.yaml
   - ./helmrelease.yaml
 components:
+  - ../../../../components/keda/nfs-scaler
   - ../../../../components/volsync

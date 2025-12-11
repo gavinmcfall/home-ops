@@ -7,5 +7,6 @@ resources:
   - ./helmrelease.yaml
   - ./servicemonitor.yaml
 components:
+  - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
   - ../../../../components/volsync
