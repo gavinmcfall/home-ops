@@ -9,5 +9,4 @@ resources:
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/guarded
-  # TODO: Re-enable volsync after updating backup prefix from paperless-ngx to paperless
-  # - ../../../../components/volsync
+  - ../../../../components/volsync
