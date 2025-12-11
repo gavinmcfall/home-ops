@@ -5,8 +5,18 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  - ./pvc.yaml
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/guarded
   - ../../../../components/volsync
+patches:
+  # Override volsync PVC to bind to existing PV (migrated from paperless-ngx)
+  - target:
+      kind: PersistentVolumeClaim
+      name: paperless
+    patch: |
+      - op: remove
+        path: /spec/dataSourceRef
+      - op: add
+        path: /spec/volumeName
+        value: pvc-48c5e0e4-c42c-45d9-a8f1-1d3a53c731d6
