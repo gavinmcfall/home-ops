@@ -13,3 +13,17 @@ spec:
       static:
         - citadel.internal #NAS
         # - voron.internal #3D printer current dissassembled
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/probe_v1.json
+kind: Probe
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: nfs
+spec:
+  module: tcp_connect
+  prober:
+    url: blackbox-exporter.observability.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - citadel.internal:2049
