@@ -7,4 +7,5 @@ resources:
   - ./helmrelease.yaml
   - ./servicemonitor.yaml
   - ../../../../templates/gatus/external
-  - ../../../../templates/volsync
+components:
+  - ../../../../components/volsync

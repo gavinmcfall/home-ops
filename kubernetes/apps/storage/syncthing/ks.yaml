@@ -13,6 +13,8 @@ spec:
   dependsOn:
     - name: cluster-apps-rook-ceph-cluster
       namespace: rook-ceph
+    - name: volsync
+      namespace: storage
   path: ./kubernetes/apps/storage/syncthing/app
   prune: true
   sourceRef:

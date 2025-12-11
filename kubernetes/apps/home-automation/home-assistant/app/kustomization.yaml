@@ -6,7 +6,8 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ../../../../templates/gatus/external
-  - ../../../../templates/volsync
+components:
+  - ../../../../components/volsync
 generatorOptions:
   disableNameSuffixHash: true
 configMapGenerator:
