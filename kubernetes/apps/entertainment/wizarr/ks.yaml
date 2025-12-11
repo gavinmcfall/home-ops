@@ -11,6 +11,8 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
+    - name: volsync
+      namespace: storage
     - name: plex
       namespace: entertainment
     - name: overseerr

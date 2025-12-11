@@ -10,6 +10,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  dependsOn:
+    - name: volsync
+      namespace: storage
   interval: 10m
   path: "./kubernetes/apps/entertainment/fileflows/app"
   prune: true
