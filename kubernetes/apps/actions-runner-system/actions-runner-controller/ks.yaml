@@ -32,6 +32,7 @@ spec:
   dependsOn:
     - name: actions-runner-controller
     - name: external-secrets-secrets
+      namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/actions-runner-system/actions-runner-controller/runners
   prune: true
