@@ -32,7 +32,7 @@ spec:
           sonarr:
             image:
               repository: ghcr.io/onedr0p/exportarr
-              tag: v2.0.1
+              tag: v2.3.0
             args: ["sonarr"]
             env:
               PORT: &port-sonarr 9707
@@ -79,7 +79,7 @@ spec:
           sonarr-uhd:
             image:
               repository: ghcr.io/onedr0p/exportarr
-              tag: v2.0.1
+              tag: v2.3.0
             args: ["sonarr"]
             env:
               PORT: &port-sonarr-uhd 9710
@@ -118,7 +118,7 @@ spec:
           sonarr-foreign:
             image:
               repository: ghcr.io/onedr0p/exportarr
-              tag: v2.0.1
+              tag: v2.3.0
             args: ["sonarr"]
             env:
               PORT: &port-sonarr-foreign 9711
