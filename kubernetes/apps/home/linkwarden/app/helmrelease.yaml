@@ -19,7 +19,7 @@ spec:
       linkwarden:
         annotations:
           reloader.stakater.com/auto: "true"
-        strategy: RollingUpdate
+        strategy: Recreate
         initContainers:
           init-db:
             image:
