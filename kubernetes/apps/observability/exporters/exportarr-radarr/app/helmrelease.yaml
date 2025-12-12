@@ -32,7 +32,7 @@ spec:
           radarr:
             image:
               repository: ghcr.io/onedr0p/exportarr
-              tag: v2.0.1
+              tag: v2.3.0
             args: ["radarr"]
             env:
               PORT: &port-radarr 9708
@@ -79,7 +79,7 @@ spec:
           radarr-uhd:
             image:
               repository: ghcr.io/onedr0p/exportarr
-              tag: v2.0.1
+              tag: v2.3.0
             args: ["radarr"]
             env:
               PORT: &port-radarr-uhd 9709
