@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: ghcr.io/larivierec/cloudflare-ddns
-              tag: v1.1.2@sha256:770dd8d8aa1093e5b50654cbd6f0a03f2d18e69aba9fa3c14c526c435e352433
+              tag: v1.2.0@sha256:6071610598475260d5b37d6d4ce243ffefab4d31446172aed03c843f1895ccc2
             args:
               - --zone-name
               - ${SECRET_DOMAIN}
