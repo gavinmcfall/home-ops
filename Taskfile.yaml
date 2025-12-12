@@ -28,6 +28,7 @@ includes:
   bootstrap: .taskfiles/Bootstrap
   kubernetes: .taskfiles/Kubernetes
   flux: .taskfiles/Flux
+  github: .taskfiles/Github
   repository: .taskfiles/Repository
   talos: .taskfiles/Talos
   sops: .taskfiles/Sops

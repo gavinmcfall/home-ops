@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  manage-prs:
+    desc: Interactive PR management (list, rebase, merge) with NZ timestamps
+    dir: "{{.TASKFILE_DIR}}"
+    cmd: python3 manage-prs.py
+    interactive: true
+
+  list-prs:
+    desc: List open Renovate PRs grouped by update type
+    dir: "{{.TASKFILE_DIR}}"
+    cmd: python3 pr-list.py
