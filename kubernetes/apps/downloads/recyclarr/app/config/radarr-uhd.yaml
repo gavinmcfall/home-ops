@@ -67,11 +67,12 @@ radarr:
           - dc98083864ea246d05a42df0d05f81cc # x265 (HD)
         assign_scores_to:
           - name: UHD Bluray + WEB
-            score: 0
+            score: 20
       - trash_ids:
           - 839bea857ed2c0a8e084f3cbdbd65ecb # x265 (no HDR/DV)
         assign_scores_to:
           - name: UHD Bluray + WEB
+            score: 20
 
       - trash_ids:
           # Comment out the next line if you and all of your users' setups are fully DV compatible

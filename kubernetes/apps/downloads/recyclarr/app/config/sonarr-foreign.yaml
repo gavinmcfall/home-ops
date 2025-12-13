@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
+###################################################################################################
+# Recyclarr Configuration: Sonarr Foreign                                                         #
+# Based on WEB-1080p (V4) with x265 preference and 10bit boost.                                   #
+###################################################################################################
+
+sonarr:
+  foreign:
+    base_url: http://sonarr-foreign.downloads.svc.cluster.local:80
+    api_key: !env_var SONARR_FOREIGN_API_KEY
+    delete_old_custom_formats: true
+    replace_existing_custom_formats: true
+
+    include:
+      - template: sonarr-quality-definition-series
+      - template: sonarr-v4-quality-profile-web-1080p
+      - template: sonarr-v4-custom-formats-web-1080p
+
+    custom_formats:
+      - trash_ids:
+          - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
+        assign_scores_to:
+          - name: WEB-1080p
+            score: 20
+      - trash_ids:
+          - 9b64dff695c2115facf1b6ea59c9bd07 # x265 (no HDR/DV)
+        assign_scores_to:
+          - name: WEB-1080p
+            score: 20
+      - trash_ids:
+          - b2550eb333d27b75833e25b8c2557b38 # 10bit
+        assign_scores_to:
+          - name: WEB-1080p
+            score: 10

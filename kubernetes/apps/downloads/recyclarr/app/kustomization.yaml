@@ -14,6 +14,7 @@ configMapGenerator:
       - ./config/radarr-uhd.yaml
       - ./config/radarr.yaml
       # - ./config/sonarr-anime.yaml
+      - ./config/sonarr-foreign.yaml
       - ./config/sonarr-uhd.yaml
       - ./config/sonarr.yaml
 generatorOptions:
