@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/probe_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/monitoring.coreos.com/probe_v1.json
 ---
 kind: Probe
 apiVersion: monitoring.coreos.com/v1
@@ -14,7 +14,7 @@ spec:
         - citadel.internal #NAS
         # - voron.internal #3D printer current dissassembled
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/probe_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/monitoring.coreos.com/probe_v1.json
 kind: Probe
 apiVersion: monitoring.coreos.com/v1
 metadata:

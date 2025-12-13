@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/postgres-operator.crunchydata.com/postgrescluster_v1beta1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/postgres-operator.crunchydata.com/postgrescluster_v1beta1.json
 apiVersion: postgres-operator.crunchydata.com/v1beta1
 kind: PostgresCluster
 metadata:
