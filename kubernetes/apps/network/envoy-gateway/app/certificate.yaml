@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cert-manager.io/certificate_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/cert-manager.io/certificate_v1.json
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -17,7 +17,7 @@ spec:
     - "${SECRET_DOMAIN}"
     - "*.${SECRET_DOMAIN}"
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/external-secrets.io/pushsecret_v1alpha1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/external-secrets.io/pushsecret_v1alpha1.json
 apiVersion: external-secrets.io/v1alpha1
 kind: PushSecret
 metadata:
