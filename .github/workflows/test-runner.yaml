@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Test Self-Hosted Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test Runner
+    runs-on: home-ops-runner
+    steps:
+      - name: Hello from self-hosted runner
+        run: |
+          echo "Hello from self-hosted runner!"
+          echo "Hostname: $(hostname)"
+          echo "User: $(whoami)"
+          kubectl version --client
+          echo "Runner is working!"
