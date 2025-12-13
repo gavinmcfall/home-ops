@@ -15,5 +15,4 @@ jobs:
           echo "Hello from self-hosted runner!"
           echo "Hostname: $(hostname)"
           echo "User: $(whoami)"
-          kubectl version --client
           echo "Runner is working!"
