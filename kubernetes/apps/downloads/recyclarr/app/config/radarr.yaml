@@ -13,7 +13,6 @@ radarr:
       - template: radarr-custom-formats-hd-bluray-web
 
       # Anime Templates
-      - template: radarr-quality-definition-movie
       - template: radarr-quality-profile-anime
       - template: radarr-custom-formats-anime
 
