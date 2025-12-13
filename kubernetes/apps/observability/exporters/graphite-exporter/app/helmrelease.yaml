@@ -87,7 +87,7 @@ spec:
         controller: *app
         type: LoadBalancer
         annotations:
-          io.cilium/lb-ipam-ips: 10.90.3.211
+          io.cilium/lb-ipam-ips: ${GRAPHITE_EXPORTER_LBIP}
         ports:
           metrics:
             enabled: true

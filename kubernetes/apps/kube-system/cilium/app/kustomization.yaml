@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./httproute.yaml
+  - ./networking.yaml
 configMapGenerator:
   - name: cilium-helm-values
     files:

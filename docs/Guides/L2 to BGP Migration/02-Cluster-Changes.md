@@ -42,7 +42,7 @@ Create this new file:
 ```yaml
 ---
 # What to advertise via BGP
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumBGPAdvertisement
 metadata:
   name: lb-services
@@ -62,7 +62,7 @@ spec:
             values: ["false"]
 ---
 # BGP session parameters
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumBGPPeerConfig
 metadata:
   name: udm-peer
@@ -85,7 +85,7 @@ spec:
           advertise: bgp
 ---
 # BGP peering configuration
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumBGPClusterConfig
 metadata:
   name: bgp-cluster
@@ -155,7 +155,7 @@ advertisements:
 ```bash
 cat << 'EOF' > kubernetes/apps/kube-system/cilium/config/cilium-bgp.yaml
 ---
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumBGPAdvertisement
 metadata:
   name: lb-services
@@ -173,7 +173,7 @@ spec:
             operator: NotIn
             values: ["false"]
 ---
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumBGPPeerConfig
 metadata:
   name: udm-peer
@@ -191,7 +191,7 @@ spec:
         matchLabels:
           advertise: bgp
 ---
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumBGPClusterConfig
 metadata:
   name: bgp-cluster
