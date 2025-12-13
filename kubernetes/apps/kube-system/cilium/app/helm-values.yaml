@@ -3,12 +3,13 @@ autoDirectNodeRoutes: true
 bandwidthManager:
   enabled: true
   bbr: true
+bgpControlPlane:
+  enabled: true
 bpf:
+  datapathMode: netkit
   masquerade: true
   preallocateMaps: true
   tproxy: true
-bgpControlPlane:
-  enabled: true
 cgroup:
   automount:
     enabled: false
@@ -19,13 +20,12 @@ cluster:
 cni:
   exclusive: false
 devices: "bond0"
+enableIPv4BIGTCP: true
 endpointRoutes:
   enabled: true
 envoy:
   enabled: false
 gatewayAPI:
-  enabled: false
-hubble:
   enabled: false
 ipam:
   mode: kubernetes
@@ -34,16 +34,14 @@ k8sServiceHost: 127.0.0.1
 k8sServicePort: 7445
 kubeProxyReplacement: true
 kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
-l2announcements:
-  enabled: true
 loadBalancer:
   algorithm: maglev
-  mode: snat
-socketLB:
-  enabled: true
+  mode: dsr
 localRedirectPolicy: true
 operator:
   rollOutPods: true
+pmtuDiscovery:
+  enabled: true
 rollOutCiliumPods: true
 routingMode: native
 securityContext:

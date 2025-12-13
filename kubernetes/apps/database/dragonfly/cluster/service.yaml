@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: dragonfly-lb
   annotations:
-    io.cilium/lb-ipam-ips: 10.90.3.207
+    io.cilium/lb-ipam-ips: ${DRAGONFLY_LBIP}
 spec:
   type: LoadBalancer
   ports:

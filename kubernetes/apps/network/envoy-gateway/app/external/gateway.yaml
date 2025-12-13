@@ -16,7 +16,7 @@ spec:
   gatewayClassName: envoy-external
   addresses:
     - type: IPAddress
-      value: &address "10.90.3.201"
+      value: &address "${ENVOY_EXTERNAL_LBIP}"
   infrastructure:
     annotations:
       external-dns.alpha.kubernetes.io/hostname: external.${SECRET_DOMAIN}
