@@ -13,14 +13,14 @@ spec:
       app.kubernetes.io/name: exportarr-sonarr
   endpoints:
     - port: sonarr
-      interval: 1m
-      scrapeTimeout: 30s
+      interval: 2m
+      scrapeTimeout: 1m
       path: /metrics
     - port: sonarr-uhd
       interval: 1m
       scrapeTimeout: 30s
       path: /metrics
     - port: sonarr-foreign
-      interval: 1m
-      scrapeTimeout: 30s
+      interval: 2m
+      scrapeTimeout: 45s
       path: /metrics
