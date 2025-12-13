@@ -133,7 +133,7 @@ spec:
           seedboxapi:
             image:
               repository: ghcr.io/gavinmcfall/seedboxapi
-              tag: main@sha256:46de2b2f07b7a7d67dfe9eb5de520340de083266191ba37dc6c89c8b498c7426
+              tag: main@sha256:db2cd0caf8e21fcf71be6ba998e6d0d79a51fae16b649bec5b374ad06475cd51
             env:
               interval: "1"
               METRICS_PORT: "9000"
