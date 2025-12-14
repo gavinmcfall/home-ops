@@ -29,9 +29,7 @@ Model Context Protocol (MCP) servers are configured in the root **[`.mcp.json`](
 
 **Available MCP Servers:**
 - **repoql** - Repository querying and code analysis
-- **mermaid-validator** - Validate and render Mermaid diagrams
-- **plantuml** - Generate PlantUML diagrams
-- **eraser** - Create diagrams with Eraser.io (requires `ERASER_API_KEY`)
+- **mermaid** - Validate and render Mermaid diagrams (via `@probelabs/maid-mcp`)
 
 This provides a single source of truth for MCP server configuration across all compatible tools.
 

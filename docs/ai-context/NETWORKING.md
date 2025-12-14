@@ -15,12 +15,12 @@ categories: ["Architecture[100%]", "Networking[100%]"]
 
 ## IP Address Map
 
-### Cluster LoadBalancer IPs (Cilium LB-IPAM)
+### Cluster LoadBalancer IPs (Cilium LB-IPAM via BGP)
 
 | IP | Service | Purpose |
 |----|---------|---------|
-| 10.90.3.201 | external gateway | Public traffic ingress (via Cloudflare) |
-| 10.90.3.202 | internal gateway | Private traffic ingress (LAN direct) |
+| 10.99.8.201 | external gateway | Public traffic ingress (via Cloudflare) |
+| 10.99.8.202 | internal gateway | Private traffic ingress (LAN direct) |
 
 ### Node IPs
 
@@ -44,7 +44,7 @@ These A records are manually configured in the UDM Pro:
 
 | Record | IP | Purpose |
 |--------|----|---------|
-| `internal.${SECRET_DOMAIN}` | 10.90.3.202 | Points to internal gateway |
+| `internal.${SECRET_DOMAIN}` | 10.99.8.202 | Points to internal gateway |
 | `stanton-01.internal` | 10.90.3.101 | Node 1 direct access |
 | `stanton-02.internal` | 10.90.3.102 | Node 2 direct access |
 | `stanton-03.internal` | 10.90.3.103 | Node 3 direct access |
@@ -95,7 +95,7 @@ route:
 **LAN Access Path**:
 ```
 LAN Client → UDM DNS (no record) → Cloudflare DNS → Cloudflare edge →
-cloudflared tunnel → external gateway (10.90.3.201) → App
+cloudflared tunnel → external gateway (10.99.8.201) → App
 ```
 
 ### Pattern 2: Internal Only (LAN Access)
@@ -116,7 +116,7 @@ route:
 
 **LAN Access Path**:
 ```
-LAN Client → UDM DNS → 10.90.3.202 → internal gateway → App
+LAN Client → UDM DNS → 10.99.8.202 → internal gateway → App
 ```
 
 **Internet Access**: Not available (no Cloudflare record)
@@ -151,8 +151,8 @@ route:
 
 | Client Location | DNS Response | Gateway | Path |
 |-----------------|--------------|---------|------|
-| Internet | Cloudflare IP | external (10.90.3.201) | Via tunnel |
-| LAN | 10.90.3.202 | internal (10.90.3.202) | Direct |
+| Internet | Cloudflare IP | external (10.99.8.201) | Via tunnel |
+| LAN | 10.99.8.202 | internal (10.99.8.202) | Direct |
 
 ---
 
@@ -229,57 +229,87 @@ spec:
 
 ### Capsule: CiliumNetworking
 
-**Invariant**: Cilium replaces kube-proxy with eBPF, provides LoadBalancer IPs via L2 announcements, and enables socket-level load balancing for optimal performance.
+**Invariant**: Cilium replaces kube-proxy with eBPF, provides LoadBalancer IPs via BGP route advertisements to the UDM Pro, and uses Direct Server Return (DSR) mode for optimal performance.
 
 ### Key Features Enabled
 
 | Feature | Config | Purpose |
 |---------|--------|---------|
 | **kubeProxyReplacement** | `true` | eBPF-based service routing, replaces iptables |
-| **socketLB** | `enabled: true` | Socket-level LB bypasses network stack for local traffic |
-| **l2announcements** | `enabled: true` | ARP announcements for LoadBalancer IPs |
-| **LB-IPAM** | Pool: `10.90.3.0/16` | Automatic IP allocation for LoadBalancer services |
+| **bgpControlPlane** | `enabled: true` | BGP route advertisements to upstream router |
+| **loadBalancer.mode** | `dsr` | Direct Server Return - preserves client IP, lower latency |
+| **LB-IPAM** | Pool: `10.99.8.0/24` | Automatic IP allocation for LoadBalancer services |
 | **bandwidthManager** | `enabled: true, bbr: true` | TCP BBR congestion control |
 | **bpf.masquerade** | `true` | eBPF-based SNAT for pod egress |
+| **bpf.datapathMode** | `netkit` | Modern eBPF datapath for better performance |
 
-### Socket-Level Load Balancing
+### BGP Configuration
 
-**What it does**: When a pod connects to a ClusterIP service, Cilium intercepts at the socket level and connects directly to the backend pod, bypassing the full network stack.
-
-**Benefits**:
-- Lower latency (no NAT/conntrack overhead)
-- Better performance for service mesh patterns
-- Reduced CPU usage
-
-### L2 Announcements and LB-IPAM
+The cluster uses BGP to advertise LoadBalancer IPs to the UDM Pro router, eliminating hairpin routing issues that occurred with L2 announcements.
 
 ```yaml
-# kubernetes/apps/kube-system/cilium/config/cilium-l2.yaml
-apiVersion: cilium.io/v2alpha1
-kind: CiliumL2AnnouncementPolicy
+# kubernetes/apps/kube-system/cilium/app/networking.yaml
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPAdvertisement
 metadata:
-  name: l2-policy
+  name: lb-services
 spec:
-  loadBalancerIPs: true
+  advertisements:
+    - advertisementType: "Service"
+      service:
+        addresses:
+          - LoadBalancerIP
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPPeerConfig
+metadata:
+  name: udm-peer
+spec:
+  timers:
+    holdTimeSeconds: 90
+    keepAliveTimeSeconds: 30
+  gracefulRestart:
+    enabled: true
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPClusterConfig
+metadata:
+  name: bgp-cluster
+spec:
   nodeSelector:
     matchLabels:
       kubernetes.io/os: linux
+  bgpInstances:
+    - name: "home-cluster"
+      localASN: 65010
+      peers:
+        - name: "udm-pro"
+          peerAddress: "10.90.254.1"
+          peerASN: 65001
 ---
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumLoadBalancerIPPool
 metadata:
-  name: l2-pool
+  name: lb-pool
 spec:
-  allowFirstLastIPs: "Yes"
+  allowFirstLastIPs: "No"
   blocks:
-    - cidr: "10.90.3.0/16"
+    - cidr: "10.99.8.0/24"
 ```
+
+### Why BGP Instead of L2
+
+With L2 announcements, one node "owned" a LoadBalancer IP via ARP. This caused hairpin routing issues when pods on the same node tried to reach the LoadBalancer IP.
+
+**BGP solves this**: The UDM Pro learns routes to LoadBalancer IPs and handles routing at L3. Traffic always goes through the router, so pods on any node can reach any LoadBalancer IP regardless of where the backend runs.
 
 **How IPs are assigned**:
 1. Service created with `type: LoadBalancer`
-2. Annotation `io.cilium/lb-ipam-ips: "10.90.3.XXX"` requests specific IP
-3. Cilium assigns IP from pool, announces via ARP
-4. Traffic to that IP routes to service
+2. Annotation `io.cilium/lb-ipam-ips: "10.99.8.XXX"` requests specific IP
+3. Cilium assigns IP from pool, advertises via BGP to UDM Pro
+4. UDM Pro adds route to its routing table
+5. Traffic routes through UDM to the correct node
 
 ---
 
@@ -299,7 +329,7 @@ spec:
 
 When an app is deployed with routing annotations, DNS records are created automatically:
 
-- **external-dns-unifi** watches HTTPRoutes with `internal-dns.alpha.kubernetes.io/target` annotation and creates A records in UDM pointing to the internal gateway (10.90.3.202)
+- **external-dns-unifi** watches HTTPRoutes with `internal-dns.alpha.kubernetes.io/target` annotation and creates A records in UDM pointing to the internal gateway (10.99.8.202)
 - **external-dns** watches HTTPRoutes with `external-dns.alpha.kubernetes.io/target` annotation and creates CNAMEs in Cloudflare
 
 Apps without the internal annotation have no UDM record, so LAN clients fall through to Cloudflare DNS and access via the tunnel.
@@ -319,7 +349,7 @@ Apps without the internal annotation have no UDM record, so LAN clients fall thr
 
 ```
 1. Client queries: app.${SECRET_DOMAIN}
-2. UDM DNS responds: 10.90.3.202 (internal gateway)
+2. UDM DNS responds: 10.99.8.202 (internal gateway)
    └── Record created by external-dns-unifi
 3. Client connects directly to internal gateway
 4. No hairpin, no tunnel traversal
@@ -330,7 +360,7 @@ Apps without the internal annotation have no UDM record, so LAN clients fall thr
 ```
 1. Pod queries: app.${SECRET_DOMAIN}
 2. CoreDNS forwards to /etc/resolv.conf (UDM: 10.90.254.1)
-3. UDM DNS responds: 10.90.3.202 (internal gateway)
+3. UDM DNS responds: 10.99.8.202 (internal gateway)
 4. Pod connects to gateway → service
 ```
 
@@ -339,7 +369,7 @@ Apps without the internal annotation have no UDM record, so LAN clients fall thr
 ```
 1. Client queries: app.${SECRET_DOMAIN}
 2. Tailscale Split DNS forwards to UDM (10.90.254.1)
-3. UDM DNS responds: 10.90.3.202 (internal gateway)
+3. UDM DNS responds: 10.99.8.202 (internal gateway)
 4. Client connects via WireGuard mesh to internal gateway
 ```
 
@@ -376,7 +406,7 @@ This simplified configuration forwards all non-cluster DNS queries to the upstre
 2. Cloudflare DNS returns Cloudflare edge IP
 3. Cloudflare terminates TLS, applies WAF rules
 4. Traffic tunneled via QUIC to cloudflared pod
-5. cloudflared forwards to external gateway (10.90.3.201)
+5. cloudflared forwards to external gateway (10.99.8.201)
 6. Gateway terminates TLS, routes via HTTPRoute
 
 ### Internal Traffic (LAN → App)
@@ -384,7 +414,7 @@ This simplified configuration forwards all non-cluster DNS queries to the upstre
 ![claude_network_external_traffic_lan-to-app](./images/claude_network_external_traffic_lan-to-app.png)
 
 1. User requests `app.${SECRET_DOMAIN}`
-2. UDM DNS returns 10.90.3.202 (if internal route exists)
+2. UDM DNS returns 10.99.8.202 (if internal route exists)
 3. Direct HTTPS to internal gateway
 4. Gateway terminates TLS, routes via HTTPRoute
 
@@ -403,10 +433,10 @@ metadata:
 spec:
   gatewayClassName: envoy-external
   addresses:
-    - value: "10.90.3.201"
+    - value: "${ENVOY_EXTERNAL_LBIP}"  # 10.99.8.201
   infrastructure:
     annotations:
-      io.cilium/lb-ipam-ips: "10.90.3.201"
+      io.cilium/lb-ipam-ips: "${ENVOY_EXTERNAL_LBIP}"
   listeners:
     - name: https
       port: 443
@@ -428,10 +458,10 @@ metadata:
 spec:
   gatewayClassName: envoy-internal
   addresses:
-    - value: "10.90.3.202"
+    - value: "${ENVOY_INTERNAL_LBIP}"  # 10.99.8.202
   infrastructure:
     annotations:
-      lbipam.cilium.io/ips: "10.90.3.202"
+      io.cilium/lb-ipam-ips: "${ENVOY_INTERNAL_LBIP}"
   listeners:
     - name: https
       port: 443
@@ -537,13 +567,13 @@ kubectl get pods -n network -l app.kubernetes.io/name=cloudflared
 
 | Claim | Source | Namespace | Confidence |
 |-------|--------|-----------|------------|
-| External gateway at 10.90.3.201 | [`envoy-gateway/app/external/gateway.yaml:19`](../../kubernetes/apps/network/envoy-gateway/app/external/gateway.yaml#L19) | network | Verified |
-| Internal gateway at 10.90.3.202 | [`envoy-gateway/app/internal/gateway.yaml:19`](../../kubernetes/apps/network/envoy-gateway/app/internal/gateway.yaml#L19) | network | Verified |
-| Cilium LB-IPAM pool 10.90.3.0/16 | [`cilium/config/cilium-l2.yaml:24`](../../kubernetes/apps/kube-system/cilium/config/cilium-l2.yaml#L24) | kube-system | Verified |
-| Cilium socketLB enabled | [`cilium/app/helm-values.yaml:42`](../../kubernetes/apps/kube-system/cilium/app/helm-values.yaml#L42) | kube-system | Verified |
-| external-dns filters by annotation | [`external-dns/app/helmrelease.yaml:40`](../../kubernetes/apps/network/external-dns/app/helmrelease.yaml#L40) | network | Verified |
+| External gateway at 10.99.8.201 | [`envoy-gateway/app/external/gateway.yaml:19`](../../kubernetes/apps/network/envoy-gateway/app/external/gateway.yaml#L19) | network | Verified |
+| Internal gateway at 10.99.8.202 | [`envoy-gateway/app/internal/gateway.yaml:19`](../../kubernetes/apps/network/envoy-gateway/app/internal/gateway.yaml#L19) | network | Verified |
+| Cilium LB-IPAM pool 10.99.8.0/24 | [`cilium/app/networking.yaml:68`](../../kubernetes/apps/kube-system/cilium/app/networking.yaml#L68) | kube-system | Verified |
+| Cilium BGP config | [`cilium/app/networking.yaml`](../../kubernetes/apps/kube-system/cilium/app/networking.yaml) | kube-system | Verified |
+| external-dns filters by annotation | [`external-dns/app/helmrelease.yaml`](../../kubernetes/apps/network/external-dns/app/helmrelease.yaml) | network | Verified |
 | external-dns-unifi filters by internal annotation | [`external-dns-unifi/app/helmrelease.yaml`](../../kubernetes/apps/network/external-dns-unifi/app/helmrelease.yaml) | network | Verified |
 | CoreDNS forwards to upstream (UDM) | [`coredns/app/helm-values.yaml`](../../kubernetes/apps/kube-system/coredns/app/helm-values.yaml) | kube-system | Verified |
 | bentopdf OIDC via SecurityPolicy | [`bentopdf/app/securitypolicy.yaml`](../../kubernetes/apps/home/bentopdf/app/securitypolicy.yaml) | home | Verified |
-| Pocket-ID dual-homed (both gateways) | [`pocket-id/app/helmrelease.yaml:90-108`](../../kubernetes/apps/security/pocket-id/app/helmrelease.yaml#L90) | security | Verified |
+| Pocket-ID dual-homed (both gateways) | [`pocket-id/app/helmrelease.yaml`](../../kubernetes/apps/security/pocket-id/app/helmrelease.yaml) | security | Verified |
 
