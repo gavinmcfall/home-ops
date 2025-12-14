@@ -191,21 +191,25 @@ home-ops/
 
 | Namespace | Purpose | Key Apps |
 |-----------|---------|----------|
+| actions-runner-system | GitHub Actions | actions-runner-controller |
 | cert-manager | TLS certificates | cert-manager |
-| database | Data stores | postgres, mariadb, dragonfly, mosquitto |
-| downloads | Media acquisition | prowlarr, radarr, sonarr, qbittorrent |
-| entertainment | Media serving | plex, jellyfin, audiobookshelf |
+| database | Data stores | cloudnative-pg, mariadb, dragonfly, mosquitto |
+| downloads | Media acquisition | prowlarr, radarr, sonarr, qbittorrent, sabnzbd |
+| entertainment | Media serving | plex, jellyfin, audiobookshelf, immich, overseerr |
 | external-secrets | Secret sync | external-secrets operator |
 | flux-system | GitOps | flux, weave-gitops |
 | games | Gaming | romm |
-| home | Home apps | homepage, linkwarden |
-| home-automation | IoT | home-assistant |
+| home | Home apps | homepage, linkwarden, paperless, bookstack, searxng |
+| home-automation | IoT | home-assistant, n8n, teslamate |
 | kube-system | Core k8s | cilium, coredns, metrics-server |
-| network | Networking | cloudflared, external-dns, gateways |
-| observability | Monitoring | prometheus, grafana |
+| network | Networking | cloudflared, external-dns, envoy-gateway, tailscale |
+| observability | Monitoring | kube-prometheus-stack, grafana, loki, gatus |
 | openebs-system | Storage | openebs |
+| plane | Project mgmt | plane |
 | rook-ceph | Distributed storage | ceph cluster |
 | security | Auth | pocket-id |
+| storage | Backup/sync | kopia, volsync, syncthing, snapshot-controller |
+| system-upgrade | Updates | tuppr |
 
 ---
 

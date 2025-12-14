@@ -242,6 +242,6 @@ task kubernetes:network ns=downloads
 
 | Claim | Source | Confidence |
 |-------|--------|------------|
-| task configure runs template+encrypt+validate | `Taskfile.yaml:53-60` | Verified |
+| task configure runs template+encrypt+validate | `Taskfile.yaml:55-62` | Verified |
 | flux:apply targets specific apps | `.taskfiles/Flux/Taskfile.yaml:26-51` | Verified |
 | kubernetes:sync-secrets forces refresh | `.taskfiles/Kubernetes/Taskfile.yaml:38-55` | Verified |
