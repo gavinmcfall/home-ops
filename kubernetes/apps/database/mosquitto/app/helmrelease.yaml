@@ -139,6 +139,10 @@ spec:
     persistence:
       data:
         existingClaim: mosquitto
+        advancedMounts:
+          mosquitto:
+            app:
+              - path: /mosquitto/data
       config-file:
         type: configMap
         name: mosquitto-configmap
