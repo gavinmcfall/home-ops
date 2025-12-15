@@ -37,6 +37,10 @@ spec:
               UN_WEBSERVER_METRICS: true
               UN_WEBSERVER_LOG_FILE: /logs/webserver.log
               UN_ACTIVITY: true
+              # Webhook - Notifiarr
+              UN_WEBHOOK_0_NAME: Notifiarr
+              UN_WEBHOOK_0_EVENTS_0: "0"
+              # Sonarr
               UN_SONARR_0_URL: http://sonarr.downloads.svc.cluster.local
               UN_SONARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr
               UN_RADARR_0_URL: http://radarr.downloads.svc.cluster.local
