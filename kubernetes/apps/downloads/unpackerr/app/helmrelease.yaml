@@ -43,8 +43,15 @@ spec:
               # Sonarr
               UN_SONARR_0_URL: http://sonarr.downloads.svc.cluster.local
               UN_SONARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr
+              UN_SONARR_1_URL: http://sonarr-uhd.downloads.svc.cluster.local
+              UN_SONARR_1_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr-uhd
+              UN_SONARR_2_URL: http://sonarr-foreign.downloads.svc.cluster.local
+              UN_SONARR_2_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr-foreign
+              # Radarr
               UN_RADARR_0_URL: http://radarr.downloads.svc.cluster.local
               UN_RADARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/radarr
+              UN_RADARR_1_URL: http://radarr-uhd.downloads.svc.cluster.local
+              UN_RADARR_1_PATHS_0: /media/Downloads/qbittorrent/complete/radarr-uhd
             envFrom:
               - secretRef:
                   name: unpackerr-secret
