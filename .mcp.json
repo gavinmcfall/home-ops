@@ -5,14 +5,17 @@
       "command": "/home/gavin/mcp/repoql",
       "args": [
         "mcp"
-      ]
+      ],
+      "env": {}
     },
     "mermaid": {
+      "type": "stdio",
       "command": "npx",
       "args": [
         "-y",
         "@probelabs/maid-mcp"
-      ]
+      ],
+      "env": {}
     }
   }
 }
