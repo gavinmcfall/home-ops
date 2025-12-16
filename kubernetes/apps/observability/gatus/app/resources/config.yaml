@@ -72,6 +72,13 @@ ui:
   #     border-color: #edae49 !important;
   #   }
 alerting:
+  discord:
+    webhook-url: $${DISCORD_WEBHOOK_PRIORITY}
+    default-alert:
+      description: health-check failed
+      send-on-resolved: true
+      failure-threshold: 10
+      success-threshold: 3
   pushover:
     title: Gatus
     application-token: $${PUSHOVER_TOKEN}
@@ -96,6 +103,7 @@ endpoints:
     conditions:
       - "[STATUS] == 200"
     alerts:
+      - type: discord
       - type: pushover
   - name: flux-webhook
     group: external
@@ -106,4 +114,5 @@ endpoints:
     conditions:
       - "[STATUS] == 404"
     alerts:
+      - type: discord
       - type: pushover

@@ -12,3 +12,4 @@ resources:
   - ./flux-instance/ks.yaml
   - ./flux-operator/ks.yaml
   - ./weave-gitops/ks.yaml
+  - ../../components/common/alerts/discord-flux
