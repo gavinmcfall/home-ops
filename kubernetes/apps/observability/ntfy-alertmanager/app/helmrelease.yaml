@@ -30,7 +30,7 @@ spec:
               tag: "0.5.0"
             args:
               - --config
-              - /etc/ntfy-alertmanager/config.yaml
+              - /etc/ntfy-alertmanager/config.scfg
             env:
               TZ: ${TIMEZONE}
             probes:
@@ -68,6 +68,6 @@ spec:
         type: configMap
         name: ntfy-alertmanager-config
         globalMounts:
-          - path: /etc/ntfy-alertmanager/config.yaml
-            subPath: config.yaml
+          - path: /etc/ntfy-alertmanager/config.scfg
+            subPath: config.scfg
             readOnly: true
