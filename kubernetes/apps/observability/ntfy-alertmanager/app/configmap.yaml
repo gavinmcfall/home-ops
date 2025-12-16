@@ -5,12 +5,11 @@ metadata:
   name: ntfy-alertmanager-config
 data:
   config.scfg: |
-    base-url http://ntfy.observability.svc.cluster.local
     http-address :8080
     log-level info
 
     ntfy {
-      topic k8s-alerts
+      topic http://ntfy.observability.svc.cluster.local/k8s-alerts
       priority default
     }
 
