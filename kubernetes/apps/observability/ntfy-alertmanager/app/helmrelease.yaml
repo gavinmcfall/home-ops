@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ntfy-alertmanager
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: alertmanager-ntfy
+  interval: 1h
+  values:
+    config:
+      baseURL: http://ntfy.observability.svc.cluster.local
+      httpAddress: ":8080"
+      logLevel: info
+      ntfy:
+        topic: k8s-alerts
+        priority: default
+      alertmanager:
+        silenceDuration: 24h
+        url: http://alertmanager-operated.observability.svc.cluster.local:9093
+      labels:
+        severity:
+          critical:
+            priority: urgent
+            tags:
+              - rotating_light
+              - skull
+          warning:
+            priority: high
+            tags:
+              - warning
+          info:
+            priority: default
+            tags:
+              - information_source
+      resolved:
+        tags:
+          - white_check_mark
