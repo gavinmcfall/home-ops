@@ -11,8 +11,8 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: immich-postgres
-      namespace: entertainment
+    - name: cloudnative-pg-immich18
+      namespace: database
   path: ./kubernetes/apps/entertainment/immich/app
   prune: true
   sourceRef:
@@ -26,28 +26,3 @@ spec:
   postBuild:
     substitute:
       APP: *app
----
-# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/kustomize.toolkit.fluxcd.io/kustomization_v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: &app immich-postgres
-  namespace: &namespace entertainment
-spec:
-  targetNamespace: *namespace
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/entertainment/immich/postgres
-  dependsOn:
-    - name: crunchy-operator
-      namespace: database
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  wait: false
-  interval: 30m
-  retryInterval: 1m
-  timeout: 5m

@@ -1,0 +1,23 @@
+---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: immich18-b2
+  namespace: database
+spec:
+  configuration:
+    data:
+      compression: bzip2
+    wal:
+      compression: bzip2
+      maxParallel: 8
+    destinationPath: s3://nerdz-immich-postgres/
+    endpointURL: https://s3.us-east-005.backblazeb2.com
+    s3Credentials:
+      accessKeyId:
+        name: immich-cnpg-secret
+        key: b2-access-key-id
+      secretAccessKey:
+        name: immich-cnpg-secret
+        key: b2-secret-access-key
+  retentionPolicy: 14d

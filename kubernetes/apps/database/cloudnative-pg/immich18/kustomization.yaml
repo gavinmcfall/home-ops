@@ -2,9 +2,11 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-components:
-  - ../../../../components/keda/nfs-scaler
 resources:
   - ./externalsecret.yaml
-  - ./ocirepository.yaml
-  - ./helmrelease.yaml
+  - ./objectstore-b2.yaml
+  - ./objectstore-r2.yaml
+  - ./cluster.yaml
+  - ./pooler.yaml
+  - ./scheduledbackup.yaml
+  - ./service.yaml

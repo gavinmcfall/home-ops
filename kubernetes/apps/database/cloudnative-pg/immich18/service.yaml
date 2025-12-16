@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich18-lb
+  namespace: database
+  annotations:
+    io.cilium/lb-ipam-ips: ${POSTGRES18_IMMICH_LBIP}
+spec:
+  type: LoadBalancer
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    cnpg.io/cluster: immich18
+    role: primary
