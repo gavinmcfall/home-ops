@@ -1,0 +1,104 @@
+---
+name: Discord Notifications
+
+on:
+  issues:
+    types: [opened, closed, reopened]
+  pull_request:
+    types: [opened, closed, reopened]
+
+jobs:
+  notify:
+    name: Send Discord Notification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Issue Opened
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
+          nodetail: true
+          title: "New Issue #${{ github.event.issue.number }}"
+          description: |
+            **${{ github.event.issue.title }}**
+            by ${{ github.event.issue.user.login }}
+          color: 0x238636
+          url: ${{ github.event.issue.html_url }}
+
+      - name: Issue Closed
+        if: github.event_name == 'issues' && github.event.action == 'closed'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
+          nodetail: true
+          title: "Issue Closed #${{ github.event.issue.number }}"
+          description: |
+            **${{ github.event.issue.title }}**
+            by ${{ github.actor }}
+          color: 0x8957e5
+          url: ${{ github.event.issue.html_url }}
+
+      - name: Issue Reopened
+        if: github.event_name == 'issues' && github.event.action == 'reopened'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
+          nodetail: true
+          title: "Issue Reopened #${{ github.event.issue.number }}"
+          description: |
+            **${{ github.event.issue.title }}**
+            by ${{ github.actor }}
+          color: 0xf0883e
+          url: ${{ github.event.issue.html_url }}
+
+      - name: PR Opened
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
+          nodetail: true
+          title: "New PR #${{ github.event.pull_request.number }}"
+          description: |
+            **${{ github.event.pull_request.title }}**
+            by ${{ github.event.pull_request.user.login }}
+          color: 0x238636
+          url: ${{ github.event.pull_request.html_url }}
+
+      - name: PR Merged
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
+          nodetail: true
+          title: "PR Merged #${{ github.event.pull_request.number }}"
+          description: |
+            **${{ github.event.pull_request.title }}**
+            by ${{ github.actor }}
+          color: 0x8957e5
+          url: ${{ github.event.pull_request.html_url }}
+
+      - name: PR Closed (not merged)
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
+          nodetail: true
+          title: "PR Closed #${{ github.event.pull_request.number }}"
+          description: |
+            **${{ github.event.pull_request.title }}**
+            by ${{ github.actor }}
+          color: 0xda3633
+          url: ${{ github.event.pull_request.html_url }}
+
+      - name: PR Reopened
+        if: github.event_name == 'pull_request' && github.event.action == 'reopened'
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
+          nodetail: true
+          title: "PR Reopened #${{ github.event.pull_request.number }}"
+          description: |
+            **${{ github.event.pull_request.title }}**
+            by ${{ github.actor }}
+          color: 0xf0883e
+          url: ${{ github.event.pull_request.html_url }}
