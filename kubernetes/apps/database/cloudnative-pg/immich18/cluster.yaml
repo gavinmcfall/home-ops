@@ -40,6 +40,9 @@ spec:
   monitoring:
     enablePodMonitor: true
 
+  backup:
+    retentionPolicy: 14d
+
   # Barman Cloud Plugin for backups (B2 primary, R2 secondary)
   plugins:
     - name: barman-cloud.cloudnative-pg.io
