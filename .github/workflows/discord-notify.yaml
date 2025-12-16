@@ -18,7 +18,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
-          title: "New Issue #${{ github.event.issue.number }}"
+          title: "${{ github.repository }} - New Issue #${{ github.event.issue.number }}"
           description: |
             **${{ github.event.issue.title }}**
             by ${{ github.event.issue.user.login }}
@@ -31,7 +31,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
-          title: "Issue Closed #${{ github.event.issue.number }}"
+          title: "${{ github.repository }} - Issue Closed #${{ github.event.issue.number }}"
           description: |
             **${{ github.event.issue.title }}**
             by ${{ github.actor }}
@@ -44,7 +44,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
-          title: "Issue Reopened #${{ github.event.issue.number }}"
+          title: "${{ github.repository }} - Issue Reopened #${{ github.event.issue.number }}"
           description: |
             **${{ github.event.issue.title }}**
             by ${{ github.actor }}
@@ -57,7 +57,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
-          title: "New PR #${{ github.event.pull_request.number }}"
+          title: "${{ github.repository }} - New PR #${{ github.event.pull_request.number }}"
           description: |
             **${{ github.event.pull_request.title }}**
             by ${{ github.event.pull_request.user.login }}
@@ -70,7 +70,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
-          title: "PR Merged #${{ github.event.pull_request.number }}"
+          title: "${{ github.repository }} - PR Merged #${{ github.event.pull_request.number }}"
           description: |
             **${{ github.event.pull_request.title }}**
             by ${{ github.actor }}
@@ -83,7 +83,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
-          title: "PR Closed #${{ github.event.pull_request.number }}"
+          title: "${{ github.repository }} - PR Closed #${{ github.event.pull_request.number }}"
           description: |
             **${{ github.event.pull_request.title }}**
             by ${{ github.actor }}
@@ -96,7 +96,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
-          title: "PR Reopened #${{ github.event.pull_request.number }}"
+          title: "${{ github.repository }} - PR Reopened #${{ github.event.pull_request.number }}"
           description: |
             **${{ github.event.pull_request.title }}**
             by ${{ github.actor }}
