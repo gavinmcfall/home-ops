@@ -3,7 +3,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Pooler
 metadata:
-  name: immich18-rw
+  name: immich18-pooler
   namespace: database
 spec:
   cluster:
