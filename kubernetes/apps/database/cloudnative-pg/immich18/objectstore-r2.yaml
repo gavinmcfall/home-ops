@@ -11,7 +11,7 @@ spec:
     wal:
       compression: bzip2
       maxParallel: 8
-    destinationPath: s3://${IMMICH_PG_BACKUP_R2_BUCKET}/
+    destinationPath: s3://nerdz-immich-postgres/
     endpointURL: https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
     s3Credentials:
       accessKeyId:
