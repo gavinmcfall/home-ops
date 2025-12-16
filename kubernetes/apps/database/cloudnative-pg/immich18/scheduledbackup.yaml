@@ -9,6 +9,7 @@ spec:
   schedule: "@daily"
   immediate: true
   backupOwnerReference: self
+  method: plugin
   cluster:
     name: immich18
   pluginConfiguration:
@@ -26,6 +27,7 @@ spec:
   schedule: "@daily"
   immediate: true
   backupOwnerReference: self
+  method: plugin
   cluster:
     name: immich18
   pluginConfiguration:
