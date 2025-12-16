@@ -7,7 +7,7 @@ metadata:
 spec:
   providerRef:
     name: discord-flux
-  eventSeverity: info
+  eventSeverity: error
   eventSources:
     - kind: FluxInstance
       name: "*"
