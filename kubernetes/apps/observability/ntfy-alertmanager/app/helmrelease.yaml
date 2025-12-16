@@ -10,6 +10,8 @@ spec:
     name: alertmanager-ntfy
   interval: 1h
   values:
+    image:
+      tag: "0.5.0"
     config:
       baseURL: http://ntfy.observability.svc.cluster.local
       httpAddress: ":8080"
