@@ -3,10 +3,10 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: immich18-daily
+  name: immich18-daily-b2
   namespace: database
 spec:
-  schedule: "@daily"
+  schedule: "0 3 * * *"
   immediate: true
   backupOwnerReference: self
   method: plugin
@@ -15,3 +15,25 @@ spec:
     name: immich18
   pluginConfiguration:
     name: pgbackrest.dalibo.com
+    parameters:
+      selectedRepository: "1"
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/postgresql.cnpg.io/scheduledbackup_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: immich18-daily-r2
+  namespace: database
+spec:
+  # Offset by 1 hour from B2 backup to avoid concurrent runs
+  schedule: "0 4 * * *"
+  immediate: false
+  backupOwnerReference: self
+  method: plugin
+  target: primary
+  cluster:
+    name: immich18
+  pluginConfiguration:
+    name: pgbackrest.dalibo.com
+    parameters:
+      selectedRepository: "2"
