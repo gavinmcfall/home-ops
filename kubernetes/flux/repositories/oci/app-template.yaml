@@ -13,5 +13,3 @@ spec:
   ref:
     tag: 4.5.0
   url: oci://ghcr.io/bjw-s-labs/helm/app-template
-  verify:
-    provider: cosign
