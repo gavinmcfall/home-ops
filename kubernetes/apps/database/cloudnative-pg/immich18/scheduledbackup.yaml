@@ -10,6 +10,7 @@ spec:
   immediate: true
   backupOwnerReference: self
   method: plugin
+  target: primary
   cluster:
     name: immich18
   pluginConfiguration:
