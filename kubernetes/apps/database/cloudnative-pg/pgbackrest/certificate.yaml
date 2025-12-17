@@ -34,12 +34,12 @@ metadata:
   name: pgbackrest-controller-server
   namespace: database
 spec:
-  commonName: pgbackrest
+  commonName: cnpg-pgbackrest
   dnsNames:
-    - pgbackrest
-    - pgbackrest.database
-    - pgbackrest.database.svc
-    - pgbackrest.database.svc.cluster.local
+    - cnpg-pgbackrest
+    - cnpg-pgbackrest.database
+    - cnpg-pgbackrest.database.svc
+    - cnpg-pgbackrest.database.svc.cluster.local
   duration: 2160h
   isCA: false
   issuerRef:
