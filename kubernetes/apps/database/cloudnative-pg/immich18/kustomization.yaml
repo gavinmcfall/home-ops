@@ -4,8 +4,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./externalsecret.yaml
-  # NOTE: externalsecret-flux.yaml moved to pgbackrest/ folder
-  # It must be deployed before this Kustomization for Flux substitution to work
   - ./repository.yaml
   - ./cluster.yaml
   - ./pooler.yaml

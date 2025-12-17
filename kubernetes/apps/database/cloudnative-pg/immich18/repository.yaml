@@ -14,7 +14,7 @@ spec:
     processMax: 4
     s3Repositories:
       # Primary: Backblaze B2
-      - bucket: ${IMMICH_PG_BACKUP_B2_BUCKET}
+      - bucket: nerdz-immich-postgres
         endpoint: s3.us-east-005.backblazeb2.com
         region: us-east-005
         repoPath: /immich18
@@ -35,7 +35,7 @@ spec:
             name: immich-cnpg18-secret
             key: b2-secret-access-key
       # Secondary: Cloudflare R2
-      - bucket: ${IMMICH_PG_BACKUP_R2_BUCKET}
+      - bucket: nerdz-immich-postgres
         endpoint: ${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
         region: auto
         repoPath: /immich18

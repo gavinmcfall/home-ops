@@ -65,8 +65,6 @@ spec:
       namespace: database
     - name: cert-manager
       namespace: cert-manager
-    - name: external-secrets-stores
-      namespace: external-secrets
   path: ./kubernetes/apps/database/cloudnative-pg/pgbackrest
   prune: true
   sourceRef:
@@ -139,9 +137,3 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
-  postBuild:
-    substituteFrom:
-      - kind: ConfigMap
-        name: cluster-settings
-      - kind: Secret
-        name: immich-cnpg18-flux-secret

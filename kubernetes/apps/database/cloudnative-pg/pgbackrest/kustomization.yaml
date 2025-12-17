@@ -9,5 +9,3 @@ resources:
   - ./certificate.yaml
   - ./deployment.yaml
   - ./service.yaml
-  # Flux substitution secret for immich18 (must exist before immich18 Kustomization)
-  - ./externalsecret-flux.yaml
