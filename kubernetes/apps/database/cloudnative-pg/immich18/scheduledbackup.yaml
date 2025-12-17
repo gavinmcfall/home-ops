@@ -3,7 +3,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: immich18-b2
+  name: immich18-daily
   namespace: database
 spec:
   schedule: "@daily"
@@ -13,24 +13,4 @@ spec:
   cluster:
     name: immich18
   pluginConfiguration:
-    name: barman-cloud.cloudnative-pg.io
-    parameters:
-      barmanObjectName: immich18-b2
----
-# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/postgresql.cnpg.io/scheduledbackup_v1.json
-apiVersion: postgresql.cnpg.io/v1
-kind: ScheduledBackup
-metadata:
-  name: immich18-r2
-  namespace: database
-spec:
-  schedule: "@daily"
-  immediate: true
-  backupOwnerReference: self
-  method: plugin
-  cluster:
-    name: immich18
-  pluginConfiguration:
-    name: barman-cloud.cloudnative-pg.io
-    parameters:
-      barmanObjectName: immich18-r2
+    name: pgbackrest.dalibo.com

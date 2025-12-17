@@ -40,17 +40,11 @@ spec:
   monitoring:
     enablePodMonitor: true
 
-  backup:
-    retentionPolicy: 14d
-
-  # Barman Cloud Plugin for backups (B2 primary, R2 secondary)
+  # pgBackRest Plugin for backups (B2 + R2 dual destination)
   plugins:
-    - name: barman-cloud.cloudnative-pg.io
-      enabled: true
-      isWALArchiver: true
+    - name: pgbackrest.dalibo.com
       parameters:
-        barmanObjectName: immich18-b2
-        serverName: immich18-v1
+        repositoryRef: immich18-repository
 
   bootstrap:
     initdb:

@@ -2,10 +2,10 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: database
 resources:
-  - ./externalsecret.yaml
-  - ./repository.yaml
-  - ./cluster.yaml
-  - ./pooler.yaml
-  - ./scheduledbackup.yaml
+  - ./crd.yaml
+  - ./rbac.yaml
+  - ./certificate.yaml
+  - ./deployment.yaml
   - ./service.yaml

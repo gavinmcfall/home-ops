@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pgbackrest-controller
+  name: pgbackrest-controller
+  namespace: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgbackrest-controller
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: pgbackrest-controller
+    spec:
+      containers:
+        - name: pgbackrest-controller
+          image: registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - operator
+            - --server-cert=/server/tls.crt
+            - --server-key=/server/tls.key
+            - --client-cert=/client/tls.crt
+            - --server-address=:9090
+            - --log-level=debug
+          env:
+            - name: SIDECAR_IMAGE
+              value: registry.hub.docker.com/dalibo/cnpg-pgbackrest-sidecar:latest
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 9090
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /server
+              name: server
+            - mountPath: /client
+              name: client
+      serviceAccountName: pgbackrest-controller
+      volumes:
+        - name: server
+          secret:
+            secretName: pgbackrest-controller-server-tls
+        - name: client
+          secret:
+            secretName: pgbackrest-controller-client-tls

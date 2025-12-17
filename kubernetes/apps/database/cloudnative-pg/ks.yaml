@@ -53,6 +53,33 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: cloudnative-pg-pgbackrest
+  namespace: &namespace database
+spec:
+  targetNamespace: database
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: cloudnative-pg-pgbackrest
+  dependsOn:
+    - name: cloudnative-pg
+      namespace: database
+    - name: cert-manager
+      namespace: cert-manager
+  path: ./kubernetes/apps/database/cloudnative-pg/pgbackrest
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: &app cloudnative-pg-cluster17
   namespace: &namespace database
 spec:
@@ -96,7 +123,7 @@ spec:
   dependsOn:
     - name: cloudnative-pg
       namespace: database
-    - name: cloudnative-pg-barman-cloud
+    - name: cloudnative-pg-pgbackrest
       namespace: database
     - name: external-secrets-stores
       namespace: external-secrets

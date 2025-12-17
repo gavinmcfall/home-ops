@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgbackrest
+  namespace: database
+  labels:
+    app: pgbackrest-controller
+    cnpg.io/pluginName: pgbackrest.dalibo.com
+  annotations:
+    cnpg.io/pluginClientSecret: pgbackrest-controller-client-tls
+    cnpg.io/pluginServerSecret: pgbackrest-controller-server-tls
+    cnpg.io/pluginPort: "9090"
+spec:
+  ports:
+    - port: 9090
+      protocol: TCP
+      targetPort: 9090
+  selector:
+    app: pgbackrest-controller

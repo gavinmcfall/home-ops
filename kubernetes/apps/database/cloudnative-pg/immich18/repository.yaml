@@ -1,0 +1,57 @@
+---
+apiVersion: pgbackrest.dalibo.com/v1
+kind: Repository
+metadata:
+  name: immich18-repository
+  namespace: database
+spec:
+  repoConfiguration:
+    stanza: immich18
+    archive:
+      async: true
+      getQueueMax: 128MiB
+      pushQueueMax: 1GiB
+    processMax: 4
+    s3Repositories:
+      # Primary: Backblaze B2
+      - bucket: nerdz-immich-postgres
+        endpoint: s3.us-east-005.backblazeb2.com
+        region: us-east-005
+        repoPath: /immich18
+        uriStyle: path
+        verifyTLS: true
+        retentionPolicy:
+          full: 14
+          fullType: count
+          diff: 30
+          archive: 7
+          archiveType: full
+          history: 30
+        secretRef:
+          accessKeyId:
+            name: immich-cnpg-secret
+            key: b2-access-key-id
+          secretAccessKey:
+            name: immich-cnpg-secret
+            key: b2-secret-access-key
+      # Secondary: Cloudflare R2
+      - bucket: nerdz-immich-postgres
+        endpoint: ${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
+        region: auto
+        repoPath: /immich18
+        uriStyle: path
+        verifyTLS: true
+        retentionPolicy:
+          full: 14
+          fullType: count
+          diff: 30
+          archive: 7
+          archiveType: full
+          history: 30
+        secretRef:
+          accessKeyId:
+            name: immich-cnpg-secret
+            key: r2-access-key-id
+          secretAccessKey:
+            name: immich-cnpg-secret
+            key: r2-secret-access-key

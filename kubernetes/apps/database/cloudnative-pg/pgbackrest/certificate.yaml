@@ -1,0 +1,52 @@
+---
+#yaml-language-server: $schema=https://k8s-schemas.nerdz.cloud/cert-manager.io/v1beta1/issuer.json
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: pgbackrest-selfsigned-issuer
+  namespace: database
+spec:
+  selfSigned: {}
+---
+# yaml-language-server: $schema=https://k8s-schemas.nerdz.cloud/cert-manager.io/v1beta1/certificate.json
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: pgbackrest-controller-client
+  namespace: database
+spec:
+  commonName: pgbackrest-controller-client
+  duration: 2160h
+  isCA: false
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: pgbackrest-selfsigned-issuer
+  renewBefore: 360h
+  secretName: pgbackrest-controller-client-tls
+  usages:
+    - client auth
+---
+# yaml-language-server: $schema=https://k8s-schemas.nerdz.cloud/cert-manager.io/v1beta1/certificate.json
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: pgbackrest-controller-server
+  namespace: database
+spec:
+  commonName: pgbackrest
+  dnsNames:
+    - pgbackrest
+    - pgbackrest.database
+    - pgbackrest.database.svc
+    - pgbackrest.database.svc.cluster.local
+  duration: 2160h
+  isCA: false
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: pgbackrest-selfsigned-issuer
+  renewBefore: 360h
+  secretName: pgbackrest-controller-server-tls
+  usages:
+    - server auth
