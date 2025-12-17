@@ -58,6 +58,22 @@ spec:
               IMMICH_FFMPEG_ACCEL_DECODE: "true"
               IMMICH_FFMPEG_PRESET: veryfast
               IMMICH_FFMPEG_CRF: "23"
+              # OIDC / Pocket-ID
+              OAUTH_ENABLED: "true"
+              OAUTH_ISSUER_URL: https://id.${SECRET_DOMAIN}
+              OAUTH_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-secret
+                    key: OAUTH_CLIENT_ID
+              OAUTH_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-secret
+                    key: OAUTH_CLIENT_SECRET
+              OAUTH_SCOPE: "openid profile email"
+              OAUTH_AUTO_REGISTER: "true"
+              OAUTH_BUTTON_TEXT: "Login with Pocket-ID"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
