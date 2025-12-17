@@ -9,6 +9,9 @@ spec:
   chartRef:
     kind: OCIRepository
     name: immich
+  dependsOn:
+    - name: intel-device-plugin-gpu
+      namespace: kube-system
   values:
     controllers:
       immich:
@@ -16,6 +19,24 @@ spec:
         pod:
           annotations:
             reloader.stakater.com/auto: "true"
+          # Soft anti-affinity: prefer not to share node with other GPU apps
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: plex
+                    topologyKey: kubernetes.io/hostname
+                - weight: 50
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: fileflows
+                    topologyKey: kubernetes.io/hostname
+          nodeSelector:
+            intel.feature.node.kubernetes.io/gpu: "true"
         containers:
           main:
             image:
@@ -23,7 +44,7 @@ spec:
               tag: v2.3.1@sha256:f8d06a32b1b2a81053d78e40bf8e35236b9faefb5c3903ce9ca8712c9ed78445
             env:
               TZ: ${TIMEZONE}
-              IMMICH_TRUSTED_PROXIES: "172.31.0.0/16"
+              IMMICH_TRUSTED_PROXIES: "10.69.0.0/16,10.96.0.0/16"
               IMMICH_MEDIA_LOCATION: &mediaLocation /library
               DB_URL:
                 valueFrom:
@@ -32,32 +53,63 @@ spec:
                     key: DB_URL
               REDIS_HOSTNAME: &redisHostname "immich-valkey.entertainment.svc.cluster.local"
               IMMICH_TELEMETRY_INCLUDE: "all"
+              # FFmpeg hardware acceleration (Intel QSV)
+              IMMICH_FFMPEG_ACCEL: qsv
+              IMMICH_FFMPEG_ACCEL_DECODE: "true"
+              IMMICH_FFMPEG_PRESET: veryfast
+              IMMICH_FFMPEG_CRF: "23"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
-                memory: 256Mi
+                memory: 512Mi
               limits:
-                memory: 6G
+                gpu.intel.com/i915: 1
+                memory: 8Gi
       machine-learning:
         strategy: RollingUpdate
         pod:
           annotations:
             reloader.stakater.com/auto: "true"
+          # ML can run on any node, doesn't need GPU (CPU inference is fine)
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: plex
+                    topologyKey: kubernetes.io/hostname
+                - weight: 50
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: fileflows
+                    topologyKey: kubernetes.io/hostname
         containers:
           main:
             image:
               repository: ghcr.io/immich-app/immich-machine-learning
+              # Using CPU version - OpenVINO has compatibility issues with some iGPUs
               tag: v2.3.1@sha256:379e31b8c75107b0af8141904baa8cc933d7454b88fdb204265ef11749d7d908
             env:
               REDIS_HOSTNAME: *redisHostname
               MPLCONFIGDIR: "/cache/matplotlib"
               IMMICH_MEDIA_LOCATION: *mediaLocation
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
-                memory: 256Mi
+                memory: 512Mi
               limits:
-                memory: 4G
+                memory: 6Gi
             probes:
               liveness: &probes
                 enabled: true
@@ -88,6 +140,10 @@ spec:
             image:
               repository: ghcr.io/valkey-io/valkey
               tag: 9.0.1
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
             probes:
               liveness:
                 enabled: true
@@ -116,6 +172,15 @@ spec:
                   periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 30
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [44, 10000]
+        seccompProfile: { type: RuntimeDefault }
     service:
       immich:
         controller: immich
@@ -148,11 +213,31 @@ spec:
             scheme: http
             path: /metrics
     route:
-      immich:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Entertainment
+          gethomepage.dev/name: Immich
+          gethomepage.dev/app: immich
+          gethomepage.dev/icon: immich.png
+          gethomepage.dev/description: Photo Management
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames: ["photos.${SECRET_DOMAIN}"]
         parentRefs:
           - name: external
-            namespace: networking
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - name: immich
+                port: *port
+      internal:
+        annotations:
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames: ["photos.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: internal
+            namespace: network
             sectionName: https
         rules:
           - backendRefs:
@@ -175,7 +260,7 @@ spec:
         type: persistentVolumeClaim
         storageClass: openebs-hostpath
         accessMode: ReadWriteOnce
-        size: 10Gi
+        size: 50Gi
         advancedMounts:
           machine-learning:
             main:
@@ -192,3 +277,11 @@ spec:
                 subPath: geocoding
               - path: /usr/src/app/.transformers_cache
                 subPath: transformers
+      # Intel GPU device for QSV transcoding
+      dri:
+        type: hostPath
+        hostPath: /dev/dri
+        advancedMounts:
+          immich:
+            main:
+              - path: /dev/dri

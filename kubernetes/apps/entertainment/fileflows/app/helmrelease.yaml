@@ -31,6 +31,24 @@ spec:
       server:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          hostname: &name ff-server
+          # Soft anti-affinity: prefer not to share node with other GPU apps
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: plex
+                    topologyKey: kubernetes.io/hostname
+                - weight: 75
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: immich
+                    topologyKey: kubernetes.io/hostname
         # initContainers:
         #   install-vaapi-drivers:
         #     image:
@@ -50,8 +68,6 @@ spec:
         #           - ALL
         #       seccompProfile:
         #         type: RuntimeDefault
-        pod:
-          hostname: &name ff-server
         containers:
           *name : &container
             image:
@@ -85,14 +101,30 @@ spec:
               capabilities: { drop: ["ALL"] }
       node:
         pod:
-          hostname: &name ff-node
+          hostname: &nodename ff-node
+          # Soft anti-affinity: prefer not to share node with other GPU apps
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: plex
+                    topologyKey: kubernetes.io/hostname
+                - weight: 75
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: immich
+                    topologyKey: kubernetes.io/hostname
         containers:
-          *name :
+          *nodename :
             <<: *container
             probes:
-              liveness: &probes
+              liveness: &nodeprobes
                 enabled: false
-              readiness: *probes
+              readiness: *nodeprobes
             env:
               FFNODE: 1
               ServerUrl: http://fileflows-server:5000

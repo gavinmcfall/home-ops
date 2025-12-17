@@ -34,6 +34,23 @@ spec:
       plex:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          # Soft anti-affinity: prefer not to share node with other GPU apps
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: immich
+                    topologyKey: kubernetes.io/hostname
+                - weight: 50
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: fileflows
+                    topologyKey: kubernetes.io/hostname
         containers:
           app:
             image:
