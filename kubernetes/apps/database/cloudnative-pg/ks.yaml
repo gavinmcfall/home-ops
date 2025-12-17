@@ -65,6 +65,8 @@ spec:
       namespace: database
     - name: cert-manager
       namespace: cert-manager
+    - name: external-secrets-stores
+      namespace: external-secrets
   path: ./kubernetes/apps/database/cloudnative-pg/pgbackrest
   prune: true
   sourceRef:
