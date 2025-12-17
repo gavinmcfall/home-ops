@@ -74,6 +74,7 @@ The ExternalSecret pulls from multiple 1Password items. Ensure these fields exis
 | `cloudflare` | `IMMICH_R2_ACCESS_KEY` | Cloudflare R2 access key ID |
 | `cloudflare` | `IMMICH_R2_SECRET_ACCESS_KEY` | Cloudflare R2 secret access key |
 | `cloudflare` | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID (for R2 endpoint) |
+| `immich` | `IMMICH_PG_BACKUP_B2_BUCKET` | B2 bucket name for Flux substitution |
 | `immich` | `IMMICH_PG_BACKUP_R2_BUCKET` | R2 bucket name for Flux substitution |
 
 ### Required S3 Buckets
@@ -82,8 +83,8 @@ Create these buckets (they can have the same name in both providers):
 
 | Provider | Bucket Name | Region |
 |----------|-------------|--------|
-| Backblaze B2 | `nerdz-immich-postgres` | `us-east-005` (or your region) |
-| Cloudflare R2 | `nerdz-immich-postgres` | `auto` |
+| Backblaze B2 | `<your-bucket-name>` | `us-east-005` (or your region) |
+| Cloudflare R2 | `<your-bucket-name>` | `auto` |
 
 ---
 
@@ -452,6 +453,7 @@ spec:
         r2-access-key-id: "{{ .IMMICH_R2_ACCESS_KEY }}"
         r2-secret-access-key: "{{ .IMMICH_R2_SECRET_ACCESS_KEY }}"
         # Bucket and account info for Flux substitution
+        IMMICH_PG_BACKUP_B2_BUCKET: "{{ .IMMICH_PG_BACKUP_B2_BUCKET }}"
         IMMICH_PG_BACKUP_R2_BUCKET: "{{ .IMMICH_PG_BACKUP_R2_BUCKET }}"
         CLOUDFLARE_ACCOUNT_ID: "{{ .CLOUDFLARE_ACCOUNT_ID }}"
   dataFrom:
@@ -486,8 +488,8 @@ spec:
       pushQueueMax: 1GiB
     processMax: 4
     s3Repositories:
-      # Repository 1: Backblaze B2
-      - bucket: nerdz-immich-postgres
+      # Repository 1: Backblaze B2 (use Flux variable substitution)
+      - bucket: ${IMMICH_PG_BACKUP_B2_BUCKET}
         endpoint: s3.us-east-005.backblazeb2.com
         region: us-east-005
         repoPath: /immich18
@@ -531,7 +533,7 @@ spec:
 ```
 
 > [!NOTE]
-> The R2 bucket and endpoint use Flux variable substitution. Ensure your ExternalSecret includes `IMMICH_PG_BACKUP_R2_BUCKET` and `CLOUDFLARE_ACCOUNT_ID` fields, and your Kustomization has `substituteFrom` configured to reference the secret.
+> Both bucket names and the R2 endpoint use Flux variable substitution. Ensure your ExternalSecret includes `IMMICH_PG_BACKUP_B2_BUCKET`, `IMMICH_PG_BACKUP_R2_BUCKET`, and `CLOUDFLARE_ACCOUNT_ID` fields, and your Kustomization has `substituteFrom` configured to reference the secret.
 
 ### Step 2.4: Create the Cluster
 
@@ -830,10 +832,10 @@ EOF
 
 ```bash
 # Check B2
-aws s3 ls s3://nerdz-immich-postgres/immich18/ --profile backblaze-b2 --recursive | wc -l
+aws s3 ls s3://<your-bucket>/immich18/ --profile backblaze-b2 --recursive | wc -l
 
 # Check R2
-aws s3 ls s3://nerdz-immich-postgres/immich18/ --profile cloudflare-r2 --region auto --recursive | wc -l
+aws s3 ls s3://<your-bucket>/immich18/ --profile cloudflare-r2 --region auto --recursive | wc -l
 ```
 
 Both should show files. B2 and R2 should each have:
