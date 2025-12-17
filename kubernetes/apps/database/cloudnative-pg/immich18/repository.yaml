@@ -35,7 +35,7 @@ spec:
             name: immich-cnpg-secret
             key: b2-secret-access-key
       # Secondary: Cloudflare R2
-      - bucket: nerdz-immich-postgres
+      - bucket: ${IMMICH_PG_BACKUP_R2_BUCKET}
         endpoint: ${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
         region: auto
         repoPath: /immich18
