@@ -12,7 +12,7 @@ resources:
   - ./audiobookshelf/ks.yaml
   - ./calibre-web/ks.yaml
   - ./fileflows/ks.yaml
-  - ./immich/ks.yaml
+  # - ./immich/ks.yaml
   # - ./jellyfin/ks.yaml
   - ./kavita/ks.yaml
   - ./overseerr/ks.yaml
