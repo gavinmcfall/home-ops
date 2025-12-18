@@ -1,0 +1,57 @@
+---
+apiVersion: pgbackrest.dalibo.com/v1
+kind: Repository
+metadata:
+  name: postgres18-cluster-repository
+  namespace: database
+spec:
+  repoConfiguration:
+    stanza: postgres18-cluster
+    archive:
+      async: true
+      getQueueMax: 128MiB
+      pushQueueMax: 1GiB
+    processMax: 4
+    s3Repositories:
+      # Primary: Backblaze B2
+      - bucket: nerdz-postgres-cluster
+        endpoint: s3.us-east-005.backblazeb2.com
+        region: us-east-005
+        repoPath: /postgres18-cluster
+        uriStyle: path
+        verifyTLS: true
+        retentionPolicy:
+          full: 14
+          fullType: count
+          diff: 30
+          archive: 7
+          archiveType: full
+          history: 30
+        secretRef:
+          accessKeyId:
+            name: cloudnative-pg-secret
+            key: b2-access-key-id
+          secretAccessKey:
+            name: cloudnative-pg-secret
+            key: b2-secret-access-key
+      # Secondary: Cloudflare R2
+      - bucket: nerdz-postgres-cluster
+        endpoint: ${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
+        region: auto
+        repoPath: /postgres18-cluster
+        uriStyle: path
+        verifyTLS: true
+        retentionPolicy:
+          full: 14
+          fullType: count
+          diff: 30
+          archive: 7
+          archiveType: full
+          history: 30
+        secretRef:
+          accessKeyId:
+            name: cloudnative-pg-secret
+            key: r2-access-key-id
+          secretAccessKey:
+            name: cloudnative-pg-secret
+            key: r2-secret-access-key

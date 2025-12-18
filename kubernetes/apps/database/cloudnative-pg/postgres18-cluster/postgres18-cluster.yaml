@@ -1,0 +1,77 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres18-cluster
+  namespace: database
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:18@sha256:7f374e054e46fdefd64b52904e32362949703a75c05302dca8ffa1eb78d41891
+  primaryUpdateStrategy: unsupervised
+
+  storage:
+    size: 20Gi
+    storageClass: openebs-hostpath
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: cloudnative-pg-secret
+
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: 256MB
+      wal_keep_size: 2GB
+
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname
+    podAntiAffinityType: required
+
+  resources:
+    requests:
+      cpu: 100m
+    limits:
+      memory: 1Gi
+
+  monitoring:
+    enablePodMonitor: true
+
+  # pgBackRest Plugin for backups (B2 + R2 dual destination)
+  plugins:
+    - name: pgbackrest.dalibo.com
+      parameters:
+        repositoryRef: postgres18-cluster-repository
+
+  bootstrap:
+    initdb:
+      database: postgres
+      owner: postgres
+
+  # ============================================================================
+  # RESTORE FROM BACKUP (commented out - use instead of initdb above)
+  # ============================================================================
+  # To restore from backup:
+  # 1. Comment out the 'initdb' block above
+  # 2. Uncomment the 'recovery' block and 'externalClusters' below
+  # 3. Optionally add recoveryTarget for point-in-time recovery
+  # ============================================================================
+  # bootstrap:
+  #   recovery:
+  #     source: pgbackrest-backup
+  #     # Optional: Point-in-time recovery
+  #     # recoveryTarget:
+  #     #   targetTime: "2025-01-15 10:30:00"  # Restore to specific time
+  #     #   # OR use: targetLSN, targetXID, targetImmediate
+  #
+  # externalClusters:
+  #   - name: pgbackrest-backup
+  #     plugin:
+  #       name: pgbackrest.dalibo.com
+  #       parameters:
+  #         repositoryRef: postgres18-cluster-repository
+  #         # Optional: Select which repo to restore from (1=B2, 2=R2)
+  #         # selectedRepository: "1"

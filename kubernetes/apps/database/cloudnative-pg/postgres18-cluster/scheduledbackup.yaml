@@ -1,0 +1,39 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/postgresql.cnpg.io/scheduledbackup_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: postgres18-cluster-daily-b2
+  namespace: database
+spec:
+  schedule: "0 3 * * *"
+  immediate: true
+  backupOwnerReference: self
+  method: plugin
+  target: primary
+  cluster:
+    name: postgres18-cluster
+  pluginConfiguration:
+    name: pgbackrest.dalibo.com
+    parameters:
+      selectedRepository: "1"
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/postgresql.cnpg.io/scheduledbackup_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: postgres18-cluster-daily-r2
+  namespace: database
+spec:
+  # Offset by 1 hour from B2 backup to avoid concurrent runs
+  schedule: "0 4 * * *"
+  immediate: true
+  backupOwnerReference: self
+  method: plugin
+  target: primary
+  cluster:
+    name: postgres18-cluster
+  pluginConfiguration:
+    name: pgbackrest.dalibo.com
+    parameters:
+      selectedRepository: "2"
