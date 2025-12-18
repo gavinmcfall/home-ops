@@ -3,7 +3,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: immich18
+  name: postgres18-immich
   namespace: database
   annotations:
     cnpg.io/skipEmptyWalArchiveCheck: "enabled"
@@ -46,7 +46,7 @@ spec:
   plugins:
     - name: pgbackrest.dalibo.com
       parameters:
-        repositoryRef: immich18-repository
+        repositoryRef: postgres18-immich-repository
 
   bootstrap:
     initdb:
@@ -78,6 +78,6 @@ spec:
   #     plugin:
   #       name: pgbackrest.dalibo.com
   #       parameters:
-  #         repositoryRef: immich18-repository
+  #         repositoryRef: postgres18-immich-repository
   #         # Optional: Select which repo to restore from (1=B2, 2=R2)
   #         # selectedRepository: "1"

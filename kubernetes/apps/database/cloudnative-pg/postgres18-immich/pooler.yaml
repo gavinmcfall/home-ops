@@ -3,11 +3,11 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Pooler
 metadata:
-  name: immich18-pooler
+  name: postgres18-immich-pooler
   namespace: database
 spec:
   cluster:
-    name: immich18
+    name: postgres18-immich
   instances: 2
   type: rw
   pgbouncer:

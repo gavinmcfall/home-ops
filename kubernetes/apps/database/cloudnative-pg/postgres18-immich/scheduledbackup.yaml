@@ -3,7 +3,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: immich18-daily-b2
+  name: postgres18-immich-daily-b2
   namespace: database
 spec:
   schedule: "0 3 * * *"
@@ -12,7 +12,7 @@ spec:
   method: plugin
   target: primary
   cluster:
-    name: immich18
+    name: postgres18-immich
   pluginConfiguration:
     name: pgbackrest.dalibo.com
     parameters:
@@ -22,7 +22,7 @@ spec:
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: immich18-daily-r2
+  name: postgres18-immich-daily-r2
   namespace: database
 spec:
   # Offset by 1 hour from B2 backup to avoid concurrent runs
@@ -32,7 +32,7 @@ spec:
   method: plugin
   target: primary
   cluster:
-    name: immich18
+    name: postgres18-immich
   pluginConfiguration:
     name: pgbackrest.dalibo.com
     parameters:

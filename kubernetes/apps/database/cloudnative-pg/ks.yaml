@@ -88,7 +88,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app cloudnative-pg-immich18
+  name: &app cloudnative-pg-postgres18-immich
   namespace: &namespace database
 spec:
   targetNamespace: *namespace
@@ -102,7 +102,7 @@ spec:
       namespace: database
     - name: external-secrets-stores
       namespace: external-secrets
-  path: ./kubernetes/apps/database/cloudnative-pg/immich18
+  path: ./kubernetes/apps/database/cloudnative-pg/postgres18-immich
   prune: true
   sourceRef:
     kind: GitRepository
