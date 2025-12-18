@@ -37,6 +37,14 @@ spec:
                     topologyKey: kubernetes.io/hostname
           nodeSelector:
             intel.feature.node.kubernetes.io/gpu: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 18.1.0@sha256:866f15038ed5185a2b8118821f470bb7ca0df8c4231b8e277446e681ebb1ed84
+            envFrom:
+              - secretRef:
+                  name: immich-secret
         containers:
           main:
             image:
@@ -51,7 +59,7 @@ spec:
                   secretKeyRef:
                     name: immich-secret
                     key: DB_URL
-              REDIS_HOSTNAME: &redisHostname "immich-valkey.entertainment.svc.cluster.local"
+              REDIS_HOSTNAME: &redisHostname "dragonfly.database.svc.cluster.local"
               IMMICH_TELEMETRY_INCLUDE: "all"
               # FFmpeg hardware acceleration (Intel QSV)
               IMMICH_FFMPEG_ACCEL: qsv
@@ -150,44 +158,6 @@ spec:
                   periodSeconds: 10
                   timeoutSeconds: 1
                   failureThreshold: 60
-      valkey:
-        containers:
-          app:
-            image:
-              repository: ghcr.io/valkey-io/valkey
-              tag: 9.0.1
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
-            probes:
-              liveness:
-                enabled: true
-                custom: true
-                spec:
-                  exec: &probe-exec { command: ["sh", "-c", "valkey-cli ping | grep PONG"] }
-                  initialDelaySeconds: 30
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 3
-              readiness:
-                enabled: true
-                custom: true
-                spec:
-                  exec: *probe-exec
-                  initialDelaySeconds: 5
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 3
-              startup:
-                enabled: true
-                custom: true
-                spec:
-                  exec: *probe-exec
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 30
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -212,11 +182,6 @@ spec:
         ports:
           http:
             port: *mlPort
-      valkey:
-        controller: valkey
-        ports:
-          http:
-            port: 6379
     serviceMonitor:
       immich:
         enabled: true

@@ -29,10 +29,10 @@ spec:
           history: 30
         secretRef:
           accessKeyId:
-            name: immich-cnpg18-secret
+            name: cloudnative-pg-secret
             key: b2-access-key-id
           secretAccessKey:
-            name: immich-cnpg18-secret
+            name: cloudnative-pg-secret
             key: b2-secret-access-key
       # Secondary: Cloudflare R2
       - bucket: nerdz-immich-postgres
@@ -50,8 +50,8 @@ spec:
           history: 30
         secretRef:
           accessKeyId:
-            name: immich-cnpg18-secret
+            name: cloudnative-pg-secret
             key: r2-access-key-id
           secretAccessKey:
-            name: immich-cnpg18-secret
+            name: cloudnative-pg-secret
             key: r2-secret-access-key

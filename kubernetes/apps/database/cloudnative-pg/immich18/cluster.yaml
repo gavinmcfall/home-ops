@@ -19,7 +19,7 @@ spec:
 
   enableSuperuserAccess: true
   superuserSecret:
-    name: immich-cnpg18-secret
+    name: cloudnative-pg-secret
 
   postgresql:
     shared_preload_libraries: ["vchord.so"]

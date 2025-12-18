@@ -27,7 +27,7 @@ metadata:
 spec:
   # Offset by 1 hour from B2 backup to avoid concurrent runs
   schedule: "0 4 * * *"
-  immediate: false
+  immediate: true
   backupOwnerReference: self
   method: plugin
   target: primary
