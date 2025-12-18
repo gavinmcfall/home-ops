@@ -38,7 +38,7 @@ CloudNativePG doesn't support in-place restore. You bootstrap a **new cluster** 
    kubectl delete cluster immich18 -n database
    ```
 
-3. **Edit cluster.yaml** - Comment out `initdb`, uncomment `recovery`:
+3. **Edit immich18.yaml** - Comment out `initdb`, uncomment `recovery`:
    ```yaml
    bootstrap:
      recovery:
@@ -58,7 +58,7 @@ CloudNativePG doesn't support in-place restore. You bootstrap a **new cluster** 
    kubectl get cluster immich18 -n database -w
    ```
 
-5. **After restore completes**, revert cluster.yaml to `initdb` (for future fresh deployments) and scale immich back up.
+5. **After restore completes**, revert immich18.yaml to `initdb` (for future fresh deployments) and scale immich back up.
 
 ### Option 2: Restore to New Cluster Name (Side-by-side)
 
@@ -115,7 +115,7 @@ kubectl exec -n database immich18-1 -c plugin-pgbackrest -- pgbackrest info
 
 | File | Purpose |
 |------|---------|
-| `cluster.yaml` | Cluster definition with restore template |
+| `immich18.yaml` | Cluster definition with restore template |
 | `repository.yaml` | pgBackRest dual-repo config (B2 + R2) |
 | `scheduledbackup.yaml` | Two scheduled backups (one per repo) |
 | `externalsecret.yaml` | Credentials from 1Password |
