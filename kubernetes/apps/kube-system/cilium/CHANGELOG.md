@@ -1,4 +1,36 @@
-# Cilium BGP Migration Changelog
+# Cilium Configuration Changelog
+
+## 2025-12-20: Fix Pod-to-LB-VIP Hairpin with Hybrid Mode
+
+### Problem
+
+With `loadBalancer.mode: dsr`, pods cannot reach LoadBalancer VIPs when the backend is on the same node. Example: `qui` pod on `stanton-01` couldn't reach `id.nerdz.cloud` (OIDC endpoint at LB VIP `10.99.8.202`) because envoy-internal backend is also on `stanton-01`.
+
+This is a [known Cilium limitation](https://github.com/cilium/cilium/issues/39198) - DSR mode's ARP handling only triggers for external traffic, not pod-originated traffic. Socket LB alone doesn't fix this for LoadBalancer VIPs.
+
+### Solution
+
+Changed `loadBalancer.mode` from `dsr` to `hybrid`:
+- **External traffic**: Still uses DSR (preserves client IP, lower latency)
+- **Internal traffic**: Uses SNAT (allows hairpin to work)
+
+Also enabled `socketLB` for additional socket-level service resolution.
+
+### Changes
+
+| Setting | Before | After |
+|---------|--------|-------|
+| `loadBalancer.mode` | `dsr` | `hybrid` |
+| `socketLB.enabled` | (default: false) | `true` |
+
+### Trade-offs
+
+- Internal pod-to-LB traffic won't preserve original client IP (uses SNAT)
+- External traffic still gets full DSR benefits
+
+---
+
+## 2024-12: BGP Migration
 
 Migration from L2 announcements to BGP for LoadBalancer IP advertisement.
 
