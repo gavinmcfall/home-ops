@@ -37,7 +37,7 @@ spec:
           app:
             image:
               repository: docker.io/n8nio/n8n
-              tag: 1.119.0@sha256:8f6834c399b5a764d5b0165db5d52d757652edb8f6b938b30b0cdf70fdfd3df1
+              tag: 2.1.1@sha256:0f10214f8f9484581288861f682eb73482f923c2c697d57fa300568433bb9ff1
             env:
               GENERIC_TIMEZONE: ${TIMEZONE}
               N8N_PORT: &port 80
