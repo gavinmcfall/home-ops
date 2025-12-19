@@ -603,6 +603,9 @@ Now that BGP is working:
 2. **Monitor BGP**: Set up alerts for BGP session failures
 3. **Learn about Gateway API**: See the [Gateway API Routing Guide](../gateway-api-routing/README.md) to expose your services via HTTP/HTTPS
 
+> [!WARNING]
+> **DSR Hairpin Limitation**: If you're using Cilium's DSR (Direct Server Return) mode, be aware that BGP doesn't solve all hairpin scenarios. When a pod tries to reach a LoadBalancer VIP and the backend is on the *same node*, traffic can fail. This is a known Cilium limitation ([GitHub #39198](https://github.com/cilium/cilium/issues/39198)). The workaround is CoreDNS rewriting to return ClusterIP for pod-to-service traffic. See the [Dual-Homing Access Patterns Guide](../Dual-Homing%20Access%20Patterns/README.md) for more details on internal traffic routing.
+
 ---
 
 ## Further Reading

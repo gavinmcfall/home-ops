@@ -302,7 +302,34 @@ spec:
 
 With L2 announcements, one node "owned" a LoadBalancer IP via ARP. This caused hairpin routing issues when pods on the same node tried to reach the LoadBalancer IP.
 
-**BGP solves this**: The UDM Pro learns routes to LoadBalancer IPs and handles routing at L3. Traffic always goes through the router, so pods on any node can reach any LoadBalancer IP regardless of where the backend runs.
+**BGP solves L2-level hairpin**: The UDM Pro learns routes to LoadBalancer IPs and handles routing at L3. Traffic always goes through the router, so pods on any node can reach any LoadBalancer IP regardless of where the backend runs.
+
+### DSR Same-Node Hairpin Limitation
+
+> **Important**: BGP fixes L2 hairpin but DSR mode has its own limitation. When a pod tries to reach a LoadBalancer VIP and the backend is on the *same node*, traffic fails. This is a known Cilium limitation ([GitHub #39198](https://github.com/cilium/cilium/issues/39198)).
+
+**Workaround**: CoreDNS template plugin rewrites internal service DNS queries to return ClusterIP instead of LoadBalancer VIP:
+
+```yaml
+# kubernetes/apps/kube-system/coredns/app/helm-values.yaml
+servers:
+  # Internal gateway rewrite - resolves internal services to ClusterIP
+  - zones:
+      - zone: ${SECRET_DOMAIN}
+        scheme: dns://
+    port: 53
+    plugins:
+      - name: template
+        parameters: IN A
+        configBlock: |-
+          match (^internal\.|^id\.)nerdz\.cloud\.$
+          answer "{{ .Name }} 60 IN A ${ENVOY_INTERNAL_CLUSTERIP}"
+          fallthrough
+```
+
+The `ENVOY_INTERNAL_CLUSTERIP` variable is defined in `cluster-settings.yaml` (currently `10.96.9.253`). If the envoy-internal service is recreated with a different ClusterIP, update the variable there.
+
+This ensures pods reach internal services via ClusterIP (which always works) rather than LoadBalancer VIP (which fails with DSR same-node hairpin).
 
 **How IPs are assigned**:
 1. Service created with `type: LoadBalancer`
@@ -375,9 +402,32 @@ Apps without the internal annotation have no UDM record, so LAN clients fall thr
 
 ### CoreDNS Configuration
 
+CoreDNS has two server blocks:
+
+1. **Internal gateway rewrite** - Intercepts queries for internal services and returns ClusterIP (workaround for DSR hairpin):
+
 ```yaml
-# kubernetes/apps/kube-system/coredns/app/helm-values.yaml
 servers:
+  # Internal gateway rewrite - resolves internal services to ClusterIP
+  - zones:
+      - zone: ${SECRET_DOMAIN}
+        scheme: dns://
+    port: 53
+    plugins:
+      - name: template
+        parameters: IN A
+        configBlock: |-
+          match (^internal\.|^id\.)nerdz\.cloud\.$
+          answer "{{ .Name }} 60 IN A ${ENVOY_INTERNAL_CLUSTERIP}"
+          fallthrough
+      - name: forward
+        parameters: . /etc/resolv.conf
+```
+
+2. **Default server** - Handles cluster DNS and forwards external queries to UDM:
+
+```yaml
+  # Default server
   - zones:
       - zone: .
         scheme: dns://
@@ -392,7 +442,7 @@ servers:
         parameters: 30
 ```
 
-This simplified configuration forwards all non-cluster DNS queries to the upstream resolver (UDM), which has authoritative records for all cluster apps created by external-dns-unifi.
+The internal gateway rewrite ensures pods reach `internal.${SECRET_DOMAIN}` and `id.${SECRET_DOMAIN}` via ClusterIP instead of LoadBalancer VIP, working around the DSR same-node hairpin limitation.
 
 ---
 
@@ -574,6 +624,7 @@ kubectl get pods -n network -l app.kubernetes.io/name=cloudflared
 | external-dns filters by annotation | [`external-dns/app/helmrelease.yaml`](../../kubernetes/apps/network/external-dns/app/helmrelease.yaml) | network | Verified |
 | external-dns-unifi filters by internal annotation | [`external-dns-unifi/app/helmrelease.yaml`](../../kubernetes/apps/network/external-dns-unifi/app/helmrelease.yaml) | network | Verified |
 | CoreDNS forwards to upstream (UDM) | [`coredns/app/helm-values.yaml`](../../kubernetes/apps/kube-system/coredns/app/helm-values.yaml) | kube-system | Verified |
+| CoreDNS DSR hairpin workaround | [`coredns/app/helm-values.yaml`](../../kubernetes/apps/kube-system/coredns/app/helm-values.yaml) | kube-system | Verified |
 | bentopdf OIDC via SecurityPolicy | [`bentopdf/app/securitypolicy.yaml`](../../kubernetes/apps/home/bentopdf/app/securitypolicy.yaml) | home | Verified |
 | Pocket-ID dual-homed (both gateways) | [`pocket-id/app/helmrelease.yaml`](../../kubernetes/apps/security/pocket-id/app/helmrelease.yaml) | security | Verified |
 

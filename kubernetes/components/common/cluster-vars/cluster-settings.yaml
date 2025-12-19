@@ -29,6 +29,10 @@ data:
   # LoadBalancer IPs (Services VLAN - 10.99.8.0/24)
   ENVOY_EXTERNAL_LBIP: "10.99.8.201"
   ENVOY_INTERNAL_LBIP: "10.99.8.202"
+
+  # ClusterIPs (for CoreDNS DSR hairpin workaround)
+  # These are dynamically assigned - update if service is recreated
+  ENVOY_INTERNAL_CLUSTERIP: "10.96.9.253"
   MOSQUITTO_LBIP: "10.99.8.203"
   SMTP_RELAY_LBIP: "10.99.8.204"
   QBITTORRENT_LBIP: "10.99.8.205"

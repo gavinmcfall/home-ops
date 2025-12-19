@@ -24,7 +24,7 @@ servers:
         parameters: IN A
         configBlock: |-
           match (^internal\.|^id\.)nerdz\.cloud\.$
-          answer "{{ .Name }} 60 IN A 10.96.9.253"
+          answer "{{ .Name }} 60 IN A ${ENVOY_INTERNAL_CLUSTERIP}"
           fallthrough
       - name: template
         parameters: IN AAAA
