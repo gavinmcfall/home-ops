@@ -1,0 +1,83 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kait
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kait
+  interval: 1h
+  values:
+    controllers:
+      kait:
+        serviceAccount:
+          name: kait
+        replicas: 1
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/kait
+              tag: 1.0.0@sha256:fdc0fe3446bc2c0b27f185bd312a18fd2e53200107ff38a469b6de5ffd9985f3
+            env:
+              TZ: ${TIMEZONE}
+              WEBHOOK__PORT: &port 9000
+              DRY_RUN: "true"  # Set to "false" after testing
+              TALOSCONFIG: /talos/talosconfig
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *port
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+    service:
+      app:
+        controller: kait
+        ports:
+          http:
+            port: *port
+    persistence:
+      hooks:
+        type: configMap
+        name: kait-hooks
+        globalMounts:
+          - path: /config
+      scripts:
+        type: configMap
+        name: kait-scripts
+        defaultMode: 0755
+        globalMounts:
+          - path: /scripts
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+      talosconfig:
+        type: secret
+        name: kait-talosconfig
+        globalMounts:
+          - path: /talos

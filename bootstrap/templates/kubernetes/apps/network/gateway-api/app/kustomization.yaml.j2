@@ -1,0 +1,26 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+patches:
+  # k8s-gateway v0.4.0 requires v1alpha2.GRPCRoute which was removed in Gateway API v1.1.0+
+  # Use JSON patch to ADD v1alpha2 version without replacing existing v1
+  - target:
+      kind: CustomResourceDefinition
+      name: grpcroutes.gateway.networking.k8s.io
+    patch: |-
+      - op: add
+        path: /spec/versions/-
+        value:
+          name: v1alpha2
+          served: true
+          storage: false
+          schema:
+            openAPIV3Schema:
+              type: object
+              properties:
+                spec:
+                  type: object
+                status:
+                  type: object

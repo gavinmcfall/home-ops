@@ -1,6 +1,15 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: flux-system
+
+# TODO: Enable common component after removing kubernetes/flux/vars/
+# components:
+#   - ../../components/common
+
 resources:
   - ./namespace.yaml
-  - ./webhooks/ks.yaml
+  - ./flux-instance/ks.yaml
+  - ./flux-operator/ks.yaml
+  - ./weave-gitops/ks.yaml
+  - ../../components/common/alerts/discord-flux

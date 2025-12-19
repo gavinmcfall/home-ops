@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ntfy-alertmanager-config
+data:
+  config.scfg: |
+    http-address :8080
+    log-level info
+
+    ntfy {
+      topic http://ntfy.observability.svc.cluster.local/k8s-alerts
+      priority default
+    }
+
+    alertmanager {
+      silence-duration 24h
+      url http://alertmanager-operated.observability.svc.cluster.local:9093
+    }
+
+    labels {
+      order severity
+
+      label severity {
+        critical {
+          priority urgent
+          tags rotating_light,skull
+        }
+        warning {
+          priority high
+          tags warning
+        }
+        info {
+          priority default
+          tags information_source
+        }
+      }
+    }
+
+    resolved {
+      tags white_check_mark
+    }

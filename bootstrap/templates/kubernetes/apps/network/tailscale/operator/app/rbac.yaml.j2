@@ -1,0 +1,15 @@
+---
+# RBAC for remote kubectl access via Tailscale API server proxy
+# This binds your Tailscale user to cluster-admin
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tailscale-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: ${TAILSCALE_EMAIL}

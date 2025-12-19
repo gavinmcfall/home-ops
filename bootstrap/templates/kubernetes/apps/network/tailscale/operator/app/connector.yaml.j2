@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/tailscale.com/connector_v1alpha1.json
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: home-subnet
+spec:
+  hostname: home-subnet-router
+  subnetRouter:
+    advertiseRoutes:
+      - 10.90.0.0/16 # LAN
+      - 10.99.8.0/24 # k8s BGP

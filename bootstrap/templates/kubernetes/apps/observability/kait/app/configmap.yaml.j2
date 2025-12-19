@@ -1,0 +1,366 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kait-hooks
+  namespace: observability
+data:
+  hooks.yaml: |
+    - id: alertmanager
+      execute-command: /scripts/handler.sh
+      pass-arguments-to-command:
+        - source: payload
+          name: status
+        - source: payload
+          name: alerts.0.labels.alertname
+      trigger-rule:
+        match:
+          type: regex
+          regex: "ThunderboltNode.*|ThunderboltNetwork.*"
+          parameter:
+            source: payload
+            name: alerts.0.labels.alertname
+      http-methods: ["POST"]
+      include-command-output-in-response: true
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kait-scripts
+  namespace: observability
+data:
+  handler.sh: |
+    #!/bin/bash
+    set -euo pipefail
+
+    # Arguments from webhook: $$1=status, $$2=alertname
+    STATUS="$${1:-unknown}"
+    ALERT_NAME="$${2:-unknown}"
+
+    COOLDOWN_FILE="/tmp/kait.cooldown"
+    COOLDOWN_SECONDS=3600  # 1 hour between actions
+    LOG_PREFIX="[kait]"
+
+    TB_CIDR="169.254.255.0/24"
+    LAN_CIDR="10.90.0.0/16"
+    CONFIGMAP_NS="flux-system"
+    CONFIGMAP_NAME="cluster-settings"
+    KUSTOMIZATION_NS="rook-ceph"
+    KUSTOMIZATION_NAME="cluster-apps-rook-ceph-cluster"
+
+    # Kubernetes API configuration
+    KUBE_TOKEN=$$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+    KUBE_CA=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    KUBE_API="https://kubernetes.default.svc"
+
+    log() {
+        echo "$$LOG_PREFIX $$(date '+%Y-%m-%d %H:%M:%S') $$*"
+    }
+
+    kube_api() {
+        local method="$$1"
+        local path="$$2"
+        local data="$${3:-}"
+
+        local args=(
+            -s
+            --cacert "$$KUBE_CA"
+            -H "Authorization: Bearer $$KUBE_TOKEN"
+            -H "Content-Type: application/json"
+            -X "$$method"
+        )
+
+        if [[ -n "$$data" ]]; then
+            args+=(-d "$$data")
+        fi
+
+        curl "$${args[@]}" "$${KUBE_API}$${path}"
+    }
+
+    check_cooldown() {
+        if [[ -f "$$COOLDOWN_FILE" ]]; then
+            last_action=$$(cat "$$COOLDOWN_FILE")
+            now=$$(date +%s)
+            elapsed=$$((now - last_action))
+            if [[ $$elapsed -lt $$COOLDOWN_SECONDS ]]; then
+                remaining=$$((COOLDOWN_SECONDS - elapsed))
+                log "Cooldown active, $$remaining seconds remaining. Skipping action."
+                return 1
+            fi
+        fi
+        return 0
+    }
+
+    set_cooldown() {
+        date +%s > "$$COOLDOWN_FILE"
+    }
+
+    get_current_cidr() {
+        kube_api GET "/api/v1/namespaces/$${CONFIGMAP_NS}/configmaps/$${CONFIGMAP_NAME}" \
+            | jq -r '.data.CEPH_CLUSTER_CIDR // ""'
+    }
+
+    patch_configmap() {
+        local new_cidr="$$1"
+        local patch_data
+        patch_data=$$(jq -n --arg cidr "$$new_cidr" '{"data":{"CEPH_CLUSTER_CIDR":$$cidr}}')
+
+        kube_api PATCH "/api/v1/namespaces/$${CONFIGMAP_NS}/configmaps/$${CONFIGMAP_NAME}" "$$patch_data"
+    }
+
+    trigger_reconcile() {
+        local timestamp
+        timestamp=$$(date +%s)
+        local patch_data
+        patch_data=$$(jq -n --arg ts "$$timestamp" '{"metadata":{"annotations":{"reconcile.fluxcd.io/requestedAt":$$ts}}}')
+
+        kube_api PATCH "/apis/kustomize.toolkit.fluxcd.io/v1/namespaces/$${KUSTOMIZATION_NS}/kustomizations/$${KUSTOMIZATION_NAME}" "$$patch_data"
+    }
+
+    get_cephcluster_cidr() {
+        # Get the actual CephCluster spec network CIDR
+        kube_api GET "/apis/ceph.rook.io/v1/namespaces/rook-ceph/cephclusters/rook-ceph" \
+            | jq -r '.spec.network.addressRanges.cluster[0] // ""'
+    }
+
+    wait_for_cephcluster_update() {
+        local expected_cidr="$$1"
+        local max_wait=120  # 2 minutes
+        local interval=10
+        local elapsed=0
+
+        log "Waiting for CephCluster to update to $$expected_cidr..."
+
+        while [[ $$elapsed -lt $$max_wait ]]; do
+            local current_cidr
+            current_cidr=$$(get_cephcluster_cidr)
+
+            if [[ "$$current_cidr" == "$$expected_cidr" ]]; then
+                log "CephCluster spec updated to $$expected_cidr"
+                return 0
+            fi
+
+            log "CephCluster still at $$current_cidr, waiting..."
+            sleep $$interval
+            elapsed=$$((elapsed + interval))
+        done
+
+        log "ERROR: Timeout waiting for CephCluster to update to $$expected_cidr"
+        return 1
+    }
+
+    verify_osd_network() {
+        local expected_cidr="$$1"
+        local max_wait=180  # 3 minutes after OSD restart
+        local interval=15
+        local elapsed=0
+
+        # Extract the network prefix from CIDR (e.g., 169.254.255 from 169.254.255.0/24)
+        local expected_prefix
+        expected_prefix=$$(echo "$$expected_cidr" | cut -d'.' -f1-3)
+
+        log "Verifying OSDs are using network prefix $$expected_prefix..."
+
+        while [[ $$elapsed -lt $$max_wait ]]; do
+            # Use ceph tools pod to check OSD network addresses
+            local osd_dump
+            osd_dump=$$(kubectl exec -n rook-ceph deploy/rook-ceph-tools -- ceph osd dump 2>/dev/null || echo "")
+
+            if [[ -z "$$osd_dump" ]]; then
+                log "Unable to get OSD dump, waiting..."
+                sleep $$interval
+                elapsed=$$((elapsed + interval))
+                continue
+            fi
+
+            # Check if all OSDs have the expected cluster network prefix in their second address
+            # OSD dump shows: [public_addr] [cluster_addr]
+            local wrong_network
+            wrong_network=$$(echo "$$osd_dump" | grep "^osd\." | grep -v "$$expected_prefix" | grep -c "exists,up" || echo "0")
+
+            if [[ "$$wrong_network" == "0" ]]; then
+                log "All OSDs verified on $$expected_prefix network"
+                return 0
+            fi
+
+            log "$$wrong_network OSDs still on wrong network, waiting..."
+            sleep $$interval
+            elapsed=$$((elapsed + interval))
+        done
+
+        log "WARNING: Not all OSDs migrated to $$expected_prefix network"
+        return 1
+    }
+
+    restart_osd_deployments() {
+        log "Restarting OSD deployments to apply network change..."
+
+        # Get all OSD deployments
+        local deployments
+        deployments=$$(kube_api GET "/apis/apps/v1/namespaces/rook-ceph/deployments?labelSelector=app=rook-ceph-osd" \
+            | jq -r '.items[].metadata.name')
+
+        local restart_timestamp
+        restart_timestamp=$$(date -Iseconds)
+
+        for deploy in $$deployments; do
+            log "Restarting deployment: $$deploy"
+            local patch_data
+            patch_data=$$(jq -n --arg ts "$$restart_timestamp" \
+                '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":$$ts}}}}}')
+
+            kube_api PATCH "/apis/apps/v1/namespaces/rook-ceph/deployments/$$deploy" "$$patch_data" > /dev/null
+        done
+
+        log "OSD restart initiated for $$(echo "$$deployments" | wc -w) deployments"
+    }
+
+    wait_for_osds_ready() {
+        log "Waiting for OSDs to become ready..."
+        local max_wait=300  # 5 minutes
+        local interval=10
+        local elapsed=0
+
+        while [[ $$elapsed -lt $$max_wait ]]; do
+            local not_ready
+            not_ready=$$(kube_api GET "/api/v1/namespaces/rook-ceph/pods?labelSelector=app=rook-ceph-osd" \
+                | jq '[.items[] | select(.status.phase != "Running" or (.status.containerStatuses[]?.ready != true))] | length')
+
+            if [[ "$$not_ready" == "0" ]]; then
+                log "All OSDs are ready"
+                return 0
+            fi
+
+            log "Waiting for $$not_ready OSD pods to become ready..."
+            sleep $$interval
+            elapsed=$$((elapsed + interval))
+        done
+
+        log "WARNING: Timeout waiting for OSDs, $$not_ready still not ready"
+        return 1
+    }
+
+    failover_to_lan() {
+        log "FAILOVER: Switching Ceph cluster network to LAN ($$LAN_CIDR)"
+
+        # Check ConfigMap state
+        local configmap_cidr
+        configmap_cidr=$$(get_current_cidr)
+        log "Current ConfigMap CEPH_CLUSTER_CIDR: $$configmap_cidr"
+
+        # Check actual CephCluster state
+        local cephcluster_cidr
+        cephcluster_cidr=$$(get_cephcluster_cidr)
+        log "Current CephCluster spec: $$cephcluster_cidr"
+
+        if [[ "$$cephcluster_cidr" == "$$LAN_CIDR" ]]; then
+            log "CephCluster already on LAN network, skipping"
+            return 0
+        fi
+
+        if [[ "$${DRY_RUN:-false}" == "true" ]]; then
+            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $$LAN_CIDR and restart OSDs"
+            return 0
+        fi
+
+        # Step 1: Patch ConfigMap
+        log "Step 1/5: Patching ConfigMap..."
+        patch_configmap "$$LAN_CIDR" > /dev/null
+
+        # Step 2: Trigger Flux reconciliation
+        log "Step 2/5: Triggering Flux reconciliation..."
+        trigger_reconcile > /dev/null
+
+        # Step 3: Wait for CephCluster to update
+        log "Step 3/5: Waiting for CephCluster spec to update..."
+        if ! wait_for_cephcluster_update "$$LAN_CIDR"; then
+            log "ERROR: CephCluster did not update, aborting"
+            return 1
+        fi
+
+        # Step 4: Restart OSDs and wait for ready
+        log "Step 4/5: Restarting OSD deployments..."
+        restart_osd_deployments
+        wait_for_osds_ready
+
+        # Step 5: Verify OSDs are using new network
+        log "Step 5/5: Verifying OSD network addresses..."
+        verify_osd_network "$$LAN_CIDR"
+
+        set_cooldown
+        log "Failover complete - Ceph cluster network changed to LAN ($$LAN_CIDR)"
+    }
+
+    restore_to_thunderbolt() {
+        log "RESTORE: Switching Ceph cluster network to Thunderbolt ($$TB_CIDR)"
+
+        # Check ConfigMap state
+        local configmap_cidr
+        configmap_cidr=$$(get_current_cidr)
+        log "Current ConfigMap CEPH_CLUSTER_CIDR: $$configmap_cidr"
+
+        # Check actual CephCluster state
+        local cephcluster_cidr
+        cephcluster_cidr=$$(get_cephcluster_cidr)
+        log "Current CephCluster spec: $$cephcluster_cidr"
+
+        if [[ "$$cephcluster_cidr" == "$$TB_CIDR" ]]; then
+            log "CephCluster already on Thunderbolt network, skipping"
+            return 0
+        fi
+
+        if [[ "$${DRY_RUN:-false}" == "true" ]]; then
+            log "DRY_RUN: Would patch CEPH_CLUSTER_CIDR to $$TB_CIDR and restart OSDs"
+            return 0
+        fi
+
+        # Step 1: Patch ConfigMap
+        log "Step 1/5: Patching ConfigMap..."
+        patch_configmap "$$TB_CIDR" > /dev/null
+
+        # Step 2: Trigger Flux reconciliation
+        log "Step 2/5: Triggering Flux reconciliation..."
+        trigger_reconcile > /dev/null
+
+        # Step 3: Wait for CephCluster to update
+        log "Step 3/5: Waiting for CephCluster spec to update..."
+        if ! wait_for_cephcluster_update "$$TB_CIDR"; then
+            log "ERROR: CephCluster did not update, aborting"
+            return 1
+        fi
+
+        # Step 4: Restart OSDs and wait for ready
+        log "Step 4/5: Restarting OSD deployments..."
+        restart_osd_deployments
+        wait_for_osds_ready
+
+        # Step 5: Verify OSDs are using new network
+        log "Step 5/5: Verifying OSD network addresses..."
+        verify_osd_network "$$TB_CIDR"
+
+        set_cooldown
+        log "Restore complete - Ceph cluster network changed to Thunderbolt ($$TB_CIDR)"
+    }
+
+    # Main logic
+    log "Received alert: $$ALERT_NAME (status: $$STATUS)"
+
+    if ! check_cooldown; then
+        exit 0
+    fi
+
+    case "$$ALERT_NAME" in
+        ThunderboltNodeIsolated)
+            if [[ "$$STATUS" == "firing" ]]; then
+                failover_to_lan
+            fi
+            ;;
+        ThunderboltNetworkRecovered)
+            if [[ "$$STATUS" == "firing" ]]; then
+                restore_to_thunderbolt
+            fi
+            ;;
+        *)
+            log "Unknown alert: $$ALERT_NAME, ignoring"
+            ;;
+    esac

@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: truenas
+  labels:
+    app.kubernetes.io/name: truenas
+    app.kubernetes.io/instance: truenas
+  annotations:
+    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+spec:
+  parentRefs:
+    - name: internal
+      namespace: network
+      sectionName: https
+  hostnames:
+    - citadel.${SECRET_DOMAIN}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: truenas
+          port: 443

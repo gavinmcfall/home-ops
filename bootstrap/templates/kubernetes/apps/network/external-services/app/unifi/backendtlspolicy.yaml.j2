@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/gateway.networking.k8s.io_backendtlspolicy_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: unifi-backend-tls
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: unifi
+  validation:
+    caCertificateRefs:
+      - name: unifi-ca-cert
+        group: ""
+        kind: ConfigMap
+    hostname: unifi.local

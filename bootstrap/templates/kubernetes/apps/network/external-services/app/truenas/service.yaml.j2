@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: truenas
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: citadel.${SECRET_DOMAIN}
+    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+spec:
+  type: ClusterIP
+  ports:
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 443
+      appProtocol: https

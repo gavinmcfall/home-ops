@@ -1,6 +1,28 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: observability
+
+components:
+  - ../../components/common
+
 resources:
-  - ./namespace.yaml
+  # Applications
+  - ./gatus/ks.yaml
+  - ./grafana/ks.yaml
+  - ./kait/ks.yaml
+  - ./keda/ks.yaml
+  - ./kromgo/ks.yaml
+  - ./kube-prometheus-stack/ks.yaml
+  - ./loki/ks.yaml
+  - ./network-ups-tools/ks.yaml
+  - ./notifiarr/ks.yaml
+  - ./ntfy/ks.yaml
+  - ./ntfy-alertmanager/ks.yaml
   - ./prometheus-operator-crds/ks.yaml
+  - ./promtail/ks.yaml
+  - ./redisinsight/ks.yaml
+  - ./unpoller/ks.yaml
+
+  # Exporters
+  - ./exporters

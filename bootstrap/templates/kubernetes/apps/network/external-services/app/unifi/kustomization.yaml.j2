@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: network
+resources:
+  - ./service.yaml
+  - ./endpoints.yaml
+  - ./httproute.yaml
+  - ./backendtlspolicy.yaml
+  - ./backendtrafficpolicy.yaml
+  - ./ca-configmap.yaml

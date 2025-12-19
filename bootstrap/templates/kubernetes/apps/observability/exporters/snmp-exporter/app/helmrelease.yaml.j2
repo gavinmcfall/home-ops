@@ -1,0 +1,58 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app snmp-exporter
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: prometheus-snmp-exporter
+      version: 9.9.1
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: kube-prometheus-stack
+      namespace: observability
+  values:
+    fullnameOverride: *app
+    # Load both default modules config and our custom auth
+    # v0.29 supports multiple --config.file arguments
+    extraArgs:
+      - --config.file=/etc/snmp_exporter/snmp.yml  # Default modules from chart
+      - --config.file=/etc/snmp-auth/auth.yml       # Our custom auth
+    extraSecretMounts:
+      - name: snmp-auth
+        mountPath: /etc/snmp-auth
+        secretName: snmp-exporter-secret
+        readOnly: true
+    serviceMonitor:
+      enabled: true
+      params:
+        - name: udm-pro
+          auth: ["unifi_v3"]
+          module: ["if_mib"]
+          target: 10.90.254.1  # Dream Machine Pro
+        - name: main-switch
+          auth: ["unifi_v3"]
+          module: ["if_mib"]
+          target: 10.90.100.219  # US48 Main Switch
+        - name: main-poe-switch
+          auth: ["unifi_v3"]
+          module: ["if_mib"]
+          target: 10.90.100.191  # US 24 PoE 250W
+      path: /snmp
+      scrapeTimeout: 10s
+      relabelings:
+        - {sourceLabels: ["__param_target"], targetLabel: instance}

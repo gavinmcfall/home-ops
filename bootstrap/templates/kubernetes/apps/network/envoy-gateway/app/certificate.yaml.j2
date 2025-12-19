@@ -1,0 +1,48 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/cert-manager.io/certificate_v1.json
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: envoy-gateway
+spec:
+  secretName: "envoy-gateway-${SECRET_DOMAIN/./-}-tls"
+  secretTemplate:
+    labels:
+      app.kubernetes.io/name: envoy-gateway-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: "${SECRET_DOMAIN}"
+  dnsNames:
+    - "${SECRET_DOMAIN}"
+    - "*.${SECRET_DOMAIN}"
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/external-secrets.io/pushsecret_v1alpha1.json
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: envoy-gateway-tls
+spec:
+  secretStoreRefs:
+    - name: onepassword-connect
+      kind: ClusterSecretStore
+  selector:
+    secret:
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: envoy-gateway-tls
+  template:
+    data:
+      tls.crt: '{{ index . "tls.crt" | b64enc }}'
+      tls.key: '{{ index . "tls.key" | b64enc }}'
+  data:
+    - match:
+        secretKey: &crt_key tls.crt
+        remoteRef:
+          remoteKey: "envoy-gateway-${SECRET_DOMAIN/./-}-tls"
+          property: *crt_key
+    - match:
+        secretKey: &key_key tls.key
+        remoteRef:
+          remoteKey: "envoy-gateway-${SECRET_DOMAIN/./-}-tls"
+          property: *key_key

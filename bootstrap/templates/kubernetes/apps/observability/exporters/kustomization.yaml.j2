@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./blackbox-exporter/ks.yaml
+  - ./exportarr-radarr/ks.yaml
+  - ./exportarr-sonarr/ks.yaml
+  - ./graphite-exporter/ks.yaml
+  - ./intel-gpu-exporter/ks.yaml
+  - ./mariadb-exporter/ks.yaml
+  - ./nut-exporter/ks.yaml
+  - ./plex-exporter/ks.yaml
+  - ./smartctl-exporter/ks.yaml
+  - ./snmp-exporter/ks.yaml
+  - ./speedtest-exporter/ks.yaml
+  - ./tautulli-exporter/ks.yaml

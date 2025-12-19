@@ -1,0 +1,73 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ntfy-alertmanager
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: ntfy-alertmanager
+  interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      ntfy-alertmanager:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: codeberg.org/xenrox/ntfy-alertmanager
+              tag: "0.5.0"
+            args:
+              - --config
+              - /etc/ntfy-alertmanager/config.scfg
+            env:
+              TZ: ${TIMEZONE}
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 64Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: ntfy-alertmanager
+        ports:
+          http:
+            port: 8080
+    persistence:
+      config:
+        type: configMap
+        name: ntfy-alertmanager-config
+        globalMounts:
+          - path: /etc/ntfy-alertmanager/config.scfg
+            subPath: config.scfg
+            readOnly: true

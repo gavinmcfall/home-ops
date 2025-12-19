@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/monitoring.coreos.com/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: exportarr-radarr
+  labels:
+    app.kubernetes.io/instance: exportarr-radarr
+    app.kubernetes.io/name: exportarr-radarr
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: exportarr-radarr
+  endpoints:
+    - port: radarr
+      interval: 1m
+      scrapeTimeout: 30s
+      path: /metrics
+    - port: radarr-uhd
+      interval: 1m
+      scrapeTimeout: 30s
+      path: /metrics
