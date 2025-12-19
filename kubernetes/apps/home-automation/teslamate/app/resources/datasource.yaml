@@ -6,7 +6,7 @@ datasources:
     type: postgres
     uid: teslamate
     access: proxy
-    url: postgres17-rw.database.svc.cluster.local
+    url: postgres18-cluster-rw.database.svc.cluster.local
     user: {{ .TESLAMATE_POSTGRES_USER }}
     jsonData:
       database: teslamate
