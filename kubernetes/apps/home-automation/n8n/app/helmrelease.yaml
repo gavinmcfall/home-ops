@@ -43,6 +43,7 @@ spec:
               N8N_PORT: &port 80
               N8N_HOST: &host "n8n.${SECRET_DOMAIN}"
               WEBHOOK_URL: "https://n8n.${SECRET_DOMAIN}"
+              N8N_BLOCK_ENV_ACCESS_IN_NODE: true
               N8N_LOG_LEVEL: debug
               N8N_LOG_OUTPUT: console, file
               N8N_PERSONALIZATION_ENABLED: true
