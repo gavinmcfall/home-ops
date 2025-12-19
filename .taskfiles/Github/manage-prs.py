@@ -76,7 +76,7 @@ def parse_renovate_body(body: str) -> list[tuple[str, str]]:
     return updates
 
 
-def classify_update(body: str, title: str) -> str:
+def classify_update(body: str, title: str, labels: list[dict]) -> str:
     """Classify a PR as digest, patch, minor, major, or unknown."""
     updates = parse_renovate_body(body)
     if updates:
@@ -89,6 +89,18 @@ def classify_update(body: str, title: str) -> str:
     # Fallback: keyword match
     if match := re.search(r"\b(major|minor|patch)\b", title, re.IGNORECASE):
         return match.group(1).lower()
+
+    # Fallback: Check labels for type/patch, type/minor, etc.
+    for label in labels:
+        label_name = label.get("name", "").lower()
+        if label_name == "type/digest":
+            return "digest"
+        if label_name == "type/patch":
+            return "patch"
+        if label_name == "type/minor":
+            return "minor"
+        if label_name == "type/major":
+            return "major"
 
     return "unknown"
 
@@ -104,7 +116,7 @@ def group_prs(prs: list[dict]) -> dict[str, list[dict]]:
     grouped = defaultdict(list)
 
     for pr in prs:
-        update_type = classify_update(pr.get("body", ""), pr["title"])
+        update_type = classify_update(pr.get("body", ""), pr["title"], pr.get("labels", []))
         if is_dont_touch(pr["title"]):
             update_type = "dont_touch"
         grouped[update_type].append(pr)

@@ -52,6 +52,8 @@ spec:
               tag: v2.4.1@sha256:e6a6298e67ae077808fdb7d8d5565955f60b0708191576143fc02d30ab1389d1
             env:
               TZ: ${TIMEZONE}
+              # Config file (from secret, templated by ESO with secrets from 1Password)
+              IMMICH_CONFIG_FILE: /config/immich-config.yaml
               IMMICH_TRUSTED_PROXIES: "10.69.0.0/16,10.96.0.0/16"
               IMMICH_MEDIA_LOCATION: &mediaLocation /library
               DB_URL:
@@ -61,27 +63,6 @@ spec:
                     key: DB_URL
               REDIS_HOSTNAME: &redisHostname "dragonfly.database.svc.cluster.local"
               IMMICH_TELEMETRY_INCLUDE: "all"
-              # FFmpeg hardware acceleration (Intel QSV)
-              IMMICH_FFMPEG_ACCEL: qsv
-              IMMICH_FFMPEG_ACCEL_DECODE: "true"
-              IMMICH_FFMPEG_PRESET: veryfast
-              IMMICH_FFMPEG_CRF: "23"
-              # OIDC / Pocket-ID
-              OAUTH_ENABLED: "true"
-              OAUTH_ISSUER_URL: https://id.${SECRET_DOMAIN}
-              OAUTH_CLIENT_ID:
-                valueFrom:
-                  secretKeyRef:
-                    name: immich-secret
-                    key: OAUTH_CLIENT_ID
-              OAUTH_CLIENT_SECRET:
-                valueFrom:
-                  secretKeyRef:
-                    name: immich-secret
-                    key: OAUTH_CLIENT_SECRET
-              OAUTH_SCOPE: "openid profile email"
-              OAUTH_AUTO_REGISTER: "true"
-              OAUTH_BUTTON_TEXT: "Login with Pocket-ID"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -225,6 +206,15 @@ spec:
               - name: immich
                 port: *port
     persistence:
+      config:
+        type: secret
+        name: immich-secret
+        advancedMounts:
+          immich:
+            main:
+              - path: /config/immich-config.yaml
+                subPath: immich-config.yaml
+                readOnly: true
       matplotlib:
         type: emptyDir
         advancedMounts:
