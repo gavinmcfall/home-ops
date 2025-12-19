@@ -7,6 +7,35 @@ service:
   name: kube-dns
   clusterIP: "10.96.0.10"
 servers:
+  # Internal gateway rewrite - resolves *.internal.nerdz.cloud to ClusterIP
+  # This works around Cilium DSR hairpin limitation (pods can't reach LB VIP on same node)
+  # Services like id.nerdz.cloud CNAME to internal.nerdz.cloud which resolves to LB VIP externally
+  - zones:
+      - zone: ${SECRET_DOMAIN}
+        scheme: dns://
+    port: 53
+    plugins:
+      - name: errors
+      - name: log
+        configBlock: |-
+          class error
+      - name: template
+        parameters: IN A
+        configBlock: |-
+          match ^internal\.nerdz\.cloud\.$
+          answer "{{ .Name }} 60 IN A 10.96.9.253"
+          fallthrough
+      - name: template
+        parameters: IN AAAA
+        configBlock: |-
+          match ^internal\.nerdz\.cloud\.$
+          rcode NOERROR
+          fallthrough
+      - name: forward
+        parameters: . /etc/resolv.conf
+      - name: cache
+        parameters: 30
+  # Default server
   - zones:
       - zone: .
         scheme: dns://
