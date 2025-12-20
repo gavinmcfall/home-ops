@@ -116,6 +116,28 @@ This Git repository contains the following directories:
 
 ---
 
+## 💾 Backup Architecture
+
+<details>
+  <summary>Click to expand backup strategy</summary>
+
+![Backup Strategy](./docs/ai-context/images/claude_backup_strategy.png)
+
+### Backup Flows
+
+| Flow | Tool | Destinations | Schedule |
+|------|------|--------------|----------|
+| Application PVCs | VolSync + Kopia | NFS (hourly), B2/R2 (daily) | Hourly/Daily |
+| NFS to Cloud | Kopia Server | B2 (2 AM), R2 (3 AM) | Daily |
+| PostgreSQL | pgBackRest | B2 (3 AM), R2 (4 AM) | Daily |
+| Images | TrueNAS Cloud Sync | B2 | TrueNAS scheduled |
+
+For details, see the [Backup Strategy Guide](./docs/Guides/Storage/Backup-Strategy/README.md).
+
+</details>
+
+---
+
 ## 🌐 Networking
 
 <details>

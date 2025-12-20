@@ -239,6 +239,44 @@ home-ops/
 
 ---
 
+## Backup Strategy
+
+![Backup Strategy](images/claude_backup_strategy.png)
+
+### Four Backup Flows
+
+1. **VolSync + Kopia (Application PVCs)**
+   - VolSync creates Kopia snapshots of app PVCs (radarr, sonarr, bazarr, etc.)
+   - All data flows through Kopia for compression/deduplication
+   - Three destinations: NFS (hourly), Backblaze B2 (daily), Cloudflare R2 (daily)
+
+2. **Kopia Server Sync (NFS to Cloud)**
+   - Kopia server reads from NFS at `citadel.internal:/mnt/storage0/backups/VolsyncKopia`
+   - CronJobs sync repository to B2 (2 AM) and R2 (3 AM)
+   - Provides additional redundancy for NFS backups
+
+3. **pgBackRest (PostgreSQL Databases)**
+   - postgres18-cluster and postgres18-immich clusters
+   - Dual scheduled backups: B2 (3 AM) and R2 (4 AM)
+   - Full + WAL archiving with 14-day retention
+
+4. **TrueNAS Cloud Sync (Images)**
+   - Configured directly in TrueNAS UI (not in this repo)
+   - Syncs image storage to Backblaze B2
+
+### Backup Schedules
+
+| Component | Destination | Schedule | Retention |
+|-----------|-------------|----------|-----------|
+| VolSync NFS | TrueNAS Citadel | Hourly | 24h + 7 days |
+| VolSync B2/R2 | Cloud | Daily (midnight) | 14 days |
+| Kopia sync B2 | Backblaze | 2 AM daily | Mirrors NFS |
+| Kopia sync R2 | Cloudflare | 3 AM daily | Mirrors NFS |
+| pgBackRest B2 | Backblaze | 3 AM daily | 14 full + 30 diff |
+| pgBackRest R2 | Cloudflare | 4 AM daily | 14 full + 30 diff |
+
+---
+
 ## Evidence
 
 | Claim | Source | Confidence |
