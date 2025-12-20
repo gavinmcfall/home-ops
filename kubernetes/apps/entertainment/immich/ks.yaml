@@ -11,7 +11,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: cloudnative-pg-immich18
+    - name: cloudnative-pg-postgres18-immich
       namespace: database
   path: ./kubernetes/apps/entertainment/immich/app
   prune: true
