@@ -66,6 +66,8 @@ spec:
               REDIS_HOSTNAME: &redisHostname "dragonfly.database.svc.cluster.local"
               # Isolate Immich data in dedicated Redis DB index
               REDIS_DBINDEX: "1"
+              # Explicit ML service URL for resilience
+              IMMICH_MACHINE_LEARNING_URL: "http://immich-machine-learning.entertainment.svc.cluster.local:3003"
               IMMICH_TELEMETRY_INCLUDE: "all"
             securityContext:
               allowPrivilegeEscalation: false
@@ -112,6 +114,9 @@ spec:
               # ML cache folder paths
               MACHINE_LEARNING_CACHE_FOLDER: "/cache"
               TRANSFORMERS_CACHE: "/cache"
+              # Preload models on startup for faster first requests
+              MACHINE_LEARNING_PRELOAD__CLIP: "ViT-B-32__openai"
+              MACHINE_LEARNING_PRELOAD__FACIAL_RECOGNITION: "buffalo_l"
               IMMICH_MEDIA_LOCATION: *mediaLocation
             securityContext:
               allowPrivilegeEscalation: false
