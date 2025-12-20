@@ -38,6 +38,15 @@ data:
   QBITTORRENT_LBIP: "10.99.8.205"
   PLEX_LBIP: "10.99.8.206"
   DRAGONFLY_LBIP: "10.99.8.207"
+  # Dragonfly Redis DB Index Allocation:
+  # | Index | App                      |
+  # |-------|--------------------------|
+  # | 0     | Manyfold, PeerTube       |
+  # | 1     | Immich                   |
+  # | 2     | Paperless                |
+  # | 3     | ROMM                     |
+  # | 4     | SearXNG                  |
+  # | 5-15  | Available                |
   JELLYFIN_LBIP: "10.99.8.208"
   NETWORK_UPS_TOOLS_LBIP: "10.99.8.209"
   GRAPHITE_EXPORTER_LBIP: "10.99.8.210"
