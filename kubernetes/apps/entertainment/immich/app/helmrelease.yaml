@@ -56,12 +56,16 @@ spec:
               IMMICH_CONFIG_FILE: /config/immich-config.yaml
               IMMICH_TRUSTED_PROXIES: "10.69.0.0/16,10.96.0.0/16"
               IMMICH_MEDIA_LOCATION: &mediaLocation /library
+              # Prevent NFS mount check failures
+              IMMICH_IGNORE_MOUNT_CHECK_ERRORS: "true"
               DB_URL:
                 valueFrom:
                   secretKeyRef:
                     name: immich-secret
                     key: DB_URL
               REDIS_HOSTNAME: &redisHostname "dragonfly.database.svc.cluster.local"
+              # Isolate Immich data in dedicated Redis DB index
+              REDIS_DBINDEX: "1"
               IMMICH_TELEMETRY_INCLUDE: "all"
             securityContext:
               allowPrivilegeEscalation: false
@@ -103,7 +107,11 @@ spec:
               tag: v2.4.1@sha256:b3deefd1826f113824e9d7bc30d905e7f823535887d03f869330946b6db3b44a
             env:
               REDIS_HOSTNAME: *redisHostname
+              REDIS_DBINDEX: "1"
               MPLCONFIGDIR: "/cache/matplotlib"
+              # ML cache folder paths
+              MACHINE_LEARNING_CACHE_FOLDER: "/cache"
+              TRANSFORMERS_CACHE: "/cache"
               IMMICH_MEDIA_LOCATION: *mediaLocation
             securityContext:
               allowPrivilegeEscalation: false
