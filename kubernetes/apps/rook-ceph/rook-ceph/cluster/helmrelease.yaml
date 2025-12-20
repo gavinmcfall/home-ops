@@ -51,7 +51,7 @@ spec:
           dataSource: zero
           iteration: 1
       cephVersion:
-        image: quay.io/ceph/ceph:v19.2.3-20250717
+        image: quay.io/ceph/ceph:v20.2.0-20251104
         allowUnsupported: false
       crashCollector:
         disable: false
