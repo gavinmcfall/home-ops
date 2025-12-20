@@ -15,7 +15,7 @@ spec:
       namespace: rook-ceph
     - name: dragonfly-cluster
       namespace: database
-    - name: cloudnative-pg-cluster17
+    - name: cloudnative-pg-postgres18-cluster
       namespace: database
   path: ./kubernetes/apps/plane/plane/app
   prune: true
