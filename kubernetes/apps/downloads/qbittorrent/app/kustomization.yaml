@@ -9,7 +9,7 @@ resources:
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/guarded
-  - ../../../../components/volsync
+  # - ../../../../components/volsync  # TEMP: disabled during restore
 configMapGenerator:
   - name: qbittorrent-scripts
     files:
