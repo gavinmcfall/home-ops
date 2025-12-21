@@ -28,6 +28,15 @@ spec:
     - name: volsync
       namespace: storage
   values:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: {type: RuntimeDefault}
     controllers:
       qbittorrent:
         annotations:
@@ -71,16 +80,9 @@ spec:
                   failureThreshold: 30
                   periodSeconds: 10
             securityContext:
-              runAsUser: 568
-              runAsGroup: 568
-              fsGroup: 568
-              fsGroupChangePolicy: OnRootMismatch
-              supplementalGroups: [10000]
-              seccompProfile: { type: RuntimeDefault }
-              runAsNonRoot: true
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 100m
