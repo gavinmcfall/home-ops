@@ -4,9 +4,3 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-configMapGenerator:
-  - name: tqm-configmap
-    files:
-      - ./resources/config.yaml
-generatorOptions:
-  disableNameSuffixHash: true
