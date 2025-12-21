@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+  - ./pvc.yaml
   # - ./networkpolicy.yaml
 components:
   - ../../../../components/keda/nfs-scaler
