@@ -1,0 +1,14 @@
+---
+# Bootstrap PVC without dataSourceRef
+# Used when no Kopia backup exists yet
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${APP}
+spec:
+  accessModes:
+    - ${VOLSYNC_ACCESSMODES:=ReadWriteOnce}
+  resources:
+    requests:
+      storage: ${VOLSYNC_CAPACITY:=5Gi}
+  storageClassName: ${VOLSYNC_STORAGECLASS:=ceph-block}

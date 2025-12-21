@@ -5,12 +5,11 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  - ./pvc.yaml
   # - ./networkpolicy.yaml
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/guarded
-  - ../../../../components/volsync
+  - ../../../../components/volsync-migrate  # Bootstrap: switch to volsync after first backup
 configMapGenerator:
   - name: qbittorrent-scripts
     files:

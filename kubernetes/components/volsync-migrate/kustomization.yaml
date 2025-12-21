@@ -1,9 +1,11 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
-# Migration-only component for apps with existing PVCs
-# Use this for initial backup migration, then switch to full volsync component
+# Bootstrap component for apps WITHOUT existing Kopia backups
+# Creates PVC + ReplicationSources only (no ReplicationDestination)
+# After first backup succeeds, switch to full volsync component
 apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
-resources:
-  - ../volsync/externalsecret.yaml
-  - ../volsync/replicationsource.yaml
+components:
+  - ./nfs-truenas
+  - ../volsync/s3-backblaze
+  - ../volsync/s3-cloudflare
