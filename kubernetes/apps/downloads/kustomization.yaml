@@ -20,7 +20,7 @@ resources:
   - ./kapowarr/ks.yaml
   - ./metube/ks.yaml
   - ./prowlarr/ks.yaml
-  # - ./qbittorrent/ks.yaml  # Disabled - full cleanup
+  - ./qbittorrent/ks.yaml  # Restic restore from Dec 10
   - ./qui/ks.yaml
   - ./radarr/ks.yaml
   - ./radarr-uhd/ks.yaml
