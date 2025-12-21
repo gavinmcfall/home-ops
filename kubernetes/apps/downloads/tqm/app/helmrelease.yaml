@@ -42,9 +42,6 @@ spec:
               - qbt
             env:
               TZ: *timeZone
-            envFrom:
-              - secretRef:
-                  name: tqm-secret
             resources:
               requests:
                 cpu: 25m
