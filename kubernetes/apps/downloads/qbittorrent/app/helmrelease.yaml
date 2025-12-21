@@ -107,6 +107,8 @@ spec:
               - secretRef:
                   name: qbittorrent-secret
             securityContext:
+              runAsUser: 0
+              runAsNonRoot: false
               capabilities:
                 add:
                   - NET_ADMIN
