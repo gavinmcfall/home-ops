@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/volsync.backube/replicationdestination_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: "${APP}-restic-dst"
+  labels:
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
+spec:
+  trigger:
+    manual: restore-once
+  restic:
+    repository: ${APP}-volsync-restic-secret
+    destinationPVC: ${APP}
+    copyMethod: Direct
+    storageClassName: ${VOLSYNC_STORAGECLASS:=ceph-block}
+    accessModes:
+      - ${VOLSYNC_ACCESSMODES:=ReadWriteOnce}
+    capacity: ${VOLSYNC_CAPACITY:=5Gi}
+    cacheStorageClassName: ${VOLSYNC_CACHE_SNAPSHOTCLASS:=openebs-hostpath}
+    cacheAccessModes:
+      - ${VOLSYNC_CACHE_ACCESSMODES:=ReadWriteOnce}
+    cacheCapacity: ${VOLSYNC_CACHE_CAPACITY:=8Gi}
+    # Restore snapshots from before this timestamp
+    restoreAsOf: "${RESTIC_RESTORE_AS_OF:=2025-12-10T23:59:59Z}"
+    moverSecurityContext:
+      runAsUser: ${VOLSYNC_UID:=568}
+      runAsGroup: ${VOLSYNC_GID:=568}
+      fsGroup: ${VOLSYNC_GID:=568}

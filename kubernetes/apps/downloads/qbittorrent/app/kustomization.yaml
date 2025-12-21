@@ -5,20 +5,12 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  # - ./networkpolicy.yaml
 components:
-  # - ../../../../components/keda/nfs-scaler  # Disabled during restore
-  - ../../../../components/gatus/guarded
-  - ../../../../components/volsync-migrate  # Bootstrap: switch to volsync after first backup
+  # Restore from old Restic backup in Backblaze B2 - no KEDA, no Kopia
+  - ../../../../components/volsync-restic-restore
 configMapGenerator:
   - name: qbittorrent-scripts
     files:
       - completed.sh=./resources/completed.sh
-  - name: qbittorrent-loki-rules
-    files:
-      - ./resources/lokirule.yaml
-    options:
-      labels:
-        loki_rule: "true"
 generatorOptions:
   disableNameSuffixHash: true

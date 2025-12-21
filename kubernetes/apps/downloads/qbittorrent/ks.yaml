@@ -26,8 +26,9 @@ spec:
   postBuild:
     substitute:
       APP: *app
-      GATUS_SUBDOMAIN: qb
       VOLSYNC_CAPACITY: 2Gi
       VOLSYNC_ACCESSMODES: ReadWriteMany
       VOLSYNC_STORAGECLASS: ceph-filesystem
       VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
+      # Restore from Dec 10, 2025 - before Kopia migration
+      RESTIC_RESTORE_AS_OF: "2025-12-10T23:59:59Z"

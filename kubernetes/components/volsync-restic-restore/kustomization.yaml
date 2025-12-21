@@ -1,0 +1,10 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+# Restore component for apps using old Restic backups in Backblaze B2
+# Creates PVC + ReplicationDestination for one-time restore from Restic
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+resources:
+  - ./externalsecret.yaml
+  - ./replicationdestination.yaml
+  - ./pvc.yaml
