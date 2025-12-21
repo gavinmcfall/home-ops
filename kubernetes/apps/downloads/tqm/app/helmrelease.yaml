@@ -74,8 +74,8 @@ spec:
         globalMounts:
           - path: /.config/tqm
       config-file:
-        type: secret
-        name: tqm-secret
+        type: configMap
+        name: tqm-config
         globalMounts:
           - path: /.config/tqm/config.yaml
             subPath: config.yaml
