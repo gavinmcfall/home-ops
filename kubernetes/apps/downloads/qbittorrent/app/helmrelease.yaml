@@ -44,8 +44,9 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/home-operations/qbittorrent
-              tag: 5.1.4@sha256:25fc7caf22101f85276ede9b1f76a46b7a93971bb6b70b6c58d14d6ab7f51415
+              # Temporarily using 5.0.2 to read Dec 10 backup - export torrents then upgrade
+              repository: ghcr.io/onedr0p/qbittorrent
+              tag: 5.0.2@sha256:c228a180dbfcd96c25accf48fb248ca75be4e92938238325d00bba4edfcff4bb
             env:
               TZ: ${TIMEZONE}
               QBT_WEBUI_PORT: &port 80
