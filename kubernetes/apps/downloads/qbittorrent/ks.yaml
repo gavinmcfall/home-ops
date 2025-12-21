@@ -27,7 +27,7 @@ spec:
     substitute:
       APP: *app
       GATUS_SUBDOMAIN: qb
-      VOLSYNC_CAPACITY: 2Gi
-      VOLSYNC_ACCESSMODES: ReadWriteMany
-      VOLSYNC_STORAGECLASS: ceph-filesystem
-      VOLSYNC_SNAPSHOTCLASS: csi-ceph-filesystem
+      VOLSYNC_CAPACITY: 1Gi
+      VOLSYNC_ACCESSMODES: ReadWriteOnce
+      VOLSYNC_STORAGECLASS: ceph-block
+      VOLSYNC_SNAPSHOTCLASS: csi-ceph-block
