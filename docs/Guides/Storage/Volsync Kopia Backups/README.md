@@ -631,6 +631,10 @@ These gotchas were discovered during implementation:
 | DNS annotation | `external-dns.alpha...` | `internal-dns.alpha.kubernetes.io/target` |
 | PVC dataSource | Can be changed | Immutable after creation—delete and recreate |
 | Kopia mover | Standard Volsync | Requires [perfectra1n/volsync](https://github.com/perfectra1n/volsync-kopia) fork |
+| Storage class for backups | `ceph-filesystem` | `ceph-block` (see warning below) |
 
 > [!CAUTION]
 > The upstream Volsync doesn't have native Kopia support yet. You must use the `perfectra1n/volsync` fork which adds the Kopia mover. Track the upstream PR for when this gets merged.
+
+> [!WARNING]
+> **CephFS Sparse File Corruption**: Do not use `ceph-filesystem` storage class for VolSync-backed PVCs. CephFS has a quirk with sparse file handling during restore operations that can silently zero out file contents while preserving file metadata (size, permissions). All VolSync-backed PVCs should use `ceph-block`. Use `ceph-filesystem` only for shared working storage (e.g., media processing) that doesn't need backup/restore.

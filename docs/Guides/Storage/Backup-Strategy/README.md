@@ -138,3 +138,17 @@ VolSync includes Prometheus alerts:
 - `VolSyncVolumeOutOfSync` - Fired when a volume is out of sync for 15 minutes
 
 See `kubernetes/apps/storage/volsync/app/prometheusrule.yaml` for alert definitions.
+
+---
+
+## Storage Class Requirements
+
+> [!WARNING]
+> **CephFS Sparse File Corruption**: Do not use `ceph-filesystem` for VolSync-backed PVCs. CephFS has issues with sparse file handling during restore operations that can silently zero out file contents. Use `ceph-block` for all backup/restore workloads.
+
+| Use Case | Storage Class | Notes |
+|----------|---------------|-------|
+| App config/data (backed by VolSync) | `ceph-block` | Required for reliable restores |
+| Shared working storage (media processing) | `ceph-filesystem` | ReadWriteMany, not backed up |
+| Databases (backed by pgBackRest) | `ceph-block` | Block storage for performance |
+| Temporary/cache data | `openebs-hostpath` | Node-local, ephemeral |
