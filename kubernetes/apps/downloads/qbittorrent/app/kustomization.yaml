@@ -6,8 +6,8 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
 components:
-  # Restore from old Restic backup in Backblaze B2 - no KEDA, no Kopia
-  - ../../../../components/volsync-restic-restore
+  - ../../../../components/keda/nfs-scaler
+  - ../../../../components/volsync
 configMapGenerator:
   - name: qbittorrent-scripts
     files:
