@@ -145,6 +145,8 @@ See `kubernetes/apps/storage/volsync/app/prometheusrule.yaml` for alert definiti
 
 > [!WARNING]
 > **CephFS Sparse File Corruption**: Do not use `ceph-filesystem` for VolSync-backed PVCs. CephFS has issues with sparse file handling during restore operations that can silently zero out file contents. Use `ceph-block` for all backup/restore workloads.
+>
+> **Also disable** `csi.readAffinity.enabled` in your rook-ceph cluster—this setting can worsen CephFS data consistency issues.
 
 | Use Case | Storage Class | Notes |
 |----------|---------------|-------|

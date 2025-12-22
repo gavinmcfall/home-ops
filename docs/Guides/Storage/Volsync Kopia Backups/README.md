@@ -638,3 +638,5 @@ These gotchas were discovered during implementation:
 
 > [!WARNING]
 > **CephFS Sparse File Corruption**: Do not use `ceph-filesystem` storage class for VolSync-backed PVCs. CephFS has a quirk with sparse file handling during restore operations that can silently zero out file contents while preserving file metadata (size, permissions). All VolSync-backed PVCs should use `ceph-block`. Use `ceph-filesystem` only for shared working storage (e.g., media processing) that doesn't need backup/restore.
+>
+> **Additionally**: Disable `csi.readAffinity.enabled` in your rook-ceph cluster config. This setting can exacerbate CephFS data consistency issues by preferring local OSD reads.
