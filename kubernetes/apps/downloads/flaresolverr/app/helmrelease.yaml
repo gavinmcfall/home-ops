@@ -41,7 +41,9 @@ spec:
     service:
       app:
         controller: *app
-        type: ClusterIP
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: ${FLARESOLVERR_LBIP}
         ports:
           http:
             port: 8191

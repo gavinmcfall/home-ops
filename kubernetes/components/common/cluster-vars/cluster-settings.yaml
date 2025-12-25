@@ -38,6 +38,13 @@ data:
   QBITTORRENT_LBIP: "10.99.8.205"
   PLEX_LBIP: "10.99.8.206"
   DRAGONFLY_LBIP: "10.99.8.207"
+  JELLYFIN_LBIP: "10.99.8.208"
+  NETWORK_UPS_TOOLS_LBIP: "10.99.8.209"
+  GRAPHITE_EXPORTER_LBIP: "10.99.8.210"
+  FLARESOLVERR_LBIP: "10.99.8.211"
+  POSTGRES18_IMMICH_LBIP: "10.99.8.212"
+  POSTGRES18_CLUSTER_LBIP: "10.99.8.213"
+
   # Dragonfly Redis DB Index Allocation:
   # | Index | App                      |
   # |-------|--------------------------|
@@ -47,9 +54,3 @@ data:
   # | 3     | ROMM                     |
   # | 4     | SearXNG                  |
   # | 5-15  | Available                |
-  JELLYFIN_LBIP: "10.99.8.208"
-  NETWORK_UPS_TOOLS_LBIP: "10.99.8.209"
-  GRAPHITE_EXPORTER_LBIP: "10.99.8.210"
-  # UNUSED_LBIP: "10.99.8.211"
-  POSTGRES18_IMMICH_LBIP: "10.99.8.212"
-  POSTGRES18_CLUSTER_LBIP: "10.99.8.213"

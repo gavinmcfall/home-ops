@@ -21,6 +21,7 @@ categories: ["Architecture[100%]", "Networking[100%]"]
 |----|---------|---------|
 | 10.99.8.201 | external gateway | Public traffic ingress (via Cloudflare) |
 | 10.99.8.202 | internal gateway | Private traffic ingress (LAN direct) |
+| 10.99.8.211 | flaresolverr | Cloudflare challenge solver API for CLI tools |
 
 ### Node IPs
 
