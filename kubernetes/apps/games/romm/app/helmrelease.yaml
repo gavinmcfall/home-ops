@@ -101,8 +101,8 @@ spec:
         type: configMap
         name: romm-config
         globalMounts:
-          - path: /romm/config/config.yaml
-            subPath: config.yaml
+          - path: /romm/config/config.yml
+            subPath: config.yml
             readOnly: true
       data:
         existingClaim: romm
