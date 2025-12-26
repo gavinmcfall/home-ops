@@ -1,0 +1,125 @@
+exclude:
+  roms:
+    single_file:
+      extensions:
+        - "xml"
+        - "txt"
+      names:
+        - "info.txt"
+        - "metadata.txt"
+        - "systeminfo.txt"
+        - "psy.ggjud.iso"
+        - "psy.ggjud.nfo"
+        - "._*" # macOS AppleDouble files
+        - "*.nfo"
+        - "Thumbs.db"
+        - "desktop.ini"
+        - "sce_sys" # Common decrypted console internals
+    multi_file:
+      names:
+        # Common multi-file game subfolders / console data dirs
+        - "roms" # Nested ROM directories
+        - "pfx" # Wine/Proton prefix directories
+        - "mlc01" # Wii U emulator (Cemu) internal data directory
+        - ".Trash*" # Linux/macOS trash folders
+
+        # Common ES-DE media folders (prevents accidental scanning)
+        - "3dboxes"
+        - "backcovers"
+        - "covers"
+        - "fanart"
+        - "manuals"
+        - "marquees"
+        - "miximages"
+        - "physicalmedia"
+        - "screenshots"
+        - "titlescreens"
+        - "videos"
+        - "downloaded_media"
+        - "media"
+
+system:
+  platforms:
+    # Nintendo
+    gb: "gb" # Game Boy
+    gba: "gba" # Game Boy Advance
+    gbc: "gbc" # Game Boy Color
+    gc: "ngc" # GameCube
+    n3ds: "3ds" # Nintendo 3DS
+    n64: "n64" # Nintendo 64
+    nds: "nds" # Nintendo DS
+    nes: "nes" # Nintendo Entertainment System
+    snes: "snes" # Super Nintendo Entertainment System
+    switch: "switch" # Nintendo Switch
+    wii: "wii" # Wii
+    wiiu: "wiiu" # Wii U
+    # Sega
+    mastersystem: "sms" # SEGA Master System
+    megadrive: "genesis" # Genesis/Mega Drive
+    dreamcast: "dc" # Dreamcast
+    # Playstation
+    psx: "psx" # PlayStation
+    ps2: "ps2" # PlayStation 2
+    ps3: "ps3" # PlayStation 3
+    ps4: "ps4" # PlayStation 4
+    ps5: "ps5" # Playstation 5
+    psp: "psp" # PlayStation Portable
+    psvita: "psvita" # Playstation Vita
+    # Microsoft
+    xbox: "xbox" # Xbox
+    xbox360: "xbox360" # Xbox 360
+    xboxone: "xboxone" # Xbox One
+    xboxseriesx: "series-x-s" # Xbox One Series X/S
+    # PC
+    dos: "dos" # DOS
+    pc: "win" # PC (Microsoft Windows)
+
+
+scan:
+  # Metadata priority during scans
+  priority:
+    # Below are the default priority values used
+    # Metadata text (titles/descriptions) – ES-DE gamelist intentionally excluded
+    metadata: # Top-level metadata source priority
+      - "ss" # Screenscraper
+      - "ra" # RetroAchievements
+      - "igdb" # IGDB (highest priority)
+      - "hasheous" # Hasheous
+      - "moby" # MobyGames
+      - "launchbox" # Launchbox
+      - "flashpoint" # Flashpoint Project
+      - "hltb" # HowLongToBeat (lowest priority)
+    artwork: # Cover art and screenshots
+      - "gamelist" # ES-DE gamelist.xml
+      - "sgdb" # SteamGridDB
+      - "igdb" # IGDB
+      - "moby" # MobyGames
+      - "ss" # Screenscraper
+      - "ra" # RetroAchievements
+      - "launchbox" # Launchbox
+      - "hasheous" # Hasheous
+      - "flashpoint" # Flashpoint Project
+      - "hltb" # HowLongToBeat
+
+    region:
+      - "us" # United States
+      - "wor" # World
+      - "eu" # Europe
+      - "jp" # Japan
+    language:
+      - "en" # English
+
+  # Media assets to download
+  media:
+    # Used as alternative cover art
+    - box2d # Normal cover art (always enabled)
+    - box3d # 3D box art
+    - miximage # Mixed image of multiple media
+    - physical # Disc, cartridge, etc.
+    # Added to the screenshots carousel
+    - screenshot # Screenshot (enabled by default)
+    - title_screen # Title screen
+    - marquee # Transparent logo
+    - fanart # User uploaded artwork
+    # Gameplay video
+    - video # Video (warning: large file size)

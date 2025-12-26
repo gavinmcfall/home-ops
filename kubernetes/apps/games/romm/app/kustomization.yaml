@@ -11,6 +11,6 @@ components:
 configMapGenerator:
 - name: romm-config
   files:
-    - ./config/config.yml
+    - ./config/config.yaml
   options:
     disableNameSuffixHash: true
