@@ -60,7 +60,7 @@ spec:
               - clean
               - qbt
         pod:
-          restartPolicy: Never
+          restartPolicy: OnFailure
 
     defaultPodOptions:
       securityContext:
