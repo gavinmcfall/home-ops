@@ -7,4 +7,5 @@ resources:
   - ./helmrelease.yaml
   - ./prometheusrule.yaml
   - ./resources/prometheusrule-thunderbolt.yaml
+  - ./resources/prometheusrule-node-overrides.yaml
   # - ./scrapeconfig.yaml
