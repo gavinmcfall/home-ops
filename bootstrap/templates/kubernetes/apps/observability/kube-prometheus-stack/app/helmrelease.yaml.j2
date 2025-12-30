@@ -34,6 +34,9 @@ spec:
     crds:
       enabled: false
     cleanPrometheusOperatorObjectNames: true
+    defaultRules:
+      disabled:
+        NodeSystemSaturation: true
     alertmanager:
       alertmanagerSpec:
         useExistingSecret: true
