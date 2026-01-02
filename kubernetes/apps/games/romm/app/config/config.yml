@@ -4,6 +4,7 @@ exclude:
       extensions:
         - "xml"
         - "txt"
+        - "bin"
       names:
         - "info.txt"
         - "metadata.txt"
