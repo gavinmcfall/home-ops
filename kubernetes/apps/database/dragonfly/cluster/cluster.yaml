@@ -18,12 +18,13 @@ spec:
     - --proactor_threads=2
     - --cluster_mode=emulated
     - --default_lua_flags=allow-undeclared-keys
+    - --shard_repl_backlog_len=8192
   resources:
     requests:
       cpu: 100m
-      memory: 768Mi
-    limits:
       memory: 1Gi
+    limits:
+      memory: 1536Mi
   topologySpreadConstraints:
     - maxSkew: 1
       topologyKey: "kubernetes.io/hostname"
