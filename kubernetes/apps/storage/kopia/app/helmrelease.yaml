@@ -81,43 +81,22 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
-    configMaps:
-      config:
-        data:
-          repository.config: |-
-            {
-              "storage": {
-                "type": "filesystem",
-                "config": {
-                  "path": "/repository"
-                }
-              },
-              "hostname": "volsync.storage.svc.cluster.local",
-              "username": "volsync",
-              "description": "volsync",
-              "enableActions": false
-            }
     persistence:
-      config-file:
-        type: configMap
-        identifier: config
-        globalMounts:
-          - path: /config/repository.config
-            subPath: repository.config
       repository:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/backups/VolsyncKopia
         globalMounts:
           - path: /repository
-      tmpfs:
+      config:
         type: emptyDir
         advancedMounts:
           kopia:
             app:
-              - path: /config/cache
-                subPath: cache
-              - path: /config/logs
-                subPath: logs
+              - path: /config
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          kopia:
+            app:
               - path: /tmp
-                subPath: tmp
