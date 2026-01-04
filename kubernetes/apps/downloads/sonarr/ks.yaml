@@ -32,6 +32,7 @@ spec:
       APP: *app
       GATUS_PATH: /ping
       VOLSYNC_CAPACITY: 2Gi
+      VOLSYNC_MINUTE: "45"
       VOLSYNC_STORAGECLASS: ceph-block
       VOLSYNC_SNAPSHOTCLASS: csi-ceph-block
       VOLSYNC_ACCESSMODES: ReadWriteOnce

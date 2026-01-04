@@ -6,4 +6,4 @@ resources:
   - ./helmrelease.yaml
 components:
   - ../../../../components/keda/nfs-scaler
-  - ../../../../components/volsync
+  - ../../../../components/volsync-standard
