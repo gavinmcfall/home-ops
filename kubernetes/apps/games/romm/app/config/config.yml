@@ -136,5 +136,5 @@ scan:
     - title_screen # Title screen
     - marquee # Transparent logo
     - fanart # User uploaded artwork
-    # Gameplay video
-    - video # Video (warning: large file size)
+    # Gameplay video (disabled - large file size, was consuming 3GB+)
+    # - video
