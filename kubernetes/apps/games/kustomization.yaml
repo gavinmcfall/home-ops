@@ -10,4 +10,4 @@ resources:
   # Applications
   - ./romm/ks.yaml
   - ./android-11/ks.yaml
-  # - ./android-13/ks.yaml
+  - ./android-13/ks.yaml
