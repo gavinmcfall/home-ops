@@ -10,6 +10,7 @@ components:
 resources:
   # Applications
   - ./kopia/ks.yaml
+  - ./minio-console/ks.yaml
   - ./snapshot-controller/ks.yaml
   - ./syncthing/ks.yaml
   - ./volsync/ks.yaml
