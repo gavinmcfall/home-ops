@@ -43,3 +43,7 @@ spec:
         CREATE DATABASE IF NOT EXISTS bookstackapp;
         CREATE USER IF NOT EXISTS 'bookstack'@'%' IDENTIFIED BY '${BOOKSTACK_MARIADB_PASSWORD}';
         GRANT ALL PRIVILEGES ON bookstackapp.* to 'bookstack'@'%';
+      create-pterodactyl.sql: |
+        CREATE DATABASE IF NOT EXISTS pterodactyl;
+        CREATE USER IF NOT EXISTS 'pterodactyl'@'%' IDENTIFIED BY '${PTERODACTYL_MARIADB_PASSWORD}';
+        GRANT ALL PRIVILEGES ON pterodactyl.* to 'pterodactyl'@'%';
