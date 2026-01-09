@@ -11,7 +11,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: rook-ceph-cluster
+    - name: cluster-apps-rook-ceph
       namespace: rook-ceph
     - name: dragonfly-cluster
       namespace: database
