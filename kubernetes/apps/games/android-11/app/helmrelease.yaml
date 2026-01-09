@@ -36,6 +36,8 @@ spec:
             env:
               EMULATOR_DEVICE: "Samsung Galaxy S10"
               WEB_VNC: "true"
+              WEB_LOG: "false"
+              APPIUM: "false"
               EMULATOR_TIMEOUT: "300"
               TZ: ${TIMEZONE}
             resources:
@@ -90,6 +92,19 @@ spec:
           adb:
             port: 5555
             protocol: TCP
+    persistence:
+      emulator:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 20Gi
+        globalMounts:
+          - path: /home/androidusr/emulator
+      android-config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        globalMounts:
+          - path: /home/androidusr/.android
     route:
       app:
         annotations:
@@ -100,6 +115,10 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
+        rules:
+          - backendRefs:
+              - name: android-11
+                port: 6080
       adb:
         kind: TCPRoute
         parentRefs:
