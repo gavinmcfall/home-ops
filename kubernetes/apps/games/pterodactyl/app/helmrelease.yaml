@@ -71,10 +71,11 @@ spec:
           gethomepage.dev/name: Pterodactyl
           gethomepage.dev/icon: pterodactyl
           gethomepage.dev/description: Game Server Management
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
-          - pterodactyl.${SECRET_DOMAIN}
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
-          - name: internal
+          - name: external
             namespace: network
             sectionName: https
         rules:
