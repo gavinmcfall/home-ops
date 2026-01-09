@@ -17,7 +17,7 @@ spec:
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
-    - name: dragonfly
+    - name: dragonfly-operator
       namespace: database
     - name: mariadb
       namespace: database
