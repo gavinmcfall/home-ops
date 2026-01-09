@@ -25,7 +25,7 @@ spec:
   values:
     controllers:
       android-11:
-        replicas: 1
+        replicas: 0 # I will scale up when needed
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
