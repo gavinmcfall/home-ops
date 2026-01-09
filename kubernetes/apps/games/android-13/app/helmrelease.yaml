@@ -92,19 +92,6 @@ spec:
           adb:
             port: 5555
             protocol: TCP
-    persistence:
-      emulator:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 20Gi
-        globalMounts:
-          - path: /home/androidusr/emulator
-      android-config:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        globalMounts:
-          - path: /home/androidusr/.android
     route:
       app:
         annotations:
