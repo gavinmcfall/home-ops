@@ -33,7 +33,21 @@ servers:
           rcode NOERROR
           fallthrough
       - name: forward
-        parameters: . /etc/resolv.conf
+        parameters: . 10.90.254.1
+      - name: cache
+        parameters: 30
+  # Internal domain - forward to UniFi for local DNS
+  - zones:
+      - zone: internal
+        scheme: dns://
+    port: 53
+    plugins:
+      - name: errors
+      - name: log
+        configBlock: |-
+          class error
+      - name: forward
+        parameters: . 10.90.254.1
       - name: cache
         parameters: 30
   # Default server
@@ -59,7 +73,7 @@ servers:
           pods insecure
           fallthrough in-addr.arpa ip6.arpa
       - name: forward
-        parameters: . /etc/resolv.conf
+        parameters: . 10.90.254.1 1.1.1.1
       - name: cache
         parameters: 30
       - name: loop
