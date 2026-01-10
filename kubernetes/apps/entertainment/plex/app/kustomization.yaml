@@ -11,6 +11,16 @@ components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
   - ../../../../components/volsync-standard
+patches:
+  - target:
+      group: keda.sh
+      version: v1alpha1
+      kind: ScaledObject
+      name: plex
+    patch: |
+      - op: replace
+        path: /spec/minReplicaCount
+        value: 1
 configMapGenerator:
   - name: plex-loki-rules
     files:

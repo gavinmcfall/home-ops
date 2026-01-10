@@ -10,3 +10,13 @@ components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
   - ../../../../components/volsync-standard
+patches:
+  - target:
+      group: keda.sh
+      version: v1alpha1
+      kind: ScaledObject
+      name: audiobookshelf
+    patch: |
+      - op: replace
+        path: /spec/minReplicaCount
+        value: 1
