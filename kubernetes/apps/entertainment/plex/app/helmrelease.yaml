@@ -35,6 +35,7 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         pod:
+          priorityClassName: media-critical
           # Soft anti-affinity: prefer not to share node with other GPU apps
           affinity:
             podAntiAffinity:
@@ -126,6 +127,10 @@ spec:
           - name: external
             namespace: network
             sectionName: https
+    podDisruptionBudget:
+      plex:
+        enabled: true
+        minAvailable: 1
     persistence:
       config:
         existingClaim: plex

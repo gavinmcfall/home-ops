@@ -31,6 +31,7 @@ spec:
     controllers:
       audiobookshelf:
         pod:
+          priorityClassName: media-critical
           securityContext:
             runAsNonRoot: true
             runAsUser: 568
@@ -112,6 +113,10 @@ spec:
           - backendRefs:
               - identifier: app
                 port: *port
+    podDisruptionBudget:
+      audiobookshelf:
+        enabled: true
+        minAvailable: 1
     persistence:
       config:
         existingClaim: audiobookshelf
