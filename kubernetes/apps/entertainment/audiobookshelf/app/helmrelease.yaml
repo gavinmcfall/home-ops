@@ -113,10 +113,6 @@ spec:
           - backendRefs:
               - identifier: app
                 port: *port
-    podDisruptionBudget:
-      audiobookshelf:
-        enabled: true
-        minAvailable: 1
     persistence:
       config:
         existingClaim: audiobookshelf

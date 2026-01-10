@@ -127,10 +127,6 @@ spec:
           - name: external
             namespace: network
             sectionName: https
-    podDisruptionBudget:
-      plex:
-        enabled: true
-        minAvailable: 1
     persistence:
       config:
         existingClaim: plex

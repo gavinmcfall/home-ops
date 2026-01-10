@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./backendtrafficpolicy.yaml
+  - ./pdb.yaml
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
