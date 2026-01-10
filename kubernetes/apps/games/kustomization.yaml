@@ -8,7 +8,7 @@ components:
 
 resources:
   # Applications
-  - ./android-11/ks.yaml
-  - ./android-13/ks.yaml
+  # - ./android-11/ks.yaml
+  # - ./android-13/ks.yaml
   - ./pterodactyl/ks.yaml
   - ./romm/ks.yaml
