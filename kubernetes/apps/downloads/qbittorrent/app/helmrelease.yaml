@@ -63,7 +63,7 @@ spec:
               QBT_BitTorrent__Session__InterfaceName: wg0
             probes:
               liveness: &probes
-                enabled: false
+                enabled: true
                 custom: true
                 spec:
                   httpGet:
@@ -113,6 +113,25 @@ spec:
                 add:
                   - NET_ADMIN
               allowPrivilegeEscalation: false
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /v1/publicip/ip
+                    port: 8000
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
+              startup:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /v1/publicip/ip
+                    port: 8000
+                  failureThreshold: 30
+                  periodSeconds: 5
           port-forward:
             image:
               repository: ghcr.io/bjw-s-labs/gluetun-qb-port-sync
