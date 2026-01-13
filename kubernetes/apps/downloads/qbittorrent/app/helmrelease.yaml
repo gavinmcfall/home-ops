@@ -114,7 +114,7 @@ spec:
                   - NET_ADMIN
               allowPrivilegeEscalation: false
             probes:
-              liveness:
+              liveness: &gluetunProbe
                 enabled: true
                 custom: true
                 spec:
@@ -124,6 +124,7 @@ spec:
                   periodSeconds: 30
                   timeoutSeconds: 10
                   failureThreshold: 6
+              readiness: *gluetunProbe
               startup:
                 enabled: true
                 custom: true
