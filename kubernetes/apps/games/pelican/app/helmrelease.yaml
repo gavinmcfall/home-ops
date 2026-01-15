@@ -71,11 +71,14 @@ spec:
                 # Cleanup
                 rm -rf /tmp/plugins.zip /tmp/plugins-main
 
+                # Fix ownership for main container
+                chown -R 1000:1000 /pelican-data
+
                 echo "Plugins installed to $PLUGINS_DIR:"
                 ls -la "$PLUGINS_DIR"
             securityContext:
-              runAsUser: 1000
-              runAsGroup: 1000
+              runAsUser: 0
+              runAsGroup: 0
         containers:
           app:
             image:
