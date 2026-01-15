@@ -47,3 +47,7 @@ spec:
         CREATE DATABASE IF NOT EXISTS pterodactyl;
         CREATE USER IF NOT EXISTS 'pterodactyl'@'%' IDENTIFIED BY '${PTERODACTYL_MARIADB_PASSWORD}';
         GRANT ALL PRIVILEGES ON pterodactyl.* to 'pterodactyl'@'%';
+      create-pelican.sql: |
+        CREATE DATABASE IF NOT EXISTS pelican;
+        CREATE USER IF NOT EXISTS 'pelican'@'%' IDENTIFIED BY '${PELICAN_MARIADB_PASSWORD}';
+        GRANT ALL PRIVILEGES ON pelican.* to 'pelican'@'%';
