@@ -10,5 +10,6 @@ resources:
   # Applications
   # - ./android-11/ks.yaml
   # - ./android-13/ks.yaml
-  - ./pterodactyl/ks.yaml
+  - ./pelican/ks.yaml
+  # - ./pterodactyl/ks.yaml  # Migrated to Pelican
   - ./romm/ks.yaml

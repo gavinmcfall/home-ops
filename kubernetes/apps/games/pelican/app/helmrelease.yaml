@@ -1,0 +1,133 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app pelican
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 15m
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: dragonfly-operator
+      namespace: database
+    - name: mariadb
+      namespace: database
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  driftDetection:
+    mode: enabled
+    ignore:
+      - paths:
+          - /spec/containers/resources/limits
+        target:
+          kind: Pod
+  values:
+    controllers:
+      pelican:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          download-plugins:
+            image:
+              repository: ghcr.io/tarampampam/curl
+              tag: 8.12.1@sha256:ca4cf23af0a88a597ec39f80f735bc0d049424e7d50eadba8a27386e50c18c5f
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -e
+                PLUGINS_DIR=/pelican-data/plugins
+                mkdir -p "$PLUGINS_DIR"
+
+                # Download PocketID Provider plugin
+                echo "Downloading PocketID Provider plugin..."
+                cd /tmp
+                curl -fsSL -o plugins.zip https://github.com/pelican-dev/plugins/archive/refs/heads/main.zip
+                unzip -q plugins.zip
+
+                # Copy PocketID provider plugin
+                if [ -d "plugins-main/pocketid-provider" ]; then
+                  cp -r plugins-main/pocketid-provider "$PLUGINS_DIR/"
+                  echo "PocketID Provider plugin installed"
+                fi
+
+                # Cleanup
+                rm -rf /tmp/plugins.zip /tmp/plugins-main
+
+                echo "Plugins installed to $PLUGINS_DIR:"
+                ls -la "$PLUGINS_DIR"
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+        containers:
+          app:
+            image:
+              repository: ghcr.io/pelican-dev/panel
+              tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
+            env:
+              XDG_DATA_HOME: /pelican-data
+            envFrom:
+              - secretRef:
+                  name: pelican-secret
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                memory: 512Mi
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 80
+
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Games
+          gethomepage.dev/name: Pelican
+          gethomepage.dev/icon: pterodactyl
+          gethomepage.dev/description: Game Server Management
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: 80
+
+    persistence:
+      data:
+        existingClaim: *app
+        advancedMounts:
+          pelican:
+            download-plugins:
+              - path: /pelican-data
+            app:
+              - path: /pelican-data
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /var/www/html/storage/logs
