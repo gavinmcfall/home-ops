@@ -79,6 +79,37 @@ spec:
             securityContext:
               runAsUser: 0
               runAsGroup: 0
+          install-composer-deps:
+            image:
+              repository: ghcr.io/pelican-dev/panel
+              tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -e
+
+                # Copy vendor to shared volume if empty
+                if [ ! -f "/vendor-shared/autoload.php" ]; then
+                  echo "Copying vendor directory to shared volume..."
+                  cp -a /var/www/html/vendor/. /vendor-shared/
+                fi
+
+                # Install pocketid provider if not present
+                if [ ! -d "/vendor-shared/socialiteproviders/pocketid" ]; then
+                  echo "Installing socialiteproviders/pocketid..."
+                  cd /var/www/html
+                  COMPOSER_VENDOR_DIR=/vendor-shared composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress
+                else
+                  echo "socialiteproviders/pocketid already installed"
+                fi
+
+                echo "Composer packages ready"
+            env:
+              XDG_DATA_HOME: /pelican-data
+            securityContext:
+              runAsUser: 0
+              runAsGroup: 0
         containers:
           app:
             image:
@@ -132,6 +163,14 @@ spec:
               - path: /pelican-data
             app:
               - path: /pelican-data
+      vendor:
+        type: emptyDir
+        advancedMounts:
+          pelican:
+            install-composer-deps:
+              - path: /vendor-shared
+            app:
+              - path: /var/www/html/vendor
       logs:
         type: emptyDir
         globalMounts:
