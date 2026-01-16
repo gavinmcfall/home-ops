@@ -35,10 +35,20 @@
                                 ])
                             >
                                 <div class="flex items-center gap-2">
-                                    @if($document->type === 'admin')
+                                    @if($document->type === 'host_admin')
+                                        <x-filament::icon
+                                            icon="tabler-shield-lock"
+                                            class="h-4 w-4 text-danger-500"
+                                        />
+                                    @elseif(in_array($document->type, ['server_admin', 'admin']))
                                         <x-filament::icon
                                             icon="tabler-lock"
-                                            class="h-4 w-4 text-danger-500"
+                                            class="h-4 w-4 text-warning-500"
+                                        />
+                                    @elseif($document->type === 'server_mod')
+                                        <x-filament::icon
+                                            icon="tabler-user-shield"
+                                            class="h-4 w-4 text-info-500"
                                         />
                                     @else
                                         <x-filament::icon
@@ -67,10 +77,20 @@
                                     {{ $selectedDocument->title }}
                                 </h2>
                                 <div class="flex items-center gap-2">
-                                    @if($selectedDocument->type === 'admin')
+                                    @if($selectedDocument->type === 'host_admin')
                                         <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-danger-50 text-danger-700 dark:bg-danger-900/50 dark:text-danger-400">
+                                            <x-filament::icon icon="tabler-shield-lock" class="h-3 w-3" />
+                                            Host Admin
+                                        </span>
+                                    @elseif(in_array($selectedDocument->type, ['server_admin', 'admin']))
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-warning-50 text-warning-700 dark:bg-warning-900/50 dark:text-warning-400">
                                             <x-filament::icon icon="tabler-lock" class="h-3 w-3" />
-                                            Admin Only
+                                            Server Admin
+                                        </span>
+                                    @elseif($selectedDocument->type === 'server_mod')
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-info-50 text-info-700 dark:bg-info-900/50 dark:text-info-400">
+                                            <x-filament::icon icon="tabler-user-shield" class="h-3 w-3" />
+                                            Server Mod
                                         </span>
                                     @endif
                                     @if($selectedDocument->is_global)

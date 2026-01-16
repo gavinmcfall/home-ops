@@ -6,8 +6,6 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Enums\IconSize;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Starter\ServerDocumentation\Filament\Admin\Resources\DocumentResource;
 
 class CreateDocument extends CreateRecord
@@ -31,14 +29,6 @@ class CreateDocument extends CreateRecord
     protected function getFormActions(): array
     {
         return [];
-    }
-
-    protected function handleRecordCreation(array $data): Model
-    {
-        $data['uuid'] ??= Str::uuid()->toString();
-        $data['author_id'] ??= auth()->id();
-
-        return parent::handleRecordCreation($data);
     }
 
     protected function getRedirectUrl(): string

@@ -109,11 +109,21 @@ class Document extends Model
         return $this->versions()->max('version_number') ?? 1;
     }
 
-    // Scopes
+    // Scopes - 4-tier permission system
 
-    public function scopeAdmin(Builder $query): Builder
+    public function scopeHostAdmin(Builder $query): Builder
     {
-        return $query->where('type', 'admin');
+        return $query->where('type', 'host_admin');
+    }
+
+    public function scopeServerAdmin(Builder $query): Builder
+    {
+        return $query->whereIn('type', ['server_admin', 'admin']); // 'admin' for backwards compatibility
+    }
+
+    public function scopeServerMod(Builder $query): Builder
+    {
+        return $query->where('type', 'server_mod');
     }
 
     public function scopePlayer(Builder $query): Builder
@@ -139,15 +149,61 @@ class Document extends Model
         });
     }
 
-    // Helpers
-
-    public function isAdminOnly(): bool
+    public function scopeForTypes(Builder $query, array $types): Builder
     {
-        return $this->type === 'admin';
+        return $query->whereIn('type', $types);
+    }
+
+    // Helpers - 4-tier permission system
+
+    /**
+     * Document type hierarchy (highest to lowest):
+     * - host_admin: Root Admin only
+     * - server_admin: Server owners + admins with Server Update/Create
+     * - server_mod: Subusers with control permissions
+     * - player: Anyone with server access
+     */
+    public const TYPE_HIERARCHY = [
+        'host_admin' => 4,
+        'server_admin' => 3,
+        'admin' => 3, // backwards compatibility
+        'server_mod' => 2,
+        'player' => 1,
+    ];
+
+    public function isHostAdminOnly(): bool
+    {
+        return $this->type === 'host_admin';
+    }
+
+    public function isServerAdminOnly(): bool
+    {
+        return in_array($this->type, ['server_admin', 'admin']);
+    }
+
+    public function isServerModOnly(): bool
+    {
+        return $this->type === 'server_mod';
     }
 
     public function isPlayerVisible(): bool
     {
         return $this->type === 'player';
+    }
+
+    /**
+     * Get the minimum tier required to view this document.
+     */
+    public function getRequiredTier(): int
+    {
+        return self::TYPE_HIERARCHY[$this->type] ?? 1;
+    }
+
+    /**
+     * Check if a user with the given tier can view this document.
+     */
+    public function isVisibleToTier(int $tier): bool
+    {
+        return $tier >= $this->getRequiredTier();
     }
 }

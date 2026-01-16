@@ -42,8 +42,17 @@ class DocumentsRelationManager extends RelationManager
 
                 TextColumn::make('type')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'host_admin' => 'Host Admin',
+                        'server_admin', 'admin' => 'Server Admin',
+                        'server_mod' => 'Server Mod',
+                        'player' => 'Player',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
-                        'admin' => 'danger',
+                        'host_admin' => 'danger',
+                        'server_admin', 'admin' => 'warning',
+                        'server_mod' => 'info',
                         'player' => 'success',
                         default => 'gray',
                     }),
@@ -70,7 +79,9 @@ class DocumentsRelationManager extends RelationManager
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'admin' => 'Admin',
+                        'host_admin' => 'Host Admin',
+                        'server_admin' => 'Server Admin',
+                        'server_mod' => 'Server Mod',
                         'player' => 'Player',
                     ]),
             ])
