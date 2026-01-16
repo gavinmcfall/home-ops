@@ -110,7 +110,7 @@ spec:
                 # Install pocketid provider if not present
                 if [ ! -d "vendor/socialiteproviders/pocketid" ]; then
                   echo "Installing socialiteproviders/pocketid..."
-                  composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress
+                  composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress --ignore-platform-reqs
                 else
                   echo "socialiteproviders/pocketid already installed"
                 fi
