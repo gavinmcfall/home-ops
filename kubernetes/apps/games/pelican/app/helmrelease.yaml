@@ -41,6 +41,31 @@ spec:
       pelican:
         annotations:
           reloader.stakater.com/auto: "true"
+        initContainers:
+          fix-plugins-symlink:
+            image:
+              repository: ghcr.io/pelican-dev/panel
+              tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -e
+                # Ensure plugins dir exists on PVC
+                mkdir -p /pelican-data/plugins
+                chown www-data:www-data /pelican-data/plugins
+                chmod 775 /pelican-data/plugins
+
+                # Fix the nested symlink issue in the official image
+                # Remove the broken /var/www/html/plugins dir and recreate as proper symlink
+                rm -rf /var/www/html/plugins
+                ln -sf /pelican-data/plugins /var/www/html/plugins
+
+                echo "Plugins symlink fixed: /var/www/html/plugins -> /pelican-data/plugins"
+                ls -la /var/www/html/plugins
+            securityContext:
+              runAsUser: 0
+              runAsGroup: 0
         containers:
           app:
             image:
