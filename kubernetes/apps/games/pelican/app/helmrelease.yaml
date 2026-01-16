@@ -41,85 +41,6 @@ spec:
       pelican:
         annotations:
           reloader.stakater.com/auto: "true"
-        initContainers:
-          download-plugins:
-            image:
-              repository: alpine
-              tag: 3.21.2@sha256:56fa17d2a7e7f168a043a2712e63aed1f8543aeafdcee47c58dcffe38ed51099
-            command:
-              - /bin/sh
-              - -c
-              - |
-                set -e
-                apk add --no-cache unzip
-
-                PLUGINS_DIR=/pelican-data/plugins
-                mkdir -p "$PLUGINS_DIR"
-
-                # Download PocketID Provider plugin
-                echo "Downloading PocketID Provider plugin..."
-                cd /tmp
-                wget -q -O plugins.zip https://github.com/pelican-dev/plugins/archive/refs/heads/main.zip
-                unzip -q plugins.zip
-
-                # Copy PocketID provider plugin
-                if [ -d "plugins-main/pocketid-provider" ]; then
-                  cp -r plugins-main/pocketid-provider "$PLUGINS_DIR/"
-                  echo "PocketID Provider plugin installed"
-                fi
-
-                # Cleanup
-                rm -rf /tmp/plugins.zip /tmp/plugins-main
-
-                # Fix ownership for main container (www-data = 82:82)
-                chown -R 82:82 /pelican-data
-
-                echo "Plugins installed to $PLUGINS_DIR:"
-                ls -la "$PLUGINS_DIR"
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
-          copy-vendor:
-            image:
-              repository: ghcr.io/pelican-dev/panel
-              tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
-            command:
-              - /bin/sh
-              - -c
-              - |
-                set -e
-                echo "Copying composer files to shared volume..."
-                cp -a /var/www/html/vendor /composer-workdir/
-                cp /var/www/html/composer.json /composer-workdir/
-                cp /var/www/html/composer.lock /composer-workdir/
-                echo "Composer files copied"
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
-          install-composer-deps:
-            image:
-              repository: composer
-              tag: "2@sha256:f5e5bb7048c7b0182ea153fed4a63d021f3c77d4a654d6572da4a42aaff547e3"
-            command:
-              - /bin/sh
-              - -c
-              - |
-                set -e
-                cd /composer-workdir
-
-                # Install pocketid provider if not present
-                if [ ! -d "vendor/socialiteproviders/pocketid" ]; then
-                  echo "Installing socialiteproviders/pocketid..."
-                  composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress --ignore-platform-reqs
-                else
-                  echo "socialiteproviders/pocketid already installed"
-                fi
-
-                echo "Composer packages ready"
-                ls -la vendor/socialiteproviders/
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
         containers:
           app:
             image:
@@ -167,23 +88,8 @@ spec:
     persistence:
       data:
         existingClaim: *app
-        advancedMounts:
-          pelican:
-            download-plugins:
-              - path: /pelican-data
-            app:
-              - path: /pelican-data
-      composer-workdir:
-        type: emptyDir
-        advancedMounts:
-          pelican:
-            copy-vendor:
-              - path: /composer-workdir
-            install-composer-deps:
-              - path: /composer-workdir
-            app:
-              - path: /var/www/html/vendor
-                subPath: vendor
+        globalMounts:
+          - path: /pelican-data
       logs:
         type: emptyDir
         globalMounts:
