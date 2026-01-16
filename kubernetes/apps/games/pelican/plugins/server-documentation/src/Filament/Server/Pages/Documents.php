@@ -2,6 +2,7 @@
 
 namespace Starter\ServerDocumentation\Filament\Server\Pages;
 
+use App\Enums\SubuserPermission;
 use App\Models\Server;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -64,15 +65,62 @@ class Documents extends Page
         return static::getDocumentsForServer($server);
     }
 
-    protected static function getDocumentsForServer(Server $server): Collection
+    /**
+     * Get the user's document access tier.
+     * Returns an array of document types the user can view.
+     *
+     * Hierarchy (highest to lowest):
+     * - host_admin: Root Admin only
+     * - server_admin: Server owner OR admins with update/create server permission
+     * - server_mod: Subusers with any control.* permission
+     * - player: Everyone with server access
+     */
+    protected static function getAllowedDocTypes(Server $server): array
     {
         $user = user();
-        $canViewAdminDocs = $user?->can('update server', $server);
+
+        if (!$user) {
+            return ['player'];
+        }
+
+        // Host Admin: Root Admin only
+        if ($user->isRootAdmin()) {
+            // Include 'admin' for backwards compatibility with old docs
+            return ['host_admin', 'server_admin', 'admin', 'server_mod', 'player'];
+        }
+
+        // Server Admin: Server owner OR has update/create server admin permission
+        $isServerAdmin = $server->owner_id === $user->id ||
+            $user->hasPermissionTo('update server') ||
+            $user->hasPermissionTo('create server');
+
+        if ($isServerAdmin) {
+            // Include 'admin' for backwards compatibility with old docs
+            return ['server_admin', 'admin', 'server_mod', 'player'];
+        }
+
+        // Server Mod: Has any control.* subuser permission on this server
+        $isServerMod = $user->can(SubuserPermission::ControlConsole, $server) ||
+            $user->can(SubuserPermission::ControlStart, $server) ||
+            $user->can(SubuserPermission::ControlStop, $server) ||
+            $user->can(SubuserPermission::ControlRestart, $server);
+
+        if ($isServerMod) {
+            return ['server_mod', 'player'];
+        }
+
+        // Player: Default - can only see player docs
+        return ['player'];
+    }
+
+    protected static function getDocumentsForServer(Server $server): Collection
+    {
+        $allowedTypes = static::getAllowedDocTypes($server);
 
         // Get documents directly attached to this server
         $attachedDocs = $server->documents()
             ->where('is_published', true)
-            ->when(!$canViewAdminDocs, fn ($q) => $q->where('type', 'player'))
+            ->whereIn('type', $allowedTypes)
             ->orderByPivot('sort_order')
             ->get();
 
@@ -80,7 +128,7 @@ class Documents extends Page
         $globalDocs = Document::query()
             ->where('is_global', true)
             ->where('is_published', true)
-            ->when(!$canViewAdminDocs, fn ($q) => $q->where('type', 'player'))
+            ->whereIn('type', $allowedTypes)
             ->orderBy('sort_order')
             ->get();
 

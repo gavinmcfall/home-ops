@@ -102,6 +102,7 @@ spec:
               tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
             env:
               XDG_DATA_HOME: /pelican-data
+              FILAMENT_UPLOADABLE_AVATARS: "true"
             envFrom:
               - secretRef:
                   name: pelican-secret
