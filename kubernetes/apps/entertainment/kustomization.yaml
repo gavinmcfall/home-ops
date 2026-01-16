@@ -17,6 +17,5 @@ resources:
   - ./overseerr/ks.yaml
   - ./pasta/ks.yaml
   - ./plex/ks.yaml
-  # - ./stash/ks.yaml
   - ./tautulli/ks.yaml
   - ./wizarr/ks.yaml
