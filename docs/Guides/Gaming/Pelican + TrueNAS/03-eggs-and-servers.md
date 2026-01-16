@@ -11,7 +11,7 @@ Import community game eggs and create your first game server.
 | **Nest** | A category of game servers (e.g., "Minecraft", "Steam Games") |
 | **Egg** | A specific server configuration within a nest (e.g., "Forge", "Paper", "Vanilla") |
 
-Pterodactyl comes with some default eggs, but the community maintains hundreds more.
+Pelican comes with some default eggs, but the community maintains hundreds more.
 
 ---
 
@@ -58,7 +58,7 @@ Find the game you want and get the raw JSON URL:
 | CurseForge (Minecraft) | `https://raw.githubusercontent.com/pelican-eggs/minecraft/main/java/curseforge/egg-curse-forge.json` |
 | Factorio | `https://raw.githubusercontent.com/pelican-eggs/games-standalone/main/factorio/factorio-vanilla/egg-factorio-vanilla.json` |
 
-### Step 3: Import into Pterodactyl
+### Step 3: Import into Pelican
 
 1. Go to **Admin Panel** → **Nests** → Select your nest
 2. Click **Import Egg**
@@ -106,6 +106,7 @@ Recommended minimums by game type:
 | Satisfactory | 8192 MiB | 25 GB | 400% |
 | ARK | 16384 MiB | 100 GB | 400% |
 | Palworld | 8192 MiB | 30 GB | 400% |
+| Hytale | 2048 MiB | 10 GB | 200% |
 
 > [!TIP]
 > Set CPU Limit to `0` for unlimited, or calculate as `threads × 100` (e.g., 4 threads = 400%).
@@ -134,6 +135,11 @@ These vary by egg. Common examples:
 | Server Password | Password to join (optional) |
 | Max Players | Player limit |
 
+**Satisfactory:**
+| Variable | Description |
+|----------|-------------|
+| Beta Branch | Set to `public` for stable release |
+
 ### Step 7: Create and Monitor
 
 1. Click **Create Server**
@@ -155,6 +161,18 @@ Minecraft servers require EULA acceptance before they'll run:
 3. Open `eula.txt`
 4. Change `eula=false` to `eula=true`
 5. Save and **Start** the server
+
+---
+
+## Post-Install: Hytale Authentication
+
+Hytale servers require OAuth authentication:
+
+1. Start the server and wait for it to initialize
+2. In the console, run: `/auth login device`
+3. Follow the device authentication flow in your browser
+4. Authentication is not persistent by default — re-auth required after restart
+5. For persistent auth, run: `/auth persistence Encrypted`
 
 ---
 
@@ -183,6 +201,7 @@ If you need more ports for additional servers:
 | Palworld | 8211 | UDP | 27015 (query) |
 | Rust | 28015 | TCP/UDP | 28016 (RCON) |
 | Factorio | 34197 | UDP | - |
+| Hytale | 10200 | TCP/UDP | - |
 
 ---
 
@@ -192,13 +211,32 @@ If you need more ports for additional servers:
 
 Check Wings logs:
 ```bash
-sudo docker logs wings-wings-1 --tail=50
+ssh truenas "cd /mnt/storage0/game-servers/wings && sudo docker compose logs --tail=50"
 ```
 
 Common causes:
-- `/tmp/pterodactyl` mount issue (see Part 2 troubleshooting)
+- `/tmp/pelican` mount issue (see Part 2 troubleshooting)
 - Network issues downloading game files
 - Disk space full
+
+### Satisfactory "Missing configuration"
+
+**Symptoms:** Install fails with "Missing configuration" error
+
+**Fix:** Set the Beta Branch variable to `public`:
+1. Edit the server in Admin Panel
+2. Under Service Variables, set **Beta Branch** to `public`
+3. Save and reinstall
+
+### Minecraft Client-Only Mod Crash
+
+**Symptoms:** Server crashes on startup with mod errors
+
+**Fix:** Remove client-only mods from the server's mods folder:
+1. Go to the server's **Files** tab
+2. Navigate to `mods/`
+3. Delete client-only mods (e.g., `cobblemon-ui-tweaks`, shader mods)
+4. Restart the server
 
 ### Server Exits Immediately (Code 0)
 
@@ -214,3 +252,11 @@ Increase memory allocation in **Admin** → **Servers** → **Build Configuratio
 1. Verify port forward exists for the game's port
 2. Check allocation uses `0.0.0.0` (not a specific IP)
 3. Test with `nc -zv play.${SECRET_DOMAIN} <port>` from outside network
+
+---
+
+## Next Steps
+
+With game servers running, you can optionally configure SSO authentication:
+
+- [Part 4: PocketID OAuth](./04-pocketid-oauth.md) — Enable single sign-on with PocketID
