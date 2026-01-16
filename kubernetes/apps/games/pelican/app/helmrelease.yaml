@@ -55,10 +55,16 @@ spec:
                 mkdir -p /pelican-data/plugins
                 chown www-data:www-data /pelican-data/plugins
                 chmod 775 /pelican-data/plugins
-                # Ensure avatars dir has correct permissions
-                mkdir -p /pelican-data/avatars
-                chown www-data:www-data /pelican-data/avatars
-                chmod 775 /pelican-data/avatars
+                # Ensure storage directories exist (symlinks in image point here)
+                mkdir -p /pelican-data/storage/avatars
+                mkdir -p /pelican-data/storage/fonts
+                mkdir -p /pelican-data/storage/icons/server
+                chown -R www-data:www-data /pelican-data/storage
+                chmod -R 775 /pelican-data/storage
+                # Create icons symlink (avatars/fonts already have symlinks in image)
+                if [ ! -L /var/www/html/storage/app/public/icons ]; then
+                  ln -sf /pelican-data/storage/icons /var/www/html/storage/app/public/icons
+                fi
                 echo "Data directories ready"
             securityContext:
               runAsUser: 0
@@ -155,8 +161,6 @@ spec:
               - path: /pelican-data
               - path: /var/www/html/plugins
                 subPath: plugins
-              - path: /var/www/html/storage/app/public/avatars
-                subPath: avatars
       composer-workdir:
         type: emptyDir
         advancedMounts:
