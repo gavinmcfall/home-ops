@@ -79,7 +79,7 @@ spec:
             securityContext:
               runAsUser: 0
               runAsGroup: 0
-          install-composer-deps:
+          copy-vendor:
             image:
               repository: ghcr.io/pelican-dev/panel
               tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
@@ -88,25 +88,35 @@ spec:
               - -c
               - |
                 set -e
-
-                # Copy vendor to shared volume if empty
-                if [ ! -f "/vendor-shared/autoload.php" ]; then
-                  echo "Copying vendor directory to shared volume..."
-                  cp -a /var/www/html/vendor/. /vendor-shared/
-                fi
+                echo "Copying composer files to shared volume..."
+                cp -a /var/www/html/vendor /composer-workdir/
+                cp /var/www/html/composer.json /composer-workdir/
+                cp /var/www/html/composer.lock /composer-workdir/
+                echo "Composer files copied"
+            securityContext:
+              runAsUser: 0
+              runAsGroup: 0
+          install-composer-deps:
+            image:
+              repository: composer
+              tag: 2.8.5@sha256:8a8dc696a974c88fea89eb9669d58c86d9dce6551949a4297302d773d69a7e94
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -e
+                cd /composer-workdir
 
                 # Install pocketid provider if not present
-                if [ ! -d "/vendor-shared/socialiteproviders/pocketid" ]; then
+                if [ ! -d "vendor/socialiteproviders/pocketid" ]; then
                   echo "Installing socialiteproviders/pocketid..."
-                  cd /var/www/html
-                  COMPOSER_VENDOR_DIR=/vendor-shared composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress
+                  composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress
                 else
                   echo "socialiteproviders/pocketid already installed"
                 fi
 
                 echo "Composer packages ready"
-            env:
-              XDG_DATA_HOME: /pelican-data
+                ls -la vendor/socialiteproviders/
             securityContext:
               runAsUser: 0
               runAsGroup: 0
@@ -163,14 +173,17 @@ spec:
               - path: /pelican-data
             app:
               - path: /pelican-data
-      vendor:
+      composer-workdir:
         type: emptyDir
         advancedMounts:
           pelican:
+            copy-vendor:
+              - path: /composer-workdir
             install-composer-deps:
-              - path: /vendor-shared
+              - path: /composer-workdir
             app:
               - path: /var/www/html/vendor
+                subPath: vendor
       logs:
         type: emptyDir
         globalMounts:
