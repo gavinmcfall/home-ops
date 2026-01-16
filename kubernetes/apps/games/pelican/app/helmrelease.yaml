@@ -55,7 +55,11 @@ spec:
                 mkdir -p /pelican-data/plugins
                 chown www-data:www-data /pelican-data/plugins
                 chmod 775 /pelican-data/plugins
-                echo "Plugins directory ready"
+                # Ensure avatars dir has correct permissions
+                mkdir -p /pelican-data/avatars
+                chown www-data:www-data /pelican-data/avatars
+                chmod 775 /pelican-data/avatars
+                echo "Data directories ready"
             securityContext:
               runAsUser: 0
               runAsGroup: 0
@@ -151,6 +155,8 @@ spec:
               - path: /pelican-data
               - path: /var/www/html/plugins
                 subPath: plugins
+              - path: /var/www/html/storage/app/public/avatars
+                subPath: avatars
       composer-workdir:
         type: emptyDir
         advancedMounts:
