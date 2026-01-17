@@ -8,6 +8,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Enums\IconSize;
 use Starter\ServerDocumentation\Filament\Admin\Resources\DocumentResource;
+use Starter\ServerDocumentation\Services\MarkdownConverter;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EditDocument extends EditRecord
 {
@@ -17,6 +19,13 @@ class EditDocument extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('export')
+                ->label(trans('server-documentation::strings.actions.export'))
+                ->icon('tabler-download')
+                ->iconButton()
+                ->iconSize(IconSize::ExtraLarge)
+                ->color('gray')
+                ->action(fn () => $this->exportAsMarkdown()),
             Action::make('versions')
                 ->label(trans('server-documentation::strings.versions.title'))
                 ->icon('tabler-history')
@@ -33,6 +42,36 @@ class EditDocument extends EditRecord
                 ->iconButton()
                 ->iconSize(IconSize::ExtraLarge),
         ];
+    }
+
+    /**
+     * Export the current document as a Markdown file.
+     */
+    public function exportAsMarkdown(): StreamedResponse
+    {
+        $converter = new MarkdownConverter();
+        $document = $this->record;
+
+        // Convert HTML content to Markdown
+        $markdown = $converter->toMarkdown($document->content);
+
+        // Add frontmatter with document metadata
+        $markdown = $converter->addFrontmatter($markdown, [
+            'title' => $document->title,
+            'slug' => $document->slug,
+            'type' => $document->type,
+            'is_global' => $document->is_global,
+            'is_published' => $document->is_published,
+            'sort_order' => $document->sort_order,
+        ]);
+
+        $filename = $converter->generateFilename($document->title, $document->slug);
+
+        return response()->streamDownload(function () use ($markdown) {
+            echo $markdown;
+        }, $filename, [
+            'Content-Type' => 'text/markdown',
+        ]);
     }
 
     protected function getFormActions(): array

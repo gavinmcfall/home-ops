@@ -90,4 +90,23 @@ return [
         'last_updated' => 'Last updated :time',
         'global' => 'Global',
     ],
+
+    'actions' => [
+        'export' => 'Export as Markdown',
+        'import' => 'Import Markdown',
+    ],
+
+    'import' => [
+        'file_label' => 'Markdown File',
+        'file_helper' => 'Upload a .md file to create a new document',
+        'use_frontmatter' => 'Use YAML Frontmatter',
+        'use_frontmatter_helper' => 'Extract title, type, and settings from YAML frontmatter if present',
+        'success' => 'Document Imported',
+        'success_body' => 'Successfully created document ":title"',
+    ],
+
+    'export' => [
+        'success' => 'Document Exported',
+        'success_body' => 'Document has been downloaded as Markdown',
+    ],
 ];

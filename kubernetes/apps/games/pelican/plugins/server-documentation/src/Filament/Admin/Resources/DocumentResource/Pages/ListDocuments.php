@@ -4,9 +4,16 @@ namespace Starter\ServerDocumentation\Filament\Admin\Resources\DocumentResource\
 
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Starter\ServerDocumentation\Filament\Admin\Resources\DocumentResource;
+use Starter\ServerDocumentation\Models\Document;
+use Starter\ServerDocumentation\Services\MarkdownConverter;
 
 class ListDocuments extends ListRecords
 {
@@ -15,6 +22,25 @@ class ListDocuments extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('import')
+                ->label(trans('server-documentation::strings.actions.import'))
+                ->icon('tabler-upload')
+                ->color('gray')
+                ->form([
+                    FileUpload::make('markdown_file')
+                        ->label(trans('server-documentation::strings.import.file_label'))
+                        ->helperText(trans('server-documentation::strings.import.file_helper'))
+                        ->acceptedFileTypes(['text/markdown', 'text/plain', '.md'])
+                        ->required()
+                        ->storeFiles(false),
+                    Toggle::make('use_frontmatter')
+                        ->label(trans('server-documentation::strings.import.use_frontmatter'))
+                        ->helperText(trans('server-documentation::strings.import.use_frontmatter_helper'))
+                        ->default(true),
+                ])
+                ->action(function (array $data): void {
+                    $this->importMarkdownFile($data);
+                }),
             Action::make('help')
                 ->label('Permission Guide')
                 ->icon('tabler-help')
@@ -77,5 +103,79 @@ class ListDocuments extends ListRecords
                 ->modalCancelActionLabel('Close'),
             CreateAction::make(),
         ];
+    }
+
+    /**
+     * Import a Markdown file and create a new document.
+     */
+    protected function importMarkdownFile(array $data): void
+    {
+        $converter = new MarkdownConverter();
+
+        /** @var TemporaryUploadedFile $file */
+        $file = $data['markdown_file'];
+        $content = file_get_contents($file->getRealPath());
+        $useFrontmatter = $data['use_frontmatter'] ?? true;
+
+        // Parse frontmatter if enabled
+        $metadata = [];
+        $markdownContent = $content;
+
+        if ($useFrontmatter) {
+            [$metadata, $markdownContent] = $converter->parseFrontmatter($content);
+        }
+
+        // Convert markdown to HTML
+        $htmlContent = $converter->toHtml($markdownContent);
+
+        // Determine title from frontmatter, filename, or first heading
+        $title = $metadata['title']
+            ?? $this->extractTitleFromMarkdown($markdownContent)
+            ?? pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
+        // Generate slug from frontmatter or title
+        $slug = $metadata['slug'] ?? Str::slug($title);
+
+        // Ensure slug is unique
+        $originalSlug = $slug;
+        $counter = 1;
+        while (Document::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter++;
+        }
+
+        // Create the document
+        $document = Document::create([
+            'title' => $title,
+            'slug' => $slug,
+            'content' => $htmlContent,
+            'type' => $metadata['type'] ?? 'player',
+            'is_global' => filter_var($metadata['is_global'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            'is_published' => filter_var($metadata['is_published'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            'sort_order' => (int) ($metadata['sort_order'] ?? 0),
+            'author_id' => auth()->id(),
+            'last_edited_by' => auth()->id(),
+        ]);
+
+        Notification::make()
+            ->title(trans('server-documentation::strings.import.success'))
+            ->body(trans('server-documentation::strings.import.success_body', ['title' => $document->title]))
+            ->success()
+            ->send();
+
+        // Redirect to edit the newly created document
+        $this->redirect(DocumentResource::getUrl('edit', ['record' => $document]));
+    }
+
+    /**
+     * Extract title from first H1 heading in markdown.
+     */
+    protected function extractTitleFromMarkdown(string $markdown): ?string
+    {
+        // Match first H1 heading (# Title)
+        if (preg_match('/^#\s+(.+)$/m', $markdown, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return null;
     }
 }
