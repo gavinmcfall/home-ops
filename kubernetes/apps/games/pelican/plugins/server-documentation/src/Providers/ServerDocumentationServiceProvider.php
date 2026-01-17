@@ -63,12 +63,9 @@ class ServerDocumentationServiceProvider extends ServiceProvider
      * Register document-related Gates for admin panel permissions.
      *
      * These gates control who can manage documents in the admin panel.
-     * By default, only root admins have access. The DocumentResource
-     * overrides canAccess() to allow all admin panel users, but these
-     * gates provide fine-grained control for individual CRUD operations.
-     *
-     * To extend for role-based access, modify these gates or integrate
-     * with Pelican's role system when available.
+     * Access is granted to:
+     * - Root Admins (full access)
+     * - Server Admins (users with server update/create permissions)
      */
     protected function registerDocumentPermissions(): void
     {
@@ -83,8 +80,12 @@ class ServerDocumentationServiceProvider extends ServiceProvider
         foreach ($permissions as $permission) {
             Gate::define($permission, function (User $user) {
                 // Root admins always have full document access
-                // This can be extended to support role-based permissions
-                return $user->isRootAdmin();
+                if ($user->isRootAdmin()) {
+                    return true;
+                }
+
+                // Server Admins (users with server management permissions) can manage documents
+                return $user->can('update server') || $user->can('create server');
             });
         }
     }
