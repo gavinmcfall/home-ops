@@ -15,11 +15,7 @@ class ServerDocumentationServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Load plugin's vendor autoloader for additional dependencies
-        $vendorAutoload = plugin_path('server-documentation', 'vendor/autoload.php');
-        if (file_exists($vendorAutoload)) {
-            require_once $vendorAutoload;
-        }
+        // No external dependencies - uses Pelican's bundled packages
     }
 
     public function boot(): void

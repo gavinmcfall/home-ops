@@ -10,9 +10,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
-        "league/commonmark": "^2.4",
-        "league/html-to-markdown": "^5.1"
+        "php": "^8.2"
     },
     "autoload": {
         "psr-4": {
