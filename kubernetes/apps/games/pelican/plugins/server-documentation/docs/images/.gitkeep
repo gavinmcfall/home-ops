@@ -1,0 +1,16 @@
+# Screenshots needed for README
+
+Place the following screenshots in this directory:
+
+## Have (rename from Downloads):
+- admin-documents-list.png (from "Pelican Plugin (Docs) - Admin - Documents List.png")
+- player-server-view.png (from "Pelican Plugin (Docs) - Player - Server View - Documents.png")
+- server-mod-admin-view.png (from "Pelican Plugin (Docs) - Server Mod - Admin View - Documents.png")
+- server-mod-server-view.png (from "Pelican Plugin (Docs) - Server Mod - Server View - Documents.png")
+
+## Need:
+- admin-document-editor.png - Document edit page with rich editor
+- permission-guide-modal.png - The permission guide popup
+- server-admin-server-view.png - Server admin viewing server documents
+- documents-relation-manager.png - Attaching documents to servers
+- version-history.png (optional) - Version history page
