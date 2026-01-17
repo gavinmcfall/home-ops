@@ -6,5 +6,9 @@
     "author": "Gavin",
     "category": "plugin",
     "namespace": "Starter\\ServerDocumentation",
-    "class": "ServerDocumentationPlugin"
+    "class": "ServerDocumentationPlugin",
+    "meta": {
+        "status": "enabled",
+        "status_message": null
+    }
 }
