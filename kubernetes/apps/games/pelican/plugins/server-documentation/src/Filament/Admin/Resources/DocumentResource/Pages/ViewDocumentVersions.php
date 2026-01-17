@@ -25,7 +25,7 @@ class ViewDocumentVersions extends Page implements HasTable
 
     protected static string $resource = DocumentResource::class;
 
-    protected static string $view = 'server-documentation::filament.pages.document-versions';
+    protected string $view = 'server-documentation::filament.pages.document-versions';
 
     public function mount(int|string $record): void
     {
