@@ -3,6 +3,12 @@
         $documents = $this->getDocuments();
     @endphp
 
+    @once
+        @push('styles')
+            <link rel="stylesheet" href="{{ asset('plugins/server-documentation/css/document-content.css') }}">
+        @endpush
+    @endonce
+
     @if($documents->isEmpty())
         <div class="flex flex-col items-center justify-center p-8 text-center">
             <x-filament::icon
@@ -10,10 +16,10 @@
                 class="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4"
             />
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                No documents available
+                {{ trans('server-documentation::strings.server_panel.no_documents') }}
             </h3>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                There are no documents for this server yet.
+                {{ trans('server-documentation::strings.server_panel.no_documents_description') }}
             </p>
         </div>
     @else
@@ -22,7 +28,7 @@
             <div class="lg:col-span-1">
                 <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10">
                     <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">Documents</h3>
+                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ trans('server-documentation::strings.navigation.documents') }}</h3>
                     </div>
                     <nav class="p-2 space-y-1">
                         @foreach($documents as $document)
@@ -59,7 +65,7 @@
                                     <span class="truncate">{{ $document->title }}</span>
                                 </div>
                                 @if($document->is_global)
-                                    <span class="text-xs text-gray-500 dark:text-gray-400 ml-6">Global</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 ml-6">{{ trans('server-documentation::strings.server_panel.global') }}</span>
                                 @endif
                             </button>
                         @endforeach
@@ -80,34 +86,35 @@
                                     @if($selectedDocument->type === 'host_admin')
                                         <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-danger-50 text-danger-700 dark:bg-danger-900/50 dark:text-danger-400">
                                             <x-filament::icon icon="tabler-shield-lock" class="h-3 w-3" />
-                                            Host Admin
+                                            {{ trans('server-documentation::strings.types.host_admin') }}
                                         </span>
                                     @elseif(in_array($selectedDocument->type, ['server_admin', 'admin']))
                                         <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-warning-50 text-warning-700 dark:bg-warning-900/50 dark:text-warning-400">
                                             <x-filament::icon icon="tabler-lock" class="h-3 w-3" />
-                                            Server Admin
+                                            {{ trans('server-documentation::strings.types.server_admin') }}
                                         </span>
                                     @elseif($selectedDocument->type === 'server_mod')
                                         <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-info-50 text-info-700 dark:bg-info-900/50 dark:text-info-400">
                                             <x-filament::icon icon="tabler-user-shield" class="h-3 w-3" />
-                                            Server Mod
+                                            {{ trans('server-documentation::strings.types.server_mod') }}
                                         </span>
                                     @endif
                                     @if($selectedDocument->is_global)
                                         <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
                                             <x-filament::icon icon="tabler-world" class="h-3 w-3" />
-                                            Global
+                                            {{ trans('server-documentation::strings.server_panel.global') }}
                                         </span>
                                     @endif
                                 </div>
                             </div>
                             @if($selectedDocument->updated_at)
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                    Last updated {{ $selectedDocument->updated_at->diffForHumans() }}
+                                    {{ trans('server-documentation::strings.server_panel.last_updated', ['time' => $selectedDocument->updated_at->diffForHumans()]) }}
                                 </p>
                             @endif
                         </div>
                         <div class="p-6 document-content">
+                            {{-- Inline styles as fallback if external CSS not loaded --}}
                             <style>
                                 .document-content h1 { font-size: 1.875rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 1rem; color: rgb(var(--gray-100)); }
                                 .document-content h2 { font-size: 1.5rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: rgb(var(--gray-100)); }
@@ -144,10 +151,10 @@
                             class="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4"
                         />
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                            Select a document
+                            {{ trans('server-documentation::strings.server_panel.select_document') }}
                         </h3>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Choose a document from the list to view its contents.
+                            {{ trans('server-documentation::strings.server_panel.select_document_description') }}
                         </p>
                     </div>
                 @endif

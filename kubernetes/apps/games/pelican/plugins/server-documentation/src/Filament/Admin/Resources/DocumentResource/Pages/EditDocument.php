@@ -17,6 +17,13 @@ class EditDocument extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('versions')
+                ->label(trans('server-documentation::strings.versions.title'))
+                ->icon('tabler-history')
+                ->iconButton()
+                ->iconSize(IconSize::ExtraLarge)
+                ->url(fn () => DocumentResource::getUrl('versions', ['record' => $this->record]))
+                ->badge(fn () => $this->record->versions()->count() ?: null),
             $this->getSaveFormAction()
                 ->formId('form')
                 ->iconButton()
