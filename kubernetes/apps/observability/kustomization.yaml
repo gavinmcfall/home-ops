@@ -9,6 +9,7 @@ components:
 
 resources:
   # Applications
+  - ./discord-message-scheduler/ks.yaml
   - ./gatus/ks.yaml
   - ./grafana/ks.yaml
   - ./kait/ks.yaml
