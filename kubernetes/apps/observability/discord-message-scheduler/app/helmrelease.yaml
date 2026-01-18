@@ -35,7 +35,7 @@ spec:
             env:
               TZ: ${TIMEZONE}
               PREFIX: "="
-              SYNC_SLASH_COMMANDS: "off"
+              SYNC_SLASH_COMMANDS: "on"
             envFrom:
               - secretRef:
                   name: discord-message-scheduler-secret
