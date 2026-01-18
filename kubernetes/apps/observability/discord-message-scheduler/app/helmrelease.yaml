@@ -61,4 +61,4 @@ spec:
       data:
         existingClaim: discord-message-scheduler
         globalMounts:
-          - path: /app/data
+          - path: /bot/data
