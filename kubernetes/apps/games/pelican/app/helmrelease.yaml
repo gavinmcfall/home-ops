@@ -42,17 +42,25 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          install-composer:
+          install-plugin-deps:
             image:
-              repository: composer
-              tag: "2@sha256:f5e5bb7048c7b0182ea153fed4a63d021f3c77d4a654d6572da4a42aaff547e3"
+              repository: ghcr.io/pelican-dev/panel
+              tag: v1.0.0-beta31@sha256:5c57b17627eb134d52c0589bc1eaccf198b811a47c33cceb6416ff29504b2fa5
             command:
               - /bin/sh
               - -c
               - |
-                mkdir -p /pelican-data/bin
-                cp /usr/bin/composer /pelican-data/bin/composer
-                echo "Composer installed to /pelican-data/bin"
+                set -e
+                cd /var/www/html
+                # Install composer if not present
+                if [ ! -f /pelican-data/bin/composer ]; then
+                  mkdir -p /pelican-data/bin
+                  wget -q -O /pelican-data/bin/composer https://getcomposer.org/download/latest-stable/composer.phar
+                  chmod +x /pelican-data/bin/composer
+                fi
+                # Install plugin composer dependencies
+                /pelican-data/bin/composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress --no-dev 2>/dev/null || true
+                echo "Plugin dependencies ready"
         containers:
           app:
             image:
@@ -103,7 +111,7 @@ spec:
         existingClaim: *app
         advancedMounts:
           pelican:
-            install-composer:
+            install-plugin-deps:
               - path: /pelican-data
             app:
               - path: /pelican-data
