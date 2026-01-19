@@ -41,6 +41,18 @@ spec:
       pelican:
         annotations:
           reloader.stakater.com/auto: "true"
+        initContainers:
+          install-composer:
+            image:
+              repository: composer
+              tag: "2@sha256:f5e5bb7048c7b0182ea153fed4a63d021f3c77d4a654d6572da4a42aaff547e3"
+            command:
+              - /bin/sh
+              - -c
+              - |
+                mkdir -p /pelican-data/bin
+                cp /usr/bin/composer /pelican-data/bin/composer
+                echo "Composer installed to /pelican-data/bin"
         containers:
           app:
             image:
@@ -89,8 +101,12 @@ spec:
     persistence:
       data:
         existingClaim: *app
-        globalMounts:
-          - path: /pelican-data
+        advancedMounts:
+          pelican:
+            install-composer:
+              - path: /pelican-data
+            app:
+              - path: /pelican-data
       logs:
         type: emptyDir
         globalMounts:
