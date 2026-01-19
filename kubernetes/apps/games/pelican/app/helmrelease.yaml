@@ -41,75 +41,11 @@ spec:
       pelican:
         annotations:
           reloader.stakater.com/auto: "true"
-        initContainers:
-          init-plugins:
-            image:
-              repository: ghcr.io/pelican-dev/panel
-              tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
-            command:
-              - /bin/sh
-              - -c
-              - |
-                set -e
-                # Ensure plugins dir has correct permissions
-                mkdir -p /pelican-data/plugins
-                chown www-data:www-data /pelican-data/plugins
-                chmod 775 /pelican-data/plugins
-                # Ensure storage directories exist (symlinks in image point here)
-                mkdir -p /pelican-data/storage/avatars
-                mkdir -p /pelican-data/storage/fonts
-                mkdir -p /pelican-data/storage/icons/server
-                chown -R www-data:www-data /pelican-data/storage
-                chmod -R 775 /pelican-data/storage
-                # Create icons symlink (avatars/fonts already have symlinks in image)
-                if [ ! -L /var/www/html/storage/app/public/icons ]; then
-                  ln -sf /pelican-data/storage/icons /var/www/html/storage/app/public/icons
-                fi
-                echo "Data directories ready"
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
-          copy-vendor:
-            image:
-              repository: ghcr.io/pelican-dev/panel
-              tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
-            command:
-              - /bin/sh
-              - -c
-              - |
-                set -e
-                echo "Copying composer files to shared volume..."
-                cp -a /var/www/html/vendor /composer-workdir/
-                cp /var/www/html/composer.json /composer-workdir/
-                cp /var/www/html/composer.lock /composer-workdir/
-                echo "Vendor files copied"
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
-          install-pocketid:
-            image:
-              repository: composer
-              tag: "2@sha256:f5e5bb7048c7b0182ea153fed4a63d021f3c77d4a654d6572da4a42aaff547e3"
-            command:
-              - /bin/sh
-              - -c
-              - |
-                set -e
-                cd /composer-workdir
-                if [ ! -d "vendor/socialiteproviders/pocketid" ]; then
-                  echo "Installing socialiteproviders/pocketid..."
-                  composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress --ignore-platform-reqs
-                else
-                  echo "socialiteproviders/pocketid already installed"
-                fi
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
         containers:
           app:
             image:
               repository: ghcr.io/pelican-dev/panel
-              tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
+              tag: v1.0.0-beta31@sha256:5c57b17627eb134d52c0589bc1eaccf198b811a47c33cceb6416ff29504b2fa5
             env:
               XDG_DATA_HOME: /pelican-data
               FILAMENT_UPLOADABLE_AVATARS: "true"
@@ -153,25 +89,8 @@ spec:
     persistence:
       data:
         existingClaim: *app
-        advancedMounts:
-          pelican:
-            init-plugins:
-              - path: /pelican-data
-            app:
-              - path: /pelican-data
-              - path: /var/www/html/plugins
-                subPath: plugins
-      composer-workdir:
-        type: emptyDir
-        advancedMounts:
-          pelican:
-            copy-vendor:
-              - path: /composer-workdir
-            install-pocketid:
-              - path: /composer-workdir
-            app:
-              - path: /var/www/html/vendor
-                subPath: vendor
+        globalMounts:
+          - path: /pelican-data
       logs:
         type: emptyDir
         globalMounts:
