@@ -225,6 +225,14 @@ Also check out my [Guides](./docs/Guides/)
 
 ---
 
+## ☕ Support
+
+If you find this project helpful, consider supporting my work:
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/gavinmcfall)
+
+---
+
 ## 📜 Changelog
 
 See my _awful_ [commit history](https://github.com/gavinmcfall/home-ops/commits/main)
