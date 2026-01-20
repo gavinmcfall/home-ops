@@ -144,7 +144,7 @@ spec:
           - path: /var/www/html/storage/logs
       php-config:
         type: configMap
-        name: pelican-php-config
+        identifier: php-config
         advancedMounts:
           pelican:
             app:
