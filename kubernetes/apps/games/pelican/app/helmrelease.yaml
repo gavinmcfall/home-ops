@@ -79,6 +79,7 @@ spec:
             env:
               XDG_DATA_HOME: /pelican-data
               FILAMENT_UPLOADABLE_AVATARS: "true"
+              PATH: /opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
             envFrom:
               - secretRef:
                   name: pelican-secret
@@ -151,7 +152,7 @@ spec:
             install-plugin-deps:
               - path: /shared-bin
             app:
-              - path: /usr/local/bin
+              - path: /opt/bin
       php-config:
         type: configMap
         identifier: php-config
