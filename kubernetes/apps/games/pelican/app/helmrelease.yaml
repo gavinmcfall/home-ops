@@ -114,6 +114,13 @@ spec:
               - identifier: app
                 port: 80
 
+    configMaps:
+      php-config:
+        data:
+          uploads.ini: |
+            upload_max_filesize = 5M
+            post_max_size = 8M
+
     persistence:
       data:
         existingClaim: *app
@@ -135,3 +142,11 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /var/www/html/storage/logs
+      php-config:
+        type: configMap
+        name: pelican-php-config
+        advancedMounts:
+          pelican:
+            app:
+              - path: /usr/local/etc/php/conf.d/uploads.ini
+                subPath: uploads.ini
