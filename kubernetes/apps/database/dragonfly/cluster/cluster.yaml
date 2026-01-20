@@ -15,6 +15,7 @@ spec:
           divisor: 1Mi
   args:
     - --maxmemory=$(MAX_MEMORY)Mi
+    - --maxmemory-policy=allkeys-lru
     - --proactor_threads=2
     - --cluster_mode=emulated
     - --default_lua_flags=allow-undeclared-keys
@@ -22,7 +23,7 @@ spec:
   resources:
     requests:
       cpu: 100m
-      memory: 1Gi
+      memory: 1536Mi
     limits:
       memory: 1536Mi
   topologySpreadConstraints:
