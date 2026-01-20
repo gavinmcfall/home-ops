@@ -68,6 +68,8 @@ spec:
                 cd /var/www/html
                 /pelican-data/bin/composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress --no-scripts
                 /pelican-data/bin/composer dump-autoload --no-scripts --optimize
+                # Copy composer to shared bin dir for main container
+                cp /pelican-data/bin/composer /shared-bin/composer
                 echo "Plugin dependencies ready"
         containers:
           app:
@@ -77,7 +79,6 @@ spec:
             env:
               XDG_DATA_HOME: /pelican-data
               FILAMENT_UPLOADABLE_AVATARS: "true"
-              PATH: /pelican-data/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
             envFrom:
               - secretRef:
                   name: pelican-secret
@@ -143,6 +144,14 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /var/www/html/storage/logs
+      shared-bin:
+        type: emptyDir
+        advancedMounts:
+          pelican:
+            install-plugin-deps:
+              - path: /shared-bin
+            app:
+              - path: /usr/local/bin
       php-config:
         type: configMap
         identifier: php-config
