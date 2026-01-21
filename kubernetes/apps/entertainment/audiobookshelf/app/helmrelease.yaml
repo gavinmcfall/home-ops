@@ -31,7 +31,6 @@ spec:
     controllers:
       audiobookshelf:
         pod:
-          priorityClassName: media-critical
           securityContext:
             runAsNonRoot: true
             runAsUser: 568

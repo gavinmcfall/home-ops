@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: games-quota
+spec:
+  hard:
+    requests.cpu: "16"
+    limits.cpu: "24"
+    requests.memory: 96Gi
+    limits.memory: 128Gi
+    persistentvolumeclaims: "20"
+    requests.storage: 1Ti
+    pods: "50"
