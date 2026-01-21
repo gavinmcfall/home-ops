@@ -119,7 +119,7 @@ spec:
           dind:
             image:
               repository: docker
-              tag: 27-dind@sha256:aa3df78ecf320f5fafdce71c659f1629e96e9de0968305fe1de670e0ca9176ce
+              tag: 29-dind@sha256:3a33fc81fa4d38360f490f5b900e9846f725db45bb1d9b1fe02d849bd42a5cf2
             env:
               DOCKER_TLS_CERTDIR: ""
             securityContext:
