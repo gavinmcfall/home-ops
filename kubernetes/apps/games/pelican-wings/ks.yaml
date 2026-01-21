@@ -6,7 +6,6 @@ metadata:
   name: &app pelican-wings
   namespace: &namespace games
 spec:
-  suspend: true  # Suspended pending priority class deployment
   targetNamespace: *namespace
   commonMetadata:
     labels:

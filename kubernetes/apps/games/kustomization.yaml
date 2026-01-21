@@ -9,4 +9,5 @@ components:
 resources:
   # Applications
   - ./pelican/ks.yaml
+  # - ./pelican-wings/ks.yaml
   - ./romm/ks.yaml
