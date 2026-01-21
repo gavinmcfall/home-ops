@@ -10,7 +10,6 @@ resources:
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
-  - ../../../../components/priority/priority-02
   - ../../../../components/volsync-standard
 patches:
   - target:
