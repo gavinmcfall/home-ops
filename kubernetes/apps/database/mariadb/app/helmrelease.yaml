@@ -51,3 +51,7 @@ spec:
         CREATE DATABASE IF NOT EXISTS pelican;
         CREATE USER IF NOT EXISTS 'pelican'@'%' IDENTIFIED BY '${PELICAN_MARIADB_PASSWORD}';
         GRANT ALL PRIVILEGES ON pelican.* to 'pelican'@'%';
+      create-pelican-dev.sql: |
+        CREATE DATABASE IF NOT EXISTS pelican_dev;
+        CREATE USER IF NOT EXISTS 'pelican_dev'@'%' IDENTIFIED BY '${PELICAN_DEV_MARIADB_PASSWORD}';
+        GRANT ALL PRIVILEGES ON pelican_dev.* to 'pelican_dev'@'%';

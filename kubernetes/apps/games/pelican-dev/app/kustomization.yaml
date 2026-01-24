@@ -1,13 +1,9 @@
+---
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: games
-
-components:
-  - ../../components/common
-
 resources:
-  # Applications
-  - ./pelican/ks.yaml
-  - ./pelican-dev/ks.yaml
-  - ./romm/ks.yaml
+  - ./externalsecret.yaml
+  - ./helmrelease.yaml
+components:
+  - ../../../../components/volsync-standard
