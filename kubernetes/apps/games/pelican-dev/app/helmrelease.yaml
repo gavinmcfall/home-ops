@@ -57,6 +57,8 @@ spec:
               - -c
               - |
                 set -e
+                # Ensure plugins directory exists (symlinked from /var/www/html/plugins)
+                mkdir -p /pelican-data/plugins
                 # Copy vendor from image to emptyDir (only if empty)
                 if [ ! -f /mnt/vendor/autoload.php ]; then
                   echo "Copying vendor directory..."
