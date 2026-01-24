@@ -39,7 +39,7 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        fsGroup: 1000
+        fsGroup: 82  # www-data
         fsGroupChangePolicy: OnRootMismatch
     controllers:
       pelican-dev:
