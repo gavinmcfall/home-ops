@@ -37,6 +37,10 @@ spec:
         target:
           kind: Pod
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
     controllers:
       pelican-dev:
         annotations:
