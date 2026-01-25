@@ -24,6 +24,12 @@ spec:
       strategy: rollback
       retries: 3
   values:
+    # TODO: v20.2.0 has a prometheus module bug ("not all arguments converted during string formatting")
+    # Module disabled via: kubectl -n rook-ceph exec deploy/rook-ceph-tools -- ceph mgr module disable prometheus
+    # After updating, re-enable: kubectl -n rook-ceph exec deploy/rook-ceph-tools -- ceph mgr module enable prometheus
+    cephImage:
+      repository: quay.io/ceph/ceph
+      tag: v20.2.0-20251104
     monitoring:
       enabled: true
       createPrometheusRules: true
@@ -50,12 +56,6 @@ spec:
           method: quick
           dataSource: zero
           iteration: 1
-      cephVersion:
-        # TODO: v20.2.0 has a prometheus module bug ("not all arguments converted during string formatting")
-        # Module disabled via: kubectl -n rook-ceph exec deploy/rook-ceph-tools -- ceph mgr module disable prometheus
-        # After updating, re-enable: kubectl -n rook-ceph exec deploy/rook-ceph-tools -- ceph mgr module enable prometheus
-        image: quay.io/ceph/ceph:v20.2.0-20251104
-        allowUnsupported: false
       crashCollector:
         disable: false
       csi:
