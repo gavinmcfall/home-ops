@@ -25,5 +25,6 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 10Gi
+      VOLSYNC_MINUTE: "10"
       VOLSYNC_STORAGECLASS: ceph-block
       VOLSYNC_SNAPSHOTCLASS: csi-ceph-block

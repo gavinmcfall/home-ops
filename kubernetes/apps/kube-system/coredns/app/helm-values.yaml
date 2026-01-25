@@ -36,6 +36,20 @@ servers:
         parameters: . /etc/resolv.conf
       - name: cache
         parameters: 30
+  # Internal domain - forward to UniFi for local DNS (citadel.internal, etc.)
+  - zones:
+      - zone: internal.
+        scheme: dns://
+    port: 53
+    plugins:
+      - name: errors
+      - name: log
+        configBlock: |-
+          class error
+      - name: forward
+        parameters: . 10.90.254.1
+      - name: cache
+        parameters: 30
   # Default server
   - zones:
       - zone: .

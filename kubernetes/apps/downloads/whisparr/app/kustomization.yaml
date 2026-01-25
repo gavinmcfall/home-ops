@@ -8,7 +8,7 @@ resources:
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/guarded
-  - ../../../../components/volsync
+  - ../../../../components/volsync-standard
 generatorOptions:
   disableNameSuffixHash: true
   annotations:

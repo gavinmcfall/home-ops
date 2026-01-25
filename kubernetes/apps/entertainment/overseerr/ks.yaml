@@ -27,4 +27,5 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 2Gi
+      VOLSYNC_MINUTE: "20"
       GATUS_SUBDOMAIN: requests

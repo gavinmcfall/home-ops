@@ -43,3 +43,15 @@ spec:
         CREATE DATABASE IF NOT EXISTS bookstackapp;
         CREATE USER IF NOT EXISTS 'bookstack'@'%' IDENTIFIED BY '${BOOKSTACK_MARIADB_PASSWORD}';
         GRANT ALL PRIVILEGES ON bookstackapp.* to 'bookstack'@'%';
+      create-pterodactyl.sql: |
+        CREATE DATABASE IF NOT EXISTS pterodactyl;
+        CREATE USER IF NOT EXISTS 'pterodactyl'@'%' IDENTIFIED BY '${PTERODACTYL_MARIADB_PASSWORD}';
+        GRANT ALL PRIVILEGES ON pterodactyl.* to 'pterodactyl'@'%';
+      create-pelican.sql: |
+        CREATE DATABASE IF NOT EXISTS pelican;
+        CREATE USER IF NOT EXISTS 'pelican'@'%' IDENTIFIED BY '${PELICAN_MARIADB_PASSWORD}';
+        GRANT ALL PRIVILEGES ON pelican.* to 'pelican'@'%';
+      create-pelican-dev.sql: |
+        CREATE DATABASE IF NOT EXISTS pelican_dev;
+        CREATE USER IF NOT EXISTS 'pelican_dev'@'%' IDENTIFIED BY '${PELICAN_DEV_MARIADB_PASSWORD}';
+        GRANT ALL PRIVILEGES ON pelican_dev.* to 'pelican_dev'@'%';

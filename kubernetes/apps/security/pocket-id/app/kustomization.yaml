@@ -8,4 +8,4 @@ resources:
   - ./referencegrant.yaml
 components:
   - ../../../../components/gatus/guarded
-  - ../../../../components/volsync
+  - ../../../../components/volsync-critical

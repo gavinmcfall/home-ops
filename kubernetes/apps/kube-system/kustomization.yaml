@@ -10,6 +10,7 @@ components:
 resources:
   # Applications
   - ./descheduler/ks.yaml
+  - ./priority-classes/ks.yaml
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
   - ./intel-device-plugin/ks.yaml

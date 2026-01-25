@@ -1,0 +1,163 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app pelican
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 15m
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: dragonfly-operator
+      namespace: database
+    - name: mariadb
+      namespace: database
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  driftDetection:
+    mode: enabled
+    ignore:
+      - paths:
+          - /spec/containers/resources/limits
+        target:
+          kind: Pod
+  values:
+    controllers:
+      pelican:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          install-plugin-deps:
+            image:
+              repository: ghcr.io/pelican-dev/panel
+              tag: v1.0.0-beta31@sha256:5c57b17627eb134d52c0589bc1eaccf198b811a47c33cceb6416ff29504b2fa5
+            env:
+              COMPOSER_VENDOR_DIR: /mnt/vendor
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -e
+                # Copy vendor from image to emptyDir (only if empty)
+                if [ ! -f /mnt/vendor/autoload.php ]; then
+                  echo "Copying vendor directory..."
+                  cp -a /var/www/html/vendor/. /mnt/vendor/
+                fi
+                # Install composer if not present
+                if [ ! -f /pelican-data/bin/composer ]; then
+                  mkdir -p /pelican-data/bin
+                  wget -q -O /pelican-data/bin/composer https://getcomposer.org/download/latest-stable/composer.phar
+                  chmod +x /pelican-data/bin/composer
+                fi
+                # Install plugin composer dependencies into the shared vendor dir
+                cd /var/www/html
+                /pelican-data/bin/composer require socialiteproviders/pocketid:^5.0 --no-interaction --no-progress --no-scripts
+                /pelican-data/bin/composer dump-autoload --no-scripts --optimize
+                # Copy composer to shared bin dir for main container
+                cp /pelican-data/bin/composer /shared-bin/composer
+                echo "Plugin dependencies ready"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/pelican-dev/panel
+              tag: v1.0.0-beta31@sha256:5c57b17627eb134d52c0589bc1eaccf198b811a47c33cceb6416ff29504b2fa5
+            env:
+              XDG_DATA_HOME: /pelican-data
+              FILAMENT_UPLOADABLE_AVATARS: "true"
+              PATH: /opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            envFrom:
+              - secretRef:
+                  name: pelican-secret
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 80
+
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Games
+          gethomepage.dev/name: Pelican
+          gethomepage.dev/icon: pterodactyl
+          gethomepage.dev/description: Game Server Management
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: 80
+
+    configMaps:
+      php-config:
+        data:
+          uploads.ini: |
+            upload_max_filesize = 5M
+            post_max_size = 8M
+
+    persistence:
+      data:
+        existingClaim: *app
+        advancedMounts:
+          pelican:
+            install-plugin-deps:
+              - path: /pelican-data
+            app:
+              - path: /pelican-data
+      vendor:
+        type: emptyDir
+        advancedMounts:
+          pelican:
+            install-plugin-deps:
+              - path: /mnt/vendor
+            app:
+              - path: /var/www/html/vendor
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /var/www/html/storage/logs
+      shared-bin:
+        type: emptyDir
+        advancedMounts:
+          pelican:
+            install-plugin-deps:
+              - path: /shared-bin
+            app:
+              - path: /opt/bin
+      php-config:
+        type: configMap
+        identifier: php-config
+        advancedMounts:
+          pelican:
+            app:
+              - path: /usr/local/etc/php/conf.d/uploads.ini
+                subPath: uploads.ini

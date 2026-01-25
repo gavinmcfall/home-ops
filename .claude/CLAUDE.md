@@ -33,7 +33,9 @@ GitOps-managed Kubernetes homelab using Flux, Talos, and Makejinja templates.
 
 ### Capsule: MakejinjaTemplates
 
-**Invariant**: Edit templates in `bootstrap/templates/`, run `task configure`; don't edit generated files.
+**Invariant**: Edit templates in `bootstrap/templates/`; don't edit generated files.
+
+**CRITICAL**: NEVER run `task configure` - it is for initial bootstrap only. Edit both the template AND the generated output file manually when making changes.
 
 ### Capsule: SopsEncryption
 
@@ -47,7 +49,6 @@ GitOps-managed Kubernetes homelab using Flux, Talos, and Makejinja templates.
 
 | Task | Command |
 |------|---------|
-| Render templates | `task configure` |
 | Validate | `task kubernetes:kubeconform` |
 | Check status | `flux get helmreleases -A` |
 | Force sync | `task flux:reconcile` |

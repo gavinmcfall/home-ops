@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 80.9.1
+      version: 81.2.2
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
@@ -62,15 +62,6 @@ spec:
             regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
     kubeApiServer:
       enabled: true
-      serviceMonitor:
-        metricRelabelings:
-          # Drop high cardinality labels
-          - action: drop
-            sourceLabels: ["__name__"]
-            regex: (apiserver|etcd|rest_client)_request(|_sli|_slo)_duration_seconds_bucket
-          - action: drop
-            sourceLabels: ["__name__"]
-            regex: (apiserver_response_sizes_bucket|apiserver_watch_events_sizes_bucket)
     kubeControllerManager:
       enabled: true
       endpoints: &cp
@@ -92,6 +83,16 @@ spec:
         enabled: false
       prometheusSpec:
         scrapeInterval: 1m # Must match interval in Grafana Helm chart
+        version: v2.55.1 # override 'unsupported Prometheus version' error
+        image:
+          registry: docker.io
+          repository: prompp/prompp
+          tag: 0.7.4
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 64535
+          runAsGroup: 64535
+          fsGroup: 64535
         logLevel: debug
         ruleSelectorNilUsesHelmValues: false
         serviceMonitorSelectorNilUsesHelmValues: false

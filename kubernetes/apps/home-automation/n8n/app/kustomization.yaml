@@ -9,4 +9,4 @@ resources:
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
-  - ../../../../components/volsync
+  - ../../../../components/volsync-critical

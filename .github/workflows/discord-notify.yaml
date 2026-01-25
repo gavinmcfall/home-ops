@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Issue Opened
         if: github.event_name == 'issues' && github.event.action == 'opened'
-        uses: sarisia/actions-status-discord@b8381b25576cb341b2af39926ab42c5056cc44ed # v1
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
@@ -27,7 +27,7 @@ jobs:
 
       - name: Issue Closed
         if: github.event_name == 'issues' && github.event.action == 'closed'
-        uses: sarisia/actions-status-discord@b8381b25576cb341b2af39926ab42c5056cc44ed # v1
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
@@ -40,7 +40,7 @@ jobs:
 
       - name: Issue Reopened
         if: github.event_name == 'issues' && github.event.action == 'reopened'
-        uses: sarisia/actions-status-discord@b8381b25576cb341b2af39926ab42c5056cc44ed # v1
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
@@ -53,7 +53,7 @@ jobs:
 
       - name: PR Opened
         if: github.event_name == 'pull_request' && github.event.action == 'opened'
-        uses: sarisia/actions-status-discord@b8381b25576cb341b2af39926ab42c5056cc44ed # v1
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
@@ -66,7 +66,7 @@ jobs:
 
       - name: PR Merged
         if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
-        uses: sarisia/actions-status-discord@b8381b25576cb341b2af39926ab42c5056cc44ed # v1
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
@@ -79,7 +79,7 @@ jobs:
 
       - name: PR Closed (not merged)
         if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
-        uses: sarisia/actions-status-discord@b8381b25576cb341b2af39926ab42c5056cc44ed # v1
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true
@@ -92,7 +92,7 @@ jobs:
 
       - name: PR Reopened
         if: github.event_name == 'pull_request' && github.event.action == 'reopened'
-        uses: sarisia/actions-status-discord@b8381b25576cb341b2af39926ab42c5056cc44ed # v1
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
           nodetail: true

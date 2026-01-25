@@ -7,7 +7,15 @@ metadata:
 spec:
   advanced:
     restoreToOriginalReplicaCount: true
-  cooldownPeriod: 0
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 60
+          policies:
+            - type: Percent
+              value: 100
+              periodSeconds: 15
+  cooldownPeriod: 60
   minReplicaCount: 0
   maxReplicaCount: 1
   scaleTargetRef:

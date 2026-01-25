@@ -5,4 +5,4 @@ resources:
   - ./pvc.yaml
   - ./scaledobjects.yaml
 components:
-  - ../../../../components/volsync
+  - ../../../../components/volsync-standard

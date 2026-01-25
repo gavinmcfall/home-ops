@@ -7,7 +7,7 @@ resources:
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
-  - ../../../../components/volsync
+  - ../../../../components/volsync-standard
 configMapGenerator:
 - name: romm-config
   files:

@@ -8,4 +8,6 @@ components:
 
 resources:
   # Applications
+  - ./pelican/ks.yaml
+  - ./pelican-dev/ks.yaml
   - ./romm/ks.yaml

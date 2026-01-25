@@ -6,7 +6,7 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
 components:
-  - ../../../../components/volsync
+  - ../../../../components/volsync-standard
 configMapGenerator:
   - name: recyclarr-configmap
     files:

@@ -1,0 +1,8 @@
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: priority-03
+value: 800000
+globalDefault: false
+description: "Priority level 03 - Important services"

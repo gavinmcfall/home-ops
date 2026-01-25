@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./priority-01.yaml
+  - ./priority-02.yaml
+  - ./priority-03.yaml
+  - ./priority-04.yaml
+  - ./priority-05.yaml
+  - ./priority-06.yaml
+  - ./priority-07.yaml
+  - ./priority-08.yaml
+  - ./priority-09.yaml
+  - ./priority-10.yaml

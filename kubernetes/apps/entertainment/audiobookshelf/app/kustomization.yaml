@@ -5,7 +5,18 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./backendtrafficpolicy.yaml
+  - ./pdb.yaml
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
-  - ../../../../components/volsync
+  - ../../../../components/volsync-standard
+patches:
+  - target:
+      group: keda.sh
+      version: v1alpha1
+      kind: ScaledObject
+      name: audiobookshelf
+    patch: |
+      - op: replace
+        path: /spec/minReplicaCount
+        value: 1

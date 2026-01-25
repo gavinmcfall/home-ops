@@ -27,4 +27,5 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 4Gi
+      VOLSYNC_MINUTE: "15"
       GATUS_SUBDOMAIN: comics

@@ -7,4 +7,4 @@ resources:
   - ./pvc.yaml
 components:
   - ../../../../components/gatus/external
-  - ../../../../components/volsync
+  - ../../../../components/volsync-standard

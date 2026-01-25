@@ -1,0 +1,8 @@
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: priority-08
+value: 300000
+globalDefault: false
+description: "Priority level 08 - Low priority services"

@@ -5,7 +5,7 @@ kind: Dragonfly
 metadata:
   name: dragonfly
 spec:
-  image: ghcr.io/dragonflydb/dragonfly:v1.35.1
+  image: ghcr.io/dragonflydb/dragonfly:v1.36.0
   replicas: 6
   env:
     - name: MAX_MEMORY
@@ -15,15 +15,17 @@ spec:
           divisor: 1Mi
   args:
     - --maxmemory=$(MAX_MEMORY)Mi
+    - --maxmemory-policy=allkeys-lru
     - --proactor_threads=2
     - --cluster_mode=emulated
     - --default_lua_flags=allow-undeclared-keys
+    - --shard_repl_backlog_len=8192
   resources:
     requests:
       cpu: 100m
-      memory: 768Mi
+      memory: 1536Mi
     limits:
-      memory: 1Gi
+      memory: 1536Mi
   topologySpreadConstraints:
     - maxSkew: 1
       topologyKey: "kubernetes.io/hostname"

@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/kopia
-              tag: 0.22.3@sha256:eeebd12fd4b3a9c25b9f711fff32454f62e2d5e2d431ab6806ad21c52f414807
+              tag: 0.22.3@sha256:17ab64542280197a5368247deaefadc3e3bbe15714ab666c2455a06824e86efd
             env:
               KOPIA_WEB_ENABLED: true
               KOPIA_WEB_PORT: &port 80
@@ -32,9 +32,10 @@ spec:
               - |
                 export HOME=/tmp
                 export USER=kopia
-                # Config file is pre-mounted from ConfigMap, just start the server
-                # (disable CSRF for reverse proxy compatibility)
-                exec kopia server start --address=0.0.0.0:80 --without-password --insecure --disable-csrf-token-checks --config-file=/config/repository.config
+                # Connect to existing repository (fast - doesn't load full index)
+                kopia repository connect filesystem --path=/repository --override-hostname=volsync.storage.svc.cluster.local --override-username=volsync
+                # Start the server (disable CSRF for reverse proxy compatibility)
+                exec kopia server start --address=0.0.0.0:80 --without-password --insecure --disable-csrf-token-checks
             probes:
               liveness:
                 enabled: true
@@ -90,43 +91,22 @@ spec:
           - name: internal
             namespace: network
             sectionName: https
-    configMaps:
-      config:
-        data:
-          repository.config: |-
-            {
-              "storage": {
-                "type": "filesystem",
-                "config": {
-                  "path": "/repository"
-                }
-              },
-              "hostname": "volsync.storage.svc.cluster.local",
-              "username": "volsync",
-              "description": "volsync",
-              "enableActions": false
-            }
     persistence:
-      config-file:
-        type: configMap
-        identifier: config
-        globalMounts:
-          - path: /config/repository.config
-            subPath: repository.config
       repository:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/backups/VolsyncKopia
         globalMounts:
           - path: /repository
-      tmpfs:
+      config:
         type: emptyDir
         advancedMounts:
           kopia:
             app:
-              - path: /config/cache
-                subPath: cache
-              - path: /config/logs
-                subPath: logs
+              - path: /config
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          kopia:
+            app:
               - path: /tmp
-                subPath: tmp
