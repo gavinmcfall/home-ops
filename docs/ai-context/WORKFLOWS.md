@@ -231,10 +231,15 @@ task kubernetes:network ns=downloads
 | `task kubernetes:sync-secrets` | Force ExternalSecret refresh |
 | `task kubernetes:network` | Debug pod networking |
 | `task flux:bootstrap` | Initial Flux installation |
-| `task flux:apply path=<ns>/<app>` | Apply specific app |
+| `task flux:apply` | Apply specific Flux Kustomization |
 | `task flux:reconcile` | Force full reconciliation |
 | `task flux:hr-restart` | Restart failed HelmReleases |
 | `task sops:encrypt` | Encrypt all SOPS files |
+| `task volsync:snapshot` | Snapshot an app PVC |
+| `task volsync:restore` | Restore a PVC from snapshot |
+| `task volsync:list` | List snapshots for an application |
+| `task talos:upgrade` | Upgrade Talos on a node |
+| `task talos:upgrade-k8s` | Upgrade Kubernetes across the cluster |
 
 ---
 
@@ -243,5 +248,6 @@ task kubernetes:network ns=downloads
 | Claim | Source | Confidence |
 |-------|--------|------------|
 | task configure runs template+encrypt+validate | `Taskfile.yaml:55-62` | Verified |
-| flux:apply targets specific apps | `.taskfiles/Flux/Taskfile.yaml:26-51` | Verified |
-| kubernetes:sync-secrets forces refresh | `.taskfiles/Kubernetes/Taskfile.yaml:38-55` | Verified |
+| flux:apply targets specific Kustomizations | `.taskfiles/Flux/Taskfile.yaml` | Verified |
+| kubernetes:sync-secrets forces refresh | `.taskfiles/Kubernetes/Taskfile.yaml` | Verified |
+| volsync tasks for backup management | `.taskfiles/VolSync/Taskfile.yaml` | Verified |

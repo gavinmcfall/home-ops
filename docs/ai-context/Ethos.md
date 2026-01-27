@@ -1,3 +1,10 @@
+---
+description: Documentation philosophy defining hard rules, strong guidance, and values for knowledge capture
+tags: ["DocumentationPhilosophy", "HardRules", "StrongGuidance", "KnowledgeCapture", "EvidenceHierarchy"]
+audience: ["LLMs", "Humans"]
+categories: ["Philosophy[100%]", "Documentation[95%]"]
+---
+
 # Ethos: Documentation Philosophy and Principles
 
 **Purpose**: The values, principles, and rules that guide what we capture in this knowledge base.

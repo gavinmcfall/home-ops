@@ -33,17 +33,25 @@ kubernetes/apps/<namespace>/<app>/
 
 | Namespace | Purpose |
 |-----------|---------|
+| `actions-runner-system` | GitHub Actions runners |
 | `cert-manager` | TLS certificates |
-| `database` | Databases (postgres, mariadb, dragonfly) |
-| `downloads` | Media acquisition (arr stack) |
-| `entertainment` | Media playback (plex, jellyfin) |
+| `database` | Databases (postgres, mariadb, dragonfly, mosquitto) |
+| `downloads` | Media acquisition (arr stack, qbittorrent, sabnzbd) |
+| `entertainment` | Media playback (plex, jellyfin, immich) |
+| `external-secrets` | Secret synchronization |
 | `flux-system` | GitOps infrastructure |
-| `home` | Home utilities (homepage) |
-| `home-automation` | IoT (home-assistant) |
+| `games` | Gaming (romm, pelican) |
+| `home` | Home utilities (homepage, paperless, bookstack) |
+| `home-automation` | IoT (home-assistant, n8n) |
 | `kube-system` | Core Kubernetes |
-| `network` | Networking (gateways, DNS) |
-| `observability` | Monitoring (prometheus, grafana) |
+| `network` | Networking (gateways, DNS, cloudflared) |
+| `observability` | Monitoring (prometheus, grafana, loki) |
+| `openebs-system` | Local storage provisioner |
+| `plane` | Project management |
+| `rook-ceph` | Distributed storage |
 | `security` | Auth (pocket-id) |
+| `storage` | Backup and sync (volsync) |
+| `system-upgrade` | Cluster updates |
 
 ---
 

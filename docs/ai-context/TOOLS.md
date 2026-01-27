@@ -13,7 +13,7 @@ categories: ["Reference[100%]", "Tools[95%]"]
 
 ## MCP Servers
 
-Configured in `.mcp.json`:
+Configured in `.mcp.json` and `.vscode/mcp.json`:
 
 ### RepoQL
 
@@ -61,12 +61,16 @@ SELECT * FROM snippet('file:///path/to/file.yaml#line=42', 3)
 | `task kubernetes:kubeconform` | Validate YAML schemas |
 | `task kubernetes:resources` | List cluster resources |
 | `task kubernetes:sync-secrets` | Force secret sync |
-| `task kubernetes:network ns=X` | Debug networking |
+| `task kubernetes:network` | Debug networking |
 | `task flux:bootstrap` | Initial Flux setup |
-| `task flux:apply path=X` | Apply specific app |
+| `task flux:apply` | Apply specific Kustomization |
 | `task flux:reconcile` | Force reconciliation |
 | `task flux:hr-restart` | Restart failed releases |
 | `task sops:encrypt` | Encrypt SOPS files |
+| `task volsync:snapshot` | Snapshot app PVC |
+| `task volsync:restore` | Restore from snapshot |
+| `task talos:upgrade` | Upgrade Talos node |
+| `task talos:upgrade-k8s` | Upgrade Kubernetes |
 
 ### Flux CLI
 

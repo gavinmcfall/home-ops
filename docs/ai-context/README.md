@@ -47,7 +47,7 @@ This directory contains the single source of truth for AI assistant context acro
 | [WORKFLOWS.md](WORKFLOWS.md) | Operational workflows and procedures |
 | [TOOLS.md](TOOLS.md) | MCP servers, CLI commands, discovery patterns |
 | [CONVENTIONS.md](CONVENTIONS.md) | Coding standards, commit guidelines, project structure |
-| [PERSONAS.md](PERSONAS.md) | User access personas for Internal and Externall application access |
+| [PERSONAS.md](PERSONAS.md) | User access personas for internal and external application access |
 
 ---
 
