@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "repoql": {
+      "type": "stdio",
+      "command": "/home/gavin/mcp/repoql",
+      "args": [
+        "mcp"
+      ]
+    }
+  }
+}
