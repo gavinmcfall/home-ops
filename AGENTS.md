@@ -20,6 +20,46 @@ This centralized approach provides:
 - ✅ Version controlled and team-friendly
 - ✅ Future-proof for new AI assistants
 
+## 📖 Read First
+
+1. **[docs/ai-context/Ethos.md](docs/ai-context/Ethos.md)** - Documentation philosophy
+2. **[docs/ai-context/ARCHITECTURE.md](docs/ai-context/ARCHITECTURE.md)** - System architecture
+3. **[docs/ai-context/CONVENTIONS.md](docs/ai-context/CONVENTIONS.md)** - Coding standards
+
+## 🛠️ Skills
+
+**Always invoke `using-skills` first.** Skills encode proven practices—ignoring them means reinventing wheels or missing important patterns.
+
+| Skill | Purpose | Invoke When |
+|-------|---------|-------------|
+| `using-skills` | Check available skills | Start of any task |
+| `writing-documents` | Documentation guidance | Writing READMEs, guides, designs, plans, runbooks |
+| `code-review` | Fresh-eyes code review | Reviewing PRs, commits, staged changes, auditing code |
+| `review-responder` | Process review feedback | After receiving PR comments or code review findings |
+| `research` | Evidence-first investigation | Gathering information for decisions |
+| `mermaid-diagrams` | Effective diagrams | Creating diagrams in markdown documents |
+| `skill-builder` | Skill creation | Creating or improving Claude Code skills |
+
+## ⚠️ Critical Invariants
+
+### Capsule: GitOpsReconciliation
+
+**Invariant**: Cluster state converges to match Git; Flux reverts manual changes.
+
+### Capsule: MakejinjaTemplates
+
+**Invariant**: Edit templates in `bootstrap/templates/`; don't edit generated files.
+
+**CRITICAL**: NEVER run `task configure` - it is for initial bootstrap only. Edit both the template AND the generated output file manually when making changes.
+
+### Capsule: SopsEncryption
+
+**Invariant**: Secrets are SOPS-encrypted in Git; Flux decrypts at runtime.
+
+### Capsule: AppTemplateChart
+
+**Invariant**: Apps use `bjw-s/app-template` chart; vendor charts are exceptions.
+
 ## 🔌 MCP Server Configuration
 
 Model Context Protocol (MCP) servers are configured in the root **[`.mcp.json`](.mcp.json)** file, which is shared across:
@@ -196,6 +236,9 @@ rg -n "\${SECRET_DOMAIN}" -g"*.yaml" kubernetes/apps
 - **Images:** Pin with digest: `<tag>@sha256:<digest>` (see below)
 - **Validation:** Always run `task configure` → `task kubernetes:kubeconform` → `flux diff`
 - **PRs:** Include `flux diff` output, never push directly to `main`
+- **Makejinja delimiters:** `#{var}#` not `{{var}}` (avoids Helm conflicts)
+- **Gateway API routing:** Use `route` not `ingress` for main traffic
+- **SOPS files:** End in `.sops.yaml`, encrypted before commit
 
 ### Container Image Tags
 
@@ -237,5 +280,16 @@ This ensures:
 - Reproducible deployments (digest guarantees exact image)
 - Clear version tracking (tag shows semantic version)
 - No surprise updates from mutable tags like `latest`
+
+### Commit Message Closing
+
+When writing commits to git, use the following for the closing comments:
+
+```
+Pair-programmed with Claude Code - https://claude.com/claude-code
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: Gavin <gavin@nerdz.cloud>
+```
 
 For complete details, see the documentation in [`docs/ai-context/`](docs/ai-context/).
