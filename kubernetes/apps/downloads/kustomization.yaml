@@ -32,4 +32,4 @@ resources:
   - ./sonarr-uhd/ks.yaml
   - ./tqm/ks.yaml
   - ./unpackerr/ks.yaml
-  - ./whisparr/ks.yaml
+  # - ./whisparr/ks.yaml
