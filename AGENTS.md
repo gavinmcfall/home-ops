@@ -26,20 +26,6 @@ This centralized approach provides:
 2. **[docs/ai-context/ARCHITECTURE.md](docs/ai-context/ARCHITECTURE.md)** - System architecture
 3. **[docs/ai-context/CONVENTIONS.md](docs/ai-context/CONVENTIONS.md)** - Coding standards
 
-## 🛠️ Skills
-
-**Always invoke `using-skills` first.** Skills encode proven practices—ignoring them means reinventing wheels or missing important patterns.
-
-| Skill | Purpose | Invoke When |
-|-------|---------|-------------|
-| `using-skills` | Check available skills | Start of any task |
-| `writing-documents` | Documentation guidance | Writing READMEs, guides, designs, plans, runbooks |
-| `code-review` | Fresh-eyes code review | Reviewing PRs, commits, staged changes, auditing code |
-| `review-responder` | Process review feedback | After receiving PR comments or code review findings |
-| `research` | Evidence-first investigation | Gathering information for decisions |
-| `mermaid-diagrams` | Effective diagrams | Creating diagrams in markdown documents |
-| `skill-builder` | Skill creation | Creating or improving Claude Code skills |
-
 ## ⚠️ Critical Invariants
 
 ### Capsule: GitOpsReconciliation
