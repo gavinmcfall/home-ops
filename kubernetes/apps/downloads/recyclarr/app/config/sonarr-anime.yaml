@@ -41,4 +41,15 @@ sonarr:
           - 418f50b10f1907201b6cfdf881f467b7 # Anime Dual Audio
         assign_scores_to:
           - name: Remux-1080p - Anime
-            score: 0 # Adjust scoring as desired
+            score: 100
+
+      - trash_ids:
+          - 9c14d194486c4014d422adc64092d794 # Dubs Only
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+            score: 100
+
+      - trash_ids:
+          - 69aa1e159f97d860440b04cd6d590c4f # Language: Not English
+        assign_scores_to:
+          - name: Remux-1080p - Anime
