@@ -178,12 +178,15 @@ spec:
               capabilities:
                 drop:
                   - ALL
-          speedtest:
+          browser:
             image:
-              repository: docker.io/openspeedtest/latest
-              tag: v2.0.5
+              repository: lscr.io/linuxserver/firefox
+              tag: 130.0.1
             env:
-              PORT: "8080"
+              PUID: "568"
+              PGID: "568"
+              TZ: ${TIMEZONE}
+              CUSTOM_PORT: "8080"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
@@ -200,7 +203,7 @@ spec:
         ports:
           http:
             port: *port
-          speedtest:
+          browser:
             port: 8080
           # bittorrent:
           #   enabled: true
@@ -243,11 +246,11 @@ spec:
           - backendRefs:
               - identifier: qbittorrent
                 port: 80
-      speedtest:
+      browser:
         annotations:
           internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - qb-speedtest.${SECRET_DOMAIN}
+          - qb-browser.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network
