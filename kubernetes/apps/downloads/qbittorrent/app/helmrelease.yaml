@@ -102,7 +102,7 @@ spec:
               DOT: off
               DOT_IPV6: off
               DNS_ADDRESS: 10.96.0.10 # Use cluster DNS (CoreDNS) instead of 1.1.1.1
-              FIREWALL_INPUT_PORTS: 80,8000,8080,9000
+              FIREWALL_INPUT_PORTS: 80,3000,8000,9000
               FIREWALL_OUTBOUND_SUBNETS: 10.69.0.0/16,10.96.0.0/16 # Allow access to k8s subnets
             envFrom:
               - secretRef:
@@ -180,22 +180,27 @@ spec:
                   - ALL
           browser:
             image:
-              repository: lscr.io/linuxserver/firefox
-              tag: 130.0.1
+              repository: ghcr.io/linuxserver/firefox
+              tag: 131.0.3
             env:
               PUID: "568"
               PGID: "568"
               TZ: ${TIMEZONE}
-              CUSTOM_PORT: "8080"
             securityContext:
               runAsUser: 0
               runAsGroup: 0
               runAsNonRoot: false
-              allowPrivilegeEscalation: false
+              allowPrivilegeEscalation: true
               readOnlyRootFilesystem: false
               capabilities:
                 drop:
                   - ALL
+                add:
+                  - CHOWN
+                  - SETUID
+                  - SETGID
+                  - FOWNER
+                  - DAC_OVERRIDE
     service:
       qbittorrent:
         primary: true
@@ -207,7 +212,7 @@ spec:
           http:
             port: *port
           browser:
-            port: 8080
+            port: 3000
           # bittorrent:
           #   enabled: true
           #   port: *bittorrentPort
@@ -261,7 +266,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: qbittorrent
-                port: 8080
+                port: 3000
     persistence:
       config:
         enabled: true
