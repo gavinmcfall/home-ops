@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: pgbackrest-controller
-          image: registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller:latest
+          image: registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller:latest@sha256:ad4f41e73eded654ed29bfba7665af20087c1427c8bf14c37e479a1212c8e085
           imagePullPolicy: IfNotPresent
           args:
             - operator
@@ -31,7 +31,7 @@ spec:
             - --log-level=debug
           env:
             - name: SIDECAR_IMAGE
-              value: registry.hub.docker.com/dalibo/cnpg-pgbackrest-sidecar:latest
+              value: registry.hub.docker.com/dalibo/cnpg-pgbackrest-sidecar:latest@sha256:97f06d791b4ef1351c27a87819cf5d0050b120b5f78acf497c4d23c845741956
           ports:
             - containerPort: 9090
               protocol: TCP

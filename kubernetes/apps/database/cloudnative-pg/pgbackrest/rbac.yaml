@@ -47,6 +47,22 @@ rules:
       - patch
       - update
   - apiGroups:
+      - pgbackrest.dalibo.com
+    resources:
+      - stanzas
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - pgbackrest.dalibo.com
+    resources:
+      - stanzas/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
       - postgresql.cnpg.io
     resources:
       - backups
