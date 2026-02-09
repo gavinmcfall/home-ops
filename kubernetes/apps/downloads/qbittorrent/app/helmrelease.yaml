@@ -180,17 +180,11 @@ spec:
                   - ALL
           speedtest:
             image:
-              repository: ghcr.io/librespeed/speedtest
-              tag: 2025.01.05@sha256:5e24c7a6815ef5f3a3dd50cac52f95c78d33821093c2c67a8b1ceaec9c1cc9fe
-            command: ["/bin/sh", "-c"]
-            args:
-              - |
-                sed -i 's/listen 80/listen 8080/' /etc/nginx/conf.d/default.conf && \
-                exec nginx -g 'daemon off;'
+              repository: docker.io/openspeedtest/latest
+              tag: v2.0.5
+            env:
+              PORT: "8080"
             securityContext:
-              runAsUser: 568
-              runAsGroup: 568
-              runAsNonRoot: true
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
               capabilities:
