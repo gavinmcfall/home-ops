@@ -79,6 +79,12 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
+  postBuild:
+    substitute:
+      APP: *app
+      GATUS_SVC_NAME: postgres18-immich-lb
+      GATUS_NAMESPACE: database
+      GATUS_SVC_PORT: "5432"
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -108,3 +114,9 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
+  postBuild:
+    substitute:
+      APP: *app
+      GATUS_SVC_NAME: postgres18-cluster-lb
+      GATUS_NAMESPACE: database
+      GATUS_SVC_PORT: "5432"

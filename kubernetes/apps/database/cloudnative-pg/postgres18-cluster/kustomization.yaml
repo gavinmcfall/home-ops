@@ -9,3 +9,5 @@ resources:
   - ./scheduledbackup.yaml
   - ./prometheusrule.yaml
   - ./service.yaml
+components:
+  - ../../../../components/gatus/infrastructure

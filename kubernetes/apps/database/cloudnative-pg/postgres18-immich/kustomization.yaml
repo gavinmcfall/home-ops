@@ -8,3 +8,5 @@ resources:
   - ./pooler.yaml
   - ./scheduledbackup.yaml
   - ./service.yaml
+components:
+  - ../../../../components/gatus/infrastructure
