@@ -188,6 +188,9 @@ spec:
               TZ: ${TIMEZONE}
               CUSTOM_PORT: "8080"
             securityContext:
+              runAsUser: 0
+              runAsGroup: 0
+              runAsNonRoot: false
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
               capabilities:
@@ -278,6 +281,12 @@ spec:
         advancedMounts:
           qbittorrent:
             seedboxapi:
+              - path: /config
+      browser-config:
+        type: emptyDir
+        advancedMounts:
+          qbittorrent:
+            browser:
               - path: /config
       media:
         type: nfs
