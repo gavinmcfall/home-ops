@@ -17,6 +17,17 @@ spec:
     type: Kubernetes
     kubernetes:
       envoyDeployment:
+        pod:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: tailscale.com/parent-resource-type
+                        operator: In
+                        values:
+                          - connector
+                  topologyKey: kubernetes.io/hostname
         container:
           resources:
             requests:
