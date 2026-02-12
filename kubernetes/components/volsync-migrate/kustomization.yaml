@@ -8,4 +8,3 @@ kind: Component
 components:
   - ./nfs-truenas
   - ../volsync/s3-backblaze
-  - ../volsync/s3-cloudflare
