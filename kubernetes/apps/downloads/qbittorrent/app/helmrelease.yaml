@@ -178,29 +178,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-          browser:
-            image:
-              repository: ghcr.io/linuxserver/firefox
-              tag: 131.0.3
-            env:
-              PUID: "568"
-              PGID: "568"
-              TZ: ${TIMEZONE}
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
-              runAsNonRoot: false
-              allowPrivilegeEscalation: true
-              readOnlyRootFilesystem: false
-              capabilities:
-                drop:
-                  - ALL
-                add:
-                  - CHOWN
-                  - SETUID
-                  - SETGID
-                  - FOWNER
-                  - DAC_OVERRIDE
     service:
       qbittorrent:
         primary: true
@@ -211,8 +188,6 @@ spec:
         ports:
           http:
             port: *port
-          browser:
-            port: 3000
           # bittorrent:
           #   enabled: true
           #   port: *bittorrentPort
@@ -254,19 +229,6 @@ spec:
           - backendRefs:
               - identifier: qbittorrent
                 port: 80
-      browser:
-        annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        hostnames:
-          - qb-browser.${SECRET_DOMAIN}
-        parentRefs:
-          - name: internal
-            namespace: network
-            sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: qbittorrent
-                port: 3000
     persistence:
       config:
         enabled: true
@@ -286,12 +248,6 @@ spec:
         advancedMounts:
           qbittorrent:
             seedboxapi:
-              - path: /config
-      browser-config:
-        type: emptyDir
-        advancedMounts:
-          qbittorrent:
-            browser:
               - path: /config
       media:
         type: nfs
