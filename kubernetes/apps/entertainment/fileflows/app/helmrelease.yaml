@@ -72,7 +72,7 @@ spec:
           *name : &container
             image:
               repository: ghcr.io/aclerici38/fileflows
-              tag: 26.1.2.6139@sha256:bd3c17c3febbe913840dbe4e945376e3170fae18920136aaadebdb7ce3e62581
+              tag: 26.1.9.6181@sha256:1165614391f2facc7f4c527dfd5bc7002f3cbf13e5fc84c49b41e36c93084021
             env:
               TZ: ${TIMEZONE}
               PORT: &port 5000
