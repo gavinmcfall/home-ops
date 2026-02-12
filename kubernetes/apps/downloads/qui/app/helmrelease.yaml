@@ -108,7 +108,8 @@ spec:
             sectionName: https
     persistence:
       config:
-        type: emptyDir
+        enabled: true
+        existingClaim: qui
         globalMounts:
           - path: /config
       tmp:
