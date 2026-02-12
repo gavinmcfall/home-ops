@@ -181,7 +181,7 @@ spec:
           browser:
             image:
               repository: ghcr.io/linuxserver/firefox
-              tag: 131.0.3
+              tag: 139.0.4
             env:
               PUID: "568"
               PGID: "568"
