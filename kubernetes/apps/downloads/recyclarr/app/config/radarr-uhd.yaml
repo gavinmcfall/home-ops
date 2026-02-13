@@ -25,7 +25,7 @@ radarr:
     include:
       # SQP (Streaming Quality Profile) - like onedr0p
       - template: radarr-quality-definition-sqp-streaming
-      - template: radarr-quality-profile-sqp-1-2160p
+      - template: radarr-quality-profile-sqp-1-2160p-default
       - template: radarr-custom-formats-sqp-1-2160p
 
     # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
