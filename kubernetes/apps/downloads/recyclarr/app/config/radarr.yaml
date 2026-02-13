@@ -22,10 +22,6 @@ radarr:
       - template: radarr-quality-profile-anime
       - template: radarr-custom-formats-anime
 
-    quality_profiles:
-      - name: SQP-1 (1080p)
-      - name: Remux-1080p - Anime
-
     custom_formats:
       # Movie Custom Formats
       - trash_ids:
