@@ -6,45 +6,55 @@ radarr:
     delete_old_custom_formats: true
     replace_existing_custom_formats: true
 
+    media_naming:
+      folder: plex-imdb
+      movie:
+        rename: true
+        standard: plex-imdb
+
     include:
-      # Movie Templates
-      - template: radarr-quality-definition-movie
-      - template: radarr-quality-profile-hd-bluray-web
-      - template: radarr-custom-formats-hd-bluray-web
+      # Movie Templates - SQP (Streaming Quality Profile)
+      - template: radarr-quality-definition-sqp-streaming
+      - template: radarr-quality-profile-sqp-1-1080p
+      - template: radarr-custom-formats-sqp-1-1080p
 
       # Anime Templates
       - template: radarr-quality-profile-anime
       - template: radarr-custom-formats-anime
+
+    quality_profiles:
+      - name: SQP-1 (1080p)
+      - name: Remux-1080p - Anime
 
     custom_formats:
       # Movie Custom Formats
       - trash_ids:
           - 9f6cbff8cfe4ebbc1bde14c7b7bec0de # IMAX Enhanced
         assign_scores_to:
-          - name: HD Bluray + WEB
+          - name: SQP-1 (1080p)
             # score: 0 # Uncomment this line to disable prioritised IMAX Enhanced releases
 
-      # Optional
+      # Unwanted (based on onedr0p's config)
       - trash_ids:
-          # - b6832f586342ef70d9c128d40c07b872 # Bad Dual Groups
-          # - 90cedc1fea7ea5d11298bebd3d1d3223 # EVO (no WEBDL)
-          # - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup
-          # - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
-          # - 5c44f52a8714fdd79bb4d98e2673be1f # Retags
-          # - f537cf427b64c38c8e36298f657e4828 # Scene
+          - b6832f586342ef70d9c128d40c07b872 # Bad Dual Groups
+          - 90cedc1fea7ea5d11298bebd3d3223 # EVO (no WEBDL)
+          - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup
+          - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
+          - 5c44f52a8714fdd79bb4d98e2673be1f # Retags
+          - f537cf427b64c38c8e36298f657e4828 # Scene
         assign_scores_to:
-          - name: HD Bluray + WEB
+          - name: SQP-1 (1080p)
 
+      # x265 preference (space saving)
       - trash_ids:
-          # Uncomment the next six lines to allow x265 HD releases with HDR/DV
           - dc98083864ea246d05a42df0d05f81cc # x265 (HD)
         assign_scores_to:
-          - name: HD Bluray + WEB
+          - name: SQP-1 (1080p)
             score: 20
       - trash_ids:
           - 839bea857ed2c0a8e084f3cbdbd65ecb # x265 (no HDR/DV)
         assign_scores_to:
-          - name: HD Bluray + WEB
+          - name: SQP-1 (1080p)
             score: 20
 
       # Anime Custom Formats

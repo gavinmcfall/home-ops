@@ -16,6 +16,12 @@ radarr:
     delete_old_custom_formats: true
     replace_existing_custom_formats: true
 
+    media_naming:
+      folder: plex-imdb
+      movie:
+        rename: true
+        standard: plex-imdb
+
     include:
       # Comment out any of the following includes to disable them
       - template: radarr-quality-definition-movie
@@ -24,6 +30,17 @@ radarr:
 
     # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
     custom_formats:
+      # Unwanted (core filters for anime)
+      - trash_ids:
+          - b6832f586342ef70d9c128d40c07b872 # Bad Dual Groups
+          - 90cedc1fea7ea5d11298bebd3d3223 # EVO (no WEBDL)
+          - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup
+          - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
+          - 5c44f52a8714fdd79bb4d98e2673be1f # Retags
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+
+      # Anime-specific formats
       - trash_ids:
           - 064af5f084a0a24458cc8ecd3220f93f # Uncensored
         assign_scores_to:
