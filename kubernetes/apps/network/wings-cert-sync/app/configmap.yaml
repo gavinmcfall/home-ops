@@ -17,6 +17,7 @@ data:
     {
       echo "-----BEGIN OPENSSH PRIVATE KEY-----"
       cat /ssh/id_ed25519 | sed 's/-----BEGIN OPENSSH PRIVATE KEY-----//;s/-----END OPENSSH PRIVATE KEY-----//' | tr -d ' \n' | fold -w 70
+      echo
       echo "-----END OPENSSH PRIVATE KEY-----"
     } > $${SSH_DIR}/id_ed25519
     chmod 600 $${SSH_DIR}/id_ed25519
