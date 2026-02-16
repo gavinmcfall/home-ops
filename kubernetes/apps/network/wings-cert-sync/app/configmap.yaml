@@ -13,7 +13,12 @@ data:
     # Setup SSH (use /tmp since we run as nobody)
     SSH_DIR=/tmp/.ssh
     mkdir -p $${SSH_DIR}
-    cp /ssh/id_ed25519 $${SSH_DIR}/id_ed25519
+    # Reconstruct proper PEM format (1Password strips newlines)
+    {
+      echo "-----BEGIN OPENSSH PRIVATE KEY-----"
+      cat /ssh/id_ed25519 | sed 's/-----BEGIN OPENSSH PRIVATE KEY-----//;s/-----END OPENSSH PRIVATE KEY-----//' | tr -d ' \n' | fold -w 70
+      echo "-----END OPENSSH PRIVATE KEY-----"
+    } > $${SSH_DIR}/id_ed25519
     chmod 600 $${SSH_DIR}/id_ed25519
     cat > $${SSH_DIR}/config <<EOF
     Host $${TRUENAS_HOST}
