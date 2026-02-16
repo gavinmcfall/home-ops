@@ -19,3 +19,4 @@ resources:
   - ./gateway-api/ks.yaml
   - ./multus/ks.yaml
   - ./tailscale/ks.yaml
+  - ./wings-cert-sync/ks.yaml

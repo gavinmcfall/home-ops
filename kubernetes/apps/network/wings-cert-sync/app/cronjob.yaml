@@ -1,0 +1,72 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wings-cert-sync
+spec:
+  schedule: "0 3 * * *"
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            fsGroup: 65534
+          containers:
+            - name: cert-sync
+              image: alpine:3.21
+              command: ["/bin/sh", "-c", "apk add --no-cache openssh-client > /dev/null 2>&1 && /scripts/sync-certs.sh"]
+              env:
+                - name: TRUENAS_HOST
+                  value: "citadel.internal"
+                - name: TRUENAS_USER
+                  value: "admin"
+                - name: CERT_PATH
+                  value: "/mnt/storage0/game-servers/wings/certs"
+                - name: WINGS_CONTAINER
+                  value: "wings-wings-1"
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
+              volumeMounts:
+                - name: tls-cert
+                  mountPath: /certs
+                  readOnly: true
+                - name: ssh-key
+                  mountPath: /ssh
+                  readOnly: true
+                - name: sync-script
+                  mountPath: /scripts
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tls-cert
+              secret:
+                secretName: envoy-gateway-nerdz-cloud-tls
+                defaultMode: 0444
+            - name: ssh-key
+              secret:
+                secretName: wings-cert-sync-ssh-key
+                defaultMode: 0400
+            - name: sync-script
+              configMap:
+                name: wings-cert-sync-script
+                defaultMode: 0555
+            - name: tmp
+              emptyDir: {}

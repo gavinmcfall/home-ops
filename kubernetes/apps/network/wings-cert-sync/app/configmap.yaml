@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wings-cert-sync-script
+data:
+  sync-certs.sh: |
+    #!/bin/sh
+    set -e
+
+    echo "=== Wings Certificate Sync Started at $(date) ==="
+
+    # Setup SSH
+    mkdir -p /.ssh
+    cp /ssh/id_ed25519 /.ssh/id_ed25519
+    chmod 600 /.ssh/id_ed25519
+    cat > /.ssh/config <<EOF
+    Host ${TRUENAS_HOST}
+      StrictHostKeyChecking no
+      UserKnownHostsFile /dev/null
+      LogLevel ERROR
+    EOF
+    chmod 600 /.ssh/config
+
+    SSH_CMD="ssh -i /.ssh/id_ed25519 ${TRUENAS_USER}@${TRUENAS_HOST}"
+
+    # Checksum local certs (from k8s secret mount)
+    LOCAL_CERT_SHA=$(sha256sum /certs/tls.crt | awk '{print $1}')
+    LOCAL_KEY_SHA=$(sha256sum /certs/tls.key | awk '{print $1}')
+    echo "Local cert: ${LOCAL_CERT_SHA}"
+
+    # Checksum remote certs
+    REMOTE_CERT_SHA=$(${SSH_CMD} "sha256sum ${CERT_PATH}/fullchain.pem 2>/dev/null" | awk '{print $1}' || echo "missing")
+    echo "Remote cert: ${REMOTE_CERT_SHA}"
+
+    if [ "${LOCAL_CERT_SHA}" = "${REMOTE_CERT_SHA}" ]; then
+      echo "Certificates match — no sync needed"
+      exit 0
+    fi
+
+    echo "Certificates differ — syncing..."
+    scp -i /.ssh/id_ed25519 /certs/tls.crt "${TRUENAS_USER}@${TRUENAS_HOST}:${CERT_PATH}/fullchain.pem"
+    scp -i /.ssh/id_ed25519 /certs/tls.key "${TRUENAS_USER}@${TRUENAS_HOST}:${CERT_PATH}/privkey.pem"
+
+    echo "Restarting Wings..."
+    ${SSH_CMD} "sudo docker restart ${WINGS_CONTAINER}"
+
+    echo "=== Sync completed at $(date) ==="
