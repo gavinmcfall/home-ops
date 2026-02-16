@@ -16,10 +16,8 @@ spec:
         spec:
           restartPolicy: OnFailure
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 65534
-            runAsGroup: 65534
-            fsGroup: 65534
+            runAsUser: 0
+            runAsGroup: 0
           containers:
             - name: cert-sync
               image: alpine:3.21
