@@ -10,19 +10,20 @@ data:
 
     echo "=== Wings Certificate Sync Started at $(date) ==="
 
-    # Setup SSH
-    mkdir -p /.ssh
-    cp /ssh/id_ed25519 /.ssh/id_ed25519
-    chmod 600 /.ssh/id_ed25519
-    cat > /.ssh/config <<EOF
+    # Setup SSH (use /tmp since we run as nobody)
+    SSH_DIR=/tmp/.ssh
+    mkdir -p ${SSH_DIR}
+    cp /ssh/id_ed25519 ${SSH_DIR}/id_ed25519
+    chmod 600 ${SSH_DIR}/id_ed25519
+    cat > ${SSH_DIR}/config <<EOF
     Host ${TRUENAS_HOST}
       StrictHostKeyChecking no
       UserKnownHostsFile /dev/null
       LogLevel ERROR
     EOF
-    chmod 600 /.ssh/config
+    chmod 600 ${SSH_DIR}/config
 
-    SSH_CMD="ssh -i /.ssh/id_ed25519 ${TRUENAS_USER}@${TRUENAS_HOST}"
+    SSH_CMD="ssh -F ${SSH_DIR}/config -i ${SSH_DIR}/id_ed25519 ${TRUENAS_USER}@${TRUENAS_HOST}"
 
     # Checksum local certs (from k8s secret mount)
     LOCAL_CERT_SHA=$(sha256sum /certs/tls.crt | awk '{print $1}')
@@ -39,8 +40,8 @@ data:
     fi
 
     echo "Certificates differ — syncing..."
-    scp -i /.ssh/id_ed25519 /certs/tls.crt "${TRUENAS_USER}@${TRUENAS_HOST}:${CERT_PATH}/fullchain.pem"
-    scp -i /.ssh/id_ed25519 /certs/tls.key "${TRUENAS_USER}@${TRUENAS_HOST}:${CERT_PATH}/privkey.pem"
+    scp -F ${SSH_DIR}/config -i ${SSH_DIR}/id_ed25519 /certs/tls.crt "${TRUENAS_USER}@${TRUENAS_HOST}:${CERT_PATH}/fullchain.pem"
+    scp -F ${SSH_DIR}/config -i ${SSH_DIR}/id_ed25519 /certs/tls.key "${TRUENAS_USER}@${TRUENAS_HOST}:${CERT_PATH}/privkey.pem"
 
     echo "Restarting Wings..."
     ${SSH_CMD} "sudo docker restart ${WINGS_CONTAINER}"
