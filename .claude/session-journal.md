@@ -4,36 +4,22 @@ This file maintains running context across compactions.
 
 ## Current Focus
 
+- Fixed session journal — added instructions for Claude to maintain this file
 
 ## Recent Changes
 
+- Added rule 17 (Maintain the Session Journal) to global `~/.claude/CLAUDE.md`
+- Added Session Journal section with update triggers, content guide, and conventions
+- Reset this journal from stale compaction-only timestamps to clean template
 
 ## Key Decisions
 
+- Session journal instructions live globally (not per-project) since `init-project.sh` creates journals everywhere
+- Update frequency: after each significant task (not continuous, not end-of-session only)
+- Journal is a snapshot of NOW, not a history log — replace content, don't append endlessly
 
 ## Important Context
 
-
----
-**Session compacted at:** 2026-02-10 11:58:04
-
-
----
-**Session compacted at:** 2026-02-11 10:48:12
-
-
----
-**Session compacted at:** 2026-02-11 20:31:35
-
-
----
-**Session compacted at:** 2026-02-11 21:11:36
-
-
----
-**Session compacted at:** 2026-02-13 07:48:39
-
-
----
-**Session compacted at:** 2026-02-13 09:36:26
-
+- PreCompact hook (`~/.claude/hooks/session-journal.sh`) handles timestamps and trimming automatically
+- SessionStart compact hook reads journal back after compaction via `cat`
+- The shell hooks can't write meaningful content — only Claude can, driven by the CLAUDE.md instructions
