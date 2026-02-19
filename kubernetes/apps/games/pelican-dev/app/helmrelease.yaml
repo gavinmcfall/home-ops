@@ -49,7 +49,7 @@ spec:
           install-plugin-deps:
             image:
               repository: ghcr.io/pelican-dev/panel
-              tag: v1.0.0-beta32@sha256:11814b3dc26fa62ffffb62465858d3c12642724b921fe18573cb0049dc1a89e2
+              tag: v1.0.0-beta33@sha256:871032c289b7e00a23e1eb701772603750a14b8c7cfa72b072058ce645c41032
             env:
               COMPOSER_VENDOR_DIR: /mnt/vendor
             command:
@@ -81,7 +81,7 @@ spec:
           app:
             image:
               repository: ghcr.io/pelican-dev/panel
-              tag: v1.0.0-beta32@sha256:11814b3dc26fa62ffffb62465858d3c12642724b921fe18573cb0049dc1a89e2
+              tag: v1.0.0-beta33@sha256:871032c289b7e00a23e1eb701772603750a14b8c7cfa72b072058ce645c41032
             env:
               XDG_DATA_HOME: /pelican-data
               FILAMENT_UPLOADABLE_AVATARS: "true"
