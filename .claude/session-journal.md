@@ -23,3 +23,15 @@ This file maintains running context across compactions.
 - PreCompact hook (`~/.claude/hooks/session-journal.sh`) handles timestamps and trimming automatically
 - SessionStart compact hook reads journal back after compaction via `cat`
 - The shell hooks can't write meaningful content — only Claude can, driven by the CLAUDE.md instructions
+
+---
+**Session compacted at:** 2026-02-17 19:14:34
+
+
+---
+**Session compacted at:** 2026-02-20 10:41:44
+
+
+---
+**Session compacted at:** 2026-02-20 12:20:05
+
