@@ -22,7 +22,7 @@ libraries:
     operations:
       mass_genre_update: tmdb
       mass_content_rating_update:
-        - mdb_commonsense
+        - mdb_age_rating
         - mal
         - NR
       mass_audience_rating_update: mdb_tomatoesaudience
@@ -58,6 +58,7 @@ libraries:
       mass_genre_update: imdb
       mass_content_rating_update:
         - mdb_commonsense
+        - mdb_age_rating
         - omdb
         - NR
       mass_audience_rating_update: mdb_tomatoesaudience
@@ -89,6 +90,7 @@ libraries:
       mass_genre_update: imdb
       mass_content_rating_update:
         - mdb_commonsense
+        - mdb_age_rating
         - omdb
         - NR
       mass_audience_rating_update: mdb_tomatoesaudience
@@ -138,6 +140,7 @@ libraries:
       mass_genre_update: tmdb
       mass_content_rating_update:
         - mdb_commonsense
+        - mdb_age_rating
         - omdb
         - NR
       mass_audience_rating_update: mdb_tomatoesaudience
@@ -173,6 +176,7 @@ libraries:
       mass_genre_update: tmdb
       mass_content_rating_update:
         - mdb_commonsense
+        - mdb_age_rating
         - omdb
         - NR
       mass_audience_rating_update: mdb_tomatoesaudience
@@ -225,6 +229,7 @@ libraries:
       mass_genre_update: tmdb
       mass_content_rating_update:
         - mdb_commonsense
+        - mdb_age_rating
         - omdb
         - NR
       mass_audience_rating_update: mdb_tomatoesaudience
