@@ -1,0 +1,69 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cdn-sync-crawl
+  namespace: home
+  labels: &labels
+    app.kubernetes.io/name: cdn-sync
+spec:
+  backoffLimit: 5
+  activeDeadlineSeconds: 259200 # 3 days
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: cdn-sync
+          # renovate: datasource=docker depName=ghcr.io/gavinmcfall/cdn-sync
+          image: ghcr.io/gavinmcfall/cdn-sync:latest
+          command: ["/app/cdn-sync"]
+          args: ["crawl"]
+          env:
+            - name: DB_PATH
+              value: /app/data/crawler.db
+            - name: MAX_DEPTH
+              value: "50"
+            - name: RATE_LIMIT
+              value: "2s"
+            - name: PAGE_TIMEOUT
+              value: "60s"
+            - name: NETWORK_IDLE
+              value: "3s"
+            - name: CHECKPOINT_FREQ
+              value: "10"
+            - name: LOG_JSON
+              value: "true"
+            - name: HEADLESS
+              value: "true"
+            - name: NO_SANDBOX
+              value: "true"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              memory: 2Gi
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            - name: dshm
+              mountPath: /dev/shm
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cdn-sync-data
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
+        - name: tmp
+          emptyDir: {}

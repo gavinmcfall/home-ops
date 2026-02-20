@@ -12,6 +12,7 @@ resources:
   - ./atuin/ks.yaml
   - ./bentopdf/ks.yaml
   - ./bookstack/ks.yaml
+  - ./cdn-sync/ks.yaml
   - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
   - ./linkwarden/ks.yaml
