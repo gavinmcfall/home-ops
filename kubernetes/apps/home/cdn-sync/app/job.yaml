@@ -47,9 +47,9 @@ spec:
           resources:
             requests:
               cpu: 500m
-              memory: 512Mi
+              memory: 1Gi
             limits:
-              memory: 2Gi
+              memory: 4Gi
           volumeMounts:
             - name: data
               mountPath: /app/data
@@ -64,6 +64,6 @@ spec:
         - name: dshm
           emptyDir:
             medium: Memory
-            sizeLimit: 2Gi
+            sizeLimit: 512Mi
         - name: tmp
           emptyDir: {}
