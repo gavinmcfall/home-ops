@@ -65,7 +65,7 @@ libraries:
       mass_critic_rating_update: mdb_metacritic
       mass_user_rating_update: imdb
 
-  Movies-UHD:
+  Movies - UHD:
     run_order:
       - collections
       - metadata
@@ -147,7 +147,7 @@ libraries:
       mass_critic_rating_update: mdb_metacritic
       mass_user_rating_update: imdb
 
-  TV Shows-UHD:
+  TV Shows - UHD:
     run_order:
       - collections
       - metadata
@@ -200,7 +200,7 @@ libraries:
       plex_path: "/media/Library/Television - UHD"
       upgrade_existing: false
 
-  TV Shows-Foreign:
+  TV Shows - Foreign:
     run_order:
       - collections
       - metadata
