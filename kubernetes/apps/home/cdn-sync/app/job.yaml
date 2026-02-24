@@ -22,7 +22,7 @@ spec:
       containers:
         - name: cdn-sync
           # renovate: datasource=docker depName=ghcr.io/gavinmcfall/cdn-sync
-          image: ghcr.io/gavinmcfall/cdn-sync:latest@sha256:d534a5bfd643172546cab021e9eb0f03f916421c15d3b3247ae62becb9f7a05c
+          image: ghcr.io/gavinmcfall/cdn-sync:latest@sha256:c8717bccd47f6588b22b58f979049cc094a07382fbe3e4dcfe8b0fbe5df572f9
           command: ["/app/cdn-sync"]
           args: ["crawl"]
           env:
