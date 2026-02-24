@@ -106,7 +106,7 @@ spec:
             image:
               repository: ghcr.io/immich-app/immich-machine-learning
               # Using CPU version - OpenVINO has compatibility issues with some iGPUs
-              tag: v2.5.6@sha256:b213fa3c82d27a21a299c46ffbb38a091f18384db1ad67d409a3b34fe0fce556
+              tag: v2.5.6
             env:
               REDIS_HOSTNAME: *redisHostname
               REDIS_DBINDEX: "1"
