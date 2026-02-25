@@ -63,6 +63,8 @@ spec:
               - /output
               - --parallel
               - "2"
+              - --include-threads
+              - all
               - --fuck-russia  # bypass geo-restriction (harmless flag name, just unlocks full functionality)
 
             resources:
