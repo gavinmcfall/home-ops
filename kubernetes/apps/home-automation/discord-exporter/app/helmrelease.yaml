@@ -1,0 +1,81 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app discord-exporter
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      discord-exporter:
+        type: cronjob
+        cronjob:
+          # Run weekly Sunday at 03:00 — adjust as needed
+          # Trigger manually: kubectl create job -n home-automation --from=cronjob/discord-exporter discord-exporter-manual
+          schedule: "0 3 * * 0"
+          successfulJobsHistory: 1
+          failedJobsHistory: 3
+          concurrencyPolicy: Forbid
+
+        containers:
+          app:
+            image:
+              repository: tyrrrz/discordchatexporter
+              tag: stable
+
+            # Token comes from ExternalSecret.
+            # Guild IDs are not sensitive — add one per server you want to export.
+            # Find a guild ID: Discord → server name → right-click → Copy Server ID
+            # (requires Developer Mode in Discord settings)
+            env:
+              DISCORD_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: discord-exporter-secret
+                    key: DISCORD_TOKEN
+
+              # Space-separated guild IDs — update these with the actual server IDs
+              # e.g. StarFab/scdatatools community server
+              DISCORD_GUILD_IDS: "REPLACE_WITH_GUILD_ID"
+
+            # DiscordChatExporter CLI args — exportguild exports all readable channels
+            # from the specified guild as JSON into /output/<guild-name>/<channel-name>.json
+            args:
+              - exportguild
+              - --token
+              - $(DISCORD_TOKEN)
+              - --guild
+              - $(DISCORD_GUILD_IDS)
+              - --format
+              - Json
+              - --output
+              - /output
+              - --parallel
+              - "2"
+              - --fuck-russia  # bypass geo-restriction (harmless flag name, just unlocks full functionality)
+
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+
+    persistence:
+      output:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/discord-exports
+        globalMounts:
+          - path: /output
