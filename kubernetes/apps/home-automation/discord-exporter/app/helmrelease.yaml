@@ -47,7 +47,7 @@ spec:
 
               # Space-separated guild IDs — update these with the actual server IDs
               # e.g. StarFab/scdatatools community server
-              DISCORD_GUILD_IDS: "REPLACE_WITH_GUILD_ID"
+              DISCORD_GUILD_IDS: "710322530992390177"
 
             # DiscordChatExporter CLI args — exportguild exports all readable channels
             # from the specified guild as JSON into /output/<guild-name>/<channel-name>.json
