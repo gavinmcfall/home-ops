@@ -45,6 +45,7 @@ spec:
               - "--3d"
             env:
               PYTHONDONTWRITEBYTECODE: "1"
+              PYTHONUNBUFFERED: "1"
             envFrom:
               - secretRef:
                   name: heybuilds-downloader-secret
