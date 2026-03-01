@@ -18,6 +18,7 @@ resources:
   - ./dashbrr/ks.yaml
   - ./flaresolverr/ks.yaml
   - ./heybuilds-downloader/ks.yaml
+  - ./heybuilds-viewer/ks.yaml
   - ./kapowarr/ks.yaml
   - ./metube/ks.yaml
   - ./prowlarr/ks.yaml
