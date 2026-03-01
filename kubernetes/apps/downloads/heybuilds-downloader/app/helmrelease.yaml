@@ -59,6 +59,8 @@ spec:
                 memory: 256Mi
 
     defaultPodOptions:
+      imagePullSecrets:
+        - name: heybuilds-ghcr-pull-secret
       securityContext:
         runAsNonRoot: true
         runAsUser: 568
