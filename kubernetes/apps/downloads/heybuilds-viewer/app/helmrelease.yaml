@@ -98,9 +98,12 @@ spec:
 
     persistence:
       builds:
-        existingClaim: heybuilds-downloader
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media/
         globalMounts:
           - path: /builds
+            subPath: heybuilds
             readOnly: true
       tmp:
         type: emptyDir

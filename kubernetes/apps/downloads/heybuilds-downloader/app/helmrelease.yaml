@@ -69,23 +69,15 @@ spec:
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile: { type: RuntimeDefault }
-      affinity:
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: heybuilds-viewer
-              topologyKey: kubernetes.io/hostname
 
     persistence:
       builds:
-        type: persistentVolumeClaim
-        storageClass: ceph-block
-        accessMode: ReadWriteOnce
-        size: 100Gi
-        retain: true
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media/
         globalMounts:
           - path: /builds
+            subPath: heybuilds
       tmp:
         type: emptyDir
         globalMounts:
