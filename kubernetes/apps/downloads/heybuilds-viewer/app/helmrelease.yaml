@@ -98,7 +98,7 @@ spec:
 
     persistence:
       builds:
-        existingClaim: heybuilds-downloader-builds
+        existingClaim: heybuilds-downloader
         globalMounts:
           - path: /builds
             readOnly: true
