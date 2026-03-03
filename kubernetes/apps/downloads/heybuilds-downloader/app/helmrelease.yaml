@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/heybuilds-downloader
-              tag: 7dcdcad@sha256:9065c22a32719741e3d81a86b42128be09997c0dd2a9d959ca93b4150694838c
+              tag: 52945c5@sha256:61796fa1ff0c71f49a95c773ede2c0ffd6b3e4d3d5fa4da419a3aa0b1115bc05
             args:
               - "--output"
               - "/builds"
