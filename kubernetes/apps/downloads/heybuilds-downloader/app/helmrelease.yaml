@@ -77,7 +77,7 @@ spec:
         path: /mnt/storage0/media/
         globalMounts:
           - path: /builds
-            subPath: heybuilds
+            subPath: Library/Game Builds / Minecraft & Hytale
       tmp:
         type: emptyDir
         globalMounts:
