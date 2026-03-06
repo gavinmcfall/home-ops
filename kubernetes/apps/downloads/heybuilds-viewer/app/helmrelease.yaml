@@ -29,7 +29,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/heybuilds-viewer
-              tag: 01227ca@sha256:d5150653127cfd9ebe0c8f751c5fd78ad43bf84679b73d3ce9a660971788c280
+              tag: 784cead@sha256:f19ab83f186232c95870a3952f975e409a91420d2404a2116ad4df462fb5615d
             env:
               BUILDS_DIR: /builds
               PYTHONDONTWRITEBYTECODE: "1"
