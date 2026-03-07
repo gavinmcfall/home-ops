@@ -32,3 +32,6 @@ wiki
 /tmp
 # RepoQL
 .repoql/
+# Claude Code
+.claude/*
+!.claude/CLAUDE.md
