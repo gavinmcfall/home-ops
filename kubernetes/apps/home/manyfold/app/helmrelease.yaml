@@ -67,6 +67,7 @@ spec:
               MULTIUSER: enabled
               PUBLIC_HOSTNAME: 3d.${SECRET_DOMAIN}
               PUBLIC_PORT: "443"
+              HTTPS_ONLY: "true"
               OIDC_ISSUER: https://id.${SECRET_DOMAIN}
               OIDC_NAME: Pocket-ID
               TZ: ${TIMEZONE}
