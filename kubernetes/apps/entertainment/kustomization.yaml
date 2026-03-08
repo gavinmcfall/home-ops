@@ -14,7 +14,7 @@ resources:
   - ./fileflows/ks.yaml
   - ./immich/ks.yaml
   - ./kavita/ks.yaml
-  - ./overseerr/ks.yaml
+  - ./seerr/ks.yaml
   - ./pasta/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml

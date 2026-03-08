@@ -15,7 +15,7 @@ spec:
       namespace: storage
     - name: plex
       namespace: entertainment
-    - name: overseerr
+    - name: seerr
       namespace: entertainment
   path: ./kubernetes/apps/entertainment/wizarr/app
   prune: true

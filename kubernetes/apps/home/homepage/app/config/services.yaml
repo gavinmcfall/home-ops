@@ -158,14 +158,14 @@
         href: https://jellyfin.${SECRET_DOMAIN}
         icon: jellyfin.png
         description: Jellyfin streaming
-    - Overseerr:
+    - Seerr:
         href: https://requests.${SECRET_DOMAIN}
-        icon: overseerr.png
+        icon: seerr.png
         description: Media request portal
         widget:
-          type: overseerr
-          url: http://overseerr.entertainment:5055
-          key: {{HOMEPAGE_VAR_OVERSEERR_TOKEN}}
+          type: seerr
+          url: http://seerr.entertainment:5055
+          key: {{HOMEPAGE_VAR_SEERR_TOKEN}}
     - Tautulli:
         href: https://tautulli.${SECRET_DOMAIN}
         icon: tautulli.png
