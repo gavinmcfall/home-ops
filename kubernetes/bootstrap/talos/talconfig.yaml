@@ -230,6 +230,7 @@ nodes:
               - name: nvidia
               - name: nvidia_uvm
               - name: nvidia_drm
+              - name: nvidia_modeset
 
 # Global patches
 patches:
@@ -246,6 +247,7 @@ controlPlane:
   patches:
     - "@./patches/controller/api-access.yaml"
     - "@./patches/global/thunderbolt.yaml"
+    - "@./patches/global/udev.yaml"
     - "@./patches/controller/cluster.yaml"
     - "@./patches/controller/disable-admission-controller.yaml"
     - "@./patches/controller/etcd.yaml"
