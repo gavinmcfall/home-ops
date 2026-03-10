@@ -7,6 +7,7 @@ resources:
   - ./helmrelease.yaml
 components:
   - ../../../../components/volsync-standard
+  - ../../../../components/priority/priority-09
 configMapGenerator:
   - name: recyclarr-configmap
     files:

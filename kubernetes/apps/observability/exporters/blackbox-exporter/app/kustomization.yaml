@@ -6,3 +6,5 @@ resources:
   - ./helmrelease.yaml
   - ./probes.yaml
   - ./httproute.yaml
+components:
+  - ../../../../../components/priority/priority-08

@@ -5,6 +5,8 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+components:
+  - ../../../../components/priority/priority-08
 configMapGenerator:
   - name: arr-codec-tagger-configmap
     files:

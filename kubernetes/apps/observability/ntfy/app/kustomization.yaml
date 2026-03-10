@@ -7,3 +7,4 @@ resources:
   - ./ocirepository.yaml
 components:
   - ../../../../components/gatus/external
+  - ../../../../components/priority/priority-08

@@ -6,6 +6,8 @@ resources:
   - ./externalsecret.yaml
   - ./rbac.yaml
   - ./helmrelease.yaml
+components:
+  - ../../../../components/priority/priority-08
 configMapGenerator:
   - name: gatus-configmap
     files:

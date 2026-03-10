@@ -6,3 +6,4 @@ resources:
   - ./helmrelease.yaml
 components:
   - ../../../../components/volsync-standard
+  - ../../../../components/priority/priority-10

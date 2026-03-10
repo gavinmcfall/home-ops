@@ -5,6 +5,8 @@ resources:
   - ./dnsendpoint.yaml
   - ./secret.sops.yaml
   - ./helmrelease.yaml
+components:
+  - ../../../../components/priority/priority-02
 configMapGenerator:
   - name: cloudflared-configmap
     files:

@@ -8,3 +8,5 @@ resources:
   - ./rbac.yaml
   - ./configmap.yaml
   - ./helmrelease.yaml
+components:
+  - ../../../../components/priority/priority-08

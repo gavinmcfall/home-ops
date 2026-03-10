@@ -6,6 +6,8 @@ resources:
   - ./claim.yaml
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+components:
+  - ../../../../components/priority/priority-01
 configMapGenerator:
   - name: mosquitto-configmap
     files:

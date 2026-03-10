@@ -5,6 +5,8 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+components:
+  - ../../../../components/priority/priority-10
 configMapGenerator:
   - name: smtp-relay-configmap
     files:

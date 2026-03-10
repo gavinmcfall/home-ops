@@ -6,3 +6,5 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./claim.yaml
+components:
+  - ../../../../components/priority/priority-08

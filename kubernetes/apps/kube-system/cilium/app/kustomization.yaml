@@ -5,6 +5,8 @@ resources:
   - ./helmrelease.yaml
   - ./httproute.yaml
   - ./networking.yaml
+components:
+  - ../../../../components/priority/priority-02
 configMapGenerator:
   - name: cilium-helm-values
     files:

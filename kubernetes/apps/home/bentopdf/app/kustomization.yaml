@@ -7,3 +7,5 @@ resources:
   - ./externalsecret.yaml
   - ./securitypolicy.yaml
   - ./backend.yaml
+components:
+  - ../../../../components/priority/priority-10

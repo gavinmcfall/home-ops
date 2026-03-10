@@ -8,3 +8,4 @@ resources:
   - ./servicemonitor.yaml
 components:
   - ../../../../components/volsync-standard
+  - ../../../../components/priority/priority-08

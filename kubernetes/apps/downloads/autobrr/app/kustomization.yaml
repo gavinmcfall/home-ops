@@ -4,6 +4,8 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+components:
+  - ../../../../components/priority/priority-08
 configMapGenerator:
   - name: autobrr-loki-rules
     files:

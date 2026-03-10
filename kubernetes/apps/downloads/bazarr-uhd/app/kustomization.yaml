@@ -8,6 +8,7 @@ resources:
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/volsync-standard
+  - ../../../../components/priority/priority-06
 configMapGenerator:
   - name: bazarr-uhd-scripts
     files:

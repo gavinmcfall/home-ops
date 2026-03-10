@@ -8,6 +8,7 @@ resources:
   - ./rbac.yaml
 components:
   - ../../../../components/gatus/guarded
+  - ../../../../components/priority/priority-08
 configMapGenerator:
   - name: dashbrr-config
     files:

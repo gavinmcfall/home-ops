@@ -8,3 +8,4 @@ resources:
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/guarded
+  - ../../../../components/priority/priority-10

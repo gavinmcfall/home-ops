@@ -5,3 +5,5 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./prometheusrule.yaml
+components:
+  - ../../../../../components/priority/priority-08

@@ -8,3 +8,4 @@ resources:
 components:
   - ../../../../components/gatus/external
   - ../../../../components/volsync-standard
+  - ../../../../components/priority/priority-03

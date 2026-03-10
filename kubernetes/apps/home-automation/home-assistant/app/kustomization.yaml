@@ -8,6 +8,7 @@ resources:
 components:
   - ../../../../components/gatus/external
   - ../../../../components/volsync-critical
+  - ../../../../components/priority/priority-07
 generatorOptions:
   disableNameSuffixHash: true
 configMapGenerator:

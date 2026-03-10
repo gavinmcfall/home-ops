@@ -8,4 +8,6 @@ resources:
   - ./prometheusrule.yaml
   - ./resources/prometheusrule-thunderbolt.yaml
   - ./resources/prometheusrule-node-overrides.yaml
+components:
+  - ../../../../components/priority/priority-08
   # - ./scrapeconfig.yaml

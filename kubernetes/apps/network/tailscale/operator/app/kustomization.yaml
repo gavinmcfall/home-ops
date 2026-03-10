@@ -6,3 +6,5 @@ resources:
   - ./helmrelease.yaml
   - ./connector.yaml
   - ./rbac.yaml
+components:
+  - ../../../../../components/priority/priority-02

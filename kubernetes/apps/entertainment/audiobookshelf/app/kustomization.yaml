@@ -10,6 +10,7 @@ components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
   - ../../../../components/volsync-standard
+  - ../../../../components/priority/priority-06
 patches:
   - target:
       group: keda.sh

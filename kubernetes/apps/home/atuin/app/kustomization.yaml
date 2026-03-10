@@ -7,3 +7,4 @@ resources:
   - ./helmrelease.yaml
 components:
   - ../../../../components/gatus/guarded
+  - ../../../../components/priority/priority-10

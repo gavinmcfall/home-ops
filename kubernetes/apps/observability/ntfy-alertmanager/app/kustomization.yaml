@@ -6,3 +6,5 @@ resources:
   - ./configmap.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
+components:
+  - ../../../../components/priority/priority-08

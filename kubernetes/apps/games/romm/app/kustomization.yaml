@@ -8,6 +8,7 @@ components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
   - ../../../../components/volsync-standard
+  - ../../../../components/priority/priority-06
 configMapGenerator:
 - name: romm-config
   files:

@@ -7,6 +7,7 @@ resources:
   - ./externalsecret.yaml
 components:
   - ../../../../components/gatus/guarded
+  - ../../../../components/priority/priority-10
 configMapGenerator:
   - name: searxng-config
     files:

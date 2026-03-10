@@ -10,3 +10,4 @@ components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/gatus/external
   - ../../../../components/volsync-critical
+  - ../../../../components/priority/priority-07

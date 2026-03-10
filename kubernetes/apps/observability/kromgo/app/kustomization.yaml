@@ -6,6 +6,7 @@ resources:
   - ./helmrelease.yaml
 components:
   - ../../../../components/gatus/external
+  - ../../../../components/priority/priority-08
 configMapGenerator:
   - name: kromgo-configmap
     files:

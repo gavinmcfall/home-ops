@@ -6,3 +6,5 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./prometheusrule.yaml
+components:
+  - ../../../../../components/priority/priority-08

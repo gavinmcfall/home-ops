@@ -7,3 +7,4 @@ resources:
 components:
   - ../../../../components/gatus/guarded
   - ../../../../components/volsync-standard
+  - ../../../../components/priority/priority-08

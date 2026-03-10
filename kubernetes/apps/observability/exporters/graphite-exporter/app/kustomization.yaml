@@ -6,3 +6,5 @@ resources:
   - ./helmrelease.yaml
   - ./configmap.yaml
   - ./servicemonitor.yaml
+components:
+  - ../../../../../components/priority/priority-08

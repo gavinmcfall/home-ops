@@ -9,3 +9,4 @@ resources:
 components:
   - ../../../../components/gatus/guarded
   - ../../../../components/volsync-critical
+  - ../../../../components/priority/priority-01
