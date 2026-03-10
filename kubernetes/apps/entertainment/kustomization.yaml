@@ -11,7 +11,7 @@ resources:
   # Applications
   - ./audiobookshelf/ks.yaml
   - ./calibre-web/ks.yaml
-  - ./fileflows/ks.yaml
+  # - ./fileflows/ks.yaml
   - ./immich/ks.yaml
   - ./kavita/ks.yaml
   - ./seerr/ks.yaml
