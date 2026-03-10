@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/nfd.k8s-sigs.io/nodefeaturerule_v1alpha1.json
+apiVersion: nfd.k8s-sigs.io/v1alpha1
+kind: NodeFeatureRule
+metadata:
+  name: nvidia-gpu-device
+spec:
+  rules:
+    # NVIDIA GeForce GTX 1080 Ti (Pascal GP102)
+    - name: nvidia.gpu
+      labels:
+        nvidia.feature.node.kubernetes.io/gpu: "true"
+      matchFeatures:
+        - feature: pci.device
+          matchExpressions:
+            vendor: { op: In, value: ["10de"] }
+            device: { op: In, value: ["1b06"] }

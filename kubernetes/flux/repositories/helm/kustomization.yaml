@@ -21,6 +21,7 @@ resources:
   - ./metrics-server.yaml
   - ./nextcloud.yaml
   - ./node-feature-discovery.yaml
+  - ./nvidia.yaml
   - ./openebs.yaml
   - ./piraeus-charts.yaml
   - ./prometheus-community.yaml
