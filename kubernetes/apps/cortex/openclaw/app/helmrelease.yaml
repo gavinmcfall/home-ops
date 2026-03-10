@@ -1,0 +1,269 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openclaw
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    controllers:
+      openclaw:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          install-tools:
+            image:
+              repository: ghcr.io/openclaw/openclaw
+              tag: 2026.3.8@sha256:7b1294f6aa2eb05b2070cc614743f79212313fc294e5de221ada8a2969ea52f6
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -e
+                mkdir -p /home/node/.local/bin
+
+                echo "Starting tool installation..."
+
+                # Install gh CLI if not present on PVC
+                if [ ! -f /home/node/.local/bin/gh ]; then
+                  echo "Installing gh CLI..."
+                  cd /tmp
+                  curl -fsSL https://github.com/cli/cli/releases/download/v2.61.0/gh_2.61.0_linux_amd64.tar.gz -o gh.tar.gz
+                  tar xzf gh.tar.gz
+                  cp gh_2.61.0_linux_amd64/bin/gh /home/node/.local/bin/
+                  rm -rf gh.tar.gz gh_2.61.0_linux_amd64
+                fi
+
+                # Install pip if not available
+                set +e
+                if command -v pip3 >/dev/null 2>&1 || python3 -m pip --version >/dev/null 2>&1; then
+                  echo "pip is available"
+                else
+                  echo "Installing pip..."
+                  cd /tmp
+                  curl -fsSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+                  python3 get-pip.py --user --no-warn-script-location --break-system-packages || \
+                  python3 get-pip.py --user --no-warn-script-location || \
+                  echo "pip install skipped"
+                  rm -f get-pip.py
+                fi
+                set -e
+
+                echo "Tool installation complete"
+                mkdir -p /home/node/.openclaw
+                echo "Init container completed successfully"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/openclaw/openclaw
+              tag: 2026.3.8@sha256:7b1294f6aa2eb05b2070cc614743f79212313fc294e5de221ada8a2969ea52f6
+            command:
+              - /bin/sh
+              - -c
+              - |
+                ln -sf /app/openclawbot.mjs /home/node/.local/bin/openclawbot
+                exec node dist/index.js gateway --bind lan
+            env:
+              BROWSER_WS_ENDPOINT: "ws://localhost:3000/chrome?stealth=1&--disable-web-security=true"
+              HOME: &homepath /home/node
+              OLLAMA_URL: "http://ollama.cortex.svc.cluster.local:11434"
+              OPENCLAW_GATEWAY_PORT: &port 18789
+              PATH: /home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+              PIP_BREAK_SYSTEM_PACKAGES: "1"
+              TERM: xterm-256color
+              TZ: ${TIMEZONE}
+            envFrom:
+              - secretRef:
+                  name: openclaw-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  initialDelaySeconds: 15
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 50m
+                memory: 512Mi
+              limits:
+                cpu: 2000m
+                memory: 4Gi
+          chrome:
+            image:
+              repository: ghcr.io/browserless/chrome
+              tag: v2.42.0@sha256:af7b7069d2a00de431b0c0f5e51946bed3615b90cc4e35dc72d3f1b81b907bdf
+            env:
+              TZ: ${TIMEZONE}
+              TIMEOUT: "60000"
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 1000m
+                memory: 2Gi
+          code-server:
+            image:
+              repository: ghcr.io/coder/code-server
+              tag: 4.110.0@sha256:d56097319b62b1f34e3b919ddbb7ccb90fc1d98bdb69802fb92831a16d9300d3
+            env:
+              TZ: ${TIMEZONE}
+            args:
+              [
+                "--auth",
+                "none",
+                "--user-data-dir",
+                "/home/node/.vscode",
+                "--extensions-dir",
+                "/home/node/.vscode",
+                "--port",
+                "12321",
+                "/config",
+              ]
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
+    defaultPodOptions:
+      shareProcessNamespace: true
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        controller: openclaw
+        ports:
+          http:
+            port: *port
+          code-server:
+            port: &codePort 12321
+    route:
+      app:
+        annotations:
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - cortex.${SECRET_DOMAIN}
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+      code-server:
+        annotations:
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - cortex-code.${SECRET_DOMAIN}
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *codePort
+    rbac:
+      roles:
+        openclaw-read-all:
+          type: ClusterRole
+          rules:
+            - apiGroups: [""]
+              resources: ["pods", "nodes", "services", "namespaces", "configmaps", "persistentvolumes", "persistentvolumeclaims", "endpoints", "resourcequotas", "limitranges", "serviceaccounts", "events"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: [""]
+              resources: ["pods/log"]
+              verbs: ["get", "list"]
+            - apiGroups: ["apps"]
+              resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: ["batch"]
+              resources: ["jobs", "cronjobs"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: ["networking.k8s.io"]
+              resources: ["ingresses", "networkpolicies"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: ["storage.k8s.io"]
+              resources: ["storageclasses"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: ["rbac.authorization.k8s.io"]
+              resources: ["roles", "rolebindings", "clusterroles", "clusterrolebindings"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: ["metrics.k8s.io"]
+              resources: ["nodes", "pods"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: ["helm.toolkit.fluxcd.io"]
+              resources: ["helmreleases"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: ["kustomize.toolkit.fluxcd.io"]
+              resources: ["kustomizations"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: ["external-secrets.io"]
+              resources: ["externalsecrets"]
+              verbs: ["get", "list", "watch"]
+        openclaw-write-restricted:
+          type: Role
+          rules:
+            - apiGroups: [""]
+              resources: ["pods"]
+              verbs: ["delete"]
+            - apiGroups: ["batch"]
+              resources: ["jobs"]
+              verbs: ["delete"]
+            - apiGroups: [""]
+              resources: ["pods/exec"]
+              verbs: ["create"]
+            - apiGroups: ["apps"]
+              resources: ["deployments"]
+              verbs: ["patch", "update"]
+      bindings:
+        openclaw-read-all:
+          type: ClusterRoleBinding
+          roleRef:
+            identifier: openclaw-read-all
+          subjects:
+            - identifier: openclaw
+              serviceAccount: openclaw
+        openclaw-write-restricted:
+          type: RoleBinding
+          roleRef:
+            identifier: openclaw-write-restricted
+          subjects:
+            - identifier: openclaw
+              serviceAccount: openclaw
+    serviceAccount:
+      openclaw: {}
+    persistence:
+      config:
+        existingClaim: openclaw
+        globalMounts:
+          - path: *homepath
+      openclaw-config:
+        type: secret
+        name: openclaw-config
+        advancedMounts:
+          openclaw:
+            app:
+              - path: /home/node/.openclaw/openclaw.json
+                subPath: openclaw.json
+                readOnly: true
