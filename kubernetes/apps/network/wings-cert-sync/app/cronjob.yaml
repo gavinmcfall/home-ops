@@ -20,7 +20,7 @@ spec:
             runAsGroup: 0
           containers:
             - name: cert-sync
-              image: alpine:3.21
+              image: alpine:3.23
               command: ["/bin/sh", "-c", "apk add --no-cache openssh-client > /dev/null 2>&1 && /scripts/sync-certs.sh"]
               env:
                 - name: HOME
