@@ -19,7 +19,7 @@ cluster:
   name: "home-kubernetes"
 cni:
   exclusive: false
-devices: "bond0"
+devices: "bond+ eno+"
 enableIPv4BIGTCP: true
 endpointRoutes:
   enabled: true
