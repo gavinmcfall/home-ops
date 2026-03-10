@@ -15,8 +15,6 @@ sonarr:
     base_url: http://sonarr.downloads.svc.cluster.local:80
     api_key: !env_var SONARR_API_KEY
     delete_old_custom_formats: true
-    replace_existing_custom_formats: true
-
     media_naming:
       series: plex-imdb
       season: default
@@ -36,7 +34,7 @@ sonarr:
       - template: sonarr-v4-quality-profile-anime
       - template: sonarr-v4-custom-formats-anime
 
-    quality_profiles:
+    assign_scores_to:
       - name: Remux-1080p - Anime
         min_format_score: 3000 # Require English audio (Dual Audio or Dubs Only)
 

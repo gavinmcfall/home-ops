@@ -15,8 +15,6 @@ sonarr:
     base_url: http://sonarr-uhd.downloads.svc.cluster.local:80
     api_key: !env_var SONARR_UHD_API_KEY
     delete_old_custom_formats: true
-    replace_existing_custom_formats: true
-
     media_naming:
       series: plex-imdb
       season: default

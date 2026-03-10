@@ -14,8 +14,6 @@ radarr:
     base_url: http://radarr-uhd.downloads.svc.cluster.local:80
     api_key: !env_var RADARR_UHD_API_KEY
     delete_old_custom_formats: true
-    replace_existing_custom_formats: true
-
     media_naming:
       folder: plex-imdb
       movie:
