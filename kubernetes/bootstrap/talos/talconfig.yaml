@@ -190,6 +190,47 @@ nodes:
         routes:
           - network: 169.254.255.102/32
             metric: 2048
+  ###################################################################
+  #                     WORKER NODES                               #
+  ###################################################################
+  - hostname: "pyro-01"
+    ipAddress: "10.90.3.111"
+    installDiskSelector:
+      wwid: "naa.5002538e700ffde2"
+    talosImageURL: factory.talos.dev/metal-installer/6d3b466016d617387863aec155bc5ed3b3a06c4d44391c47a8e5168f65da3681
+    controlPlane: false
+    nodeLabels:
+      nvidia.com/gpu: "true"
+      node-role.kubernetes.io/gpu: ""
+    nodeTaints:
+      nvidia.com/gpu: "true:NoSchedule"
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "70:8b:cd:58:10:7e"
+        dhcp: false
+        addresses:
+          - "10.90.3.111/16"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: "10.90.254.1"
+        mtu: 1500
+    patches:
+      # Mount 2TB SSD for model storage via OpenEBS
+      - |-
+        machine:
+          disks:
+            - device: /dev/disk/by-id/ata-Samsung_SSD_870_QVO_2TB_S5RPNF0T611875M
+              partitions:
+                - mountpoint: /var/openebs/local
+      # NVIDIA kernel modules
+      - |-
+        machine:
+          kernel:
+            modules:
+              - name: nvidia
+              - name: nvidia_uvm
+              - name: nvidia_drm
+
 # Global patches
 patches:
   - "@./patches/global/containerd.yaml"
@@ -199,12 +240,12 @@ patches:
   - "@./patches/global/kubelet.yaml"
   - "@./patches/global/openebs-local.yaml"
   - "@./patches/global/sysctl.yaml"
-  - "@./patches/global/thunderbolt.yaml"
 
 # Controller patches
 controlPlane:
   patches:
     - "@./patches/controller/api-access.yaml"
+    - "@./patches/global/thunderbolt.yaml"
     - "@./patches/controller/cluster.yaml"
     - "@./patches/controller/disable-admission-controller.yaml"
     - "@./patches/controller/etcd.yaml"
