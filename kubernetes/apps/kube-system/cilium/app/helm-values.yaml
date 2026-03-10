@@ -9,7 +9,7 @@ bpf:
   datapathMode: netkit
   masquerade: true
   preallocateMaps: true
-  tproxy: true
+  tproxy: false
 cgroup:
   automount:
     enabled: false
