@@ -1,0 +1,73 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kopia-maintenance
+spec:
+  schedule: "30 */6 * * *"
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+            - name: kopia-maintenance
+              image: ghcr.io/home-operations/kopia:0.22.3@sha256:17ab64542280197a5368247deaefadc3e3bbe15714ab666c2455a06824e86efd
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  echo "Connecting to repository as maintenance owner..."
+                  kopia repository connect filesystem \
+                    --path=/repository \
+                    --password="${KOPIA_PASSWORD}" \
+                    --override-username=kopia \
+                    --override-hostname=maintenance \
+                    --cache-directory=/cache
+                  echo "Running full maintenance..."
+                  kopia maintenance run --full
+                  echo "Maintenance complete!"
+              env:
+                - name: KOPIA_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-maintenance-secret
+                      key: KOPIA_PASSWORD
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 256Mi
+                limits:
+                  memory: 4Gi
+              volumeMounts:
+                - name: repository
+                  mountPath: /repository
+                  readOnly: false
+                - name: cache
+                  mountPath: /cache
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: repository
+              nfs:
+                server: citadel.internal
+                path: /mnt/storage0/backups/VolsyncKopia
+            - name: cache
+              emptyDir:
+                sizeLimit: 2Gi
+            - name: tmp
+              emptyDir: {}
