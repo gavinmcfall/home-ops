@@ -9,5 +9,5 @@ components:
 
 resources:
   # Applications
-  # - ./ollama/ks.yaml
-  # - ./openclaw/ks.yaml
+  - ./ollama/ks.yaml
+  - ./openclaw/ks.yaml
