@@ -66,6 +66,10 @@ spec:
           http:
             port: *port
     persistence:
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
       secret-file:
         type: secret
         name: "{{ .Release.Name }}-secret"
