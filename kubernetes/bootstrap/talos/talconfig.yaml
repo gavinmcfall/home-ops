@@ -203,7 +203,7 @@ nodes:
       nvidia.com/gpu: "true"
       node-role.kubernetes.io/gpu: ""
     nodeTaints:
-      nvidia.com/gpu: "true:NoSchedule"
+      nvidia.com/gpu: "true:NoExecute"
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "70:8b:cd:58:10:7e"

@@ -31,7 +31,7 @@ spec:
     tolerations:
       - key: nvidia.com/gpu
         operator: Exists
-        effect: NoSchedule
+        effect: NoExecute
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:

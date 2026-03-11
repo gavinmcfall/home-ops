@@ -46,7 +46,7 @@ spec:
       tolerations:
         - key: nvidia.com/gpu
           operator: Exists
-          effect: NoSchedule
+          effect: NoExecute
       nodeSelector:
         nvidia.com/gpu: "true"
       securityContext:
