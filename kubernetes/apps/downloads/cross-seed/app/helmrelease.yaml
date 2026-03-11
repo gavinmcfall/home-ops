@@ -22,7 +22,6 @@ spec:
               tag: 6.13.6@sha256:e2bf5b593e4e7d699e6242423ad7966190cd52ba8eefafdfdbb0cb5b0b609b96
             env:
               CROSS_SEED_PORT: &port 80
-              HOME: /tmp
               TZ: ${TIMEZONE}
             args:
               - daemon
@@ -41,7 +40,7 @@ spec:
               readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
+              readOnlyRootFilesystem: true
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
