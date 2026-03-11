@@ -194,6 +194,12 @@ spec:
       enabled: true
     kube-state-metrics:
       fullnameOverride: kube-state-metrics
+      resources:
+        requests:
+          cpu: 10m
+          memory: 128Mi
+        limits:
+          memory: 512Mi
       metricLabelsAllowlist:
         - nodes=[*]
         - pods=[*]
