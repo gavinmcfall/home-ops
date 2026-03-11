@@ -6,69 +6,7 @@ mem0 serves as the universal memory layer across all client interfaces (Discord,
 
 ## Architecture Diagram
 
-```mermaid
-flowchart TD
-    subgraph users["Persons (memory scoped by user_id)"]
-        direction LR
-        pa["Person A"]
-        pb["Person B"]
-        pc["Person C"]
-        pd["Person D"]
-    end
-
-    subgraph clients["Client Interfaces"]
-        discord["Discord"]
-        owui["Open WebUI (browser)"]
-        cc["Claude Code (terminal)"]
-    end
-
-    subgraph integration["Memory Integration Layer"]
-        oc_plugin["openclaw-mem0 plugin"]
-        owui_pipe["mem0-owui pipeline filter"]
-        mem0_mcp["mem0-mcp (selfhosted)"]
-    end
-
-    mem0["mem0 API Server"]:::memory
-
-    subgraph storage["Shared Storage"]
-        qdrant[("Qdrant")]
-        sqlite[("SQLite History")]
-    end
-
-    subgraph localai["LocalAI P2P Federation"]
-        lb["Load Balancer (CPU)"]
-        intel["Intel iGPU Workers x3"]
-        nvidia["NVIDIA 1080 Ti Worker"]
-    end
-
-    searxng["SearXNG"]
-
-    pa & pb & pc & pd --> discord
-    pa & pb & pc & pd --> owui
-    pa --> cc
-
-    discord --> openclaw["OpenClaw (agent)"]
-    openclaw --> oc_plugin
-    owui --> owui_pipe
-    cc --> mem0_mcp
-
-    oc_plugin --|scoped by user_id|--> mem0
-    owui_pipe --|scoped by user_id|--> mem0
-    mem0_mcp --|scoped by user_id|--> mem0
-
-    mem0 --|store and search|--> qdrant
-    mem0 --|history|--> sqlite
-    mem0 --|LLM extract and embed|--> lb
-
-    owui --|chat inference|--> lb
-    owui --|document RAG|--> qdrant
-    openclaw --|inference|--> lb
-    openclaw --|web search|--> searxng
-
-    lb --> intel & nvidia
-
-    classDef memory fill:#90EE90,stroke:#2E7D32,color:#000
-```
+![Backup Strategy](images/claude_cortex_stack.png)
 
 *Green = mem0 (central connective tissue across all interfaces)*
 
