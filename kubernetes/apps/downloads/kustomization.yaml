@@ -14,7 +14,7 @@ resources:
   - ./bazarr/ks.yaml
   - ./bazarr-foreign/ks.yaml
   - ./bazarr-uhd/ks.yaml
-  - ./cross-seed/ks.yaml
+  # - ./cross-seed/ks.yaml  # temporarily removed to reset
   - ./dashbrr/ks.yaml
   - ./flaresolverr/ks.yaml
   - ./heybuilds-downloader/ks.yaml
