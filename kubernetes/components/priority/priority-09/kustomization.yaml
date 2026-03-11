@@ -6,7 +6,11 @@ patches:
   - target:
       kind: HelmRelease
     patch: |
-      - op: add
-        path: /spec/values/defaultPodOptions
-        value:
-          priorityClassName: priority-09
+      apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      metadata:
+        name: placeholder
+      spec:
+        values:
+          defaultPodOptions:
+            priorityClassName: priority-09
