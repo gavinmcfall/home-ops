@@ -12,6 +12,7 @@ spec:
       service:
         addresses:
           - LoadBalancerIP
+          - ExternalIP
       # Advertise all LoadBalancer services unless explicitly excluded
       selector:
         matchExpressions:
