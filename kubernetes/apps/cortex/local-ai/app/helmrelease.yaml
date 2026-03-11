@@ -1,0 +1,227 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+# P2P Load Balancer — lightweight router that federates requests to workers
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: local-ai-lb
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    controllers:
+      local-ai-lb:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: quay.io/go-skynet/local-ai
+              tag: v3.12.1
+            args:
+              - "federated"
+            env:
+              LOCALAI_CONFIG_DIR: /configuration
+            envFrom:
+              - secretRef:
+                  name: local-ai-secret
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+              limits:
+                memory: 500Mi
+    service:
+      app:
+        controller: local-ai-lb
+        ports:
+          http:
+            port: 8080
+    route:
+      app:
+        annotations:
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - local-ai.${SECRET_DOMAIN}
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# Intel iGPU Workers — run on MS-01 nodes (i9-12900H, UHD 770)
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: local-ai-intel
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    controllers:
+      local-ai-intel:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        replicas: 2
+        strategy: RollingUpdate
+        rollingUpdate:
+          surge: 0
+          unavailable: 1
+        containers:
+          app:
+            image:
+              repository: quay.io/go-skynet/local-ai
+              tag: v3.12.1-gpu-intel
+            args:
+              - "run"
+              - "--p2p"
+              - "--federated"
+            securityContext:
+              privileged: true
+            env:
+              LOCALAI_MODELS_PATH: /models
+              LOCALAI_CONFIG_DIR: /configuration
+              DEBUG: "true"
+            envFrom:
+              - secretRef:
+                  name: local-ai-secret
+            resources:
+              requests:
+                cpu: 800m
+                memory: 16Gi
+                gpu.intel.com/i915: "1"
+              limits:
+                memory: 64Gi
+                gpu.intel.com/i915: "1"
+        pod:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+                  labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - local-ai-intel
+                          - plex
+    persistence:
+      models:
+        existingClaim: local-ai-models-intel
+        globalMounts:
+          - path: /models
+      dri:
+        type: hostPath
+        hostPath: /dev/dri
+        globalMounts:
+          - path: /dev/dri
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# NVIDIA GPU Worker — runs on pyro-01 (GTX 1080 Ti, 2TB SSD for models)
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: local-ai-nvidia
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    controllers:
+      local-ai-nvidia:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: quay.io/go-skynet/local-ai
+              tag: v3.12.1-gpu-nvidia-cuda-12
+            args:
+              - "run"
+              - "--p2p"
+              - "--federated"
+            env:
+              LOCALAI_MODELS_PATH: /models
+              LOCALAI_CONFIG_DIR: /configuration
+              NVIDIA_VISIBLE_DEVICES: all
+              NVIDIA_DRIVER_CAPABILITIES: compute,utility
+              DEBUG: "true"
+            envFrom:
+              - secretRef:
+                  name: local-ai-secret
+            resources:
+              requests:
+                cpu: 500m
+                memory: 4Gi
+                nvidia.com/gpu: 1
+              limits:
+                memory: 24Gi
+                nvidia.com/gpu: 1
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: { drop: ["ALL"] }
+    defaultPodOptions:
+      runtimeClassName: nvidia
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      nodeSelector:
+        nvidia.com/gpu: "true"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    persistence:
+      models:
+        existingClaim: local-ai-models-nvidia
+        globalMounts:
+          - path: /models

@@ -1,0 +1,24 @@
+---
+# Shared model storage for Intel iGPU workers (MS-01 nodes)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-ai-models-intel
+spec:
+  accessModes: ["ReadWriteMany"]
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: ceph-filesystem
+---
+# Model storage for NVIDIA worker (pyro-01 2TB SSD via openebs-hostpath)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-ai-models-nvidia
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: openebs-hostpath

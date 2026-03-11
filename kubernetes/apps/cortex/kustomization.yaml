@@ -9,5 +9,6 @@ components:
 
 resources:
   # Applications
-  - ./ollama/ks.yaml
-  - ./openclaw/ks.yaml
+  # - ./local-ai/ks.yaml
+  # - ./ollama/ks.yaml  # REPLACED by LocalAI
+  # - ./openclaw/ks.yaml  # TODO: rewire OLLAMA_URL → LocalAI, then uncomment
