@@ -189,7 +189,14 @@ spec:
         type: configMap
         name: local-ai-config-intel
         globalMounts:
-          - path: /configuration
+          - path: /models/mistral-7b-instruct.yaml
+            subPath: mistral-7b-instruct.yaml
+          - path: /models/nomic-embed-text.yaml
+            subPath: nomic-embed-text.yaml
+          - path: /models/whisper-base.yaml
+            subPath: whisper-base.yaml
+          - path: /models/piper-tts.yaml
+            subPath: piper-tts.yaml
       backends:
         type: emptyDir
         globalMounts:
@@ -308,7 +315,10 @@ spec:
         type: configMap
         name: local-ai-config-nvidia
         globalMounts:
-          - path: /configuration
+          - path: /models/qwen2.5-coder-7b.yaml
+            subPath: qwen2.5-coder-7b.yaml
+          - path: /models/qwen2.5-coder-14b.yaml
+            subPath: qwen2.5-coder-14b.yaml
       backends:
         type: emptyDir
         globalMounts:
