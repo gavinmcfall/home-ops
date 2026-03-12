@@ -2,11 +2,11 @@
 
 ## Overview
 
-mem0 serves as the universal memory layer across all client interfaces (Discord, Open WebUI, Claude Code), with user_id scoping ensuring per-person memory isolation. All inference routes through LocalAI's P2P federated cluster.
+mem0 serves as the universal memory layer across all client interfaces (Discord, Open WebUI, Claude Code), with user_id scoping ensuring per-person memory isolation. All inference routes through LocalAI's P2P federated cluster. PostgreSQL (existing CNPG) provides structured storage for both mem0 and Open WebUI.
 
-## Architecture Diagram
+## Mermaid Diagram
 
-![Backup Strategy](images/claude_cortex_stack.png)
+![Cortex Stack Architecture](images/claude_cortex_stack.png)
 
 *Green = mem0 (central connective tissue across all interfaces)*
 
@@ -16,6 +16,7 @@ mem0 serves as the universal memory layer across all client interfaces (Discord,
 |-----------|------|---------------|
 | LocalAI (LB + Workers) | Inference engine, P2P federated | cortex |
 | Qdrant | Vector storage for mem0 memories and Open WebUI RAG | cortex |
+| PostgreSQL (CNPG) | Structured data for mem0 and Open WebUI | database |
 | mem0 | Universal memory layer, fact extraction and retrieval | cortex |
 | OpenClaw | Discord agent, uses openclaw-mem0 plugin | cortex |
 | Open WebUI | Browser chat UI, mem0-owui pipeline filter | cortex |
@@ -30,6 +31,8 @@ mem0 serves as the universal memory layer across all client interfaces (Discord,
 4. mem0 (memory layer — new app-template deployment)
 5. OpenClaw (agent — rewire to LocalAI, add mem0 plugin)
 6. Open WebUI (chat UI — connects to LocalAI + Qdrant + mem0 pipeline)
+
+*PostgreSQL already deployed via CNPG — just needs new databases for mem0 and Open WebUI.*
 
 ## Memory Scoping
 
