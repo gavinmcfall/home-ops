@@ -49,7 +49,7 @@ spec:
                   httpGet:
                     path: /readyz
                     port: &port 8080
-                  initialDelaySeconds: 30
+                  initialDelaySeconds: 300
                   periodSeconds: 30
               readiness:
                 enabled: true
@@ -58,7 +58,7 @@ spec:
                   httpGet:
                     path: /readyz
                     port: *port
-                  initialDelaySeconds: 15
+                  initialDelaySeconds: 120
                   periodSeconds: 15
             resources:
               requests:
