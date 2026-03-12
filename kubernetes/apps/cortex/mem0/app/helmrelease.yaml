@@ -33,6 +33,7 @@ spec:
               repository: docker.io/mem0/openmemory-mcp
               tag: latest@sha256:b665d382a94fdc18c7bb84a647d4bebdc98d9e7fc1146fc5e559ca7f5f7f9211
             env:
+              HOME: /tmp
               # LLM — route through LocalAI (OpenAI-compatible)
               OPENAI_BASE_URL: http://local-ai-lb.cortex.svc.cluster.local:8080/v1
               # Telemetry
@@ -91,3 +92,7 @@ spec:
         storageClass: ceph-block
         globalMounts:
           - path: /app/data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
