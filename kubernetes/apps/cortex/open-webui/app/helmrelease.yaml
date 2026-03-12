@@ -41,8 +41,9 @@ spec:
               repository: docker.io/openwebui/open-webui
               tag: 0.8.10@sha256:ee057955040ce91e3e787e4b7978c9c23e828972c68d01d787ed40f9a307df9f
             env:
-              # LocalAI as OpenAI-compatible backend
-              OPENAI_API_BASE_URL: http://local-ai-lb.cortex.svc.cluster.local:8080/v1
+              # LocalAI backends (Intel: chat/embed/whisper/tts, NVIDIA: coder models)
+              OPENAI_API_BASE_URLS: "http://local-ai-intel.cortex.svc.cluster.local:8080/v1;http://local-ai-nvidia.cortex.svc.cluster.local:8080/v1"
+              OPENAI_API_KEYS: "not-needed;not-needed"
               # Qdrant for RAG
               VECTOR_DB: qdrant
               QDRANT_URI: http://qdrant.cortex.svc.cluster.local:6333

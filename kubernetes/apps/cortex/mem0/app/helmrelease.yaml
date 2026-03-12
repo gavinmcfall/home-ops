@@ -35,7 +35,7 @@ spec:
             env:
               HOME: /tmp
               # LLM — route through LocalAI (OpenAI-compatible)
-              OPENAI_BASE_URL: http://local-ai-lb.cortex.svc.cluster.local:8080/v1
+              OPENAI_BASE_URL: http://local-ai-intel.cortex.svc.cluster.local:8080/v1
               # SQLite database path
               DATABASE_URL: sqlite:////app/data/openmemory.db
               # Telemetry
