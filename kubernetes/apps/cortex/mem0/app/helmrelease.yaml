@@ -30,8 +30,8 @@ spec:
         containers:
           app:
             image:
-              repository: docker.io/mem0/mem0-api-server
-              tag: latest@sha256:2fcf4bb713cfc584d454bf06993cc7e2fe51540695995bd3aa9c7008b7065c75
+              repository: docker.io/mem0/openmemory-mcp
+              tag: latest@sha256:b665d382a94fdc18c7bb84a647d4bebdc98d9e7fc1146fc5e559ca7f5f7f9211
             env:
               # LLM — route through LocalAI (OpenAI-compatible)
               OPENAI_BASE_URL: http://local-ai-lb.cortex.svc.cluster.local:8080/v1
@@ -46,8 +46,8 @@ spec:
                 custom: true
                 spec:
                   httpGet:
-                    path: /health
-                    port: &port 8000
+                    path: /docs
+                    port: &port 8765
                   initialDelaySeconds: 30
                   periodSeconds: 30
               readiness:
@@ -55,7 +55,7 @@ spec:
                 custom: true
                 spec:
                   httpGet:
-                    path: /health
+                    path: /docs
                     port: *port
                   initialDelaySeconds: 15
                   periodSeconds: 15
@@ -82,7 +82,7 @@ spec:
         controller: mem0
         ports:
           http:
-            port: 8000
+            port: 8765
     persistence:
       history:
         type: persistentVolumeClaim
