@@ -136,6 +136,7 @@ spec:
               LOCALAI_MODELS_PATH: /models
               LOCALAI_CONFIG_DIR: /configuration
               LOCALAI_P2P_NETWORK_ID: cortex
+              LOCALAI_EXTERNAL_BACKENDS: "llama-cpp,whisper,piper"
               DEBUG: "true"
             envFrom:
               - secretRef:
@@ -148,7 +149,7 @@ spec:
                   httpGet:
                     path: /readyz
                     port: 8080
-                  initialDelaySeconds: 120
+                  initialDelaySeconds: 300
                   periodSeconds: 30
               readiness:
                 enabled: true
@@ -157,7 +158,7 @@ spec:
                   httpGet:
                     path: /readyz
                     port: 8080
-                  initialDelaySeconds: 60
+                  initialDelaySeconds: 120
                   periodSeconds: 15
             resources:
               requests:
@@ -189,6 +190,10 @@ spec:
         name: local-ai-config-intel
         globalMounts:
           - path: /configuration
+      backends:
+        type: emptyDir
+        globalMounts:
+          - path: /backends
       dri:
         type: hostPath
         hostPath: /dev/dri
@@ -241,6 +246,7 @@ spec:
               LOCALAI_MODELS_PATH: /models
               LOCALAI_CONFIG_DIR: /configuration
               LOCALAI_P2P_NETWORK_ID: cortex
+              LOCALAI_EXTERNAL_BACKENDS: "llama-cpp"
               NVIDIA_VISIBLE_DEVICES: all
               NVIDIA_DRIVER_CAPABILITIES: compute,utility
               DEBUG: "true"
@@ -255,7 +261,7 @@ spec:
                   httpGet:
                     path: /readyz
                     port: 8080
-                  initialDelaySeconds: 120
+                  initialDelaySeconds: 300
                   periodSeconds: 30
               readiness:
                 enabled: true
@@ -264,7 +270,7 @@ spec:
                   httpGet:
                     path: /readyz
                     port: 8080
-                  initialDelaySeconds: 60
+                  initialDelaySeconds: 120
                   periodSeconds: 15
             resources:
               requests:
@@ -303,3 +309,7 @@ spec:
         name: local-ai-config-nvidia
         globalMounts:
           - path: /configuration
+      backends:
+        type: emptyDir
+        globalMounts:
+          - path: /backends
