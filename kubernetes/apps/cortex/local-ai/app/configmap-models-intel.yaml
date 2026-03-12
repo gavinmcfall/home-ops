@@ -6,7 +6,7 @@ metadata:
 data:
   mistral-7b-instruct.yaml: |
     name: mistral-7b-instruct
-    backend: llama-cpp
+    backend: intel-sycl-f16-llama-cpp
     context_size: 8192
     f16: true
     mmap: true
@@ -25,7 +25,7 @@ data:
 
   nomic-embed-text.yaml: |
     name: nomic-embed-text
-    backend: llama-cpp
+    backend: intel-sycl-f16-llama-cpp
     embeddings: true
     known_usecases:
       - embeddings
@@ -37,7 +37,7 @@ data:
 
   whisper-base.yaml: |
     name: whisper-1
-    backend: whisper
+    backend: intel-sycl-f16-whisper
     known_usecases:
       - transcript
     parameters:

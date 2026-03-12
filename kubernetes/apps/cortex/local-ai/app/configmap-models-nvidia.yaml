@@ -6,7 +6,7 @@ metadata:
 data:
   qwen2.5-coder-7b.yaml: |
     name: qwen2.5-coder:7b
-    backend: llama-cpp
+    backend: cuda12-llama-cpp
     context_size: 32768
     gpu_layers: 99
     f16: true
@@ -27,7 +27,7 @@ data:
 
   qwen2.5-coder-14b.yaml: |
     name: qwen2.5-coder:14b
-    backend: llama-cpp
+    backend: cuda12-llama-cpp
     context_size: 32768
     gpu_layers: 99
     f16: true
