@@ -88,3 +88,7 @@ spec:
         storageClass: ceph-block
         globalMounts:
           - path: /qdrant/storage
+      snapshots:
+        type: emptyDir
+        globalMounts:
+          - path: /qdrant/snapshots
