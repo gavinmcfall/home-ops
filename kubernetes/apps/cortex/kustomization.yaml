@@ -14,4 +14,3 @@ resources:
   - ./mem0/ks.yaml
   - ./open-webui/ks.yaml
   - ./openclaw/ks.yaml
-  # - ./ollama/ks.yaml  # REPLACED by LocalAI
