@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: local-ai-config-intel
+data:
+  mistral-7b-instruct.yaml: |
+    name: mistral-7b-instruct
+    backend: llama-cpp
+    context_size: 8192
+    f16: true
+    mmap: true
+    known_usecases:
+      - chat
+      - completion
+    parameters:
+      model: mistral-7b-instruct-v0.3.Q4_K_M.gguf
+      temperature: 0.7
+      repeat_penalty: 1.1
+    template:
+      use_tokenizer_template: true
+    download_files:
+      - filename: mistral-7b-instruct-v0.3.Q4_K_M.gguf
+        uri: huggingface://MaziyarPanahi/Mistral-7B-Instruct-v0.3-GGUF/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf
+
+  nomic-embed-text.yaml: |
+    name: nomic-embed-text
+    backend: llama-cpp
+    embeddings: true
+    known_usecases:
+      - embeddings
+    parameters:
+      model: nomic-embed-text-v1.5.Q4_K_M.gguf
+    download_files:
+      - filename: nomic-embed-text-v1.5.Q4_K_M.gguf
+        uri: huggingface://nomic-ai/nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.Q4_K_M.gguf
+
+  whisper-base.yaml: |
+    name: whisper-1
+    backend: whisper
+    known_usecases:
+      - transcript
+    parameters:
+      model: ggml-base.en.bin
+    download_files:
+      - filename: ggml-base.en.bin
+        uri: https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
+
+  piper-tts.yaml: |
+    name: tts-1
+    backend: piper
+    known_usecases:
+      - tts
+    parameters:
+      model: en_US-amy-medium.onnx
+    download_files:
+      - filename: en_US-amy-medium.onnx
+        uri: https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/medium/en_US-amy-medium.onnx
+      - filename: en_US-amy-medium.onnx.json
+        uri: https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/amy/medium/en_US-amy-medium.onnx.json

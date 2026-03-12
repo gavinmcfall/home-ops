@@ -184,6 +184,11 @@ spec:
         existingClaim: local-ai-models-intel
         globalMounts:
           - path: /models
+      config:
+        type: configMap
+        name: local-ai-config-intel
+        globalMounts:
+          - path: /configuration
       dri:
         type: hostPath
         hostPath: /dev/dri
@@ -293,3 +298,8 @@ spec:
         existingClaim: local-ai-models-nvidia
         globalMounts:
           - path: /models
+      config:
+        type: configMap
+        name: local-ai-config-nvidia
+        globalMounts:
+          - path: /configuration

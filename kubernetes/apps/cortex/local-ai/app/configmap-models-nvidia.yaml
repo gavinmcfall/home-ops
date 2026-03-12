@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: local-ai-config-nvidia
+data:
+  qwen2.5-coder-7b.yaml: |
+    name: qwen2.5-coder:7b
+    backend: llama-cpp
+    context_size: 32768
+    gpu_layers: 99
+    f16: true
+    mmap: true
+    known_usecases:
+      - chat
+      - completion
+    parameters:
+      model: qwen2.5-coder-7b-instruct-q4_k_m.gguf
+      temperature: 0.7
+      top_p: 0.95
+      repeat_penalty: 1.05
+    template:
+      use_tokenizer_template: true
+    download_files:
+      - filename: qwen2.5-coder-7b-instruct-q4_k_m.gguf
+        uri: huggingface://Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/qwen2.5-coder-7b-instruct-q4_k_m.gguf
+
+  qwen2.5-coder-14b.yaml: |
+    name: qwen2.5-coder:14b
+    backend: llama-cpp
+    context_size: 32768
+    gpu_layers: 99
+    f16: true
+    mmap: true
+    known_usecases:
+      - chat
+      - completion
+    parameters:
+      model: qwen2.5-coder-14b-instruct-q4_k_m.gguf
+      temperature: 0.7
+      top_p: 0.95
+      repeat_penalty: 1.05
+    template:
+      use_tokenizer_template: true
+    download_files:
+      - filename: qwen2.5-coder-14b-instruct-q4_k_m.gguf
+        uri: huggingface://Qwen/Qwen2.5-Coder-14B-Instruct-GGUF/qwen2.5-coder-14b-instruct-q4_k_m.gguf
