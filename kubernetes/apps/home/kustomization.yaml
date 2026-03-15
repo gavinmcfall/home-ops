@@ -18,6 +18,7 @@ resources:
   - ./linkwarden/ks.yaml
   - ./manyfold/ks.yaml
   - ./nerdz-landing/ks.yaml
+  - ./outline/ks.yaml
   - ./paperless/ks.yaml
   - ./searxng/ks.yaml
   - ./smtp-relay/ks.yaml
