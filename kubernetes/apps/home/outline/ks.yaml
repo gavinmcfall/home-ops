@@ -15,7 +15,7 @@ spec:
       namespace: database
     - name: dragonfly-cluster
       namespace: database
-    - name: onepassword
+    - name: external-secrets-stores
       namespace: external-secrets
   path: ./kubernetes/apps/home/outline/app
   prune: true
