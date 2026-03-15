@@ -17,6 +17,8 @@ spec:
       namespace: database
     - name: external-secrets-stores
       namespace: external-secrets
+    - name: cluster-apps-rook-ceph-cluster
+      namespace: rook-ceph
   path: ./kubernetes/apps/home/outline/app
   prune: true
   sourceRef:

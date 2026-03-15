@@ -32,7 +32,7 @@ spec:
             image:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
-            envFrom: &envFrom
+            envFrom:
               - secretRef:
                   name: outline-secret
         containers:
@@ -57,7 +57,7 @@ spec:
               AWS_S3_ACL: private
               AWS_S3_FORCE_PATH_STYLE: "true"
               AWS_S3_UPLOAD_BUCKET_NAME: outline
-              AWS_S3_UPLOAD_BUCKET_URL: http://citadel.internal:9000
+              AWS_S3_UPLOAD_BUCKET_URL: https://s3.${SECRET_DOMAIN}
               # OIDC
               OIDC_DISPLAY_NAME: Pocket ID
               OIDC_SCOPES: openid profile email
@@ -74,7 +74,11 @@ spec:
               RATE_LIMITER_ENABLED: "true"
               RATE_LIMITER_REQUESTS: "1000"
               RATE_LIMITER_DURATION_WINDOW: "60"
-            envFrom: *envFrom
+            envFrom:
+              - secretRef:
+                  name: outline-secret
+              - secretRef:
+                  name: outline
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
