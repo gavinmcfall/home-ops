@@ -44,6 +44,7 @@ data:
   FLARESOLVERR_LBIP: "10.99.8.211"
   POSTGRES18_IMMICH_LBIP: "10.99.8.212"
   POSTGRES18_CLUSTER_LBIP: "10.99.8.213"
+  ANYTYPE_SYNC_LBIP: "10.99.8.214"
 
   # Dragonfly Redis DB Index Allocation:
   # | Index | App                      |

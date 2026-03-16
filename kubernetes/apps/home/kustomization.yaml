@@ -9,6 +9,7 @@ components:
 
 resources:
   # Applications
+  - ./anytype/ks.yaml
   - ./atuin/ks.yaml
   - ./bentopdf/ks.yaml
   - ./bookstack/ks.yaml
