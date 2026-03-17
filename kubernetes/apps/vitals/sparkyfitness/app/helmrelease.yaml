@@ -1,0 +1,184 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sparkyfitness
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      server:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
+            envFrom:
+              - secretRef:
+                  name: sparkyfitness-secret
+        containers:
+          app:
+            image:
+              repository: docker.io/codewithcj/sparkyfitness_server
+              tag: v0.16.5.3@sha256:216f91af29fa69ece5cfb8b0ffd8c5efbd6dc950e323d3d424cf176736febae0
+            env:
+              NODE_ENV: production
+              TZ: ${TIMEZONE}
+              SPARKY_FITNESS_FRONTEND_URL: https://nutrition.${SECRET_DOMAIN}
+              SPARKY_FITNESS_ADMIN_EMAIL: gavin@${SECRET_DOMAIN}
+              SPARKY_FITNESS_DISABLE_SIGNUP: "true"
+              # OIDC
+              OIDC_PROVIDER_SLUG: pocket-id
+              OIDC_PROVIDER_NAME: Pocket ID
+              OIDC_ISSUER_URL: https://id.${SECRET_DOMAIN}
+              OIDC_SCOPE: "openid email profile"
+            envFrom:
+              - secretRef:
+                  name: sparkyfitness-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: &serverPort 3010
+                  initialDelaySeconds: 15
+                  periodSeconds: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: *serverPort
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+      frontend:
+        containers:
+          app:
+            image:
+              repository: docker.io/codewithcj/sparkyfitness
+              tag: v0.16.5.3@sha256:a521d4111586aa83e6432aaca3a7daad15b49b578bdbed2ef667d16b090a3d9a
+            env:
+              API_URL: http://sparkyfitness-server.vitals.svc.cluster.local:3010
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: &frontendPort 80
+                  initialDelaySeconds: 5
+                  periodSeconds: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *frontendPort
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: ["ALL"]
+                add: ["CHOWN", "NET_BIND_SERVICE", "SETGID", "SETUID"]
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: {type: RuntimeDefault}
+    service:
+      server:
+        controller: server
+        ports:
+          http:
+            port: *serverPort
+      frontend:
+        controller: frontend
+        ports:
+          http:
+            port: *frontendPort
+    route:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        hostnames:
+          - nutrition.${SECRET_DOMAIN}
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: frontend
+                port: *frontendPort
+    persistence:
+      uploads:
+        existingClaim: sparkyfitness
+        advancedMounts:
+          server:
+            app:
+              - path: /app/SparkyFitnessServer/uploads
+                subPath: uploads
+              - path: /app/SparkyFitnessServer/backup
+                subPath: backup
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          server:
+            app:
+              - path: /tmp
+                subPath: server-tmp
+              - path: /app/SparkyFitnessServer/temp_uploads
+                subPath: temp-uploads
+          frontend:
+            app:
+              - path: /tmp
+                subPath: frontend-tmp
+              - path: /var/cache/nginx
+                subPath: nginx-cache
+              - path: /var/run
+                subPath: nginx-run
