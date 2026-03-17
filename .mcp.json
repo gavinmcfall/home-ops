@@ -1,8 +1,11 @@
 {
   "mcpServers": {
     "kubernetes": {
-      "command": "npx",
-      "args": ["-y", "@kubernetes-mcp/server"]
+      "command": "/home/gavin/.nvm/versions/node/v22.21.1/bin/npx",
+      "args": ["-y", "kubernetes-mcp-server"],
+      "env": {
+        "KUBECONFIG": "/home/gavin/home-ops/kubeconfig"
+      }
     }
   }
 }
