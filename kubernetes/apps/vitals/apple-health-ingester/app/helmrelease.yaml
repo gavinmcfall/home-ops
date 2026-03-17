@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: docker.io/irvinlim/apple-health-ingester
-              tag: v0.5.0@sha256:f0072cade435b7f47bc3dbb8425288ec961cc5cd91a5473d799aabc2bc319bce
+              tag: v0.5.0@sha256:43124d11fb4368f4d977d2b5a8ef625350b4b3b3e06f3acc093dd6330ac4c025
             args:
               - --backend.influxdb
               - --influxdb.serverURL=http://influxdb-app.vitals.svc.cluster.local:8086
