@@ -11,4 +11,5 @@ resources:
   - ./influxdb/ks.yaml
   - ./telegraf/ks.yaml
   - ./apple-health-ingester/ks.yaml
+  - ./resmed-influx/ks.yaml
   - ./sparkyfitness/ks.yaml

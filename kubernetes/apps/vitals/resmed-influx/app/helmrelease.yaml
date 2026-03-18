@@ -1,0 +1,65 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: resmed-influx
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      resmed-influx:
+        replicas: 1
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: docker.io/vdbg/resmed-influx
+              tag: 1.3@sha256:19103b8afb14e18eab12b03fcc7ae55d692283d497a0448526fc0658804cb1bb
+            env:
+              TZ: ${TIMEZONE}
+              MYAIR_INFLUX_RESMED_REGION: NA
+              MYAIR_INFLUX_RESMED_MAX_DAYS: "365"
+              MYAIR_INFLUX_INFLUX_URL: http://influxdb.vitals.svc.cluster.local:8086
+              MYAIR_INFLUX_INFLUX_BUCKET: health
+              MYAIR_INFLUX_INFLUX_MEASUREMENT: cpap
+              MYAIR_INFLUX_INFLUX_ORG: vitals
+              MYAIR_INFLUX_MAIN_LOOP_MINUTES: "60"
+            envFrom:
+              - secretRef:
+                  name: resmed-influx-secret
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        seccompProfile: {type: RuntimeDefault}
