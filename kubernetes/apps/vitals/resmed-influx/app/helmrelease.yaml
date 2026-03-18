@@ -36,13 +36,6 @@ spec:
               tag: 1.3@sha256:19103b8afb14e18eab12b03fcc7ae55d692283d497a0448526fc0658804cb1bb
             env:
               TZ: ${TIMEZONE}
-              MYAIR_INFLUX_RESMED_REGION: NA
-              MYAIR_INFLUX_RESMED_MAX_DAYS: "365"
-              MYAIR_INFLUX_INFLUX_URL: http://influxdb.vitals.svc.cluster.local:8086
-              MYAIR_INFLUX_INFLUX_BUCKET: health
-              MYAIR_INFLUX_INFLUX_MEASUREMENT: cpap
-              MYAIR_INFLUX_INFLUX_ORG: vitals
-              MYAIR_INFLUX_MAIN_LOOP_MINUTES: "60"
             envFrom:
               - secretRef:
                   name: resmed-influx-secret
@@ -63,3 +56,11 @@ spec:
         runAsGroup: 101
         fsGroup: 101
         seccompProfile: {type: RuntimeDefault}
+    persistence:
+      config:
+        type: secret
+        name: resmed-influx-secret
+        globalMounts:
+          - path: /app/config.toml
+            subPath: config.toml
+            readOnly: true
