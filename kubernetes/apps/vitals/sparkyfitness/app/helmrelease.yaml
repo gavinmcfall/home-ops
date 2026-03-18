@@ -45,7 +45,7 @@ spec:
               TZ: ${TIMEZONE}
               SPARKY_FITNESS_FRONTEND_URL: https://nutrition.${SECRET_DOMAIN}
               SPARKY_FITNESS_ADMIN_EMAIL: gavin@${SECRET_DOMAIN}
-              SPARKY_FITNESS_DISABLE_SIGNUP: "true"
+              SPARKY_FITNESS_DISABLE_SIGNUP: "false"
               # OIDC
               OIDC_PROVIDER_SLUG: pocket-id
               OIDC_PROVIDER_NAME: Pocket ID
