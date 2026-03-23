@@ -39,7 +39,7 @@ spec:
           app:
             image:
               repository: docker.io/codewithcj/sparkyfitness_server
-              tag: v0.16.5.3@sha256:216f91af29fa69ece5cfb8b0ffd8c5efbd6dc950e323d3d424cf176736febae0
+              tag: v0.16.5.3@sha256:971e2f3b790cf37ee787879ea74667695bfeafa4b15a6ad6563e9c7ba84f23bf
             env:
               NODE_ENV: production
               TZ: ${TIMEZONE}
