@@ -87,7 +87,7 @@ spec:
           app:
             image:
               repository: docker.io/codewithcj/sparkyfitness
-              tag: v0.16.5.3@sha256:a521d4111586aa83e6432aaca3a7daad15b49b578bdbed2ef667d16b090a3d9a
+              tag: v0.16.5.3@sha256:88d9412d054e9e44980f7cbdc41c28652051bf4a4e663cc49b01b4bc3cd8e7f3
             env:
               API_URL: http://sparkyfitness-server.vitals.svc.cluster.local:3010
             probes:
