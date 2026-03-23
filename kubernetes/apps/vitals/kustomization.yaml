@@ -13,4 +13,5 @@ resources:
   - ./apple-health-ingester/ks.yaml
   - ./resmed-influx/ks.yaml
   - ./sleeptracker-influx/ks.yaml
+  - ./speediance-influx/ks.yaml
   - ./sparkyfitness/ks.yaml
