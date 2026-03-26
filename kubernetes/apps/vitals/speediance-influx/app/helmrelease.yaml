@@ -33,7 +33,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/speediance-influx
-              tag: 1.1.1@sha256:a470d509c8738817afd6c673339d920b6f331fd0b98e35a119d5ad25baab7f6d
+              tag: 1.2.0@sha256:54acea76a3dd22a869276e1574f4ab146f2f0ec2998530ef55be6e94c948ecd8
             env:
               TZ: ${TIMEZONE}
             securityContext:
