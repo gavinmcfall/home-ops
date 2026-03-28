@@ -51,6 +51,10 @@ spec:
             index:
               prefix: loki_index_
               period: 24h
+      compactor:
+        working_directory: /var/loki/compactor/retention
+        retention_enabled: true
+        delete_request_store: filesystem
       limits_config:
         retention_period: 14d
     singleBinary:
