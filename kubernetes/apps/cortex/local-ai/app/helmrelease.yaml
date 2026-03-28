@@ -50,7 +50,7 @@ spec:
             env:
               LOCALAI_MODELS_PATH: /models
               LOCALAI_EXTERNAL_BACKENDS: "llama-cpp,whisper,piper"
-              DEBUG: "true"
+              DEBUG: "false"
             probes:
               liveness:
                 enabled: true
@@ -179,7 +179,7 @@ spec:
               LOCALAI_EXTERNAL_BACKENDS: "llama-cpp"
               NVIDIA_VISIBLE_DEVICES: all
               NVIDIA_DRIVER_CAPABILITIES: compute,utility
-              DEBUG: "true"
+              DEBUG: "false"
             probes:
               liveness:
                 enabled: true
