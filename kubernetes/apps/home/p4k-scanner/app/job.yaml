@@ -1,0 +1,56 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: p4k-scanner
+  namespace: home
+  labels: &labels
+    app.kubernetes.io/name: p4k-scanner
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 604800 # 7 days
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: p4k-scanner
+          # renovate: datasource=docker depName=ghcr.io/gavinmcfall/p4k-scanner
+          image: ghcr.io/gavinmcfall/p4k-scanner:latest@sha256:2163c42b6855e9348417e4632f0a2d686cfcc960982868b017ba5a6cac2c8cee
+          env:
+            - name: DATA_DIR
+              value: /data
+            - name: OUTPUT_DIR
+              value: /output
+            - name: WORKERS
+              value: "4"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              memory: 8Gi
+          volumeMounts:
+            - name: output
+              mountPath: /output
+            - name: p4k-data
+              mountPath: /data
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: output
+          persistentVolumeClaim:
+            claimName: p4k-scanner-output
+        - name: p4k-data
+          nfs:
+            server: citadel.internal
+            path: /mnt/storage0/media/Library/Star Citizen
+        - name: tmp
+          emptyDir: {}
