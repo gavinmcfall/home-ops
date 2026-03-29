@@ -11,6 +11,7 @@ resources:
   - ./influxdb/ks.yaml
   - ./telegraf/ks.yaml
   - ./apple-health-ingester/ks.yaml
+  - ./hume-influx/ks.yaml
   - ./mfp-influx/ks.yaml
   - ./resmed-influx/ks.yaml
   - ./sleeptracker-influx/ks.yaml
