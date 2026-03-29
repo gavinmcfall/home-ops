@@ -25,15 +25,18 @@ spec:
   values:
     controllers:
       hume-influx:
-        replicas: 1
-        strategy: Recreate
-        annotations:
-          reloader.stakater.com/auto: "true"
+        type: cronjob
+        cronjob:
+          # Monday noon NZ time (23:00 UTC Sun = noon NZST Mon, 00:00 UTC Mon = noon NZDT Mon)
+          # Run at both to cover DST transitions
+          schedule: "0 23,0 * * 0,1"
+          successfulJobsHistory: 3
+          failedJobsHistory: 3
         containers:
           app:
             image:
               repository: ghcr.io/gavinmcfall/hume-influx
-              tag: 1.0.0@sha256:1528af11eefb39a6d2c0034df74efc1ee4dd5bbffc1d129fd38ad57838be38e8
+              tag: 1.1.0@sha256:70ce679deaf5422599066c4ea740d410363e22c1d2c268d38ff4e732626e68ef
             env:
               TZ: ${TIMEZONE}
             securityContext:
