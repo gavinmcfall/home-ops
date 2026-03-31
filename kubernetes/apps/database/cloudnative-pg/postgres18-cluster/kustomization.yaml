@@ -9,6 +9,5 @@ resources:
   - ./scheduledbackup.yaml
   - ./prometheusrule.yaml
   - ./service.yaml
-  - ./password-sync-cronjob.yaml
 components:
   - ../../../../components/gatus/infrastructure
