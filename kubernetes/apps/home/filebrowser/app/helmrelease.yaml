@@ -30,14 +30,12 @@ spec:
         containers:
           app:
             image:
-              repository: docker.io/filebrowser/filebrowser
-              tag: v2.61.2@sha256:40e1185f13edf70be8e5ce0b2fb43cdd80900b1fc921e2256ab86c7865d56ec5
+              repository: ghcr.io/gtsteffaniak/filebrowser
+              tag: stable@sha256:1cc63ad4b8558314320bdd8a5aad086d068ec94b78fc4e3dd9d1c47935738893
             env:
               TZ: ${TIMEZONE}
-              FB_DATABASE: /config/filebrowser.db
-              FB_ROOT: /media
-              FB_LOG: stdout
-              FB_NOAUTH: true
+              FILEBROWSER_DATABASE: /config/database.db
+              FILEBROWSER_CONFIG: /config/config.yaml
             probes:
               liveness: &probes
                 enabled: true
@@ -78,19 +76,32 @@ spec:
     route:
       app:
         annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
-          - name: internal
+          - name: external
             namespace: network
             sectionName: https
     persistence:
       config:
         existingClaim: filebrowser
+        globalMounts:
+          - path: /config
+      config-file:
+        type: secret
+        name: filebrowser-secret
+        globalMounts:
+          - path: /config/config.yaml
+            subPath: config.yaml
+            readOnly: true
       media:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
           - path: /media
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
