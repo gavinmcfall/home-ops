@@ -100,7 +100,7 @@ spec:
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
-          - path: /media
+          - path: /folder
       tmp:
         type: emptyDir
         globalMounts:
