@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: quay.io/go-skynet/local-ai
-              tag: v3.12.1-gpu-intel@sha256:8edc281c12c61662a05aac64e3d65986dafcc582947eddcd0c259163da5ce462
+              tag: v4.1.1-gpu-intel@sha256:b21a6e1af8670f2bbf338ceddcda73a2540a31c560216f0ae7c1b0435968db7d
             args:
               - "run"
               - "--enable-memory-reclaimer"
@@ -167,7 +167,7 @@ spec:
           app:
             image:
               repository: quay.io/go-skynet/local-ai
-              tag: v3.12.1-gpu-nvidia-cuda-12@sha256:7067ca72d4c21af16d6b6aeba257ede289eaf3a82006c55a27887eeb711603c9
+              tag: v4.1.1-gpu-nvidia-cuda-12@sha256:93c1dcec01c5127f7d0f1268704db9d6354d478717891bb1205193fff420641a
             args:
               - "run"
               - "--enable-memory-reclaimer"
