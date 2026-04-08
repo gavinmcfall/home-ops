@@ -29,7 +29,8 @@ spec:
     substitute:
       APP: paperless
       VOLSYNC_CAPACITY: 20Gi
-      VOLSYNC_MINUTE: "20"
+      VOLSYNC_MINUTE: "17"
+      VOLSYNC_B2_MINUTE: "36"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -58,7 +59,8 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 2Gi
-      VOLSYNC_MINUTE: "25"
+      VOLSYNC_MINUTE: "18"
+      VOLSYNC_B2_MINUTE: "38"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -87,4 +89,5 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 2Gi
-      VOLSYNC_MINUTE: "25"
+      VOLSYNC_MINUTE: "19"
+      VOLSYNC_B2_MINUTE: "40"

@@ -27,4 +27,5 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 5Gi
-      VOLSYNC_MINUTE: "5"
+      VOLSYNC_MINUTE: "4"
+      VOLSYNC_B2_MINUTE: "16"

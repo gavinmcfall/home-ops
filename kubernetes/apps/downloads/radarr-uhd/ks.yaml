@@ -31,7 +31,8 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 2Gi
-      VOLSYNC_MINUTE: "35"
+      VOLSYNC_MINUTE: "29"
+      VOLSYNC_B2_MINUTE: "56"
       VOLSYNC_STORAGECLASS: ceph-block
       VOLSYNC_SNAPSHOTCLASS: csi-ceph-block
       VOLSYNC_ACCESSMODES: ReadWriteOnce

@@ -29,7 +29,8 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 15Gi
-      VOLSYNC_MINUTE: "40"
+      VOLSYNC_MINUTE: "34"
+      VOLSYNC_B2_MINUTE: "5"
       GATUS_PATH: /
       GATUS_STATUS: "200"
 

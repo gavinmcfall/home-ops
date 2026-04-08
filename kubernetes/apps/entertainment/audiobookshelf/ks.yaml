@@ -27,5 +27,6 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 20Gi
-      VOLSYNC_MINUTE: "0"
+      VOLSYNC_MINUTE: "20"
+      VOLSYNC_B2_MINUTE: "8"
       GATUS_PATH: /ping

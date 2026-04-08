@@ -29,6 +29,7 @@ spec:
     substitute:
       APP: *app
       VOLSYNC_CAPACITY: 5Gi
-      VOLSYNC_MINUTE: "0"
+      VOLSYNC_MINUTE: "2"
+      VOLSYNC_B2_MINUTE: "12"
       GATUS_PATH: /api/system/status
       GATUS_STATUS: "200"

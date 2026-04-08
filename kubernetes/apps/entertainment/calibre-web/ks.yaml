@@ -28,6 +28,7 @@ spec:
       APP: *app
       GATUS_SUBDOMAIN: ebooks
       VOLSYNC_CAPACITY: 1Gi
-      VOLSYNC_MINUTE: "5"
+      VOLSYNC_MINUTE: "6"
+      VOLSYNC_B2_MINUTE: "18"
       VOLSYNC_UID: "2000"
       VOLSYNC_GID: "2000"

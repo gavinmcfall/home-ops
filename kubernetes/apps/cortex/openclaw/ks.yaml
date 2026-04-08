@@ -31,3 +31,5 @@ spec:
       VOLSYNC_CAPACITY: 10Gi
       VOLSYNC_UID: "1000"
       VOLSYNC_GID: "1000"
+      VOLSYNC_MINUTE: "15"
+      VOLSYNC_B2_MINUTE: "6"

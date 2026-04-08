@@ -30,3 +30,5 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 1Gi
       VOLSYNC_CLAIM: *app
+      VOLSYNC_MINUTE: "0"
+      VOLSYNC_B2_MINUTE: "0"
