@@ -151,9 +151,11 @@ spec:
         name: bjw-s
         namespace: flux-system
   install:
+    timeout: 15m
     remediation:
       retries: 3
   upgrade:
+    timeout: 15m
     cleanupOnFail: true
     remediation:
       retries: 3
@@ -249,3 +251,7 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /backends
+      data:
+        type: emptyDir
+        globalMounts:
+          - path: /data
