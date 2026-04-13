@@ -45,13 +45,15 @@ spec:
               - --serve-http
               - --host=0.0.0.0
               - --port=8080
-              - --auth=oidc-jwt
-              - --issuer=https://pocket-id.${SECRET_DOMAIN}
-              - --audience=mempalace-mcp
+              - --auth=bearer-static
+              - --token-env=MEMPALACE_TOKEN
             env:
               PYTHONUNBUFFERED: "1"
               # HOME and MEMPALACE_PALACE_PATH are baked into the image (/data, /data/palace).
               # Do not override here without intent.
+            envFrom:
+              - secretRef:
+                  name: mempalace-secret
             probes:
               liveness:
                 enabled: true
