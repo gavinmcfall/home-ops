@@ -36,7 +36,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/hume-influx
-              tag: 1.1.1@sha256:2e615a6fe902ea39f6c7c8a188a32a1cfe363f7d509588f6c98eb49003b464f2
+              tag: 1.1.1@sha256:b236fc083b41c4a1c14a6164fa826ffe24be6cbf614aff94cabcaea5e066180d
             env:
               TZ: ${TIMEZONE}
             securityContext:
