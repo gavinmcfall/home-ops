@@ -12,5 +12,6 @@ resources:
   - ./local-ai/ks.yaml
   - ./qdrant/ks.yaml
   - ./mem0/ks.yaml
+  - ./mempalace/ks.yaml
   - ./open-webui/ks.yaml
   - ./openclaw/ks.yaml
