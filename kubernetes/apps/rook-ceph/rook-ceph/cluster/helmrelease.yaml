@@ -46,6 +46,7 @@ spec:
       bluestore_compression_algorithm = none
       # Force trim operations
       bdev_flock_retry = 3
+
     cephClusterSpec:
       cleanupPolicy:
         allowUninstallWithVolumes: false
