@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mempalace
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    controllers:
+      mempalace:
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/mempalace
+              tag: http-transport@sha256:53b56e8c4b54486e9bdce23a3a35606722abd0f1a01378127215eeee027c9fbd
+            args:
+              - --serve-http
+              - --host=0.0.0.0
+              - --port=8080
+              - --auth=oidc-jwt
+              - --issuer=https://pocket-id.${SECRET_DOMAIN}
+              - --audience=mempalace-mcp
+            env:
+              PYTHONUNBUFFERED: "1"
+              # HOME and MEMPALACE_PALACE_PATH are baked into the image (/data, /data/palace).
+              # Do not override here without intent.
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /healthz, port: 8080 }
+                  initialDelaySeconds: 20
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /readyz, port: 8080 }
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /healthz, port: 8080 }
+                  initialDelaySeconds: 10
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+            resources:
+              requests:
+                cpu: 250m
+                memory: 1Gi
+              limits:
+                cpu: 1500m
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+    service:
+      app:
+        controller: mempalace
+        ports:
+          http:
+            port: 8080
+    persistence:
+      data:
+        existingClaim: mempalace
+        globalMounts:
+          - path: /data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    serviceMonitor:
+      app:
+        serviceName: mempalace
+        endpoints:
+          - port: http
+            scheme: http
+            path: /metrics
+            interval: 30s
+            scrapeTimeout: 10s
