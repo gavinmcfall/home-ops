@@ -43,6 +43,7 @@ spec:
       bluestore_min_alloc_size = 4096
       bluestore_compression_algorithm = none
       bdev_flock_retry = 3
+
     cephClusterSpec:
       cleanupPolicy:
         allowUninstallWithVolumes: false
