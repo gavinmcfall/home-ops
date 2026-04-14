@@ -30,8 +30,8 @@ spec:
         containers:
           app:
             image:
-              repository: docker.io/taaku18/dms
-              tag: stable@sha256:3660991d0d9d05077085dd766e95e59cac46c85562f8d48cb3a49080b863249e
+              repository: ghcr.io/gavinmcfall/discord-message-scheduler
+              tag: 2.5.2@sha256:249e91396fb1c7c6a163c56386519c2c1859a7e2d0fa54c1e53e7f6ed3e57845
             env:
               TZ: ${TIMEZONE}
               PREFIX: "="
