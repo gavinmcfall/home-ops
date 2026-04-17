@@ -46,7 +46,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: devcontainers/ci@19ddf8c5778961129f90613da69436820ba5e0d9 # v0.3
+        uses: devcontainers/ci@b63b30de439b47a52267f241112c5b453b673db5 # v0.3
         env:
           BUILDX_NO_DEFAULT_ATTESTATIONS: true
         with:
