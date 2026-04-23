@@ -142,7 +142,7 @@ jobs:
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Add comment
-        uses: mshick/add-pr-comment@64b8e914979889d746c99dea15a76e77ef64580a # v3
+        uses: mshick/add-pr-comment@be5d48d9b695983ee841f45434104a1419ba6231 # v3
         with:
           message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}"
           message-failure: Diff was not successful
@@ -153,7 +153,7 @@ jobs:
 
       - if: ${{ steps.diff.outputs.diff == '' && steps.diff.outputs.bytes != '' && fromJSON(steps.diff.outputs.bytes) >= 60000 }}
         name: Add artifact notice
-        uses: mshick/add-pr-comment@64b8e914979889d746c99dea15a76e77ef64580a # v3
+        uses: mshick/add-pr-comment@be5d48d9b695983ee841f45434104a1419ba6231 # v3
         with:
           message-id: "${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{ matrix.resources }}/artifact"
           message: |
