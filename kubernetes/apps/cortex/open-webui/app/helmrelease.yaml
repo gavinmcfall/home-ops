@@ -39,7 +39,7 @@ spec:
           app:
             image:
               repository: docker.io/openwebui/open-webui
-              tag: 0.8.12@sha256:8113fa5510020ef05a44afc0c42d33eabeeb2524a996e3e3fb8c437c00f0d792
+              tag: 0.9.2@sha256:a7e4796ae894d1e2a0c1824860ade472f35c507608a01c3581377b5c19b0ed49
             env:
               # LocalAI backends (Intel: chat/embed/whisper/tts, NVIDIA: coder models)
               OPENAI_API_BASE_URLS: "http://local-ai-intel.cortex.svc.cluster.local:8080/v1;http://local-ai-nvidia.cortex.svc.cluster.local:8080/v1"
