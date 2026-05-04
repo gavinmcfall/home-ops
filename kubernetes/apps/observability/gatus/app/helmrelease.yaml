@@ -44,7 +44,7 @@ spec:
             image:
               repository: ghcr.io/kiwigrid/k8s-sidecar
               #tag: 1.30.11@sha256:91b49e5b6d2fb03e7a9014f8b072d0de199987845b02d96ce458dd9f14e753f5 #https://github.com/kiwigrid/k8s-sidecar/issues/431
-              tag: 2.6.0@sha256:a6c101156d42ef1050c536fcbcc03bf314544a63ee2daafe45280bc8dbab398f
+              tag: 2.7.1@sha256:2670f251f80d990635460c0116497a9cc3202069e8826f1a279af300ecd9f75e
             env:
               FOLDER: /config
               LABEL: gatus.io/enabled
