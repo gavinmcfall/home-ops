@@ -26,6 +26,9 @@ spec:
     controllers:
       dragonfly-operator:
         strategy: RollingUpdate
+        pod:
+          labels:
+            control-plane: controller-manager
         containers:
           app:
             image:
