@@ -7,7 +7,10 @@ categories: ["Networking[100%]", "Architecture[60%]", "Reference[80%]"]
 
 # Physical Connectivity Profile — V2 (Draft)
 
-**Status**: Draft for review. No deployment changes applied yet.
+**Status**:
+- **V2 connectivity (bond0 X710 primary + igc backup, Citadel SFP+):** *Draft for review. Cables on hand 2026-05-09 (6× 1m SFP+ DACs); no Talos config or physical cabling changes applied yet.*
+- **Thunderbolt host_reset=0 fix:** *Applied 2026-05-05 at commit `413b3ccea` via custom factory.talos.dev schematic (NOT via modules-list — that path doesn't work on UKI Talos; see "Thunderbolt reliability fix" below for the corrected mechanism).*
+
 **Purpose**: Document current physical connectivity and propose V2 migration that puts a 10G path between cluster nodes and the Citadel NAS without touching the Thunderbolt mesh that carries Ceph replication.
 
 ---
@@ -17,7 +20,8 @@ categories: ["Networking[100%]", "Architecture[60%]", "Reference[80%]"]
 - **Keep**: TB full-mesh as Ceph `cluster_network`.
 - **Change**: Each stanton node's `bond0` gains an X710 SFP+ primary member pointing at the USW Aggregation. The existing `igc` (2.5G, negotiating 1G on US48) stays as an active-backup fallback.
 - **Add**: Citadel (Dell R730) gains a 10G SFP+ NIC into the Aggregation.
-- **Result**: 10G between nodes + NAS; 1G survival path if the Agg ever fails.
+- **Fix**: Apply `thunderbolt.host_reset=0` kernel arg to stop the USB4 host-router reset that wedges TB NICs after warm reboot (per onedr0p, 2026-04-25; well-known Proxmox MS-01 community fix).
+- **Result**: 10G between nodes + NAS; 1G survival path if the Agg ever fails; TB mesh that comes back cleanly across reboots.
 
 ---
 
@@ -58,7 +62,7 @@ Each MS-01 also has 2x Thunderbolt 4 controllers used for the Ceph replication m
 
 **Characteristics**:
 - Single 1G management path per node (igc @ enp89s0). Second igc (enp87s0) and both X710 ports per node are **unused**.
-- Ceph replication over TB, delivers ~20G per link but has a history of soft flakiness.
+- Ceph replication over TB, delivers ~20G per link. "Soft flakiness" on warm reboot (devices show authorized in `boltctl list` but the link doesn't come up — needs a physical replug) traced upstream to the USB4 host-router reset that the kernel performs during driver init. Mitigated by `thunderbolt.host_reset=0` (see "Thunderbolt reliability fix" below).
 - Citadel on 1G; workload-to-NAS traffic (VolSync Kopia backups etc.) is a bottleneck.
 
 ---
@@ -208,6 +212,105 @@ Configured through the TrueNAS web UI — not GitOps. Record the steps here for 
 
 ---
 
+## Thunderbolt reliability fix (kernel arg)
+
+**Status**: **Applied 2026-05-05 at commit `413b3ccea` ("feat(talos): bake thunderbolt.host_reset=0 into stanton schematic")**. Verified live: all 3 stanton nodes show `host_reset=N` at runtime and `thunderbolt.host_reset=0` on `/proc/cmdline`.
+
+**What**: pass `host_reset=0` to the in-tree `thunderbolt` kernel module so the USB4 host router is **not** reset during driver init.
+
+**Why**: kernel default is `host_reset=true` (`drivers/thunderbolt/nhi.c`). On MS-01-class hardware that reset is what wedges TB NIC adapters across warm reboots — the device re-authorizes but link never comes up, requiring a physical cable replug. This is the community-accepted fix on Proxmox MS-01 + TB-ring + Ceph clusters.
+
+**Origin** (verbatim, onedr0p, 2026-04-25): *"I had to add that to my kernel args so my 10Gb thunderbolt NIC adapters worked without problems. Maybe it helps you too, and if it does nice to know there is a fix for the ceph TB ring problems."*
+
+### What we tried first (and why both didn't work)
+
+The original V1 of this section proposed two paths:
+
+```yaml
+# Approach 1 — modules-list parameters (TRIED, DID NOT WORK)
+machine:
+  kernel:
+    modules:
+      - name: thunderbolt
+        parameters:
+          - host_reset=0
+      - name: thunderbolt_net
+
+# Approach 2 — extraKernelArgs fallback (TRIED, REJECTED BY TALHELPER)
+machine:
+  install:
+    extraKernelArgs:
+      - thunderbolt.host_reset=0
+```
+
+- **Modules-list parameters didn't take effect.** Talos has no `/etc/modprobe.d` and the `thunderbolt` module loads from the initramfs before any modprobe.d-equivalent mechanism is consulted. After applying with `--mode=reboot`, `/sys/module/thunderbolt/parameters/host_reset` still read `Y`.
+- **`machine.install.extraKernelArgs` was rejected by talhelper:** `error: install.extraKernelArgs and install.grubUseUKICmdline can't be used together`. Talos uses UKI (Unified Kernel Image) with `grubUseUKICmdline: true` by default, which bakes the cmdline into the signed UKI binary — `extraKernelArgs` only works with grub-style boot, not UKI.
+
+### What actually worked
+
+Bake `thunderbolt.host_reset=0` into a custom **factory.talos.dev schematic** and update `talosImageURL` for each control-plane node. The schematic builds a UKI with our extra arg appended to the existing kernel cmdline.
+
+**Procedure (verified 2026-05-05):**
+
+```bash
+# 1. Fetch existing schematic to preserve all current kernel args + extensions
+curl -s https://factory.talos.dev/schematics/d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992 \
+  > /tmp/current-schematic.yaml
+
+# 2. Edit /tmp/new-schematic.yaml — append thunderbolt.host_reset=0 to extraKernelArgs.
+#    Preserve every existing arg + extension; do NOT regenerate from scratch.
+
+# 3. POST the new schematic to get a new ID
+curl -sX POST --data-binary @/tmp/new-schematic.yaml https://factory.talos.dev/schematics
+# Returns: {"id":"786a10aa2924e5caf00392a569de037cec138416143517e618d151b8176af7f3"}
+
+# 4. Update the 3 stanton talosImageURL entries in talconfig.yaml (pyro keeps its own NVIDIA schematic)
+sed -i "s|d009fe7b4f1bcd11a45d6ffd17e59921b0a33bc437eebb53cffb9a5b3b9e2992|786a10aa2924e5caf00392a569de037cec138416143517e618d151b8176af7f3|g" \
+  kubernetes/bootstrap/talos/talconfig.yaml
+
+# 5. Regenerate clusterconfig
+cd kubernetes/bootstrap/talos
+talhelper genconfig
+
+# 6. Per-node: apply-config (stages new install.image), then upgrade (re-bakes UKI with new cmdline)
+kubectl -n rook-ceph exec deploy/rook-ceph-tools -- ceph osd set noout
+talosctl apply-config --nodes 10.90.3.103 --file clusterconfig/home-kubernetes-stanton-03.yaml
+talosctl --nodes 10.90.3.103 upgrade \
+  --image=factory.talos.dev/metal-installer/786a10aa2924e5caf00392a569de037cec138416143517e618d151b8176af7f3:v1.12.6 \
+  --wait=true --timeout=15m --preserve=true
+# repeat for stanton-01, then stanton-02; unset noout at end.
+```
+
+The `talosctl apply-config` alone is **not enough** — it stages the new `install.image` but the running OS keeps the existing UKI until `talosctl upgrade` re-runs the installer.
+
+### Verification
+
+```bash
+# host_reset took effect (runtime)
+talosctl --nodes <ip> read /sys/module/thunderbolt/parameters/host_reset
+# expected output: N
+
+# kernel cmdline contains the arg (UKI)
+talosctl --nodes <ip> read /proc/cmdline | tr ' ' '\n' | grep host_reset
+# expected output: thunderbolt.host_reset=0
+
+# TB ring formed cleanly — each stanton node should show 2x 169.254.255.x addresses
+talosctl --nodes <ip> get addresses | grep 169.254
+```
+
+### What the fix did and didn't fix
+
+**Fixed:** boot-init enumeration. New-UKI nodes booted cleanly with both TB ports enumerated. The "second TB port doesn't come up after warm reboot" failure mode is gone for nodes on the new schematic.
+
+**Did NOT fix:** runtime peer-disconnect wedges. During the rolling upgrade itself, when one node rebooted, the *running* TB stack on the other nodes (which had loaded the driver before the kernel arg was active) hit `failed request link state change, aborting` on the lost-peer port and stayed wedged. Required manual cable hot-plug to recover. Once all 3 nodes were on the new schematic, the issue stopped recurring. Plan for one cable-replug per peer-reboot during any future maintenance, until/unless this regression resolves at the kernel level.
+
+### Side effects observed
+
+- `nvme nvme1: using unchecked data buffer` warning appeared once on stanton-02 post-upgrade. Single occurrence, no functional impact, attributed to NVMe driver quirk on UKI rebake. Documented for future reference.
+- Talos OS jumped from v1.12.3 → v1.12.6 as a free upgrade (the new schematic only ships a v1.12.6 installer). All 3 stantons now on v1.12.6; pyro still on v1.12.3.
+
+---
+
 ## Migration Plan
 
 **Pre-reqs** (buy/stage first):
@@ -218,13 +321,17 @@ Configured through the TrueNAS web UI — not GitOps. Record the steps here for 
 **Cutover strategy — one node at a time** to keep quorum intact:
 
 1. Cable stanton-01 X710 SFP+0 → Agg port 1 (link will come up, no traffic yet).
-2. Edit `talconfig.yaml` for stanton-01 only. Run `task talos:apply-config HOSTNAME=stanton-01` (or equivalent).
-3. Reboot stanton-01. Verify:
+2. Edit `talconfig.yaml` for stanton-01 only — update the bond0 stanza to add the X710 deviceSelector as primary, keep igc as backup (see "Talos Patch Draft" above).
+3. Re-render: `cd kubernetes/bootstrap/talos && talhelper genconfig`. Diff vs live config to confirm only bond0 changed: `talosctl apply-config --nodes 10.90.3.101 --file clusterconfig/home-kubernetes-stanton-01.yaml --dry-run`.
+4. Apply for real (no `--dry-run`). Talos will reboot the node automatically because `machine.network.interfaces` changes are reboot-required. Wait for `talosctl --nodes 10.90.3.101 health --wait-timeout=10m --server=false`.
+5. Verify:
    - `talosctl -n 10.90.3.101 get links` shows bond0 with both members, X710 active.
    - `kubectl get node stanton-01` Ready.
    - `ceph -s` shows mon.a healthy.
-4. Physically unplug the X710 DAC on stanton-01 briefly to verify failover to igc. Re-plug. Confirm no traffic interruption beyond the failover window (~1s).
-5. Repeat for stanton-02 and stanton-03, one at a time, waiting for Ceph HEALTH_OK between each.
+6. Physically unplug the X710 DAC on stanton-01 briefly to verify failover to igc. Re-plug. Confirm no traffic interruption beyond the failover window (~1s).
+7. Repeat for stanton-02 and stanton-03, one at a time, waiting for Ceph HEALTH_OK between each.
+
+**There is no `task talos:apply-config` task in this repo** — the workflow is `talhelper genconfig` to render per-node configs into `clusterconfig/`, then `talosctl apply-config --nodes <ip> --file <rendered-file>` per node. See `~/.claude/projects/-home-gavin-home-ops/memory/reference_talos_config_workflow.md` for the full procedure.
 
 **Citadel** can go in any order — it's not in the control plane. Install the new NIC, cable to Agg port 4, configure a `lagg0` in TrueNAS (see "Citadel (TrueNAS) side" above), move the existing LAN IP onto `lagg0`.
 
@@ -261,3 +368,9 @@ The TB mesh is completely untouched — Ceph replication continues regardless.
 | USW Aggregation adopted 2026-04-20 at 10.90.100.150 | UDM Pro mongo `db.device.find` | Verified |
 | TB mesh config unchanged in this proposal | [`talconfig.yaml:61-78, 118-135, 175-192`](../../kubernetes/bootstrap/talos/talconfig.yaml#L61) | Proposal scope |
 | Ceph quorum flap 2026-04-20 was NVMe, not TB | `talosctl dmesg` forensics (not network) | Verified via subagent |
+| `thunderbolt.host_reset` defaults to `true` and is `0444` (read-only after load) | [`drivers/thunderbolt/nhi.c`](https://github.com/torvalds/linux/blob/master/drivers/thunderbolt/nhi.c) — `MODULE_PARM_DESC(host_reset, "reset USB4 host router (default: true)")` | Verified upstream |
+| TB-after-reboot fix is `thunderbolt.host_reset=false` on MS-01 / NUC13 + TB SFP+ NICs | [Proxmox forum thread](https://forum.proxmox.com/threads/thunderbolt-connected-adapter-not-active-after-reboot-shutdown.168553/), kernel 6.8.12-11-pve | Verified via independent report |
+| All four nodes ran kernel 6.18.8-talos with no `thunderbolt.host_reset` arg in `/proc/cmdline` | `talosctl -n 10.90.3.101 read /proc/cmdline` 2026-04-25 | Verified live (pre-fix) |
+| 3× stanton nodes now run kernel 6.18.18-talos (Talos v1.12.6) with `thunderbolt.host_reset=0` baked into UKI cmdline | `talosctl --nodes <ip> read /proc/cmdline` 2026-05-05 | Verified live (post-fix) |
+| `machine.kernel.modules.parameters` doesn't reach early-loaded modules on UKI Talos; `extraKernelArgs` mutex with `grubUseUKICmdline: true` | Direct test 2026-05-05: applied modules-list, observed `host_reset=Y` runtime; talhelper rejected extraKernelArgs with explicit error | Verified live |
+| Custom factory.talos.dev schematic is the working path for kernel cmdline args on Talos UKI | Schematic POST → new ID `786a10aa...` → `talosctl upgrade --image=...` re-bakes UKI with new cmdline | Verified 2026-05-05 |
