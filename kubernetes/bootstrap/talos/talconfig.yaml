@@ -56,6 +56,28 @@ nodes:
         #     dhcpOptions:
         #       routeMetric: 4096
       #############################################
+      #          Ceph LACP bond (V2 fabric)       #
+      #############################################
+      - interface: bond1
+        bond:
+          mode: 802.3ad
+          xmitHashPolicy: layer3+4
+          lacpRate: fast
+          miimon: 100
+          deviceSelectors:
+            - hardwareAddr: "58:47:ca:76:16:cf"
+              driver: i40e
+            - hardwareAddr: "58:47:ca:76:16:d0"
+              driver: i40e
+        dhcp: false
+        mtu: 9000
+        vlans:
+          - vlanId: 100
+            mtu: 9000
+            dhcp: false
+            addresses:
+              - "10.99.100.101/24"
+      #############################################
       #         Thunerbolt Configuration          #
       #############################################
       - deviceSelector:
@@ -113,6 +135,28 @@ nodes:
         #     dhcpOptions:
         #       routeMetric: 4096
       #############################################
+      #          Ceph LACP bond (V2 fabric)       #
+      #############################################
+      - interface: bond1
+        bond:
+          mode: 802.3ad
+          xmitHashPolicy: layer3+4
+          lacpRate: fast
+          miimon: 100
+          deviceSelectors:
+            - hardwareAddr: "58:47:ca:76:0b:fb"
+              driver: i40e
+            - hardwareAddr: "58:47:ca:76:0b:fc"
+              driver: i40e
+        dhcp: false
+        mtu: 9000
+        vlans:
+          - vlanId: 100
+            mtu: 9000
+            dhcp: false
+            addresses:
+              - "10.99.100.102/24"
+      #############################################
       #         Thunerbolt Configuration          #
       #############################################
       - deviceSelector:
@@ -169,6 +213,28 @@ nodes:
         #         gateway: "10.99.107.1"
         #     dhcpOptions:
         #       routeMetric: 4096
+      #############################################
+      #          Ceph LACP bond (V2 fabric)       #
+      #############################################
+      - interface: bond1
+        bond:
+          mode: 802.3ad
+          xmitHashPolicy: layer3+4
+          lacpRate: fast
+          miimon: 100
+          deviceSelectors:
+            - hardwareAddr: "58:47:ca:76:0e:db"
+              driver: i40e
+            - hardwareAddr: "58:47:ca:76:0e:dc"
+              driver: i40e
+        dhcp: false
+        mtu: 9000
+        vlans:
+          - vlanId: 100
+            mtu: 9000
+            dhcp: false
+            addresses:
+              - "10.99.100.103/24"
       #############################################
       #         Thunerbolt Configuration          #
       #############################################
