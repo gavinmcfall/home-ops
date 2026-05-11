@@ -47,6 +47,7 @@ spec:
       isWALArchiver: true
       parameters:
         stanzaRef: postgres18-cluster-stanza
+        pluginConfigRef: postgres18-cluster-pluginconfig
 
   bootstrap:
     initdb:

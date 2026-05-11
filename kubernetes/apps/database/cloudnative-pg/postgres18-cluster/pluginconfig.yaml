@@ -1,0 +1,16 @@
+---
+# Hypothesis 1 experiment (Path B follow-up 2026-05-12):
+# The plugin sidecar wasn't loading the Stanza's S3 config into pgbackrest
+# even though the Stanza CR was correctly persisted and the auto-generated
+# Role granted access. Adding the optional PluginConfig CR and referencing
+# it from the Cluster spec, in case the plugin's reconciler only fires the
+# config-injection path when a PluginConfig is bound.
+apiVersion: pgbackrest.dalibo.com/v1
+kind: PluginConfig
+metadata:
+  name: postgres18-cluster-pluginconfig
+  namespace: database
+spec:
+  exporterConfig:
+    enabled: false
+    collectInterval: 600

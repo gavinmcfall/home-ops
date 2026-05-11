@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./repository.yaml
   - ./stanza.yaml
+  - ./pluginconfig.yaml
   - ./postgres18-cluster.yaml
   - ./pooler.yaml
   - ./scheduledbackup.yaml
