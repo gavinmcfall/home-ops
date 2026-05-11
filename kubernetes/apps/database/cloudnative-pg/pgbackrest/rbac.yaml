@@ -13,6 +13,16 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - persistentvolumeclaims
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - watch
+  - apiGroups:
+      - ""
+    resources:
       - secrets
     verbs:
       - create
@@ -20,6 +30,37 @@ rules:
       - get
       - list
       - watch
+  - apiGroups:
+      - pgbackrest.dalibo.com
+    resources:
+      - pluginconfigs
+      - stanzas
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - pgbackrest.dalibo.com
+    resources:
+      - pluginconfigs/finalizers
+      - stanzas/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - pgbackrest.dalibo.com
+    resources:
+      - pluginconfigs/status
+      - stanzas/status
+    verbs:
+      - get
+      - patch
+      - update
+  # Legacy Repository CRD permissions (retained until Stage 6 cleanup
+  # after the postgres18-cluster and postgres18-immich migrations complete).
   - apiGroups:
       - pgbackrest.dalibo.com
     resources:
@@ -47,22 +88,6 @@ rules:
       - patch
       - update
   - apiGroups:
-      - pgbackrest.dalibo.com
-    resources:
-      - stanzas
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - pgbackrest.dalibo.com
-    resources:
-      - stanzas/status
-    verbs:
-      - get
-      - patch
-      - update
-  - apiGroups:
       - postgresql.cnpg.io
     resources:
       - backups
@@ -70,6 +95,12 @@ rules:
       - get
       - list
       - watch
+  - apiGroups:
+      - postgresql.cnpg.io
+    resources:
+      - clusters
+    verbs:
+      - get
   - apiGroups:
       - postgresql.cnpg.io
     resources:

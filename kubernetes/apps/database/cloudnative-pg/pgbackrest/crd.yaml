@@ -382,3 +382,747 @@ spec:
     storage: true
     subresources:
       status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  name: pluginconfigs.pgbackrest.dalibo.com
+spec:
+  group: pgbackrest.dalibo.com
+  names:
+    kind: PluginConfig
+    listKind: PluginConfigList
+    plural: pluginconfigs
+    singular: pluginconfig
+  scope: Namespaced
+  versions:
+    - name: v1
+      schema:
+        openAPIV3Schema:
+          description: PluginConfig the Schema for the PluginConfig API
+          properties:
+            apiVersion:
+              description: |-
+                APIVersion defines the versioned schema of this representation of an object.
+                Servers should convert recognized schemas to the latest internal value, and
+                may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+              type: string
+            kind:
+              description: |-
+                Kind is a string value representing the REST resource this object represents.
+                Servers may infer this from the endpoint the client submits requests to.
+                Cannot be updated.
+                In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: spec defines the desired state of the PluginConfig
+              properties:
+                exporterConfig:
+                  description: |-
+                    Defines options to inject, enable and configure a pgBackRest exporter
+                    sidecar into the cluster pods.
+                    When enabled, it adds a pgBackRest exporter container to expose backup
+                    and WAL archiving metrics for monitoring purposes.
+                  properties:
+                    collectInterval:
+                      default: 600
+                      description: Collecting metrics interval in seconds.
+                      type: integer
+                    enabled:
+                      description: Define if pgBackRest exporter should be enabled.
+                      type: boolean
+                  required:
+                    - collectInterval
+                  type: object
+                resourcesRequirement:
+                  description: Defines resource requests and limits for the pgBackRest sidecar containers.
+                  properties:
+                    claims:
+                      description: |-
+                        Claims lists the names of resources, defined in spec.resourceClaims,
+                        that are used by this container.
+
+                        This field depends on the
+                        DynamicResourceAllocation feature gate.
+
+                        This field is immutable. It can only be set for containers.
+                      items:
+                        description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                        properties:
+                          name:
+                            description: |-
+                              Name must match the name of one entry in pod.spec.resourceClaims of
+                              the Pod where this field is used. It makes that resource available
+                              inside a container.
+                            type: string
+                          request:
+                            description: |-
+                              Request is the name chosen for a request in the referenced claim.
+                              If empty, everything from the claim is made available, otherwise
+                              only the result of this request.
+                            type: string
+                        required:
+                          - name
+                        type: object
+                      type: array
+                      x-kubernetes-list-map-keys:
+                        - name
+                      x-kubernetes-list-type: map
+                    limits:
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                        x-kubernetes-int-or-string: true
+                      description: |-
+                        Limits describes the maximum amount of compute resources allowed.
+                        More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                      type: object
+                    requests:
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                        x-kubernetes-int-or-string: true
+                      description: |-
+                        Requests describes the minimum amount of compute resources required.
+                        If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                        otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                        More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                      type: object
+                  type: object
+                storageConfig:
+                  description: |-
+                    Defines the configuration for pgBackRest storage used to persist WALs
+                    when running in asynchronous mode. When provided, it allows to customize
+                    the PersistentVolumeClaim settings (storage class and default size) for
+                    the pgBackRest sidecars.
+                  properties:
+                    size:
+                      description: |-
+                        Defines the size of storage request for pgBackRest WAL storage
+                        when running in asynchronous mode. This value determines the
+                        capacity allocated to safely retain WALs.
+                      pattern: ^[0-9]+?[M|G]i$
+                      type: string
+                    storageClass:
+                      default: default
+                      description: |-
+                        Defines the storage class used for PersistentVolumeClaims
+                        created for the pgBackRest sidecar container. This storage will be used
+                        to safely store WAL segments when running in asynchronous mode.
+                      minLength: 1
+                      type: string
+                  required:
+                    - storageClass
+                  type: object
+              type: object
+          required:
+            - spec
+          type: object
+      served: true
+      storage: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  name: stanzas.pgbackrest.dalibo.com
+spec:
+  group: pgbackrest.dalibo.com
+  names:
+    kind: Stanza
+    listKind: StanzaList
+    plural: stanzas
+    singular: stanza
+  scope: Namespaced
+  versions:
+    - name: v1
+      schema:
+        openAPIV3Schema:
+          description: Stanza is the Schema for the stanzas API
+          properties:
+            apiVersion:
+              description: |-
+                APIVersion defines the versioned schema of this representation of an object.
+                Servers should convert recognized schemas to the latest internal value, and
+                may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+              type: string
+            kind:
+              description: |-
+                Kind is a string value representing the REST resource this object represents.
+                Servers may infer this from the endpoint the client submits requests to.
+                Cannot be updated.
+                In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: spec defines the desired state of Stanza
+              properties:
+                stanzaConfiguration:
+                  description: Define pgbackrest stanza
+                  properties:
+                    archive:
+                      properties:
+                        async:
+                          default: false
+                          type: boolean
+                        getQueueMax:
+                          pattern: ^[0-9]+ ?(B|KiB|MiB|GiB|TiB|PiB)$
+                          type: string
+                        pushQueueMax:
+                          pattern: ^(0B|[0-9]+(KiB|MiB|GiB|TiB)|([0-4])PiB)$
+                          type: string
+                      type: object
+                    azureRepositories:
+                      items:
+                        properties:
+                          account:
+                            description: Azure repository account.
+                            minLength: 1
+                            type: string
+                          container:
+                            description: Azure container used to store the repository.
+                            minLength: 1
+                            type: string
+                          endpoint:
+                            description: Azure repository endpoint.
+                            minLength: 1
+                            type: string
+                          keyType:
+                            description: Azure repository key type.
+                            enum:
+                              - shared
+                              - sas
+                              - auto
+                            minLength: 1
+                            type: string
+                          repoPath:
+                            description: Path where backups and archives are stored.
+                            minLength: 1
+                            type: string
+                          retentionPolicy:
+                            description: Define retention strategy for a repository.
+                            properties:
+                              archive:
+                                description: |-
+                                  Number of backups worth of continuous WAL to retain.
+                                  Can be used to aggressively expire WAL segments and save disk space.
+                                  However, doing so negates the ability to perform PITR from the backups
+                                  with expired WAL and is therefore not recommended.
+                                format: int32
+                                maximum: 9999999
+                                minimum: 1
+                                type: integer
+                              archiveType:
+                                description: |-
+                                  Backup type for WAL retention.
+                                  It is recommended that this setting not be changed from the default which
+                                  will only expire WAL in conjunction with expiring full backups.
+                                  Available options are `full` (default), `diff` or `incr`.
+                                enum:
+                                  - full
+                                  - diff
+                                  - incr
+                                type: string
+                              diff:
+                                description: |-
+                                  Number of differential backups to retain.
+                                  When a differential backup expires, all incremental backups associated
+                                  with the differential backup will also expire. When not defined all
+                                  differential backups will be kept until the full backups they depend on expire.
+                                format: int32
+                                maximum: 9999999
+                                minimum: 1
+                                type: integer
+                              full:
+                                description: |-
+                                  Full backup retention count/time (in days)
+                                  When a full backup expires, all differential and incremental backups associated
+                                  with the full backup will also expire.
+                                format: int32
+                                maximum: 9999999
+                                minimum: 1
+                                type: integer
+                              fullType:
+                                description: |-
+                                  Retention type for full backups.
+                                   Determines whether the repo-retention-full setting represents a time period
+                                  (days) or count of full backups to keep.
+                                  Available options are `count` (default) and `time`.
+                                enum:
+                                  - count
+                                  - time
+                                type: string
+                              history:
+                                description: |-
+                                  Days of backup history manifests to retain.
+                                  Set history to define the number of days of backup history manifests to
+                                  retain. Unexpired backups are always kept in the backup history. Specify
+                                  history=0 to retain the backup history only for unexpired backups. When
+                                  a full backup history manifest is expired, all differential and
+                                  incremental backup history manifests associated with the full backup also
+                                  expire.
+                                format: int32
+                                maximum: 9999999
+                                minimum: 0
+                                type: integer
+                            type: object
+                          secretRef:
+                            description: Reference to a Kubernetes Secret containing the Azure repository key.
+                            properties:
+                              keyReference:
+                                description: The reference to the Azure key.
+                                properties:
+                                  key:
+                                    description: The key to select
+                                    type: string
+                                  name:
+                                    description: Name of the referent.
+                                    type: string
+                                required:
+                                  - key
+                                  - name
+                                type: object
+                            type: object
+                          uriStyle:
+                            description: Azure URI Style.
+                            enum:
+                              - host
+                              - path
+                            type: string
+                          verifyTLS:
+                            default: true
+                            description: Repository storage certificate verify.
+                            type: boolean
+                        required:
+                          - account
+                          - container
+                          - repoPath
+                        type: object
+                      type: array
+                    compressConfig:
+                      description: Define compression settings for file compression.
+                      properties:
+                        level:
+                          description: File compression level.
+                          type: integer
+                        type:
+                          default: gz
+                          description: Type of compression to use.
+                          enum:
+                            - bz2
+                            - gz
+                            - lz4
+                            - zst
+                          type: string
+                      type: object
+                    customEnvVar:
+                      additionalProperties:
+                        type: string
+                      description: Custom environnement variables to use when running pgbackrest.
+                      type: object
+                    delta:
+                      default: true
+                      description: |-
+                        Restore or backup using checksums.
+                        During a restore, by default the PostgreSQL data and tablespace directories
+                        are expected to be present but empty. This option performs a delta restore
+                        using checksums.
+
+                        During a backup, this option will use checksums instead of the timestamps to
+                        determine if files will be copied.
+                      type: boolean
+                    logLevel:
+                      default: warn
+                      description: Level for console logging.
+                      enum:
+                        - error
+                        - warn
+                        - info
+                        - detail
+                        - debug
+                        - trace
+                      type: string
+                    name:
+                      minLength: 1
+                      type: string
+                    processMax:
+                      default: 1
+                      type: integer
+                    s3Repositories:
+                      items:
+                        properties:
+                          bucket:
+                            description: S3 bucket used to store the repository.
+                            minLength: 1
+                            type: string
+                          cipherConfig:
+                            properties:
+                              encryptionPass:
+                                description: Reference to the secret containing the encryption key.
+                                properties:
+                                  key:
+                                    description: The key to select
+                                    type: string
+                                  name:
+                                    description: Name of the referent.
+                                    type: string
+                                required:
+                                  - key
+                                  - name
+                                type: object
+                              type:
+                                default: aes-256-cbc
+                                description: Cipher used to encrypt the repository.
+                                enum:
+                                  - aes-256-cbc
+                                type: string
+                            type: object
+                          endpoint:
+                            description: S3 repository endpoint.
+                            minLength: 1
+                            type: string
+                          region:
+                            description: S3 repository region.
+                            minLength: 1
+                            type: string
+                          repoPath:
+                            description: Path where backups and archive are stored.
+                            minLength: 1
+                            type: string
+                          retentionPolicy:
+                            description: Define retention strategy for a repository.
+                            properties:
+                              archive:
+                                description: |-
+                                  Number of backups worth of continuous WAL to retain.
+                                  Can be used to aggressively expire WAL segments and save disk space.
+                                  However, doing so negates the ability to perform PITR from the backups
+                                  with expired WAL and is therefore not recommended.
+                                format: int32
+                                maximum: 9999999
+                                minimum: 1
+                                type: integer
+                              archiveType:
+                                description: |-
+                                  Backup type for WAL retention.
+                                  It is recommended that this setting not be changed from the default which
+                                  will only expire WAL in conjunction with expiring full backups.
+                                  Available options are `full` (default), `diff` or `incr`.
+                                enum:
+                                  - full
+                                  - diff
+                                  - incr
+                                type: string
+                              diff:
+                                description: |-
+                                  Number of differential backups to retain.
+                                  When a differential backup expires, all incremental backups associated
+                                  with the differential backup will also expire. When not defined all
+                                  differential backups will be kept until the full backups they depend on expire.
+                                format: int32
+                                maximum: 9999999
+                                minimum: 1
+                                type: integer
+                              full:
+                                description: |-
+                                  Full backup retention count/time (in days)
+                                  When a full backup expires, all differential and incremental backups associated
+                                  with the full backup will also expire.
+                                format: int32
+                                maximum: 9999999
+                                minimum: 1
+                                type: integer
+                              fullType:
+                                description: |-
+                                  Retention type for full backups.
+                                   Determines whether the repo-retention-full setting represents a time period
+                                  (days) or count of full backups to keep.
+                                  Available options are `count` (default) and `time`.
+                                enum:
+                                  - count
+                                  - time
+                                type: string
+                              history:
+                                description: |-
+                                  Days of backup history manifests to retain.
+                                  Set history to define the number of days of backup history manifests to
+                                  retain. Unexpired backups are always kept in the backup history. Specify
+                                  history=0 to retain the backup history only for unexpired backups. When
+                                  a full backup history manifest is expired, all differential and
+                                  incremental backup history manifests associated with the full backup also
+                                  expire.
+                                format: int32
+                                maximum: 9999999
+                                minimum: 0
+                                type: integer
+                            type: object
+                          secretRef:
+                            description: Reference to a Kubernetes Secret containing S3 credentials.
+                            properties:
+                              accessKeyId:
+                                description: The reference to the access key ID
+                                properties:
+                                  key:
+                                    description: The key to select
+                                    type: string
+                                  name:
+                                    description: Name of the referent.
+                                    type: string
+                                required:
+                                  - key
+                                  - name
+                                type: object
+                              secretAccessKey:
+                                description: The reference to the secret access key
+                                properties:
+                                  key:
+                                    description: The key to select
+                                    type: string
+                                  name:
+                                    description: Name of the referent.
+                                    type: string
+                                required:
+                                  - key
+                                  - name
+                                type: object
+                            type: object
+                          uriStyle:
+                            description: S3 URI Style.
+                            enum:
+                              - host
+                              - path
+                            type: string
+                          verifyTLS:
+                            default: true
+                            description: Repository storage certificate verify.
+                            type: boolean
+                        required:
+                          - bucket
+                          - endpoint
+                          - region
+                          - repoPath
+                        type: object
+                      type: array
+                    startFast:
+                      default: true
+                      description: |-
+                        Default behavior to Force a checkpoint to start backup quickly.
+
+                        Forces a checkpoint (by passing y to the fast parameter of the backup start
+                        function) so the backup begins immediately. Otherwise the backup will start
+                        after the next regular checkpoint.
+                      type: boolean
+                  required:
+                    - name
+                  type: object
+              required:
+                - stanzaConfiguration
+              type: object
+            status:
+              description: status defines the observed state of Stanza
+              properties:
+                backupsCount:
+                  properties:
+                    Diff:
+                      type: integer
+                    Full:
+                      type: integer
+                    Incr:
+                      type: integer
+                  required:
+                    - Diff
+                    - Full
+                    - Incr
+                  type: object
+                conditions:
+                  description: |-
+                    conditions represent the current state of the Stanza resource.
+                    Each condition has a unique type and reflects the status of a specific aspect of the resource.
+
+                    Standard condition types include:
+                    - "Available": the resource is fully functional
+                    - "Progressing": the resource is being created or updated
+                    - "Degraded": the resource failed to reach or maintain its desired state
+
+                    The status of each condition is one of True, False, or Unknown.
+                  items:
+                    description: Condition contains details for one aspect of the current state of this API Resource.
+                    properties:
+                      lastTransitionTime:
+                        description: |-
+                          lastTransitionTime is the last time the condition transitioned from one status to another.
+                          This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                        format: date-time
+                        type: string
+                      message:
+                        description: |-
+                          message is a human readable message indicating details about the transition.
+                          This may be an empty string.
+                        maxLength: 32768
+                        type: string
+                      observedGeneration:
+                        description: |-
+                          observedGeneration represents the .metadata.generation that the condition was set based upon.
+                          For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                          with respect to the current state of the instance.
+                        format: int64
+                        minimum: 0
+                        type: integer
+                      reason:
+                        description: |-
+                          reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                          Producers of specific condition types may define expected values and meanings for this field,
+                          and whether the values are considered a guaranteed API.
+                          The value should be a CamelCase string.
+                          This field may not be empty.
+                        maxLength: 1024
+                        minLength: 1
+                        pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                        type: string
+                      status:
+                        description: status of the condition, one of True, False, Unknown.
+                        enum:
+                          - "True"
+                          - "False"
+                          - Unknown
+                        type: string
+                      type:
+                        description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        maxLength: 316
+                        pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                        type: string
+                    required:
+                      - lastTransitionTime
+                      - message
+                      - reason
+                      - status
+                      - type
+                    type: object
+                  type: array
+                  x-kubernetes-list-map-keys:
+                    - type
+                  x-kubernetes-list-type: map
+                recoveryWindow:
+                  properties:
+                    firstBackup:
+                      properties:
+                        archive:
+                          properties:
+                            start:
+                              type: string
+                            stop:
+                              type: string
+                          required:
+                            - start
+                            - stop
+                          type: object
+                        label:
+                          type: string
+                        lsn:
+                          properties:
+                            start:
+                              type: string
+                            stop:
+                              type: string
+                          required:
+                            - start
+                            - stop
+                          type: object
+                        prior:
+                          type: string
+                        timestamp:
+                          properties:
+                            start:
+                              format: int64
+                              type: integer
+                            stop:
+                              format: int64
+                              type: integer
+                          required:
+                            - start
+                            - stop
+                          type: object
+                        type:
+                          type: string
+                      required:
+                        - archive
+                        - label
+                        - lsn
+                        - prior
+                        - timestamp
+                        - type
+                      type: object
+                    lastBackup:
+                      properties:
+                        archive:
+                          properties:
+                            start:
+                              type: string
+                            stop:
+                              type: string
+                          required:
+                            - start
+                            - stop
+                          type: object
+                        label:
+                          type: string
+                        lsn:
+                          properties:
+                            start:
+                              type: string
+                            stop:
+                              type: string
+                          required:
+                            - start
+                            - stop
+                          type: object
+                        prior:
+                          type: string
+                        timestamp:
+                          properties:
+                            start:
+                              format: int64
+                              type: integer
+                            stop:
+                              format: int64
+                              type: integer
+                          required:
+                            - start
+                            - stop
+                          type: object
+                        type:
+                          type: string
+                      required:
+                        - archive
+                        - label
+                        - lsn
+                        - prior
+                        - timestamp
+                        - type
+                      type: object
+                  required:
+                    - firstBackup
+                    - lastBackup
+                  type: object
+              type: object
+          required:
+            - spec
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
