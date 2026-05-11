@@ -43,8 +43,10 @@ spec:
   # pgBackRest Plugin for backups (B2 + R2 dual destination)
   plugins:
     - name: pgbackrest.dalibo.com
+      enabled: true
+      isWALArchiver: true
       parameters:
-        repositoryRef: postgres18-cluster-repository
+        stanzaRef: postgres18-cluster-stanza
 
   bootstrap:
     initdb:
