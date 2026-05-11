@@ -45,8 +45,11 @@ spec:
   # pgBackRest Plugin for backups (B2 + R2 dual destination)
   plugins:
     - name: pgbackrest.dalibo.com
+      enabled: true
+      isWALArchiver: true
       parameters:
-        repositoryRef: postgres18-immich-repository
+        stanzaRef: postgres18-immich-stanza
+        pluginConfigRef: postgres18-immich-pluginconfig
 
   bootstrap:
     initdb:

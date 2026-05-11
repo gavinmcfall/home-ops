@@ -1,0 +1,16 @@
+---
+apiVersion: pgbackrest.dalibo.com/v1
+kind: PluginConfig
+metadata:
+  name: postgres18-immich-pluginconfig
+  namespace: database
+spec:
+  # storageConfig.storageClass is required by the plugin (omitting it triggers
+  # a nil pointer dereference in injectWALVolume:455). openebs-hostpath matches
+  # the cluster's existing pgdata PVC class — local fast staging for the
+  # pgbackrest WAL spool in asynchronous mode.
+  storageConfig:
+    storageClass: openebs-hostpath
+  exporterConfig:
+    enabled: false
+    collectInterval: 600
