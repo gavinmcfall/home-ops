@@ -1,8 +1,10 @@
 ---
-# Path B stage 4: new Stanza CR matches the existing Repository field-for-field.
 # Inner stanzaConfiguration.name MUST stay "postgres18-immich" — this is the
-# pgbackrest stanza identity and maps to the subdirectory inside the B2 and R2
-# buckets. Changing it would orphan all historical backups.
+# pgbackrest stanza identity and maps to the subdirectory inside the B2 bucket.
+# Changing it would orphan all historical backups.
+# R2 secondary target dropped 2026-05-12 (user decision: B2-only is sufficient
+# for current durability needs; R2 path had reliability issues with the v0.0.2
+# plugin's serialised backup queue).
 apiVersion: pgbackrest.dalibo.com/v1
 kind: Stanza
 metadata:
@@ -17,7 +19,7 @@ spec:
       pushQueueMax: 1GiB
     processMax: 4
     s3Repositories:
-      # Primary: Backblaze B2
+      # Primary: Backblaze B2 (sole repository)
       - bucket: nerdz-postgres-immich
         endpoint: s3.us-east-005.backblazeb2.com
         region: us-east-005
@@ -38,24 +40,3 @@ spec:
           secretAccessKey:
             name: cloudnative-pg-secret
             key: b2-secret-access-key
-      # Secondary: Cloudflare R2
-      - bucket: nerdz-postgres-immich
-        endpoint: ${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
-        region: auto
-        repoPath: /postgres18-immich
-        uriStyle: path
-        verifyTLS: true
-        retentionPolicy:
-          full: 14
-          fullType: count
-          diff: 30
-          archive: 7
-          archiveType: full
-          history: 30
-        secretRef:
-          accessKeyId:
-            name: cloudnative-pg-secret
-            key: r2-access-key-id
-          secretAccessKey:
-            name: cloudnative-pg-secret
-            key: r2-secret-access-key
