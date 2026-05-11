@@ -11,6 +11,15 @@ metadata:
   name: postgres18-cluster-pluginconfig
   namespace: database
 spec:
+  # storageClass is a -required- field per the CRD docstring
+  # (`kubectl explain pluginconfig.spec.storageConfig.storageClass`).
+  # Omitting it caused a nil pointer dereference in injectWALVolume:455
+  # (H1 attempt, commit 05a9fd741). The PVC backs the pgBackRest sidecar
+  # WAL spool when async archiving is enabled, which this Stanza uses
+  # (archive.async: true). openebs-hostpath matches the existing pgdata
+  # PVC class — local fast staging, no replication needed.
+  storageConfig:
+    storageClass: openebs-hostpath
   exporterConfig:
     enabled: false
     collectInterval: 600
