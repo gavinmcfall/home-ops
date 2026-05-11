@@ -32,6 +32,13 @@ spec:
           env:
             - name: SIDECAR_IMAGE
               value: registry.hub.docker.com/dalibo/cnpg-pgbackrest-sidecar:0.0.2@sha256:b4feb69660a67320590358f435fda7bf5733b7151bca297aef970c2edf54e008
+            # The plugin injects a plugin-pgbackrest-exporter init container into every
+            # instance pod even when PluginConfig.exporterConfig.enabled: false.
+            # Without SIDECAR_EXPORTER_IMAGE, the init container defaults to a bare
+            # "pgbackrest-sidecar-exporter" ref that resolves to docker.io/library/...
+            # which doesn't exist, blocking the standby rollout with ImagePullBackOff.
+            - name: SIDECAR_EXPORTER_IMAGE
+              value: registry.hub.docker.com/dalibo/cnpg-pgbackrest-sidecar-exporter:0.0.2@sha256:92b26f75fccd2b37fcc6b45505c10ed1e2ddb32aca5ca3b68eec8b1b893cd7a9
           ports:
             - containerPort: 9090
               protocol: TCP
