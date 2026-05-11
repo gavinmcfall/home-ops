@@ -20,7 +20,12 @@ spec:
     spec:
       containers:
         - name: pgbackrest-controller
-          image: registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller:latest@sha256:5f286eaa89e11bddffa8964968bf628ab6a5edb2857faf89058bf5c1ff3aea23
+          # Pinned to pre-schema-migration digest (last known-good as of 2026-02-09).
+          # Controller digests 34b367b and later require the new Stanza/PluginConfig CRDs;
+          # this repo still uses Repository/repositoryRef. Rolled back as part of
+          # post-outage triage 2026-05-12. Do NOT bump until the schema migration is complete.
+          # renovate: ignore
+          image: registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller:latest@sha256:ad4f41e73eded654ed29bfba7665af20087c1427c8bf14c37e479a1212c8e085
           imagePullPolicy: IfNotPresent
           args:
             - operator

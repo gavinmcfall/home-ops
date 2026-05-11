@@ -53,5 +53,15 @@
       matchUpdateTypes: ["major"],
       enabled: false,
     },
+    {
+      description: [
+        "Pin dalibo/cnpg-pgbackrest-controller until Stanza/PluginConfig schema migration is complete.",
+        "Controller digests 34b367b and later require new CRDs (Stanza, PluginConfig) and stanzaRef on Cluster",
+        "specs. This repo still uses the old Repository/repositoryRef shape. Re-enable after migration.",
+      ],
+      matchDatasources: ["docker"],
+      matchPackageNames: ["registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller"],
+      enabled: false,
+    },
   ],
 }
