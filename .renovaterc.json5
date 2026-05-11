@@ -53,5 +53,10 @@
       matchUpdateTypes: ["major"],
       enabled: false,
     },
+    {
+      description: ["Block qBittorrent 5.2.x — not whitelisted by MAM (2026-05-12). Re-evaluate when MAM lifts the banner."],
+      matchPackageNames: ["ghcr.io/home-operations/qbittorrent"],
+      allowedVersions: "<5.2.0",
+    },
   ],
 }
