@@ -20,12 +20,7 @@ spec:
     spec:
       containers:
         - name: pgbackrest-controller
-          # Pinned to pre-schema-migration digest (last known-good as of 2026-02-09).
-          # Controller digests 34b367b and later require the new Stanza/PluginConfig CRDs;
-          # this repo still uses Repository/repositoryRef. Rolled back as part of
-          # post-outage triage 2026-05-12. Do NOT bump until the schema migration is complete.
-          # renovate: ignore
-          image: registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller:latest@sha256:ad4f41e73eded654ed29bfba7665af20087c1427c8bf14c37e479a1212c8e085
+          image: registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller:0.0.2@sha256:6ada97fdc4b797ef03abe656ff66f5ba27ac9d6784f3bc9abfa75a0d4807105e
           imagePullPolicy: IfNotPresent
           args:
             - operator
@@ -36,7 +31,7 @@ spec:
             - --log-level=debug
           env:
             - name: SIDECAR_IMAGE
-              value: registry.hub.docker.com/dalibo/cnpg-pgbackrest-sidecar:latest@sha256:97f06d791b4ef1351c27a87819cf5d0050b120b5f78acf497c4d23c845741956
+              value: registry.hub.docker.com/dalibo/cnpg-pgbackrest-sidecar:0.0.2@sha256:b4feb69660a67320590358f435fda7bf5733b7151bca297aef970c2edf54e008
           ports:
             - containerPort: 9090
               protocol: TCP
