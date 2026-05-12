@@ -1,15 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
 ###################################################################################################
-# Recyclarr Configuration Template: WEB-2160p (V4)                                                #
-# Updated: 2024-05-21                                                                             #
-# Documentation: https://recyclarr.dev                                                            #
-# Note: If you are using multiple profiles in a single instance, please read the following        #
-# documentation about file merging:                                                               #
-# https://recyclarr.dev/wiki/yaml/config-examples/#merge-single-instance                          #
-# This config file is for use with Sonarr V4 only                                                 #
+# Recyclarr Configuration: WEB-2160p (V4)                                                         #
+# v8 schema: guide-backed quality_profile via trash_id.                                           #
 ###################################################################################################
 
-# Instance Definition: https://recyclarr.dev/wiki/yaml/config-reference/basic/
 sonarr:
   web-2160p-v4:
     base_url: http://sonarr-uhd.downloads.svc.cluster.local:80
@@ -24,22 +18,26 @@ sonarr:
         daily: default
         anime: default
 
-    include:
-      # Comment out any of the following includes to disable them
-      - template: sonarr-quality-definition-series
-      - template: sonarr-v4-quality-profile-web-2160p
-      - template: sonarr-v4-custom-formats-web-2160p
+    quality_definition:
+      type: series
 
-    # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
+    quality_profiles:
+      # WEB-2160p — guide name matches existing profile
+      - trash_id: d1498e7d189fbe6c7110ceaabb7473e6
+        reset_unmatched_scores:
+          enabled: false
+
     custom_formats:
       # HDR Formats
       - trash_ids:
           # Comment out the next line if you and all of your users' setups are fully DV compatible
-          - 9b27ab6498ec0f31a3353992e19434ca # DV (WEBDL)
+          - 9b27ab6498ec0f31a3353992e19434ca # DV (w/o HDR fallback)  (was "DV (WEBDL)" pre-v8)
 
-          # HDR10+ Boost - Uncomment the next two lines if any of your devices DO support HDR10+
-          - 0dad0a507451acddd754fe6dc3a7f5e7 # HDR10+ Boost
-          - 385e9e8581d33133c3961bdcdeffb7b4 # DV HDR10+ Boost
+          # HDR10+ Boost - guide trash_id renamed in upstream v8 cleanup
+          - 0c4b99df9206d2cfac3c05ab897dd62a # HDR10+ Boost  (was 0dad0a50...)
+          # NOTE: The pre-v8 combined "DV HDR10+ Boost" (385e9e85...) was retired upstream;
+          #       use "DV Boost" (7c3a61a9c6cb04f52f1544be6d44a026) instead if you want DV boost.
+          # - 7c3a61a9c6cb04f52f1544be6d44a026 # DV Boost
         assign_scores_to:
           - name: WEB-2160p
 
@@ -53,7 +51,6 @@ sonarr:
           - name: WEB-2160p
 
       - trash_ids:
-          # Uncomment the next six lines to allow x265 HD releases with HDR/DV
           - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
         assign_scores_to:
           - name: WEB-2160p

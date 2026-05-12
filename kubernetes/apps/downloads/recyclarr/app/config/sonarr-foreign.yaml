@@ -1,6 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
 ###################################################################################################
 # Recyclarr Configuration: Sonarr Foreign                                                         #
+# v8 schema: guide-backed quality_profile via trash_id.                                           #
 # Based on WEB-1080p (V4) with x265 preference and 10bit boost.                                   #
 ###################################################################################################
 
@@ -18,10 +19,14 @@ sonarr:
         daily: default
         anime: default
 
-    include:
-      - template: sonarr-quality-definition-series
-      - template: sonarr-v4-quality-profile-web-1080p
-      - template: sonarr-v4-custom-formats-web-1080p
+    quality_definition:
+      type: series
+
+    quality_profiles:
+      # WEB-1080p — guide name matches existing profile
+      - trash_id: 72dae194fc92bf828f32cde7744e51a1
+        reset_unmatched_scores:
+          enabled: false
 
     custom_formats:
       # Unwanted (based on onedr0p's config)

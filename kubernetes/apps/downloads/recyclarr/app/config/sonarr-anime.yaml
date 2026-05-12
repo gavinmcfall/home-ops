@@ -1,15 +1,11 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
 ###################################################################################################
-# Recyclarr Configuration Template: Anime Sonarr                                                  #
-# Updated: 2023-10-07                                                                             #
-# Documentation: https://recyclarr.dev                                                            #
-# Note: If you are using multiple profiles in a single instance, please read the following        #
-# documentation about file merging:                                                               #
-# https://recyclarr.dev/wiki/yaml/config-examples/#merge-single-instance                          #
-# This config file is for use with Sonarr V4 only                                                 #
+# Recyclarr Configuration: Anime Sonarr (same Sonarr instance as sonarr.yaml)                     #
+# v8 schema: guide-backed quality_profile via trash_id.                                           #
+# anime-sonarr-v4 reuses base_url + SONARR_API_KEY; recyclarr supports multiple                   #
+# instances against one service so long as each YAML scopes its own profile work.                 #
 ###################################################################################################
 
-# Instance Definition: https://recyclarr.dev/wiki/yaml/config-reference/basic/
 sonarr:
   anime-sonarr-v4:
     base_url: http://sonarr.downloads.svc.cluster.local:80
@@ -24,13 +20,17 @@ sonarr:
         daily: default
         anime: default
 
-    include:
-      # Comment out any of the following includes to disable them
-      - template: sonarr-quality-definition-anime
-      - template: sonarr-v4-quality-profile-anime
-      - template: sonarr-v4-custom-formats-anime
+    quality_definition:
+      type: anime
 
-    # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
+    quality_profiles:
+      # Remux-1080p - Anime — override to preserve existing Sonarr profile name
+      - trash_id: 20e0fc959f1f1704bed501f23bdae76f
+        name: Remux-1080p - Anime
+        reset_unmatched_scores:
+          enabled: false
+
+    # Custom Formats: https://recyclarr.dev/reference/configuration/custom-formats/
     custom_formats:
       # Unwanted (core filters for anime)
       - trash_ids:
