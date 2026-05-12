@@ -1,14 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
 ###################################################################################################
-# Recyclarr Configuration Template: UHD Bluray + WEB                                              #
-# Updated: 2024-05-21                                                                             #
-# Documentation: https://recyclarr.dev                                                            #
-# Note: If you are using multiple profiles in a single instance, please read the following        #
-# documentation about file merging:                                                               #
-# https://recyclarr.dev/wiki/yaml/config-examples/#merge-single-instance                          #
+# Recyclarr Configuration: UHD Bluray + WEB (SQP-1 2160p)                                         #
+# v8 schema: guide-backed quality_profile via trash_id.                                           #
 ###################################################################################################
 
-# Instance Definition: https://recyclarr.dev/wiki/yaml/config-reference/basic/
 radarr:
   uhd-bluray-web:
     base_url: http://radarr-uhd.downloads.svc.cluster.local:80
@@ -20,13 +15,17 @@ radarr:
         rename: true
         standard: plex-imdb
 
-    include:
-      # SQP (Streaming Quality Profile) - like onedr0p
-      - template: radarr-quality-definition-sqp-streaming
-      - template: radarr-quality-profile-sqp-1-2160p-default
-      - template: radarr-custom-formats-sqp-1-2160p
+    # Old config used radarr-quality-definition-sqp-streaming; preserve that sizing.
+    quality_definition:
+      type: sqp-streaming
 
-    # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
+    quality_profiles:
+      # SQP-1 (2160p) — override [SQP] SQP-1 (2160p) guide name to preserve existing binding
+      - trash_id: 5128baeb2b081b72126bc8482b2a86a0
+        name: SQP-1 (2160p)
+        reset_unmatched_scores:
+          enabled: false
+
     custom_formats:
       # Audio
       - trash_ids:
@@ -58,7 +57,7 @@ radarr:
       # Unwanted (based on onedr0p's config)
       - trash_ids:
           - b6832f586342ef70d9c128d40c07b872 # Bad Dual Groups
-          # - 90cedc1fea7ea5d11298bebd3d1d3223 # EVO (no WEBDL)
+          # - 90cedc1fea7ea5d11298bebd3d1d3223 # EVO (no WEBDL) — retired upstream, see radarr.yaml notes
           - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup
           - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
           - 5c44f52a8714fdd79bb4d98e2673be1f # Retags
@@ -67,7 +66,6 @@ radarr:
           - name: SQP-1 (2160p)
 
       - trash_ids:
-          # Uncomment the next six lines to allow x265 HD releases with HDR/DV
           - dc98083864ea246d05a42df0d05f81cc # x265 (HD)
         assign_scores_to:
           - name: SQP-1 (2160p)
@@ -78,13 +76,16 @@ radarr:
           - name: SQP-1 (2160p)
             score: 20
 
+      # HDR / DV — upstream retired several boost CFs in v8; replacements noted below.
       - trash_ids:
           # Comment out the next line if you and all of your users' setups are fully DV compatible
-          - 923b6abef9b17f937fab56cfcf89e1f1 # DV (WEBDL)
+          - 923b6abef9b17f937fab56cfcf89e1f1 # DV (w/o HDR fallback)  (was "DV (WEBDL)" pre-v8)
 
-          # HDR10+ Boost - Uncomment the next line if any of your devices DO support HDR10+
-          - b17886cb4158d9fea189859409975758 # HDR10Plus Boost
-          - 55a5b50cb416dea5a50c4955896217ab # DV HDR10+ Boost
+          # HDR10+ Boost — trash_id renamed upstream
+          - caa37d0df9c348912df1fb1d88f9273a # HDR10+ Boost  (was b17886cb...)
+          # NOTE: The pre-v8 combined "DV HDR10+ Boost" (55a5b50c...) was retired upstream;
+          #       use the separate "DV Boost" if you want DV preference.
+          # - b337d6812e06c200ec9a2d3cfa9d20a7 # DV Boost
         assign_scores_to:
           - name: SQP-1 (2160p)
 

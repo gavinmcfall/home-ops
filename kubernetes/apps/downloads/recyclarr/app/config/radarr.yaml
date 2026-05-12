@@ -1,4 +1,10 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
+###################################################################################################
+# Recyclarr Configuration: Radarr (SQP-1 1080p + Anime)                                           #
+# v8 schema: guide-backed quality_profiles via trash_id.                                          #
+# Profile names overridden to preserve existing Radarr profile bindings.                          #
+###################################################################################################
+
 radarr:
   hd-bluray-web:
     base_url: http://radarr.downloads.svc.cluster.local:80
@@ -10,15 +16,20 @@ radarr:
         rename: true
         standard: plex-imdb
 
-    include:
-      # Movie Templates - SQP (Streaming Quality Profile)
-      - template: radarr-quality-definition-sqp-streaming
-      - template: radarr-quality-profile-sqp-1-1080p
-      - template: radarr-custom-formats-sqp-1-1080p
+    quality_definition:
+      type: sqp-streaming
 
-      # Anime Templates
-      - template: radarr-quality-profile-anime
-      - template: radarr-custom-formats-anime
+    quality_profiles:
+      # SQP-1 (1080p) — override [SQP] SQP-1 (1080p) guide name to preserve existing binding
+      - trash_id: 0896c29d74de619df168d23b98104b22
+        name: SQP-1 (1080p)
+        reset_unmatched_scores:
+          enabled: false
+      # Remux-1080p - Anime — override [Anime] Remux-1080p to preserve existing binding
+      - trash_id: 722b624f9af1e492284c4bc842153a38
+        name: Remux-1080p - Anime
+        reset_unmatched_scores:
+          enabled: false
 
     custom_formats:
       # Movie Custom Formats
@@ -29,9 +40,11 @@ radarr:
             # score: 0 # Uncomment this line to disable prioritised IMAX Enhanced releases
 
       # Unwanted (based on onedr0p's config)
+      # NOTE: "EVO (no WEBDL)" was renamed upstream to "LQ (Release Title)" (e204b80c...).
+      #       The previous trash_id (90cedc1f...) in this file was also malformed (27 chars).
       - trash_ids:
           - b6832f586342ef70d9c128d40c07b872 # Bad Dual Groups
-          - 90cedc1fea7ea5d11298bebd3d3223 # EVO (no WEBDL)
+          - e204b80c87be9497a8a6eaff48f72905 # LQ (Release Title)  (was malformed "EVO (no WEBDL)")
           - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup
           - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
           - 5c44f52a8714fdd79bb4d98e2673be1f # Retags

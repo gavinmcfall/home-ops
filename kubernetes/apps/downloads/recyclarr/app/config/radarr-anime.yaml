@@ -1,14 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
 ###################################################################################################
-# Recyclarr Configuration Template: Anime Radarr                                                  #
-# Updated: 2023-10-07                                                                             #
-# Documentation: https://recyclarr.dev                                                            #
-# Note: If you are using multiple profiles in a single instance, please read the following        #
-# documentation about file merging:                                                               #
-# https://recyclarr.dev/wiki/yaml/config-examples/#merge-single-instance                          #
+# Recyclarr Configuration: Anime Radarr (same Radarr instance as radarr.yaml)                     #
+# v8 schema: guide-backed quality_profile via trash_id.                                           #
 ###################################################################################################
 
-# Instance Definition: https://recyclarr.dev/wiki/yaml/config-reference/basic/
 radarr:
   anime-radarr:
     base_url: http://radarr.downloads.svc.cluster.local:80
@@ -20,18 +15,22 @@ radarr:
         rename: true
         standard: plex-imdb
 
-    include:
-      # Comment out any of the following includes to disable them
-      - template: radarr-quality-definition-movie
-      - template: radarr-quality-profile-anime
-      - template: radarr-custom-formats-anime
+    quality_definition:
+      type: anime
 
-    # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
+    quality_profiles:
+      # Remux-1080p - Anime — override [Anime] Remux-1080p to preserve existing binding
+      - trash_id: 722b624f9af1e492284c4bc842153a38
+        name: Remux-1080p - Anime
+        reset_unmatched_scores:
+          enabled: false
+
     custom_formats:
       # Unwanted (core filters for anime)
+      # NOTE: "EVO (no WEBDL)" was renamed upstream to "LQ (Release Title)" (e204b80c...).
       - trash_ids:
           - b6832f586342ef70d9c128d40c07b872 # Bad Dual Groups
-          - 90cedc1fea7ea5d11298bebd3d3223 # EVO (no WEBDL)
+          - e204b80c87be9497a8a6eaff48f72905 # LQ (Release Title)  (was malformed "EVO (no WEBDL)")
           - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup
           - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
           - 5c44f52a8714fdd79bb4d98e2673be1f # Retags
