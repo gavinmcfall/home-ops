@@ -30,7 +30,7 @@ spec:
                   echo "Connecting to repository as maintenance owner..."
                   kopia repository connect filesystem \
                     --path=/repository \
-                    --password="${KOPIA_PASSWORD}" \
+                    --password="$${KOPIA_PASSWORD}" \
                     --override-username=kopia \
                     --override-hostname=maintenance \
                     --cache-directory=/cache
@@ -59,6 +59,8 @@ spec:
                   readOnly: false
                 - name: cache
                   mountPath: /cache
+                - name: config
+                  mountPath: /config
                 - name: tmp
                   mountPath: /tmp
           volumes:
@@ -69,5 +71,7 @@ spec:
             - name: cache
               emptyDir:
                 sizeLimit: 2Gi
+            - name: config
+              emptyDir: {}
             - name: tmp
               emptyDir: {}
