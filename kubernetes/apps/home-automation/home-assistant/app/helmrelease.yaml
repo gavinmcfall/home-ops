@@ -44,36 +44,39 @@ spec:
               - /bin/sh
               - -c
             args:
+              # NOTE: shell vars escaped as $${VAR} so Flux postBuild.substitute
+              # leaves them for the shell. See commit 733e318db (kopia) for the
+              # same pattern.
               - |
                 set -eu
                 REPO="https://github.com/codyc1515/ha-contact-energy.git"
                 REF="16826d2b82efb294e33f48f70647d21f551b6bf1"
                 DEST="/config/custom_components/contact_energy"
-                MARKER="${DEST}/.pinned-sha"
+                MARKER="$${DEST}/.pinned-sha"
                 WORK="/tmp/ha-contact-energy"
 
-                if [ -f "${MARKER}" ] && [ "$(cat "${MARKER}")" = "${REF}" ] \
-                    && [ "${FORCE_UPDATE:-false}" != "true" ]; then
-                  echo "[init-contact-energy] Already pinned at ${REF} — skipping."
+                if [ -f "$${MARKER}" ] && [ "$(cat "$${MARKER}")" = "$${REF}" ] \
+                    && [ "$${FORCE_UPDATE:-false}" != "true" ]; then
+                  echo "[init-contact-energy] Already pinned at $${REF} — skipping."
                   exit 0
                 fi
 
-                echo "[init-contact-energy] Cloning ${REPO} @ ${REF}..."
-                rm -rf "${WORK}"
-                git clone --no-checkout --filter=blob:none "${REPO}" "${WORK}"
-                git -C "${WORK}" checkout "${REF}"
+                echo "[init-contact-energy] Cloning $${REPO} @ $${REF}..."
+                rm -rf "$${WORK}"
+                git clone --no-checkout --filter=blob:none "$${REPO}" "$${WORK}"
+                git -C "$${WORK}" checkout "$${REF}"
 
-                echo "[init-contact-energy] Installing to ${DEST}..."
+                echo "[init-contact-energy] Installing to $${DEST}..."
                 mkdir -p /config/custom_components
-                rm -rf "${DEST}"
-                cp -r "${WORK}/custom_components/contact_energy" "${DEST}"
-                printf '%s' "${REF}" > "${MARKER}"
+                rm -rf "$${DEST}"
+                cp -r "$${WORK}/custom_components/contact_energy" "$${DEST}"
+                printf '%s' "$${REF}" > "$${MARKER}"
 
                 echo "[init-contact-energy] Cleaning up..."
-                rm -rf "${WORK}"
+                rm -rf "$${WORK}"
 
                 echo "[init-contact-energy] Done. Installed files:"
-                ls -la "${DEST}"
+                ls -la "$${DEST}"
             env:
               FORCE_UPDATE: "false"
             securityContext:
