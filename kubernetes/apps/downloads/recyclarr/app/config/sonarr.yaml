@@ -1,15 +1,11 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
 ###################################################################################################
-# Recyclarr Configuration Template: WEB-1080p (V4)                                                #
-# Updated: 2023-12-30                                                                             #
-# Documentation: https://recyclarr.dev                                                            #
-# Note: If you are using multiple profiles in a single instance, please read the following        #
-# documentation about file merging:                                                               #
-# https://recyclarr.dev/wiki/yaml/config-examples/#merge-single-instance                          #
-# This config file is for use with Sonarr V4 only                                                 #
+# Recyclarr Configuration: WEB-1080p (V4) + Anime                                                 #
+# v8 schema: guide-backed quality_profiles via trash_id.                                          #
+# Profile names overridden to preserve existing bindings in Sonarr.                               #
 ###################################################################################################
 
-# Instance Definition: https://recyclarr.dev/wiki/yaml/config-reference/basic/
+# Instance Definition: https://recyclarr.dev/reference/configuration/basic/
 sonarr:
   web-1080p-v4:
     base_url: http://sonarr.downloads.svc.cluster.local:80
@@ -24,21 +20,21 @@ sonarr:
         daily: default
         anime: default
 
-    include:
-      # TV Templates
-      - template: sonarr-quality-definition-series
-      - template: sonarr-v4-quality-profile-web-1080p
-      - template: sonarr-v4-custom-formats-web-1080p
-      # Anime Templates
-      - template: sonarr-quality-definition-anime
-      - template: sonarr-v4-quality-profile-anime
-      - template: sonarr-v4-custom-formats-anime
+    quality_definition:
+      type: series
 
-    assign_scores_to:
-      - name: Remux-1080p - Anime
-        min_format_score: 3000 # Require English audio (Dual Audio or Dubs Only)
+    quality_profiles:
+      # WEB-1080p — guide name matches, no override needed
+      - trash_id: 72dae194fc92bf828f32cde7744e51a1
+        reset_unmatched_scores:
+          enabled: false
+      # Remux-1080p - Anime — override to preserve existing Sonarr profile name
+      - trash_id: 20e0fc959f1f1704bed501f23bdae76f
+        name: Remux-1080p - Anime
+        reset_unmatched_scores:
+          enabled: false
 
-    # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
+    # Custom Formats: https://recyclarr.dev/reference/configuration/custom-formats/
     custom_formats:
       # Unwanted (based on onedr0p's config)
       - trash_ids:
@@ -66,7 +62,7 @@ sonarr:
           - name: WEB-1080p
             score: 10
 
-      #Anime Custom Formats
+      # Anime Custom Formats
       - trash_ids:
           - 026d5aadd1a6b4e550b134cb6c72b3ca # Uncensored
         assign_scores_to:
