@@ -1,0 +1,134 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app postcraft
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    defaultPodOptions:
+      # TODO Session 10: remove imagePullSecrets after the public-flip flow runs
+      # (ghcr.io/gavinmcfall/postcraft becomes anonymously pullable).
+      imagePullSecrets:
+        - name: postcraft-ghcr-pull-secret
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    controllers:
+      postcraft:
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/postcraft
+              tag: v0.2.0-alpha.1@sha256:66e5802fb9b92bcaece94792d1d37aa4e246d0bbef4de63a9893f28b2cc3d349
+            env:
+              POSTCRAFT_TRANSPORT: http
+              POSTCRAFT_PORT: &port 8080
+              POSTCRAFT_PUBLIC_BASE_URL: "https://postcraft.${SECRET_DOMAIN}"
+              POSTCRAFT_DATA_DIR: /data
+              POSTCRAFT_LOG_LEVEL: info
+              POSTCRAFT_AUD_CHECK: client_id
+              POSTCRAFT_VERSION: v0.2.0-alpha.1
+            envFrom:
+              - secretRef:
+                  name: postcraft-env
+              - secretRef:
+                  name: postcraft-google-oauth-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /health, port: *port }
+                  initialDelaySeconds: 20
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /ready, port: *port }
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /health, port: *port }
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+    service:
+      app:
+        labels:
+          app.kubernetes.io/name: *app
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+        hostnames:
+          - "postcraft.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+        rules:
+          - matches:
+              - path: { type: PathPrefix, value: /mcp }
+              - path: { type: PathPrefix, value: /.well-known/oauth-protected-resource }
+            backendRefs:
+              - name: *app
+                port: *port
+    persistence:
+      data:
+        existingClaim: postcraft
+        globalMounts:
+          - path: /data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

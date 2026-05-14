@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/monitoring.coreos.com/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: postcraft
+  namespace: home-automation
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postcraft
+  namespaceSelector:
+    matchNames:
+      - home-automation
+  endpoints:
+    - port: http
+      path: /metrics
+      scheme: http
+      interval: 30s
+  targetLabels:
+    - app.kubernetes.io/name
