@@ -45,7 +45,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/postcraft
-              tag: v0.3.4-alpha.1@sha256:e93847a517272778d4ab825d0a3fd8637cff4a58a7e861e625cdbdaddd0d49a8
+              tag: v0.3.5-alpha.1@sha256:65e8ee34573a58751a099242bcf5c040a60785812c5acda6c8d4447136b1ee1e
             env:
               POSTCRAFT_TRANSPORT: http
               POSTCRAFT_PORT: &port 8080
@@ -53,7 +53,7 @@ spec:
               POSTCRAFT_DATA_DIR: /data
               POSTCRAFT_LOG_LEVEL: info
               POSTCRAFT_AUD_CHECK: client_id
-              POSTCRAFT_VERSION: v0.3.4-alpha.1
+              POSTCRAFT_VERSION: v0.3.5-alpha.1
             envFrom:
               - secretRef:
                   name: postcraft-env
