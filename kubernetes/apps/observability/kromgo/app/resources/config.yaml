@@ -445,3 +445,34 @@ metrics:
       - { color: "green", min: 0, max: 50 }
       - { color: "orange", min: 50, max: 80 }
       - { color: "red", min: 80, max: 9999 }
+
+  # ── Citadel (Dell R730 via iDRAC8 ipmi-exporter) ──
+  - name: node_power_citadel
+    # Real wattage from iDRAC8 via ipmi-exporter (Probe job="idrac",
+    # target=10.90.1.89). DCMI gives the canonical power-consumption reading;
+    # falls back to 0 if the exporter is down.
+    query: round(ipmi_dcmi_power_consumption_current_watts{host="citadel"}, 0) OR vector(0)
+    suffix: "w"
+
+  - name: citadel_temp_inlet_c
+    # Front-panel inlet ambient temperature — rack air temperature proxy.
+    query: round(max(ipmi_temperature_celsius{host="citadel",name=~"Inlet.*|Ambient.*"}), 1) OR vector(0)
+    suffix: "°C"
+    colors:
+      - { color: "green", min: 0, max: 30 }
+      - { color: "orange", min: 31, max: 40 }
+      - { color: "red", min: 41, max: 9999 }
+
+  - name: citadel_temp_exhaust_c
+    # Rear exhaust — shows how hard the cooling system is working.
+    query: round(max(ipmi_temperature_celsius{host="citadel",name=~"Exhaust.*"}), 1) OR vector(0)
+    suffix: "°C"
+
+  - name: citadel_fans_max_rpm
+    # Highest fan speed — proxy for thermal stress.
+    query: round(max(ipmi_fan_speed_rpm{host="citadel"})) OR vector(0)
+    suffix: " RPM"
+
+  - name: citadel_power_state
+    # 1 = powered on, 0 = off. Useful for dashboard "node is offline" badge.
+    query: max(ipmi_chassis_power_state{host="citadel"}) OR vector(0)

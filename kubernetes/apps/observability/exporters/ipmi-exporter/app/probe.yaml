@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+# Each target listed here triggers a scrape of:
+#   http://ipmi-exporter.observability.svc.cluster.local:9290/ipmi
+#     ?module=default&target=<ip>
+# The exporter authenticates to the target IPMI BMC using credentials from
+# the `default` module in the config (rendered by externalsecret.yaml from
+# 1Password item `citadel-idrac`).
+#
+# Metrics surfaced under job="idrac":
+#   ipmi_dcmi_power_consumption_current_watts — wattage
+#   ipmi_temperature_celsius{name=<sensor>}    — board, CPU, ambient, exhaust
+#   ipmi_fan_speed_rpm{name=<sensor>}          — per-fan RPMs
+#   ipmi_voltage_volts{name=<sensor>}          — rail voltages
+#   ipmi_current_amperes{name=<sensor>}        — PSU current draws
+#   ipmi_chassis_power_state                   — 1=on, 0=off
+#   ipmi_chassis_cooling_fault                 — 0=ok, 1=fault
+#   ipmi_chassis_drive_fault                   — 0=ok, 1=fault
+#   ipmi_bmc_info{firmware_revision=...}       — BMC firmware version (gauge=1)
+#   ipmi_up                                    — 1=successful scrape, 0=fail
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: idrac
+  labels:
+    app.kubernetes.io/name: ipmi-exporter
+spec:
+  jobName: idrac
+  module: default
+  interval: 60s
+  scrapeTimeout: 30s
+  prober:
+    url: ipmi-exporter.observability.svc.cluster.local:9290
+    path: /ipmi
+  targets:
+    staticConfig:
+      static:
+        - 10.90.1.89    # citadel (Dell R730 iDRAC8)
+      labels:
+        host: citadel

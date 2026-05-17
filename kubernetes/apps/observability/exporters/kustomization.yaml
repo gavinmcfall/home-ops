@@ -8,6 +8,7 @@ resources:
   - ./exportarr-sonarr/ks.yaml
   - ./graphite-exporter/ks.yaml
   - ./intel-gpu-exporter/ks.yaml
+  - ./ipmi-exporter/ks.yaml
   - ./jetkvm-power/ks.yaml
   - ./mariadb-exporter/ks.yaml
   - ./nut-exporter/ks.yaml

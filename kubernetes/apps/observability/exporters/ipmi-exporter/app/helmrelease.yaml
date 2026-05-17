@@ -1,0 +1,88 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app ipmi-exporter
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: kube-prometheus-stack
+      namespace: observability
+  values:
+    # Runs in "remote" mode — single Deployment that scrapes BMCs over the
+    # network. The Probe CRD in probe.yaml injects the target IP via
+    # ?target=<ip>&module=<name> query params at scrape time.
+    #
+    # ipmitool / freeipmi are bundled in the image. Image runs as root by
+    # default but doesn't need to — set runAsNonRoot for hygiene.
+    controllers:
+      *app:
+        strategy: RollingUpdate
+        containers:
+          app:
+            image:
+              repository: quay.io/prometheuscommunity/ipmi-exporter
+              tag: v1.10.1@sha256:0662cadaf268b6718f0f66429047cb23566ab3e4c175f25eaf588416a7b035e8
+            args:
+              - --config.file=/etc/ipmi_exporter/ipmi.yml
+              - --web.listen-address=:9290
+            ports:
+              - name: metrics
+                containerPort: 9290
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+              limits:
+                memory: 128Mi
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 9290
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 9290
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+    service:
+      app:
+        controller: *app
+        ports:
+          metrics:
+            port: 9290
+            targetPort: metrics
+    persistence:
+      config:
+        type: secret
+        name: ipmi-exporter-config
+        globalMounts:
+          - path: /etc/ipmi_exporter/ipmi.yml
+            subPath: ipmi.yml
+            readOnly: true
