@@ -40,7 +40,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/mempalace
-              tag: http-transport@sha256:53b56e8c4b54486e9bdce23a3a35606722abd0f1a01378127215eeee027c9fbd
+              tag: http-transport@sha256:6622f057a1624ebf4f504b329a667b6665e4c158ddd62f11300c3ae2fc362eac
             args:
               - --serve-http
               - --host=0.0.0.0
