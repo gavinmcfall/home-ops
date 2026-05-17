@@ -23,6 +23,11 @@ spec:
       retries: 3
   values:
     fullnameOverride: promtail
+    tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
     config:
       clients:
         - url: http://loki-headless.observability.svc.cluster.local:3100/loki/api/v1/push
