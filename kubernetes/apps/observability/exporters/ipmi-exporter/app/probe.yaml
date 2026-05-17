@@ -8,7 +8,7 @@
 # 1Password item `citadel-idrac`).
 #
 # Metrics surfaced under job="idrac":
-#   ipmi_dcmi_power_consumption_current_watts — wattage
+#   ipmi_dcmi_power_consumption_watts          — wattage (live ~178W on Citadel R730)
 #   ipmi_temperature_celsius{name=<sensor>}    — board, CPU, ambient, exhaust
 #   ipmi_fan_speed_rpm{name=<sensor>}          — per-fan RPMs
 #   ipmi_voltage_volts{name=<sensor>}          — rail voltages
