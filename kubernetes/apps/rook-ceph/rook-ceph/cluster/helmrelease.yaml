@@ -32,7 +32,12 @@ spec:
       createPrometheusRules: true
     toolbox:
       enabled: true
-    configOverride: |
+    # |+ keep-all-trailing-newlines is REQUIRED here. Flux's kustomize
+    # silently strips trailing blank lines from `|` literal blocks, and
+    # Ceph mon init-mon-fs then fails with "parse error: expected
+    # '<empty_line>' in line 10 at position 21". The `+` chomp preserves
+    # the blank line through serialization. Incident: 2026-05-17.
+    configOverride: |+
       [global]
       bdev_enable_discard = true
       bdev_async_discard = true
