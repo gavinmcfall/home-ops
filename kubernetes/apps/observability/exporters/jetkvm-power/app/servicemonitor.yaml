@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: jetkvm-power
+  labels:
+    app.kubernetes.io/name: jetkvm-power
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jetkvm-power
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      scheme: http
+      relabelings:
+        # Map each JetKVM IP back to its host node, so the metrics are
+        # queryable as jetkvm_dc_power_watts{node="stanton-0X"} in kromgo.
+        - sourceLabels: [__address__]
+          regex: '10\.90\.108\.101:.*'
+          targetLabel: node
+          replacement: stanton-01
+          action: replace
+        - sourceLabels: [__address__]
+          regex: '10\.90\.108\.102:.*'
+          targetLabel: node
+          replacement: stanton-02
+          action: replace
+        - sourceLabels: [__address__]
+          regex: '10\.90\.108\.103:.*'
+          targetLabel: node
+          replacement: stanton-03
+          action: replace
+      metricRelabelings:
+        # Only keep the DC-extension power metrics — drop the JetKVM
+        # internal/go/timesync metrics we don't care about.
+        - sourceLabels: [__name__]
+          regex: 'jetkvm_dc_.*'
+          action: keep

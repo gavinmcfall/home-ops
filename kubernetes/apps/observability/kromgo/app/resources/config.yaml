@@ -337,25 +337,42 @@ metrics:
     query: round(sum(nvidia_smi_memory_free_bytes) / 1024 / 1024) OR vector(0)
     suffix: " MiB"
 
-  # ── Per-node power estimate ──
-  # No IPMI/BMC on the Minisforum MS-01 (Venus Series, board AHWSA), no
-  # smart PDU. UPS only reports aggregate output power. Derived per-node
-  # estimate = total cluster power × node CPU utilisation share. Treats CPU
-  # as a proxy for whole-node draw; rough but useful for relative comparison.
+  # ── Per-node power ──
+  # Each stanton has a JetKVM with a DC Power Control extension inline
+  # between the wall adapter and the MS-01's barrel jack. The extension's
+  # INA219 sensor publishes wall-to-host watts as `jetkvm_dc_power_watts`
+  # at http://<jetkvm-ip>/metrics (no auth).
+  #
+  # The OR chain falls back to the CPU-weighted UPS estimate if a JetKVM
+  # is offline or has no DC extension attached:
+  #   est = total_ups_watts × node_cpu_share
+  #
+  # pyro-01 is a desktop PC (no inline DC adapter applicable) so it stays
+  # on the estimate-only path. No IPMI/BMC on MS-01 (board AHWSA), no
+  # smart PDU. AMT vPro is available but doesn't expose power sensors on
+  # this firmware — see docs/infrastructure-roadmap/amt-enablement.md.
   - name: node_power_est_stanton01
-    query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.101:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    query: |
+      round(jetkvm_dc_power_watts{node="stanton-01"}, 1)
+        OR round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.101:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1)
+        OR vector(0)
     suffix: "w"
 
   - name: node_power_est_stanton02
-    query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.102:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    query: |
+      round(jetkvm_dc_power_watts{node="stanton-02"}, 1)
+        OR round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.102:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1)
+        OR vector(0)
     suffix: "w"
 
   - name: node_power_est_stanton03
-    query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.103:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    query: |
+      round(jetkvm_dc_power_watts{node="stanton-03"}, 1)
+        OR round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.103:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1)
+        OR vector(0)
     suffix: "w"
 
   - name: node_power_est_pyro01
-    # Needs node-exporter on pyro-01 (added 2026-05-17 via tolerations).
-    # Will return 0 until next KPS reconcile populates the recording rule.
+    # Desktop PC — no inline DC adapter possible. CPU-weighted estimate only.
     query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.111:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
     suffix: "w"

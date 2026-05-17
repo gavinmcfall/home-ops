@@ -1,0 +1,23 @@
+---
+# Manual endpoints pointing at the 3 stanton JetKVMs.
+# The endpoint name must match the Service name (`jetkvm-power`).
+# The `node` label is injected via ServiceMonitor relabelings so each
+# scraped target ends up labelled with the stanton it belongs to.
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: jetkvm-power
+  labels:
+    app.kubernetes.io/name: jetkvm-power
+subsets:
+  - addresses:
+      - ip: 10.90.108.101
+        hostname: stanton-01-kvm
+      - ip: 10.90.108.102
+        hostname: stanton-02-kvm
+      - ip: 10.90.108.103
+        hostname: stanton-03-kvm
+    ports:
+      - name: metrics
+        port: 80
+        protocol: TCP

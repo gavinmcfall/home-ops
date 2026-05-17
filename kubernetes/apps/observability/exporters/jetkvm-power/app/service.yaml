@@ -1,0 +1,31 @@
+---
+# Headless service with no selector — endpoints are wired manually in
+# endpoints.yaml to point at the 3 JetKVM devices on the management
+# VLAN (10.90.108.0/24). Each JetKVM publishes Prometheus metrics on
+# port 80 at /metrics with no authentication (verified 2026-05-17 by
+# reading web.go in jetkvm/kvm — /metrics is registered at the root
+# router, sibling to the basicAuth-protected developer routes).
+#
+# The DC Power Control extension publishes:
+#   jetkvm_dc_power_watts       INA219-measured wall-to-host watts
+#   jetkvm_dc_current_amperes
+#   jetkvm_dc_voltage_volts
+#   jetkvm_dc_power_state       1=on, 0=off
+#
+# pyro-01 is a desktop PC (no inline DC adapter applicable) so its
+# JetKVM does not contribute power metrics — its node_power_est_pyro01
+# query in kromgo keeps using the CPU-weighted UPS estimate fallback.
+apiVersion: v1
+kind: Service
+metadata:
+  name: jetkvm-power
+  labels:
+    app.kubernetes.io/name: jetkvm-power
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: metrics
+      port: 80
+      targetPort: 80
+      protocol: TCP
