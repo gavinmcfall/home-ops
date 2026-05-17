@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: docker.io/qdrant/qdrant
-              tag: v1.17.1@sha256:94728574965d17c6485dd361aa3c0818b325b9016dac5ea6afec7b4b2700865f
+              tag: v1.18.0@sha256:b3063c673f3973877c038eeecc392bad5011f072ee7892b56c9a8e204a3bdea9
             envFrom:
               - secretRef:
                   name: qdrant-secret
