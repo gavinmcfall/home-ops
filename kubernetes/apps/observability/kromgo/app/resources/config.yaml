@@ -451,7 +451,7 @@ metrics:
     # Real wattage from iDRAC8 via ipmi-exporter (Probe job="idrac",
     # target=10.90.1.89). DCMI gives the canonical power-consumption reading;
     # falls back to 0 if the exporter is down.
-    query: round(ipmi_dcmi_power_consumption_watts{host="citadel"}, 0) OR vector(0)
+    query: round(ipmi_dcmi_power_consumption_watts{host="citadel"}) OR vector(0)
     suffix: "w"
 
   - name: citadel_temp_inlet_c
