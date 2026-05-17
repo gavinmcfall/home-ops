@@ -7,6 +7,6 @@ subsets:
   - addresses:
       - ip: "${SECRET_TRUENAS_IP}"
     ports:
-      - name: https
-        port: 443
+      - name: http
+        port: 80
         protocol: TCP
