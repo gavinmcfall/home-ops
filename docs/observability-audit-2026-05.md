@@ -38,11 +38,13 @@
 
 ### Commit 2 — `feat(observability): deploy dcgm-exporter for pyro-01 GPU metrics` (REVERTED)
 
-Deployed but immediately reverted in commit 5 — the GTX 1080 Ti is consumer Pascal and DCGM returns `DCGM_ST_NOT_SUPPORTED (result=11)` even after NVML succeeds. DCGM officially supports datacenter SKUs from Tesla P100 / Volta onwards. Pod CrashLoopBackOff with `ERROR: init 250 result=11` after every restart.
+Deployed but reverted in commit 5. Pod CrashLoopBackOff — initial misdiagnosis was DCGM/Pascal incompatibility (the container stderr shows `ERROR: init 250 result=11` which I read as `DCGM_ST_NOT_SUPPORTED`), but `kubectl describe` of the dead container showed `Reason: OOMKilled, Exit Code: 137`. The 256Mi limit set in the HelmRelease was simply too tight — DCGM's hostengine wants ~500 MiB to initialise. The `init 250 result=11` text is actually a non-fatal startup-script warning that appears before the proper logger initialises on every restart; it's emitted from a previous failed run's stderr captured between restart attempts.
 
-### Commit 5 — `feat(observability): swap dcgm-exporter → nvidia-gpu-exporter (NVML-based, consumer-Pascal friendly)`
+User decision (2026-05-17): keep the swap to nvidia-gpu-exporter rather than retry dcgm-exporter at 1Gi. nvidia-gpu-exporter idles at ~30 MiB and surfaces every metric the dashboard needs for a single consumer card.
 
-Replaces the failed dcgm-exporter with `utkuozdemir/nvidia_gpu_exporter` (NVML wrapper around `nvidia-smi`):
+### Commit 5 — `feat(observability): swap dcgm-exporter → nvidia-gpu-exporter (NVML-based, lighter footprint)`
+
+Replaces the OOM-looping dcgm-exporter with `utkuozdemir/nvidia_gpu_exporter` (NVML wrapper around `nvidia-smi`):
 
 - Deleted: `dcgm-exporter/` HelmRelease + `nvidia-dcgm` HelmRepository.
 - Added: `kubernetes/apps/observability/exporters/nvidia-gpu-exporter/` using the bjw-s `app-template` chart 4.4.0 (no extra HelmRepository needed).

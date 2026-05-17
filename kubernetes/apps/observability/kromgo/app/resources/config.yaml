@@ -204,7 +204,7 @@ metrics:
 
   # ─────────────────────────────────────────────────────────────────────
   # nerdz.cloud — observability audit 2026-05 additions
-  # Depends on expanded kube-state-metrics collectors and dcgm-exporter
+  # Depends on expanded kube-state-metrics collectors and nvidia-gpu-exporter
   # ─────────────────────────────────────────────────────────────────────
 
   # ── Storage (Tier 4) ──
@@ -343,19 +343,19 @@ metrics:
   # estimate = total cluster power × node CPU utilisation share. Treats CPU
   # as a proxy for whole-node draw; rough but useful for relative comparison.
   - name: node_power_est_stanton01
-    query: round(sum(network_ups_tools_ups_realpower) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.101:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.101:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
     suffix: "w"
 
   - name: node_power_est_stanton02
-    query: round(sum(network_ups_tools_ups_realpower) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.102:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.102:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
     suffix: "w"
 
   - name: node_power_est_stanton03
-    query: round(sum(network_ups_tools_ups_realpower) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.103:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.103:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
     suffix: "w"
 
   - name: node_power_est_pyro01
     # Needs node-exporter on pyro-01 (added 2026-05-17 via tolerations).
     # Will return 0 until next KPS reconcile populates the recording rule.
-    query: round(sum(network_ups_tools_ups_realpower) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.111:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.111:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
     suffix: "w"
