@@ -23,4 +23,4 @@ spec:
             value: /
       backendRefs:
         - name: truenas
-          port: 443
+          port: 80
