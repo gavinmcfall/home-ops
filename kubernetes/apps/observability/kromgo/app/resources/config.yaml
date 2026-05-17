@@ -151,8 +151,10 @@ metrics:
       - { color: "red", min: 101, max: 9999 }
 
   # ── Internet ──
+  # Speedtest scrapes hourly; instant queries miss the 5m staleness window,
+  # so wrap each metric in last_over_time to surface the most recent run.
   - name: speedtest_download_mbps
-    query: round(speedtest_download_bits_per_second / 1000000, 1)
+    query: round(last_over_time(speedtest_download_bits_per_second[2h]) / 1000000, 1)
     suffix: " Mbps"
     colors:
       - { color: "green", min: 100, max: 9999 }
@@ -160,7 +162,7 @@ metrics:
       - { color: "red", min: 0, max: 24 }
 
   - name: speedtest_upload_mbps
-    query: round(speedtest_upload_bits_per_second / 1000000, 1)
+    query: round(last_over_time(speedtest_upload_bits_per_second[2h]) / 1000000, 1)
     suffix: " Mbps"
     colors:
       - { color: "green", min: 25, max: 9999 }
@@ -168,7 +170,7 @@ metrics:
       - { color: "red", min: 0, max: 9 }
 
   - name: speedtest_ping_ms
-    query: round(speedtest_ping_latency_milliseconds, 1)
+    query: round(last_over_time(speedtest_ping_latency_milliseconds[2h]), 1)
     suffix: " ms"
     colors:
       - { color: "green", min: 0, max: 30 }
@@ -199,3 +201,159 @@ metrics:
       - { color: "green", min: 20, max: 9999 }
       - { color: "orange", min: 5, max: 19 }
       - { color: "red", min: 0, max: 4 }
+
+  # ─────────────────────────────────────────────────────────────────────
+  # nerdz.cloud — observability audit 2026-05 additions
+  # Depends on expanded kube-state-metrics collectors and dcgm-exporter
+  # ─────────────────────────────────────────────────────────────────────
+
+  # ── Storage (Tier 4) ──
+  - name: cluster_pvc_bound
+    query: sum(kube_persistentvolumeclaim_status_phase{phase="Bound"}) OR vector(0)
+
+  - name: cluster_pvc_pending
+    query: sum(kube_persistentvolumeclaim_status_phase{phase="Pending"}) OR vector(0)
+    colors:
+      - { color: "green", min: 0, max: 0 }
+      - { color: "orange", min: 1, max: 5 }
+      - { color: "red", min: 6, max: 9999 }
+
+  - name: cluster_pvc_lost
+    query: sum(kube_persistentvolumeclaim_status_phase{phase="Lost"}) OR vector(0)
+    colors:
+      - { color: "green", min: 0, max: 0 }
+      - { color: "red", min: 1, max: 9999 }
+
+  - name: cluster_pv_count
+    query: count(kube_persistentvolume_info) OR vector(0)
+
+  - name: cluster_storageclass_count
+    query: count(kube_storageclass_info) OR vector(0)
+
+  # ── Workloads (Tier 3 — enabled by new KSM collectors) ──
+  - name: cluster_statefulsets_ready
+    query: sum(kube_statefulset_status_replicas_ready) OR vector(0)
+
+  - name: cluster_statefulsets_desired
+    query: sum(kube_statefulset_replicas) OR vector(0)
+
+  - name: cluster_daemonsets_ready
+    query: sum(kube_daemonset_status_number_ready) OR vector(0)
+
+  - name: cluster_daemonsets_desired
+    query: sum(kube_daemonset_status_desired_number_scheduled) OR vector(0)
+
+  - name: cluster_jobs_running
+    query: sum(kube_job_status_active) OR vector(0)
+
+  - name: cluster_jobs_failed
+    query: sum(kube_job_failed{condition="true"}) OR vector(0)
+    colors:
+      - { color: "green", min: 0, max: 0 }
+      - { color: "orange", min: 1, max: 5 }
+      - { color: "red", min: 6, max: 9999 }
+
+  - name: cluster_cronjobs_count
+    query: count(kube_cronjob_info) OR vector(0)
+
+  - name: cluster_services_count
+    query: count(kube_service_info) OR vector(0)
+
+  - name: cluster_namespaces_count
+    query: count(kube_namespace_created) OR vector(0)
+
+  # ── GitOps health (Tier 5) ──
+  # gotk_resource_info is published by kube-state-metrics' customResourceState
+  # collector. Includes a `ready=True|False|Unknown` label per resource.
+  - name: flux_helmreleases_ready
+    query: count(gotk_resource_info{customresource_kind="HelmRelease",ready="True"}) OR vector(0)
+
+  - name: flux_helmreleases_total
+    query: count(gotk_resource_info{customresource_kind="HelmRelease"}) OR vector(0)
+
+  - name: flux_helmreleases_failing
+    query: count(gotk_resource_info{customresource_kind="HelmRelease",ready="False"}) OR vector(0)
+    colors:
+      - { color: "green", min: 0, max: 0 }
+      - { color: "orange", min: 1, max: 2 }
+      - { color: "red", min: 3, max: 9999 }
+
+  - name: flux_kustomizations_ready
+    query: count(gotk_resource_info{customresource_kind="Kustomization",ready="True"}) OR vector(0)
+
+  - name: flux_kustomizations_total
+    query: count(gotk_resource_info{customresource_kind="Kustomization"}) OR vector(0)
+
+  - name: flux_kustomizations_failing
+    query: count(gotk_resource_info{customresource_kind="Kustomization",ready="False"}) OR vector(0)
+    colors:
+      - { color: "green", min: 0, max: 0 }
+      - { color: "orange", min: 1, max: 2 }
+      - { color: "red", min: 3, max: 9999 }
+
+  # ── Intel iGPU (stantons) ──
+  # The intel-device-plugin-exporter publishes igpu_* metrics. Package power
+  # is whole-die (CPU+iGPU) so this is a useful "are the stantons busy" gauge.
+  - name: intel_igpu_package_power_avg
+    query: round(avg(igpu_power_package), 1)
+    suffix: "w"
+
+  - name: intel_igpu_package_power_total
+    query: round(sum(igpu_power_package), 1)
+    suffix: "w"
+
+  - name: intel_igpu_video_busy_max
+    # Highest sustained video-engine utilisation across all stantons — proxy
+    # for "is Plex transcoding" since intel iGPU video engines drive QSV.
+    query: round(max(igpu_engines_video_0_busy), 1)
+    suffix: "%"
+
+  # ── NVIDIA GPU (pyro-01, via dcgm-exporter) ──
+  # All wrapped in OR vector(0) so the dashboard stays green if dcgm pods
+  # restart or the GPU is genuinely idle (1080 Ti reports 0W idle).
+  - name: nvidia_gpu_temp_c
+    query: max(DCGM_FI_DEV_GPU_TEMP) OR vector(0)
+    suffix: "°C"
+    colors:
+      - { color: "green", min: 0, max: 70 }
+      - { color: "orange", min: 71, max: 83 }
+      - { color: "red", min: 84, max: 9999 }
+
+  - name: nvidia_gpu_util_pct
+    query: max(DCGM_FI_DEV_GPU_UTIL) OR vector(0)
+    suffix: "%"
+
+  - name: nvidia_gpu_power_watts
+    query: round(sum(DCGM_FI_DEV_POWER_USAGE), 1) OR vector(0)
+    suffix: "w"
+
+  - name: nvidia_gpu_mem_used_mb
+    query: round(sum(DCGM_FI_DEV_FB_USED)) OR vector(0)
+    suffix: " MiB"
+
+  - name: nvidia_gpu_mem_free_mb
+    query: round(sum(DCGM_FI_DEV_FB_FREE)) OR vector(0)
+    suffix: " MiB"
+
+  # ── Per-node power estimate ──
+  # No IPMI/BMC on the Minisforum MS-01 (Venus Series, board AHWSA), no
+  # smart PDU. UPS only reports aggregate output power. Derived per-node
+  # estimate = total cluster power × node CPU utilisation share. Treats CPU
+  # as a proxy for whole-node draw; rough but useful for relative comparison.
+  - name: node_power_est_stanton01
+    query: round(sum(network_ups_tools_ups_realpower) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.101:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    suffix: "w"
+
+  - name: node_power_est_stanton02
+    query: round(sum(network_ups_tools_ups_realpower) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.102:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    suffix: "w"
+
+  - name: node_power_est_stanton03
+    query: round(sum(network_ups_tools_ups_realpower) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.103:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    suffix: "w"
+
+  - name: node_power_est_pyro01
+    # Needs node-exporter on pyro-01 (added 2026-05-17 via tolerations).
+    # Will return 0 until next KPS reconcile populates the recording rule.
+    query: round(sum(network_ups_tools_ups_realpower) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.111:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
+    suffix: "w"
