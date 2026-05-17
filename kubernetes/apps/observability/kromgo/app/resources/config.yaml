@@ -70,3 +70,132 @@ metrics:
       - { color: "green", min: 0, max: 0 }
       - { color: "orange", min: 1, max: 5 }
       - { color: "red", min: 6, max: 9999 }
+
+  # ─────────────────────────────────────────────────────────────────────
+  # nerdz.cloud — additions for hub + /cluster page
+  # ─────────────────────────────────────────────────────────────────────
+
+  # ── Health & topology ──
+  - name: cluster_health_ready
+    query: count(kube_node_status_condition{condition="Ready",status="true"} == 1)
+    colors:
+      - { color: "green", min: 4, max: 9999 }
+      - { color: "orange", min: 1, max: 3 }
+      - { color: "red", min: 0, max: 0 }
+
+  - name: cluster_health_total
+    query: count(kube_node_info)
+
+  - name: cluster_temp_avg
+    # Average across CPU coretemp + PCH + NVMe sensors — biased toward "is the rack hot"
+    query: round(avg(node_hwmon_temp_celsius{chip=~"coretemp.*|.*pch.*|.*nvme.*"}), 1)
+    suffix: "°C"
+    colors:
+      - { color: "green", min: 0, max: 60 }
+      - { color: "orange", min: 60, max: 75 }
+      - { color: "red", min: 75, max: 9999 }
+
+  - name: cluster_uptime_seconds
+    # Avg node uptime in seconds — page formats to "Nd HH:MM:SS"
+    query: round(avg(node_time_seconds - node_boot_time_seconds))
+
+  # ── Workloads ──
+  - name: cluster_pods_pending
+    query: sum(kube_pod_status_phase{phase="Pending"}) OR vector(0)
+    colors:
+      - { color: "green", min: 0, max: 0 }
+      - { color: "orange", min: 1, max: 5 }
+      - { color: "red", min: 6, max: 9999 }
+
+  - name: cluster_pods_failed
+    query: sum(kube_pod_status_phase{phase="Failed"}) OR vector(0)
+    colors:
+      - { color: "green", min: 0, max: 0 }
+      - { color: "orange", min: 1, max: 2 }
+      - { color: "red", min: 3, max: 9999 }
+
+  - name: cluster_deployments_ready
+    query: sum(kube_deployment_status_replicas_ready)
+
+  - name: cluster_deployments_desired
+    query: sum(kube_deployment_spec_replicas)
+
+  # ── Media library (Plex / Tautulli) ──
+  - name: plex_library_total
+    query: sum(plex_library_items)
+
+  - name: plex_library_movies
+    query: sum(plex_media_movies)
+
+  - name: plex_library_episodes
+    query: sum(plex_media_episodes)
+
+  - name: plex_active_streams
+    query: tautulli_stream_count OR vector(0)
+
+  - name: plex_active_transcodes
+    query: tautulli_stream_count_transcode OR vector(0)
+
+  # ── Arr stack ──
+  - name: radarr_movies_monitored
+    query: sum(radarr_movie_monitored_total)
+
+  - name: sonarr_episodes_total
+    query: sum(sonarr_episode_total)
+
+  - name: sonarr_episodes_missing
+    query: sum(sonarr_episode_missing_total)
+    colors:
+      - { color: "green", min: 0, max: 10 }
+      - { color: "orange", min: 11, max: 100 }
+      - { color: "red", min: 101, max: 9999 }
+
+  # ── Internet ──
+  - name: speedtest_download_mbps
+    query: round(speedtest_download_bits_per_second / 1000000, 1)
+    suffix: " Mbps"
+    colors:
+      - { color: "green", min: 100, max: 9999 }
+      - { color: "orange", min: 25, max: 99 }
+      - { color: "red", min: 0, max: 24 }
+
+  - name: speedtest_upload_mbps
+    query: round(speedtest_upload_bits_per_second / 1000000, 1)
+    suffix: " Mbps"
+    colors:
+      - { color: "green", min: 25, max: 9999 }
+      - { color: "orange", min: 10, max: 24 }
+      - { color: "red", min: 0, max: 9 }
+
+  - name: speedtest_ping_ms
+    query: round(speedtest_ping_latency_milliseconds, 1)
+    suffix: " ms"
+    colors:
+      - { color: "green", min: 0, max: 30 }
+      - { color: "orange", min: 31, max: 80 }
+      - { color: "red", min: 81, max: 9999 }
+
+  # ── Storage health ──
+  - name: smart_disks_failing
+    query: count(smartctl_device_smart_status == 0) OR vector(0)
+    colors:
+      - { color: "green", min: 0, max: 0 }
+      - { color: "orange", min: 1, max: 1 }
+      - { color: "red", min: 2, max: 9999 }
+
+  # ── UPS depth (beyond existing cluster_power_usage) ──
+  - name: ups_battery_charge_pct
+    query: avg(network_ups_tools_battery_charge)
+    suffix: "%"
+    colors:
+      - { color: "green", min: 90, max: 100 }
+      - { color: "orange", min: 50, max: 89 }
+      - { color: "red", min: 0, max: 49 }
+
+  - name: ups_battery_runtime_minutes
+    query: round(min(network_ups_tools_battery_runtime) / 60)
+    suffix: " min"
+    colors:
+      - { color: "green", min: 20, max: 9999 }
+      - { color: "orange", min: 5, max: 19 }
+      - { color: "red", min: 0, max: 4 }
