@@ -308,11 +308,13 @@ metrics:
     query: round(max(igpu_engines_video_0_busy), 1)
     suffix: "%"
 
-  # ── NVIDIA GPU (pyro-01, via dcgm-exporter) ──
-  # All wrapped in OR vector(0) so the dashboard stays green if dcgm pods
-  # restart or the GPU is genuinely idle (1080 Ti reports 0W idle).
+  # ── NVIDIA GPU (pyro-01, via utkuozdemir/nvidia_gpu_exporter) ──
+  # NVML-based — dcgm-exporter was tried first but DCGM doesn't support
+  # consumer Pascal cards (GTX 1080 Ti). Each query wraps OR vector(0)
+  # so the dashboard stays green if the exporter pod restarts or the GPU
+  # is genuinely idle (1080 Ti reports near-0W idle).
   - name: nvidia_gpu_temp_c
-    query: max(DCGM_FI_DEV_GPU_TEMP) OR vector(0)
+    query: max(nvidia_smi_temperature_gpu) OR vector(0)
     suffix: "°C"
     colors:
       - { color: "green", min: 0, max: 70 }
@@ -320,19 +322,19 @@ metrics:
       - { color: "red", min: 84, max: 9999 }
 
   - name: nvidia_gpu_util_pct
-    query: max(DCGM_FI_DEV_GPU_UTIL) OR vector(0)
+    query: round(max(nvidia_smi_utilization_gpu_ratio) * 100) OR vector(0)
     suffix: "%"
 
   - name: nvidia_gpu_power_watts
-    query: round(sum(DCGM_FI_DEV_POWER_USAGE), 1) OR vector(0)
+    query: round(sum(nvidia_smi_power_draw_watts), 1) OR vector(0)
     suffix: "w"
 
   - name: nvidia_gpu_mem_used_mb
-    query: round(sum(DCGM_FI_DEV_FB_USED)) OR vector(0)
+    query: round(sum(nvidia_smi_memory_used_bytes) / 1024 / 1024) OR vector(0)
     suffix: " MiB"
 
   - name: nvidia_gpu_mem_free_mb
-    query: round(sum(DCGM_FI_DEV_FB_FREE)) OR vector(0)
+    query: round(sum(nvidia_smi_memory_free_bytes) / 1024 / 1024) OR vector(0)
     suffix: " MiB"
 
   # ── Per-node power estimate ──

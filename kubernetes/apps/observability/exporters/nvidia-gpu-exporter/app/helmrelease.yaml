@@ -1,0 +1,89 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app nvidia-gpu-exporter
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    # NVML-based exporter (wraps nvidia-smi). dcgm-exporter was tried first
+    # but DCGM returns "not supported" (ST_NOT_SUPPORTED, result=11) on
+    # consumer Pascal cards like the GTX 1080 Ti — DCGM only fully supports
+    # datacenter SKUs from Tesla P100 / Volta onwards.
+    controllers:
+      *app:
+        type: daemonset
+        strategy: RollingUpdate
+        pod:
+          runtimeClassName: nvidia
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: nvidia.com/gpu
+                        operator: In
+                        values: ["true"]
+          tolerations:
+            - key: nvidia.com/gpu
+              operator: Exists
+              effect: NoExecute
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
+        containers:
+          app:
+            image:
+              repository: ghcr.io/utkuozdemir/nvidia_gpu_exporter
+              tag: 1.4.1@sha256:309a0e91c5f4e8f004989f004e0e764264d4433fba914a9ec8c6e0b581620ba1
+            args:
+              - --web.listen-address=:9835
+              - --web.telemetry-path=/metrics
+            env:
+              NVIDIA_VISIBLE_DEVICES: all
+              NVIDIA_DRIVER_CAPABILITIES: utility
+            ports:
+              - name: metrics
+                containerPort: 9835
+            resources:
+              requests:
+                cpu: 25m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+    service:
+      app:
+        controller: *app
+        ports:
+          metrics:
+            port: 9835
+            targetPort: metrics
+    serviceMonitor:
+      app:
+        serviceName: *app
+        endpoints:
+          - port: metrics
+            scheme: http
+            path: /metrics
+            interval: 30s
+            scrapeTimeout: 10s
+            relabelings:
+              - sourceLabels: [__meta_kubernetes_pod_node_name]
+                targetLabel: node

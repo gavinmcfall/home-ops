@@ -36,15 +36,21 @@
 - KSM collectors expanded from 3 → 17: added `persistentvolumeclaims`, `persistentvolumes`, `statefulsets`, `daemonsets`, `replicasets`, `services`, `endpoints`, `namespaces`, `jobs`, `cronjobs`, `ingresses`, `storageclasses`, `horizontalpodautoscalers`, `poddisruptionbudgets`.
 - `prometheus-node-exporter.tolerations` set to `Exists` on both `NoSchedule` and `NoExecute` so the DaemonSet schedules onto pyro-01.
 
-### Commit 2 — `feat(observability): deploy dcgm-exporter for pyro-01 GPU metrics`
+### Commit 2 — `feat(observability): deploy dcgm-exporter for pyro-01 GPU metrics` (REVERTED)
 
-- New HelmRepository `nvidia-dcgm` → `https://nvidia.github.io/dcgm-exporter/helm-charts` (wired into `kubernetes/flux/repositories/helm/kustomization.yaml`).
-- New HelmRelease `dcgm-exporter` (chart 4.8.2) under `kubernetes/apps/observability/exporters/dcgm-exporter/`.
-- Node affinity restricts to `nvidia.com/gpu="true"` (only pyro-01 today).
-- Tolerates `nvidia.com/gpu:NoExecute` and `node-role.kubernetes.io/control-plane:NoSchedule`.
-- Runs with `runtimeClassName: nvidia`. SYS_ADMIN capability NOT added — GTX 1080 Ti (Pascal, sm_6.1) does not support DCGM_FI_PROF_* metrics, so the standard counters (temp / power / SM-util / MEM-util / clocks / ECC) are all we get. Saves the privilege cost.
-- Image pinned to `nvcr.io/nvidia/k8s/dcgm-exporter:4.5.3-4.8.2-distroless@sha256:60d3b00ac80b4ae77f94dae2f943685605585ad9e92fdccda3154d009ae317cc` (per CLAUDE.md rule 4).
-- ServiceMonitor enabled, 30s interval.
+Deployed but immediately reverted in commit 5 — the GTX 1080 Ti is consumer Pascal and DCGM returns `DCGM_ST_NOT_SUPPORTED (result=11)` even after NVML succeeds. DCGM officially supports datacenter SKUs from Tesla P100 / Volta onwards. Pod CrashLoopBackOff with `ERROR: init 250 result=11` after every restart.
+
+### Commit 5 — `feat(observability): swap dcgm-exporter → nvidia-gpu-exporter (NVML-based, consumer-Pascal friendly)`
+
+Replaces the failed dcgm-exporter with `utkuozdemir/nvidia_gpu_exporter` (NVML wrapper around `nvidia-smi`):
+
+- Deleted: `dcgm-exporter/` HelmRelease + `nvidia-dcgm` HelmRepository.
+- Added: `kubernetes/apps/observability/exporters/nvidia-gpu-exporter/` using the bjw-s `app-template` chart 4.4.0 (no extra HelmRepository needed).
+- Image pinned: `ghcr.io/utkuozdemir/nvidia_gpu_exporter:1.4.1@sha256:309a0e91c5f4e8f004989f004e0e764264d4433fba914a9ec8c6e0b581620ba1`.
+- DaemonSet, `runtimeClassName: nvidia`, node affinity `nvidia.com/gpu=true`, same tolerations as dcgm-exporter.
+- Does NOT request the `nvidia.com/gpu` device — that slot is held by `local-ai-nvidia` (single GPU on pyro, no time-slicing). The exporter only needs NVML which works without exclusive allocation.
+- Metric prefix: `nvidia_smi_*` (NOT `DCGM_FI_DEV_*`). kromgo queries updated correspondingly.
+- ServiceMonitor enabled, 30s interval, port 9835.
 
 ### Commit 3 — `feat(promtail): tolerate GPU taint so logs ship from pyro-01`
 
@@ -75,16 +81,17 @@ After KPS reconciles (≤30 min from push):
 - `kube_horizontalpodautoscaler_*`
 - `kube_poddisruptionbudget_*`
 
-After dcgm-exporter reconciles + the pod starts on pyro-01:
+After nvidia-gpu-exporter reconciles + the pod starts on pyro-01:
 
-- `DCGM_FI_DEV_GPU_TEMP` — die temperature (°C)
-- `DCGM_FI_DEV_GPU_UTIL` — SM utilisation %
-- `DCGM_FI_DEV_MEM_COPY_UTIL` — memory copy engine utilisation %
-- `DCGM_FI_DEV_POWER_USAGE` — instantaneous power (W)
-- `DCGM_FI_DEV_FB_USED`, `DCGM_FI_DEV_FB_FREE`, `DCGM_FI_DEV_FB_TOTAL` — framebuffer MiB
-- `DCGM_FI_DEV_SM_CLOCK`, `DCGM_FI_DEV_MEM_CLOCK` — clocks MHz
-- `DCGM_FI_DEV_ECC_*` — ECC counters (1080 Ti has ECC disabled, will report zeros)
-- ~30 others from `default-counters.csv`
+- `nvidia_smi_temperature_gpu` — die temperature (°C)
+- `nvidia_smi_utilization_gpu_ratio` — SM utilisation (0–1)
+- `nvidia_smi_utilization_memory_ratio` — memory bandwidth utilisation (0–1)
+- `nvidia_smi_power_draw_watts` — instantaneous power
+- `nvidia_smi_memory_used_bytes`, `nvidia_smi_memory_free_bytes`, `nvidia_smi_memory_total_bytes`
+- `nvidia_smi_clocks_current_graphics_clock_hz`, `nvidia_smi_clocks_current_memory_clock_hz`
+- `nvidia_smi_fan_speed_ratio`
+- `nvidia_smi_pstate`
+- Everything else `nvidia-smi --help-query-gpu` advertises (~60 fields), prefixed `nvidia_smi_` and unit-suffixed.
 
 After node-exporter reconciles on pyro-01:
 
@@ -110,10 +117,10 @@ After node-exporter reconciles on pyro-01:
 | `flux_kustomizations_ready` / `_total` / `_failing` | same pattern for `Kustomization` | Tier 5 |
 | `intel_igpu_package_power_avg` / `_total` | `igpu_power_package` aggregates (W) | iGPU + Plex transcode load |
 | `intel_igpu_video_busy_max` | `max(igpu_engines_video_0_busy)` | "is something transcoding now?" |
-| `nvidia_gpu_temp_c` | `max(DCGM_FI_DEV_GPU_TEMP)` OR vector(0) | pyro-01 GPU temp |
-| `nvidia_gpu_util_pct` | `max(DCGM_FI_DEV_GPU_UTIL)` | SM util |
-| `nvidia_gpu_power_watts` | `sum(DCGM_FI_DEV_POWER_USAGE)` | board power |
-| `nvidia_gpu_mem_used_mb` / `_free_mb` | `sum(DCGM_FI_DEV_FB_USED|FREE)` | VRAM |
+| `nvidia_gpu_temp_c` | `max(nvidia_smi_temperature_gpu)` OR vector(0) | pyro-01 GPU temp |
+| `nvidia_gpu_util_pct` | `round(max(nvidia_smi_utilization_gpu_ratio) * 100)` | SM util |
+| `nvidia_gpu_power_watts` | `sum(nvidia_smi_power_draw_watts)` | board power |
+| `nvidia_gpu_mem_used_mb` / `_free_mb` | `sum(nvidia_smi_memory_(used|free)_bytes) / 1024^2` | VRAM |
 | `node_power_est_stanton01` / `_stanton02` / `_stanton03` / `_pyro01` | total UPS power × per-node CPU utilisation share | proxy for per-node draw — see "What's still open" |
 
 All wrap `OR vector(0)` where the underlying source can be transiently absent (dcgm-exporter restart, GPU idle, etc.) so the dashboard stays green instead of dropping the badge.
@@ -121,8 +128,7 @@ All wrap `OR vector(0)` where the underlying source can be transiently absent (d
 ## What's still open / out of scope
 
 - **Per-node power telemetry — true measurement.** The MS-01 (Venus Series, board AHWSA) does not expose IPMI/BMC to Talos (`/dev/ipmi0` absent, `/sys/class/ipmi` empty). No RAPL series. The added `node_power_est_*` queries are a CPU-weighted estimate from the aggregate UPS reading; they will mis-attribute idle baseline draw between nodes and undercount nodes doing GPU/IO-heavy work with low CPU. Documented in the kromgo config with a comment. The only true fix is a smart PDU (e.g. APC AP8959EU3) or a Shelly Plus 1PM per node — hardware buy, not a software change.
-- **dcgm-exporter on Pascal.** GTX 1080 Ti returns `-1` for `DCGM_FI_PROF_*` profiling metrics. The chart's `arguments` are set to the default counters set only, so these never get queried — but if anyone adds a custom counters configmap, those entries will be empty.
-- **Pod-resources socket on Talos.** dcgm-exporter mounts `/var/lib/kubelet/pod-resources` from the host to attribute GPU usage back to pods. Talos uses the standard kubelet path so this should work, but it has not been verified yet — if attribution is missing after the pod is up, that's the cause. The exporter still publishes GPU-wide metrics either way.
+- **No pod-level GPU attribution.** dcgm-exporter would have attributed GPU usage back to pods via the kubelet `/var/lib/kubelet/pod-resources` socket; utkuozdemir/nvidia_gpu_exporter wraps `nvidia-smi` and does not attribute per-pod. Acceptable on pyro-01 because only one tenant (`local-ai-nvidia`) actively uses the GPU today. If multiple GPU tenants land on the node, revisit.
 - **smartctl-exporter on pyro-01.** DaemonSet is 3/4 (missing pyro). Lower priority — pyro has a single SSD; not worth the toleration churn unless we start running storage-intensive workloads there.
 - **Sparkline / range data (Tier 7).** Out of scope per audit brief. Two reasonable options when wanted: Grafana iframe embeds (cheapest), or a Prometheus range-query proxy alongside kromgo (more flexible).
 - **NUT per-UPS labelling.** `network_ups_tools_*` returns 2 series per metric (jaeger + apc) — kromgo queries `min(...)` / `sum(...)` which works but loses the distinction. If the dashboard wants per-UPS, expose them as separate kromgo entries keyed on the `ups` label.

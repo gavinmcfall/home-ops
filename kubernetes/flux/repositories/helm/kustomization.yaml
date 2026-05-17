@@ -22,7 +22,6 @@ resources:
   - ./nextcloud.yaml
   - ./node-feature-discovery.yaml
   - ./nvidia.yaml
-  - ./nvidia-dcgm.yaml
   - ./openebs.yaml
   - ./piraeus-charts.yaml
   - ./prometheus-community.yaml
