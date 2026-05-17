@@ -10,7 +10,8 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: truenas
-  useClientProtocol: true
+  # TrueNAS port-80 nginx only speaks HTTP/1.1 cleartext; speaking HTTP/2 upstream causes protocol_error / 502
+  useClientProtocol: false
   connection:
     bufferLimit: 8Mi
   timeout:
