@@ -376,3 +376,72 @@ metrics:
     # Desktop PC — no inline DC adapter possible. CPU-weighted estimate only.
     query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.111:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
     suffix: "w"
+
+  # ── Per-node temperature ──
+  # Stantons: max CPU package coretemp. Pyro: GPU temp leads (it's the GPU
+  # node, the headline number anyone wants is "how hot is the 1080 Ti")
+  # with coretemp fallback if the NVIDIA exporter is offline.
+  - name: node_temp_stanton01
+    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-01",chip=~"coretemp.*"}), 1) OR vector(0)
+    suffix: "°C"
+    colors:
+      - { color: "green", min: 0, max: 60 }
+      - { color: "orange", min: 60, max: 75 }
+      - { color: "red", min: 75, max: 9999 }
+
+  - name: node_temp_stanton02
+    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-02",chip=~"coretemp.*"}), 1) OR vector(0)
+    suffix: "°C"
+    colors:
+      - { color: "green", min: 0, max: 60 }
+      - { color: "orange", min: 60, max: 75 }
+      - { color: "red", min: 75, max: 9999 }
+
+  - name: node_temp_stanton03
+    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-03",chip=~"coretemp.*"}), 1) OR vector(0)
+    suffix: "°C"
+    colors:
+      - { color: "green", min: 0, max: 60 }
+      - { color: "orange", min: 60, max: 75 }
+      - { color: "red", min: 75, max: 9999 }
+
+  - name: node_temp_pyro01
+    query: round(max(nvidia_smi_temperature_gpu), 1) OR round(max(node_hwmon_temp_celsius{kubernetes_node="pyro-01",chip=~"coretemp.*"}), 1) OR vector(0)
+    suffix: "°C"
+    colors:
+      - { color: "green", min: 0, max: 70 }
+      - { color: "orange", min: 71, max: 83 }
+      - { color: "red", min: 84, max: 9999 }
+
+  # ── Per-node load (CPU utilisation %) ──
+  - name: node_load_stanton01
+    query: round(instance:node_cpu_utilisation:rate5m{instance="10.90.3.101:9100"} * 100, 1) OR vector(0)
+    suffix: "%"
+    colors:
+      - { color: "green", min: 0, max: 50 }
+      - { color: "orange", min: 50, max: 80 }
+      - { color: "red", min: 80, max: 9999 }
+
+  - name: node_load_stanton02
+    query: round(instance:node_cpu_utilisation:rate5m{instance="10.90.3.102:9100"} * 100, 1) OR vector(0)
+    suffix: "%"
+    colors:
+      - { color: "green", min: 0, max: 50 }
+      - { color: "orange", min: 50, max: 80 }
+      - { color: "red", min: 80, max: 9999 }
+
+  - name: node_load_stanton03
+    query: round(instance:node_cpu_utilisation:rate5m{instance="10.90.3.103:9100"} * 100, 1) OR vector(0)
+    suffix: "%"
+    colors:
+      - { color: "green", min: 0, max: 50 }
+      - { color: "orange", min: 50, max: 80 }
+      - { color: "red", min: 80, max: 9999 }
+
+  - name: node_load_pyro01
+    query: round(instance:node_cpu_utilisation:rate5m{instance="10.90.3.111:9100"} * 100, 1) OR vector(0)
+    suffix: "%"
+    colors:
+      - { color: "green", min: 0, max: 50 }
+      - { color: "orange", min: 50, max: 80 }
+      - { color: "red", min: 80, max: 9999 }
