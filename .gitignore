@@ -35,3 +35,8 @@ wiki
 # Claude Code
 .claude/*
 !.claude/CLAUDE.md
+# MemPalace MCP artifacts
+entities.json
+mempalace.yaml
+# talhelper auto-backups
+kubernetes/bootstrap/talos/clusterconfig.bak.*/
