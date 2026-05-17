@@ -181,6 +181,11 @@ spec:
       enabled: true
     prometheus-node-exporter:
       fullnameOverride: node-exporter
+      tolerations:
+        - operator: Exists
+          effect: NoSchedule
+        - operator: Exists
+          effect: NoExecute
       prometheus:
         monitor:
           enabled: true
@@ -209,6 +214,20 @@ spec:
         - nodes
         - pods
         - deployments
+        - persistentvolumeclaims
+        - persistentvolumes
+        - statefulsets
+        - daemonsets
+        - replicasets
+        - services
+        - endpoints
+        - namespaces
+        - jobs
+        - cronjobs
+        - ingresses
+        - storageclasses
+        - horizontalpodautoscalers
+        - poddisruptionbudgets
       rbac:
         extraRules:
           - apiGroups:
