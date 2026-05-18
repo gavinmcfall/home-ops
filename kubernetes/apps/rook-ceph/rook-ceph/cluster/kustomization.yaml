@@ -2,9 +2,24 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: rook-ceph
 resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
   - ./dashboard-httproute.yaml
   - ./objectstore-httproute.yaml
   - ./servicemonitor.yaml
+# rook-config-override is managed by Kustomize (NOT the chart) because both
+# Flux kustomize-controller AND helm-controller strip trailing blank lines
+# from `|` literal-block scalars during YAML re-serialization. Ceph mon
+# init-mon-fs requires the file to terminate with an empty line. File-based
+# configMapGenerator preserves the raw bytes (including the trailing blank
+# line) without re-parsing through a YAML library. HelmRelease values has
+# `configOverride: ""` so the chart skips rendering its own copy.
+configMapGenerator:
+  - name: rook-config-override
+    namespace: rook-ceph
+    files:
+      - config=./rook-config-override.conf
+    options:
+      disableNameSuffixHash: true
