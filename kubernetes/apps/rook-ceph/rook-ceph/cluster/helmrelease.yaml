@@ -32,23 +32,14 @@ spec:
       createPrometheusRules: true
     toolbox:
       enabled: true
-    # |+ keep-all-trailing-newlines is REQUIRED here. Flux's kustomize
-    # silently strips trailing blank lines from `|` literal blocks, and
-    # Ceph mon init-mon-fs then fails with "parse error: expected
-    # '<empty_line>' in line 10 at position 21". The `+` chomp preserves
-    # the blank line through serialization. Incident: 2026-05-17.
-    configOverride: |+
-      [global]
-      bdev_enable_discard = true
-      bdev_async_discard = true
-      osd_class_update_on_start = false
-      bluestore_prefer_deferred_size = 0
-      bluestore_deferred_batch_ops = 16
-      bluestore_deferred_batch_ops_per_txn = 32
-      bluestore_min_alloc_size = 4096
-      bluestore_compression_algorithm = none
-      bdev_flock_retry = 3
-
+    # Empty string disables the chart's rook-config-override ConfigMap
+    # rendering (`{{- if .Values.configOverride -}}` in templates/configmap.yaml
+    # skips when value is empty). The CM is instead managed by Kustomize's
+    # configMapGenerator (file-based) so the bluestore tuning's trailing blank
+    # line — required by Ceph mon init-mon-fs — survives Flux's two YAML
+    # re-serialization layers. See ./rook-config-override.conf for the actual
+    # tuning values. Incident: 2026-05-17.
+    configOverride: ""
     cephClusterSpec:
       cleanupPolicy:
         allowUninstallWithVolumes: false
