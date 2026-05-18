@@ -32,3 +32,6 @@ spec:
       VOLSYNC_CLAIM: *app
       VOLSYNC_MINUTE: "0"
       VOLSYNC_B2_MINUTE: "0"
+      # Clone bypasses snapshot-binding race; pocket-id active writes were
+      # hitting the polling window and generating OOS alerts (2026-05-19).
+      VOLSYNC_COPYMETHOD: Clone

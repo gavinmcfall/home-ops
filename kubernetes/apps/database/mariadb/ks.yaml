@@ -30,4 +30,7 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 8Gi
       VOLSYNC_MINUTE: "10"
+      # Clone bypasses snapshot-binding race; mariadb's active writes were
+      # hitting the polling window and generating OOS alerts (2026-05-19).
+      VOLSYNC_COPYMETHOD: Clone
       VOLSYNC_B2_MINUTE: "4"
