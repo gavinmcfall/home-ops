@@ -24,6 +24,11 @@ spec:
       retries: 3
   values:
     controllers:
+      # The chart ships a `test` controller used by `helm test` runs only.
+      # Disabled because the chart can't auto-pick a serviceAccount when 2
+      # are present (default + multus), breaking `flux-local test` in CI.
+      test:
+        enabled: false
       multus:
         containers:
           multus:
