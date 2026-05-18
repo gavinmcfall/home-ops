@@ -6,3 +6,7 @@ machine:
     extraConfig:
       featureGates:
         ImageVolume: true
+      # Default 110 pods/node was the cap that broke the 2026-05-18 stanton-01
+      # drain attempt (stanton-03 was at 115/110). 250 future-proofs against
+      # the same scheduling failure mode.
+      maxPods: 250
