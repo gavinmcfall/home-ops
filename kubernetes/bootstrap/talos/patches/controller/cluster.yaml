@@ -1,8 +1,25 @@
 cluster:
   allowSchedulingOnControlPlanes: true
+  # Control-plane resource requests/limits sized from 14d Prometheus
+  # observed peak (kube-apiserver 8.4 GiB, kcm 1.6 GiB, scheduler 335 MiB).
+  # Bundled with the maxPods reboot in 2026-05-19 maintenance window since
+  # the apply cost was already sunk. See PHASE4-RUNBOOK.md.
+  apiServer:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 4Gi
+      limits:
+        memory: 10Gi
   controllerManager:
     extraArgs:
       bind-address: 0.0.0.0
+    resources:
+      requests:
+        cpu: 100m
+        memory: 768Mi
+      limits:
+        memory: 2Gi
   coreDNS:
     disabled: true
   proxy:
@@ -10,3 +27,9 @@ cluster:
   scheduler:
     extraArgs:
       bind-address: 0.0.0.0
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
