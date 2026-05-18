@@ -34,3 +34,11 @@ spec:
       enabled: true
     serviceMonitor:
       enabled: true
+    # Allow scheduling on pyro-01 (GPU worker) as a fallback during stanton
+    # maintenance. Without this, metrics-server going Pending breaks
+    # kubectl top + HPA across the whole cluster.
+    tolerations:
+      - key: nvidia.com/gpu
+        operator: Equal
+        value: "true"
+        effect: NoExecute

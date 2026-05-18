@@ -32,3 +32,11 @@ spec:
     config:
       data:
         INHERITED_ANNOTATIONS: kyverno.io/ignore
+    # Allow scheduling on pyro-01 (GPU worker) as a fallback. The operator
+    # owns CNPG cluster reconciliation; if it goes Pending due to no fit
+    # on any stanton, postgres clusters can't recover from any disruption.
+    tolerations:
+      - key: nvidia.com/gpu
+        operator: Equal
+        value: "true"
+        effect: NoExecute
