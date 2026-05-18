@@ -59,6 +59,17 @@ spec:
             - mountPath: /client
               name: client
       serviceAccountName: pgbackrest-controller
+      # Allow scheduling on pyro-01 (GPU worker) as a fallback when all 3
+      # stantons are under pressure or one is cordoned for maintenance.
+      # Without this, a stanton drain can leave pgbackrest-controller
+      # Pending -> CNPG plugin gRPC dies -> cluster reconciliation halts
+      # -> postgres18-cluster instance reschedule blocked -> drain stuck.
+      # See incident 2026-05-18 (cluster-capacity-blockers memory).
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Equal
+          value: "true"
+          effect: NoExecute
       volumes:
         - name: server
           secret:
