@@ -73,10 +73,10 @@ spec:
             resources:
               requests:
                 cpu: 800m
-                memory: 16Gi
+                memory: 512Mi
                 gpu.intel.com/i915: "1"
               limits:
-                memory: 64Gi
+                memory: 8Gi
                 gpu.intel.com/i915: "1"
         pod:
           affinity:
@@ -204,10 +204,10 @@ spec:
             resources:
               requests:
                 cpu: 500m
-                memory: 4Gi
+                memory: 512Mi
                 nvidia.com/gpu: 1
               limits:
-                memory: 24Gi
+                memory: 8Gi
                 nvidia.com/gpu: 1
             securityContext:
               allowPrivilegeEscalation: false
