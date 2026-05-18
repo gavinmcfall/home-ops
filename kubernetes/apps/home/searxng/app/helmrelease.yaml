@@ -62,11 +62,11 @@ spec:
               startup:
                 enabled: true
             resources:
-              limits:
-                memory: 2Gi
-
               requests:
                 cpu: 10m
+                memory: 6Gi
+              limits:
+                memory: 10Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

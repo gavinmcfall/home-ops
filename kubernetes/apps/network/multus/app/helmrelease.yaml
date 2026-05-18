@@ -24,11 +24,17 @@ spec:
       retries: 3
   values:
     controllers:
-      # The chart ships a `test` controller used by `helm test` runs only.
-      # Disabled because the chart can't auto-pick a serviceAccount when 2
-      # are present (default + multus), breaking `flux-local test` in CI.
+      # The chart ships `test` + `uninstall` hook controllers. They
+      # break `flux-local test` because with 2 ServiceAccounts in the
+      # namespace (default + multus) the chart can't auto-pick one.
+      # - `test` is just a chart-test artifact, fully disable.
+      # - `uninstall` is referenced by the `cni` persistence (cleanup
+      #   on helm uninstall), so disabling cascades — pin its SA instead.
       test:
         enabled: false
+      uninstall:
+        serviceAccount:
+          name: multus
       multus:
         containers:
           multus:
