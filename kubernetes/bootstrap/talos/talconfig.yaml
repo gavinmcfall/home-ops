@@ -259,44 +259,59 @@ nodes:
   ###################################################################
   #                     WORKER NODES                               #
   ###################################################################
-  - hostname: "pyro-01"
-    ipAddress: "10.90.3.111"
-    installDiskSelector:
-      wwid: "naa.5002538e700ffde2"
-    talosImageURL: factory.talos.dev/metal-installer/6d3b466016d617387863aec155bc5ed3b3a06c4d44391c47a8e5168f65da3681
-    controlPlane: false
-    nodeLabels:
-      nvidia.com/gpu: "true"
-      node-role.kubernetes.io/gpu: ""
-    nodeTaints:
-      nvidia.com/gpu: "true:NoExecute"
-    networkInterfaces:
-      - deviceSelector:
-          hardwareAddr: "70:8b:cd:58:10:7e"
-        dhcp: false
-        addresses:
-          - "10.90.3.111/16"
-        routes:
-          - network: 0.0.0.0/0
-            gateway: "10.90.254.1"
-        mtu: 1500
-    patches:
-      # Mount 2TB SSD for model storage via OpenEBS
-      - |-
-        machine:
-          disks:
-            - device: /dev/disk/by-id/ata-Samsung_SSD_870_QVO_2TB_S5RPNF0T611875M
-              partitions:
-                - mountpoint: /var/openebs/local
-      # NVIDIA kernel modules
-      - |-
-        machine:
-          kernel:
-            modules:
-              - name: nvidia
-              - name: nvidia_uvm
-              - name: nvidia_drm
-              - name: nvidia_modeset
+  # === pyro-01 DISABLED 2026-05-19 — user no longer needs local AI for a while ===
+  # Machine is physically powered off, node deleted from k8s (`kubectl delete node pyro-01`).
+  # To re-join pyro-01:
+  #   1. Uncomment the block below (remove the leading `# ` on each non-comment line)
+  #   2. `cd kubernetes/bootstrap/talos && talhelper genconfig`
+  #   3. Power on the physical machine
+  #   4. Wait for Talos to boot — should auto-join (kubelet certs preserved)
+  #   5. If auto-join fails: `talosctl apply-config --nodes 10.90.3.111 --file clusterconfig/home-kubernetes-pyro-01.yaml`
+  # Also unsuspend the relevant cortex HRs if AI workloads needed:
+  #   for hr in local-ai-intel local-ai-nvidia open-webui openclaw qdrant; do
+  #     flux resume hr $hr -n cortex
+  #   done
+  # (Those 5 cortex apps were deleted from repo though — re-create from git history or restore from backup.)
+  #
+  # - hostname: "pyro-01"
+  #   ipAddress: "10.90.3.111"
+  #   installDiskSelector:
+  #     wwid: "naa.5002538e700ffde2"
+  #   talosImageURL: factory.talos.dev/metal-installer/6d3b466016d617387863aec155bc5ed3b3a06c4d44391c47a8e5168f65da3681
+  #   controlPlane: false
+  #   nodeLabels:
+  #     nvidia.com/gpu: "true"
+  #     node-role.kubernetes.io/gpu: ""
+  #   nodeTaints:
+  #     nvidia.com/gpu: "true:NoExecute"
+  #   networkInterfaces:
+  #     - deviceSelector:
+  #         hardwareAddr: "70:8b:cd:58:10:7e"
+  #       dhcp: false
+  #       addresses:
+  #         - "10.90.3.111/16"
+  #       routes:
+  #         - network: 0.0.0.0/0
+  #           gateway: "10.90.254.1"
+  #       mtu: 1500
+  #   patches:
+  #     # Mount 2TB SSD for model storage via OpenEBS
+  #     - |-
+  #       machine:
+  #         disks:
+  #           - device: /dev/disk/by-id/ata-Samsung_SSD_870_QVO_2TB_S5RPNF0T611875M
+  #             partitions:
+  #               - mountpoint: /var/openebs/local
+  #     # NVIDIA kernel modules
+  #     - |-
+  #       machine:
+  #         kernel:
+  #           modules:
+  #             - name: nvidia
+  #             - name: nvidia_uvm
+  #             - name: nvidia_drm
+  #             - name: nvidia_modeset
+  # === END pyro-01 disabled block ===
 
 # Global patches
 patches:
