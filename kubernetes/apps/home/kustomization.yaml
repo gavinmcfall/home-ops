@@ -19,7 +19,7 @@ resources:
   - ./linkwarden/ks.yaml
   - ./manyfold/ks.yaml
   - ./nerdz-landing/ks.yaml
-  - ./outline/ks.yaml
+  # - ./outline/ks.yaml
   - ./p4k-scanner/ks.yaml
   - ./paperless/ks.yaml
   - ./searxng/ks.yaml
