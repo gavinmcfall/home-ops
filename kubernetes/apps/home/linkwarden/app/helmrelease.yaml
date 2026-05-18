@@ -44,9 +44,9 @@ spec:
             resources:
               requests:
                 cpu: 50m
-                memory: 300Mi
+                memory: 1Gi
               limits:
-                #memory: 600Mi
+                memory: 2500Mi
     service:
       app:
         controller: linkwarden
