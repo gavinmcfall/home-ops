@@ -82,13 +82,13 @@ spec:
         mgr:
           requests:
             cpu: 100m
-            memory: 512Mi
+            memory: 1Gi
           limits:
-            memory: 2Gi
+            memory: 2500Mi
         mon:
           requests:
             cpu: 50m
-            memory: 512Mi
+            memory: 1Gi
           limits:
             memory: 2Gi
         osd:

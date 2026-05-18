@@ -76,10 +76,10 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                memory: 512Mi
+                memory: 1Gi
               limits:
                 gpu.intel.com/i915: 1
-                memory: 8Gi
+                memory: 2Gi
       machine-learning:
         strategy: RollingUpdate
         pod:
@@ -125,9 +125,9 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                memory: 512Mi
+                memory: 1500Mi
               limits:
-                memory: 6Gi
+                memory: 3Gi
             probes:
               liveness: &probes
                 enabled: true
