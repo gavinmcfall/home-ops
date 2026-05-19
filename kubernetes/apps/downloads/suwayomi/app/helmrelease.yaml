@@ -35,7 +35,24 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          init-db:
+          # Seed server.conf onto the writable PVC. Suwayomi's entrypoint runs
+          # sed -i against server.conf which fails on a configMap subPath bind
+          # mount ('Device or resource busy' during atomic rename). Copying the
+          # ConfigMap into the PVC sidesteps the bind-mount restriction while
+          # keeping the config in git via Reloader (annotation already set).
+          01-init-config:
+            image:
+              repository: docker.io/library/busybox
+              tag: 1.36
+            command:
+              - sh
+              - -c
+              - |
+                set -e
+                cp /configmap/server.conf /tachidesk-data/server.conf
+                echo "seeded server.conf:"
+                ls -la /tachidesk-data/server.conf
+          02-init-db:
             image:
               repository: ghcr.io/home-operations/postgres-init
               tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
@@ -110,15 +127,20 @@ spec:
     persistence:
       config:
         existingClaim: *app
-        globalMounts:
-          - path: /home/suwayomi/.local/share/Tachidesk
+        advancedMounts:
+          suwayomi:
+            01-init-config:
+              - path: /tachidesk-data
+            app:
+              - path: /home/suwayomi/.local/share/Tachidesk
       config-file:
         type: configMap
         name: suwayomi
-        globalMounts:
-          - path: /home/suwayomi/.local/share/Tachidesk/server.conf
-            subPath: server.conf
-            readOnly: true
+        advancedMounts:
+          suwayomi:
+            01-init-config:
+              - path: /configmap
+                readOnly: true
       media:
         type: nfs
         server: citadel.internal
