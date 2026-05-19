@@ -1,0 +1,194 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app komf
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: storage
+  values:
+    controllers:
+      komf:
+        labels:
+          nfsMount: "true"
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: docker.io/sndxr/komf
+              tag: 1.7.1@sha256:4a6971a76abc30869f6d0555a7328ff8cd879f3016a7378395df331c1245cbb2
+            env:
+              TZ: ${TIMEZONE}
+              KOMF_LOG_LEVEL: INFO
+              KOMF_KAVITA_BASE_URI: http://kavita.entertainment.svc.cluster.local:5000
+            envFrom:
+              - secretRef:
+                  name: komf-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: &port 8085
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: {type: RuntimeDefault}
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Entertainment
+          gethomepage.dev/name: Komf
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: mdi-tag-text
+          gethomepage.dev/description: Kavita metadata fetcher
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+    persistence:
+      config:
+        existingClaim: *app
+        globalMounts:
+          - path: /config
+      config-file:
+        type: configMap
+        name: komf-config
+        globalMounts:
+          - path: /config/application.yml
+            subPath: application.yml
+            readOnly: true
+      media:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /media
+      tmp:
+        type: emptyDir
+    configMaps:
+      config:
+        data:
+          application.yml: |
+            # Komga is not used in this cluster; disable its event listener so the
+            # process does not try to dial a host that does not exist.
+            komga:
+              baseUri: http://komga.invalid
+              eventListener:
+                enabled: false
+
+            kavita:
+              # baseUri set via env: KOMF_KAVITA_BASE_URI
+              # apiKey set via env: KOMF_KAVITA_API_KEY
+              eventListener:
+                enabled: true
+                metadataLibraryFilter: []
+                metadataSeriesExcludeFilter: []
+                notificationsLibraryFilter: []
+              metadataUpdate:
+                default:
+                  libraryType: MANGA
+                  updateModes: [API, COMIC_INFO]
+                  aggregate: true
+                  mergeTags: true
+                  mergeGenres: true
+                  bookCovers: false
+                  seriesCovers: true
+                  overrideExistingCovers: false
+                  lockCovers: true
+                  postProcessing:
+                    seriesTitle: true
+                    seriesTitleLanguage: en
+                    alternativeSeriesTitles: true
+                    alternativeSeriesTitleLanguages:
+                      - ja-ro
+                      - ja
+                    orderBooks: true
+
+            metadataProviders:
+              # malClientId set via env: KOMF_MAL_CLIENT_ID
+              # comicVineApiKey set via env: KOMF_COMICVINE_API_KEY
+              # bangumiToken set via env: KOMF_BANGUMI_TOKEN
+              defaultProviders:
+                mangaUpdates:
+                  priority: 10
+                  enabled: true
+                  mediaType: MANGA
+                aniList:
+                  priority: 20
+                  enabled: true
+                  tagsScoreThreshold: 60
+                  tagsSizeLimit: 15
+                mal:
+                  priority: 30
+                  enabled: true
+                mangaDex:
+                  priority: 40
+                  enabled: true
+                webtoons:
+                  priority: 50
+                  enabled: true
+                comicVine:
+                  priority: 60
+                  enabled: false
+                bangumi:
+                  priority: 70
+                  enabled: false
+
+            server:
+              port: 8085
+
+            logLevel: INFO

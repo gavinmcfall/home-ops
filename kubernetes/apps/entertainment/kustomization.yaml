@@ -13,6 +13,7 @@ resources:
   - ./calibre-web/ks.yaml
   - ./immich/ks.yaml
   - ./kavita/ks.yaml
+  - ./komf/ks.yaml
   - ./seerr/ks.yaml
   - ./pasta/ks.yaml
   - ./plex/ks.yaml
