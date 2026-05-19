@@ -308,35 +308,6 @@ metrics:
     query: round(max(igpu_engines_video_0_busy), 1)
     suffix: "%"
 
-  # ── NVIDIA GPU (pyro-01, via utkuozdemir/nvidia_gpu_exporter) ──
-  # NVML-based — dcgm-exporter was tried first but DCGM doesn't support
-  # consumer Pascal cards (GTX 1080 Ti). Each query wraps OR vector(0)
-  # so the dashboard stays green if the exporter pod restarts or the GPU
-  # is genuinely idle (1080 Ti reports near-0W idle).
-  - name: nvidia_gpu_temp_c
-    query: max(nvidia_smi_temperature_gpu) OR vector(0)
-    suffix: "°C"
-    colors:
-      - { color: "green", min: 0, max: 70 }
-      - { color: "orange", min: 71, max: 83 }
-      - { color: "red", min: 84, max: 9999 }
-
-  - name: nvidia_gpu_util_pct
-    query: round(max(nvidia_smi_utilization_gpu_ratio) * 100) OR vector(0)
-    suffix: "%"
-
-  - name: nvidia_gpu_power_watts
-    query: round(sum(nvidia_smi_power_draw_watts), 1) OR vector(0)
-    suffix: "w"
-
-  - name: nvidia_gpu_mem_used_mb
-    query: round(sum(nvidia_smi_memory_used_bytes) / 1024 / 1024) OR vector(0)
-    suffix: " MiB"
-
-  - name: nvidia_gpu_mem_free_mb
-    query: round(sum(nvidia_smi_memory_free_bytes) / 1024 / 1024) OR vector(0)
-    suffix: " MiB"
-
   # ── Per-node power ──
   # Each stanton has a JetKVM with a DC Power Control extension inline
   # between the wall adapter and the MS-01's barrel jack. The extension's
@@ -346,11 +317,6 @@ metrics:
   # The OR chain falls back to the CPU-weighted UPS estimate if a JetKVM
   # is offline or has no DC extension attached:
   #   est = total_ups_watts × node_cpu_share
-  #
-  # pyro-01 is a desktop PC (no inline DC adapter applicable) so it stays
-  # on the estimate-only path. No IPMI/BMC on MS-01 (board AHWSA), no
-  # smart PDU. AMT vPro is available but doesn't expose power sensors on
-  # this firmware — see docs/infrastructure-roadmap/amt-enablement.md.
   - name: node_power_est_stanton01
     query: |
       round(jetkvm_dc_power_watts{node="stanton-01"}, 1)
@@ -372,15 +338,8 @@ metrics:
         OR vector(0)
     suffix: "w"
 
-  - name: node_power_est_pyro01
-    # Desktop PC — no inline DC adapter possible. CPU-weighted estimate only.
-    query: round(scalar(sum(network_ups_tools_ups_realpower)) * (instance:node_cpu_utilisation:rate5m{instance="10.90.3.111:9100"} / scalar(sum(instance:node_cpu_utilisation:rate5m))), 1) OR vector(0)
-    suffix: "w"
-
   # ── Per-node temperature ──
-  # Stantons: max CPU package coretemp. Pyro: GPU temp leads (it's the GPU
-  # node, the headline number anyone wants is "how hot is the 1080 Ti")
-  # with coretemp fallback if the NVIDIA exporter is offline.
+  # Max CPU package coretemp per node.
   - name: node_temp_stanton01
     query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-01",chip=~"coretemp.*"}), 1) OR vector(0)
     suffix: "°C"
@@ -405,14 +364,6 @@ metrics:
       - { color: "orange", min: 60, max: 75 }
       - { color: "red", min: 75, max: 9999 }
 
-  - name: node_temp_pyro01
-    query: round(max(nvidia_smi_temperature_gpu), 1) OR round(max(node_hwmon_temp_celsius{kubernetes_node="pyro-01",chip=~"coretemp.*"}), 1) OR vector(0)
-    suffix: "°C"
-    colors:
-      - { color: "green", min: 0, max: 70 }
-      - { color: "orange", min: 71, max: 83 }
-      - { color: "red", min: 84, max: 9999 }
-
   # ── Per-node load (CPU utilisation %) ──
   - name: node_load_stanton01
     query: round(instance:node_cpu_utilisation:rate5m{instance="10.90.3.101:9100"} * 100, 1) OR vector(0)
@@ -432,14 +383,6 @@ metrics:
 
   - name: node_load_stanton03
     query: round(instance:node_cpu_utilisation:rate5m{instance="10.90.3.103:9100"} * 100, 1) OR vector(0)
-    suffix: "%"
-    colors:
-      - { color: "green", min: 0, max: 50 }
-      - { color: "orange", min: 50, max: 80 }
-      - { color: "red", min: 80, max: 9999 }
-
-  - name: node_load_pyro01
-    query: round(instance:node_cpu_utilisation:rate5m{instance="10.90.3.111:9100"} * 100, 1) OR vector(0)
     suffix: "%"
     colors:
       - { color: "green", min: 0, max: 50 }
