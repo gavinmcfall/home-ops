@@ -52,6 +52,11 @@ spec:
                 cp /configmap/server.conf /tachidesk-data/server.conf
                 echo "seeded server.conf:"
                 ls -la /tachidesk-data/server.conf
+                # Suwayomi refuses to start with server.downloadsPath pointing
+                # at a non-existent directory; pre-create it on the shared NFS.
+                mkdir -p /media/Downloads/suwayomi
+                echo "ensured downloads dir exists:"
+                ls -ld /media/Downloads/suwayomi
           02-init-db:
             image:
               repository: ghcr.io/home-operations/postgres-init
@@ -163,7 +168,7 @@ spec:
 
             # === Database (PostgreSQL on shared postgres18-cluster) ===
             server.databaseType = "POSTGRESQL"
-            server.databaseUrl = "jdbc:postgresql://postgres18-cluster-rw.database.svc.cluster.local:5432/suwayomi_main"
+            server.databaseUrl = "postgresql://postgres18-cluster-rw.database.svc.cluster.local:5432/suwayomi_main"
             server.useHikariConnectionPool = true
 
             # === Downloads ===
