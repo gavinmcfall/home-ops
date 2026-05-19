@@ -106,7 +106,7 @@ spec:
           - path: /config
       config-file:
         type: configMap
-        name: komf-config
+        name: komf
         globalMounts:
           - path: /config/application.yml
             subPath: application.yml
