@@ -1,0 +1,183 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app suwayomi
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: storage
+  values:
+    controllers:
+      suwayomi:
+        labels:
+          nfsMount: "true"
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
+            envFrom: &envFrom
+              - secretRef:
+                  name: suwayomi-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/suwayomi/tachidesk
+              tag: v2.2.2100@sha256:6bb8fa8cf1cf86589e5851f2f1c2ede5c8248d53982ec1795a715dcde85b1da2
+            env:
+              TZ: ${TIMEZONE}
+              # Suwayomi has no env-var config layer; JVM -D flags drive runtime overrides.
+              # K8s $(VAR) expansion pulls DB creds from the secret defined below.
+              JAVA_TOOL_OPTIONS: >-
+                -Dsuwayomi.tachidesk.config.server.databaseUsername=$(SUWAYOMI_POSTGRES_USER)
+                -Dsuwayomi.tachidesk.config.server.databasePassword=$(SUWAYOMI_POSTGRES_PASSWORD)
+            envFrom: *envFrom
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: &port 4567
+                  initialDelaySeconds: 60
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 2Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: {type: RuntimeDefault}
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Downloads
+          gethomepage.dev/name: Suwayomi
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: mdi-book-open-page-variant
+          gethomepage.dev/description: Mihon/Tachiyomi self-hosted server
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+    persistence:
+      config:
+        existingClaim: *app
+        globalMounts:
+          - path: /home/suwayomi/.local/share/Tachidesk
+      config-file:
+        type: configMap
+        name: suwayomi-config
+        globalMounts:
+          - path: /home/suwayomi/.local/share/Tachidesk/server.conf
+            subPath: server.conf
+            readOnly: true
+      media:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /media
+    configMaps:
+      config:
+        data:
+          server.conf: |
+            # Suwayomi-Server config — non-secret only.
+            # DB credentials come in via JAVA_TOOL_OPTIONS -D flags from the K8s Secret.
+
+            # === Networking ===
+            server.ip = "0.0.0.0"
+            server.port = 4567
+
+            # === Auth (internal-only behind Tailscale; enable later if needed) ===
+            server.authMode = "none"
+
+            # === Database (PostgreSQL on shared postgres18-cluster) ===
+            server.databaseType = "POSTGRESQL"
+            server.databaseUrl = "jdbc:postgresql://postgres18-cluster-rw.database.svc.cluster.local:5432/suwayomi_main"
+            server.useHikariConnectionPool = true
+
+            # === Downloads ===
+            server.downloadAsCbz = true
+            server.downloadsPath = "/media/Downloads/suwayomi"
+            server.autoDownloadNewChapters = true
+            server.excludeEntryWithUnreadChapters = false
+            server.autoDownloadNewChaptersLimit = 0
+            server.autoDownloadIgnoreReUploads = true
+
+            # === FlareSolverr (cluster-local service) ===
+            server.flareSolverrEnabled = true
+            server.flareSolverrUrl = "http://flaresolverr.downloads.svc.cluster.local:8191"
+            server.flareSolverrTimeout = 60
+            server.flareSolverrSessionName = "suwayomi"
+            server.flareSolverrSessionTtl = 15
+            server.flareSolverrAsResponseFallback = false
+
+            # === Web UI ===
+            server.webUIEnabled = true
+            server.initialOpenInBrowserEnabled = false
+            server.webUIInterface = "browser"
+            server.webUIFlavor = "WebUI"
+            server.webUIChannel = "STABLE"
+            server.webUIUpdateCheckInterval = 23
+
+            # === Pre-seeded extension repos (Keiyoushi + Yuzono) ===
+            server.extensionRepos = [
+              "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.min.json",
+              "https://raw.githubusercontent.com/yuzonomanga/yuzono-extensions/repo/index.min.json"
+            ]
+
+            # === Misc ===
+            server.debugLogsEnabled = false
+            server.systemTrayEnabled = false
+            server.maxSourcesInParallel = 6
+            server.maxLogFiles = 14
+            server.maxLogFileSize = "10mb"
+            server.maxLogFolderSize = "100mb"
