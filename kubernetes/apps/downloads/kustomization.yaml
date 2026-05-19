@@ -34,4 +34,5 @@ resources:
   - ./sonarr-uhd/ks.yaml
   - ./suwayomi/ks.yaml
   - ./tqm/ks.yaml
+  - ./tranga/ks.yaml
   - ./unpackerr/ks.yaml

@@ -1,0 +1,173 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app tranga
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: storage
+  values:
+    controllers:
+      tranga:
+        labels:
+          nfsMount: "true"
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          # Pre-create downloads dir on the shared NFS. Tranga drops chapters
+          # into /Manga (mapped to /media/Downloads/tranga). Pattern matches
+          # Suwayomi — apps don't always mkdir, so we do it for them.
+          01-init-downloads:
+            image:
+              repository: docker.io/library/busybox
+              tag: 1.36
+            command:
+              - sh
+              - -c
+              - |
+                set -e
+                mkdir -p /media/Downloads/tranga
+                ls -ld /media/Downloads/tranga
+          02-init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
+            envFrom: &envFrom
+              - secretRef:
+                  name: tranga-secret
+        containers:
+          app:
+            image:
+              repository: docker.io/glax/tranga-api
+              tag: latest@sha256:dd7d8fc08ee3455c5e02feea35d70ce1bf2b58b671d72e1cbd861933d91219c7
+            env:
+              TZ: ${TIMEZONE}
+              # Tranga options (all read via Environment.GetEnvironmentVariable
+              # per API/Constants.cs + API/TrangaSettings.cs upstream).
+              # DB creds come via envFrom.
+              CREATE_COMICINFO_XML: "true"
+              CHECK_CHAPTERS_BEFORE_START: "true"
+              FLARESOLVERR_URL: http://flaresolverr.downloads.svc.cluster.local:8191
+              # Override the default /Manga output path so Tranga writes to
+              # our Downloads tier directly (per Option C). Saves a separate
+              # NFS subpath mount and avoids the chicken-and-egg of mounting
+              # a directory that doesn't exist yet.
+              DOWNLOAD_LOCATION: /media/Downloads/tranga
+            envFrom: *envFrom
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: &api-port 6531
+                  initialDelaySeconds: 60
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                # Bundles Chromium for JS-rendered scanlation sources.
+                # 1Gi handles a few concurrent headless tabs comfortably.
+                memory: 1500Mi
+          website:
+            image:
+              repository: docker.io/glax/tranga-website
+              tag: latest@sha256:68c1f4ca19b90bda9ad533036d71c94c1f31567e34b93eae5a87bc3c3fc13616
+            env:
+              TZ: ${TIMEZONE}
+              # nginx envsubst fills the proxy_pass target from this.
+              # Sidecar pattern: API is on localhost in the same pod.
+              API_URL: http://localhost:6531
+            probes:
+              liveness: &web-probes
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: &web-port 80
+                  initialDelaySeconds: 15
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness: *web-probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: {type: RuntimeDefault}
+    service:
+      app:
+        controller: *app
+        # Website is the user-facing entry; it proxies /api → tranga-api.
+        ports:
+          http:
+            port: *web-port
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Downloads
+          gethomepage.dev/name: Tranga
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: mdi-book-multiple
+          gethomepage.dev/description: Manga monitor + downloader
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+    persistence:
+      config:
+        existingClaim: *app
+        globalMounts:
+          - path: /usr/share/tranga-api
+      media:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /media
