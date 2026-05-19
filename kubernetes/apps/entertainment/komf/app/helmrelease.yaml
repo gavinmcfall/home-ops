@@ -106,7 +106,7 @@ spec:
           - path: /config
       config-file:
         type: configMap
-        name: komf-config
+        name: komf
         globalMounts:
           - path: /config/application.yml
             subPath: application.yml
@@ -159,9 +159,13 @@ spec:
                     orderBooks: true
 
             metadataProviders:
-              # malClientId set via env: KOMF_MAL_CLIENT_ID
-              # comicVineApiKey set via env: KOMF_COMICVINE_API_KEY
-              # bangumiToken set via env: KOMF_BANGUMI_TOKEN
+              # Komf's env-var auto-bind covers top-level keys (kavita.*, komga.*, etc.)
+              # but nested config like metadataProviders.malClientId requires explicit
+              # env: interpolation. The env var values themselves come from the
+              # komf-secret ExternalSecret.
+              malClientId: "env:KOMF_MAL_CLIENT_ID"
+              comicVineApiKey: "env:KOMF_COMICVINE_API_KEY"
+              bangumiToken: "env:KOMF_BANGUMI_TOKEN"
               defaultProviders:
                 mangaUpdates:
                   priority: 10
