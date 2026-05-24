@@ -171,3 +171,26 @@ spec:
         path: /mnt/storage0/media
         globalMounts:
           - path: /media
+      # nginx (in the website container) is the stock upstream image that
+      # expects to be root. As UID 568 it can't write to /etc/nginx/conf.d
+      # (for envsubst output), /var/cache/nginx (client_temp), or /var/run
+      # (nginx.pid). emptyDir mounts give it writable space at those paths
+      # so it can run unprivileged.
+      nginx-conf-d:
+        type: emptyDir
+        advancedMounts:
+          tranga:
+            website:
+              - path: /etc/nginx/conf.d
+      nginx-cache:
+        type: emptyDir
+        advancedMounts:
+          tranga:
+            website:
+              - path: /var/cache/nginx
+      nginx-run:
+        type: emptyDir
+        advancedMounts:
+          tranga:
+            website:
+              - path: /var/run
