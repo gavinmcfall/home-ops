@@ -8,6 +8,7 @@ resources:
   - ./postgres18-cluster.yaml
   - ./pooler.yaml
   - ./scheduledbackup.yaml
+  - ./scheduledbackup-weekly-full.yaml
   - ./prometheusrule.yaml
   - ./service.yaml
 components:

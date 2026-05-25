@@ -3,11 +3,11 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: postgres18-immich-daily-b2
+  name: postgres18-immich-weekly-full-b2
   namespace: database
 spec:
-  schedule: "0 3 * * *"
-  immediate: true
+  schedule: "0 1 * * 0"        # Sunday 01:00 UTC
+  immediate: true              # immich has no fresh full yet — trigger one on first apply
   backupOwnerReference: self
   method: plugin
   target: primary
@@ -17,4 +17,4 @@ spec:
     name: pgbackrest.dalibo.com
     parameters:
       selectedRepository: "1"
-      backupType: incr        # explicit (was implicit default); weekly full re-bases the chain
+      backupType: full         # re-bases the incremental chain weekly (caps depth at ~7)

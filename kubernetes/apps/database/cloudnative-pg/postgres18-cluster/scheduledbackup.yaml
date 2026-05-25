@@ -17,3 +17,4 @@ spec:
     name: pgbackrest.dalibo.com
     parameters:
       selectedRepository: "1"
+      backupType: incr        # explicit (was implicit default); weekly full re-bases the chain

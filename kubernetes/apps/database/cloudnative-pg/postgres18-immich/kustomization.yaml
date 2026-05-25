@@ -8,6 +8,7 @@ resources:
   - ./postgres18-immich.yaml
   - ./pooler.yaml
   - ./scheduledbackup.yaml
+  - ./scheduledbackup-weekly-full.yaml
   - ./service.yaml
 components:
   - ../../../../components/gatus/infrastructure
