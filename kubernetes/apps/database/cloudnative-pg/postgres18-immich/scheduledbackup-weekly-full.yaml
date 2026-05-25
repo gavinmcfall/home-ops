@@ -6,7 +6,7 @@ metadata:
   name: postgres18-immich-weekly-full-b2
   namespace: database
 spec:
-  schedule: "0 1 * * 0"        # Sunday 01:00 UTC
+  schedule: "0 0 1 * * 0"        # 6-field: Sunday 01:00 UTC
   immediate: true              # immich has no fresh full yet — trigger one on first apply
   backupOwnerReference: self
   method: plugin

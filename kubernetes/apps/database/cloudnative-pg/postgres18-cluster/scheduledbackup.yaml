@@ -6,7 +6,7 @@ metadata:
   name: postgres18-cluster-daily-b2
   namespace: database
 spec:
-  schedule: "0 3 * * *"
+  schedule: "0 0 3 * * *"        # 6-field (sec min hour dom mon dow): 03:00 daily. WAS "0 3 * * *" which CNPG's 6-field parser read as hourly-at-:03
   immediate: true
   backupOwnerReference: self
   method: plugin
