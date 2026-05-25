@@ -28,9 +28,11 @@ spec:
   values:
     fullnameOverride: *app
     config:
-      devices:
-        - /dev/nvme0n1 # Ceph Disk
-        - /dev/nvme1n1 # Primary Disk
+      # No explicit devices -> smartctl_exporter auto-scans (smartctl --scan-open) each
+      # node's real drives. The previous raw /dev/nvmeX list was wrong on 2/3 nodes
+      # (PCIe enumeration assigns numbers differently per node) and would break again
+      # after the PM9A3 /var cutover. Auto-scan fixes both and self-adapts.
+      devices: []
     serviceMonitor:
       enabled: true
     prometheusRules:
