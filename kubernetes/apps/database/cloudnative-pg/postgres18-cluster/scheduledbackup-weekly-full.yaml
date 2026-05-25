@@ -6,7 +6,7 @@ metadata:
   name: postgres18-cluster-weekly-full-b2
   namespace: database
 spec:
-  schedule: "0 1 * * 0"        # Sunday 01:00 UTC — 2h before the daily incr, no pgbackrest lock collision
+  schedule: "0 0 1 * * 0"        # 6-field: Sunday 01:00 UTC — 2h before daily incr, no pgbackrest lock collision
   immediate: false             # premigration full (20260525-005008F) already re-based the chain
   backupOwnerReference: self
   method: plugin
