@@ -18,7 +18,7 @@ resources:
   - ./filebrowser/ks.yaml
   - ./linkwarden/ks.yaml
   - ./manyfold/ks.yaml
-  - ./nerdz-landing/ks.yaml
+  # - ./nerdz-landing/ks.yaml  # retired → Cloudflare Worker 2026-05-26; Flux prunes the pod. Files kept for rollback — delete the dir after confidence.
   # - ./outline/ks.yaml
   - ./p4k-scanner/ks.yaml
   - ./paperless/ks.yaml
