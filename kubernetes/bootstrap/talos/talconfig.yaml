@@ -24,7 +24,7 @@ nodes:
   - hostname: "stanton-01"
     ipAddress: "10.90.3.101"
     installDiskSelector:
-      serial: "S73VNU0X303066H"
+      serial: "S5XMNE0TC58615"   # PM9A3 960GB (was 990 PRO S73VNU0X303066H, pulled 2026-05-26 for RMA return)
     talosImageURL: factory.talos.dev/metal-installer/786a10aa2924e5caf00392a569de037cec138416143517e618d151b8176af7f3
     controlPlane: true
     networkInterfaces:
@@ -103,7 +103,7 @@ nodes:
   - hostname: "stanton-02"
     ipAddress: "10.90.3.102"
     installDiskSelector:
-      serial: "S73VNU0X303413H"
+      serial: "S5XMNE2TC24056"   # PM9A3 960GB (was 990 PRO S73VNU0X303413H, pulled 2026-05-26 for RMA return)
     talosImageURL: factory.talos.dev/metal-installer/786a10aa2924e5caf00392a569de037cec138416143517e618d151b8176af7f3
     controlPlane: true
     networkInterfaces:
@@ -182,7 +182,7 @@ nodes:
   - hostname: "stanton-03"
     ipAddress: "10.90.3.103"
     installDiskSelector:
-      serial: "S73VNU0X303400H"
+      serial: "S5XMNE1TC99141"   # PM9A3 960GB (was 990 PRO S73VNU0X303400H, pulled 2026-05-26 for RMA return)
     talosImageURL: factory.talos.dev/metal-installer/786a10aa2924e5caf00392a569de037cec138416143517e618d151b8176af7f3
     controlPlane: true
     networkInterfaces:
