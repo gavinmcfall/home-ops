@@ -179,6 +179,18 @@ spec:
             server.autoDownloadNewChaptersLimit = 0
             server.autoDownloadIgnoreReUploads = true
 
+            # === Global update (scheduled new-chapter checks) ===
+            # Key names verified against Suwayomi-Server ServerConfig.kt source.
+            # "Pull everything" stance: don't skip series we're behind on or
+            # haven't started. globalUpdateInterval is hours (minimum 6).
+            server.globalUpdateInterval = 12
+            server.excludeUnreadChapters = false
+            server.excludeNotStarted = false
+            server.excludeCompleted = false
+            # Suwayomi-internal metadata refresh; Komf owns Kavita metadata, so
+            # leave Suwayomi from re-fetching covers/details every cycle.
+            server.updateMangas = false
+
             # === FlareSolverr (cluster-local service) ===
             server.flareSolverrEnabled = true
             server.flareSolverrUrl = "http://flaresolverr.downloads.svc.cluster.local:8191"
