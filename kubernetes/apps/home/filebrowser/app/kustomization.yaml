@@ -7,6 +7,6 @@ resources:
   - ./helmrelease.yaml
 components:
   - ../../../../components/keda/nfs-scaler
-  - ../../../../components/gatus/guarded
+  - ../../../../components/gatus/external
   - ../../../../components/volsync-standard
   - ../../../../components/priority/priority-10
