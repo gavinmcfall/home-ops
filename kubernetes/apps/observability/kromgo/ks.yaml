@@ -23,4 +23,4 @@ spec:
   postBuild:
     substitute:
       APP: *app
-      GATUS_STATUS: "404"
+      GATUS_STATUS: "200"
