@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+  - ./redirect-httproute.yaml
 components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/volsync-standard

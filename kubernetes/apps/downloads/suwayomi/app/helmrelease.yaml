@@ -124,7 +124,7 @@ spec:
           gethomepage.dev/description: Mihon/Tachiyomi self-hosted server
           internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "tachi.${SECRET_DOMAIN}"
         parentRefs:
           - name: internal
             namespace: network
