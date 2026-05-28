@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/httproute_v1.json
+# Permanent redirect from the old suwayomi.${SECRET_DOMAIN} host to the new
+# tachi.${SECRET_DOMAIN}. internal-dns still publishes the old hostname so
+# existing bookmarks keep resolving and get a 301 to the canonical host.
+# Remove this route once nothing references the old hostname.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: suwayomi-redirect
+  annotations:
+    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+spec:
+  hostnames:
+    - suwayomi.${SECRET_DOMAIN}
+  parentRefs:
+    - name: internal
+      namespace: network
+      sectionName: https
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            hostname: tachi.${SECRET_DOMAIN}
+            statusCode: 301
