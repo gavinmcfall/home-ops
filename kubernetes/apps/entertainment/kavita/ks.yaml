@@ -29,4 +29,4 @@ spec:
       VOLSYNC_CAPACITY: 4Gi
       VOLSYNC_MINUTE: "12"
       VOLSYNC_B2_MINUTE: "28"
-      GATUS_SUBDOMAIN: comics
+      GATUS_SUBDOMAIN: manga
