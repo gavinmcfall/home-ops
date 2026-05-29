@@ -402,35 +402,42 @@ metrics:
     suffix: "w"
 
   # ── Per-node temperature ──
-  # Stantons: max CPU package coretemp. Pyro: GPU temp leads (it's the GPU
-  # node, the headline number anyone wants is "how hot is the 1080 Ti")
-  # with coretemp fallback if the NVIDIA exporter is offline.
+  # Stantons are Minisforum MS-01 (i9-13900H, Tjmax 100°C). Report the CPU
+  # *package* sensor (node_hwmon_sensor_label "Package id 0"), not max() of
+  # every core — a single core boosting to 95-100°C is normal and transient,
+  # and max() made the badge sit red permanently. avg_over_time[15m] smooths
+  # those boost spikes so RED means *sustained* heat, not a momentary spike.
+  # Bands: green <80, orange 80-90, red >90 (near-Tjmax sustained = worth it).
   - name: node_temp_stanton01
-    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-01",chip=~".*coretemp.*"}), 1) OR vector(0)
+    query: round(avg_over_time((node_hwmon_temp_celsius{kubernetes_node="stanton-01",chip=~".*coretemp.*"} * on(instance,chip,sensor) group_left node_hwmon_sensor_label{label="Package id 0"})[15m:30s]), 0.1) OR vector(0)
     suffix: "°C"
     colors:
-      - { color: "green", min: 0, max: 60 }
-      - { color: "orange", min: 60, max: 75 }
-      - { color: "red", min: 75, max: 9999 }
+      - { color: "green", min: 0, max: 80 }
+      - { color: "orange", min: 80, max: 90 }
+      - { color: "red", min: 90, max: 9999 }
 
   - name: node_temp_stanton02
-    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-02",chip=~".*coretemp.*"}), 1) OR vector(0)
+    query: round(avg_over_time((node_hwmon_temp_celsius{kubernetes_node="stanton-02",chip=~".*coretemp.*"} * on(instance,chip,sensor) group_left node_hwmon_sensor_label{label="Package id 0"})[15m:30s]), 0.1) OR vector(0)
     suffix: "°C"
     colors:
-      - { color: "green", min: 0, max: 60 }
-      - { color: "orange", min: 60, max: 75 }
-      - { color: "red", min: 75, max: 9999 }
+      - { color: "green", min: 0, max: 80 }
+      - { color: "orange", min: 80, max: 90 }
+      - { color: "red", min: 90, max: 9999 }
 
   - name: node_temp_stanton03
-    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-03",chip=~".*coretemp.*"}), 1) OR vector(0)
+    query: round(avg_over_time((node_hwmon_temp_celsius{kubernetes_node="stanton-03",chip=~".*coretemp.*"} * on(instance,chip,sensor) group_left node_hwmon_sensor_label{label="Package id 0"})[15m:30s]), 0.1) OR vector(0)
     suffix: "°C"
     colors:
-      - { color: "green", min: 0, max: 60 }
-      - { color: "orange", min: 60, max: 75 }
-      - { color: "red", min: 75, max: 9999 }
+      - { color: "green", min: 0, max: 80 }
+      - { color: "orange", min: 80, max: 90 }
+      - { color: "red", min: 90, max: 9999 }
 
+  # Pyro is the GPU node — GPU temp leads ("how hot is the 1080 Ti"). Coretemp
+  # is the fallback if the NVIDIA exporter is offline; it has no "Package id 0"
+  # label, so the fallback uses avg_over_time(max(...)) for the same
+  # sustained-not-spike treatment. (pyro-01 is currently powered down.)
   - name: node_temp_pyro01
-    query: round(max(nvidia_smi_temperature_gpu), 1) OR round(max(node_hwmon_temp_celsius{kubernetes_node="pyro-01",chip=~".*coretemp.*"}), 1) OR vector(0)
+    query: round(avg_over_time(max(nvidia_smi_temperature_gpu)[15m:30s]), 1) OR round(avg_over_time(max(node_hwmon_temp_celsius{kubernetes_node="pyro-01",chip=~".*coretemp.*"})[15m:30s]), 1) OR vector(0)
     suffix: "°C"
     colors:
       - { color: "green", min: 0, max: 70 }
