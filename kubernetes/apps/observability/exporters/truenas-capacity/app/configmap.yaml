@@ -3,6 +3,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: truenas-capacity-script
+  annotations:
+    # The script is full of shell ${VAR} / $(...) expansions. Without this,
+    # Flux's postBuild envsubst eats them (e.g. strips ${TRUENAS_API_KEY} and
+    # ${TRUENAS_URL}), leaving an empty Bearer header and no host. Opt this
+    # resource out of substitution so the script reaches the pod verbatim.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
 data:
   # Pulls pool + dataset capacity from the TrueNAS REST API (read-only API
   # key) and pushes it as graphite plaintext to the existing graphite-exporter,
