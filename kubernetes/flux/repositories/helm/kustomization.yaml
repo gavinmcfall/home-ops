@@ -25,7 +25,6 @@ resources:
   - ./openebs.yaml
   - ./piraeus-charts.yaml
   - ./prometheus-community.yaml
-  - ./qdrant.yaml
   - ./redash.yaml
   - ./rook-ceph-charts.yaml
   - ./stevehipwell.yaml
