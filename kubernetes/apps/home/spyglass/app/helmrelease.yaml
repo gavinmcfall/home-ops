@@ -21,7 +21,7 @@ spec:
               # Pinned to the multi-arch manifest digest published by GHA on push to main.
               # Bump on every release — kubelet sometimes serves a cached :latest layer even
               # with imagePullPolicy: Always, so digests are the reliable trigger.
-              tag: latest@sha256:efcd6029d5d4e54e24333bf9940f7e1f8e21f1635dd99ed5cad4025c4bfb6201
+              tag: latest@sha256:3d31378ad8227393db700b474c0196dbe9924b81f8bce7e8be5c1d2531f2baaa
             envFrom:
               - secretRef:
                   name: spyglass-secret
