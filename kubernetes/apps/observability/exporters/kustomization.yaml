@@ -18,3 +18,4 @@ resources:
   - ./snmp-exporter/ks.yaml
   - ./speedtest-exporter/ks.yaml
   - ./tautulli-exporter/ks.yaml
+  - ./truenas-capacity/ks.yaml

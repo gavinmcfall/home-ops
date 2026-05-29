@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: truenas-capacity-script
+data:
+  # Pulls pool + dataset capacity from the TrueNAS REST API (read-only API
+  # key) and pushes it as graphite plaintext to the existing graphite-exporter,
+  # which maps it to truenas_pool_*_bytes / truenas_dataset_*_bytes for
+  # Prometheus. SCALE 24.10 dropped the native collectd/graphite push, so this
+  # CronJob replaces it for the capacity numbers we care about.
+  #
+  # Dataset names contain "/" which is the graphite path separator, so they're
+  # flattened ("/", " ", "." -> "_"): storage0/media -> storage0_media. The
+  # graphite-exporter mapping turns that back into a `dataset` label.
+  push.sh: |
+    #!/bin/sh
+    set -eu
+
+    : "${TRUENAS_URL:?must be set, e.g. http://citadel.internal}"
+    : "${TRUENAS_API_KEY:?must be set from the truenas-capacity secret}"
+    GRAPHITE_HOST="${GRAPHITE_HOST:-graphite-exporter.observability.svc.cluster.local}"
+    GRAPHITE_PORT="${GRAPHITE_PORT:-9109}"
+
+    auth="Authorization: Bearer ${TRUENAS_API_KEY}"
+    ts="$(date +%s)"
+
+    pools="$(curl -sf --max-time 20 -H "$auth" "${TRUENAS_URL}/api/v2.0/pool")"
+    datasets="$(curl -sf --max-time 20 -H "$auth" "${TRUENAS_URL}/api/v2.0/pool/dataset?extra.flat=true")"
+
+    lines="$(
+      printf '%s' "$pools" | jq -r --arg ts "$ts" '.[] |
+        (.name | gsub("[ /.]"; "_")) as $p |
+        "truenas.capacity.pool.\($p).size \(.size) \($ts)",
+        "truenas.capacity.pool.\($p).allocated \(.allocated) \($ts)",
+        "truenas.capacity.pool.\($p).free \(.free) \($ts)"'
+      printf '%s' "$datasets" | jq -r --arg ts "$ts" '.[] |
+        (.name | gsub("[ /.]"; "_")) as $d |
+        "truenas.capacity.dataset.\($d).used \(.used.parsed // 0) \($ts)",
+        "truenas.capacity.dataset.\($d).available \(.available.parsed // 0) \($ts)"'
+    )"
+
+    count="$(printf '%s\n' "$lines" | grep -c . || true)"
+    if [ "$count" -eq 0 ]; then
+      echo "no metrics parsed from TrueNAS API" >&2
+      exit 1
+    fi
+
+    printf '%s\n' "$lines" | nc -w 5 "$GRAPHITE_HOST" "$GRAPHITE_PORT"
+    echo "pushed ${count} capacity metrics to ${GRAPHITE_HOST}:${GRAPHITE_PORT}"
