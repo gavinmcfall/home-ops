@@ -88,7 +88,7 @@ metrics:
 
   - name: cluster_temp_avg
     # Average across CPU coretemp + PCH + NVMe sensors — biased toward "is the rack hot"
-    query: round(avg(node_hwmon_temp_celsius{chip=~"coretemp.*|.*pch.*|.*nvme.*"}), 1)
+    query: round(avg(node_hwmon_temp_celsius{chip=~".*coretemp.*|.*pch.*|.*nvme.*"}), 1)
     suffix: "°C"
     colors:
       - { color: "green", min: 0, max: 60 }
@@ -229,6 +229,30 @@ metrics:
 
   - name: cluster_storageclass_count
     query: count(kube_storageclass_info) OR vector(0)
+
+  # ── Ceph cluster capacity (rook-ceph-mgr) ──
+  # ceph_cluster_total_* is the usable (post-replication) pool capacity the
+  # mgr reports. Divisor 1099511627776 = 1024^4 = bytes→TiB. PromQL round()'s
+  # second arg is "nearest multiple" (not decimal places), so 0.01 ⇒ 2dp.
+  - name: ceph_capacity_total
+    query: round(ceph_cluster_total_bytes / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"
+
+  - name: ceph_capacity_used
+    query: round(ceph_cluster_total_used_bytes / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"
+
+  - name: ceph_capacity_free
+    query: round((ceph_cluster_total_bytes - ceph_cluster_total_used_bytes) / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"
+
+  - name: ceph_capacity_used_pct
+    query: round(ceph_cluster_total_used_bytes / ceph_cluster_total_bytes * 100, 0.1) OR vector(0)
+    suffix: "%"
+    colors:
+      - { color: "green", min: 0, max: 70 }
+      - { color: "orange", min: 70, max: 85 }
+      - { color: "red", min: 85, max: 9999 }
 
   # ── Workloads (Tier 3 — enabled by new KSM collectors) ──
   - name: cluster_statefulsets_ready
@@ -382,7 +406,7 @@ metrics:
   # node, the headline number anyone wants is "how hot is the 1080 Ti")
   # with coretemp fallback if the NVIDIA exporter is offline.
   - name: node_temp_stanton01
-    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-01",chip=~"coretemp.*"}), 1) OR vector(0)
+    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-01",chip=~".*coretemp.*"}), 1) OR vector(0)
     suffix: "°C"
     colors:
       - { color: "green", min: 0, max: 60 }
@@ -390,7 +414,7 @@ metrics:
       - { color: "red", min: 75, max: 9999 }
 
   - name: node_temp_stanton02
-    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-02",chip=~"coretemp.*"}), 1) OR vector(0)
+    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-02",chip=~".*coretemp.*"}), 1) OR vector(0)
     suffix: "°C"
     colors:
       - { color: "green", min: 0, max: 60 }
@@ -398,7 +422,7 @@ metrics:
       - { color: "red", min: 75, max: 9999 }
 
   - name: node_temp_stanton03
-    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-03",chip=~"coretemp.*"}), 1) OR vector(0)
+    query: round(max(node_hwmon_temp_celsius{kubernetes_node="stanton-03",chip=~".*coretemp.*"}), 1) OR vector(0)
     suffix: "°C"
     colors:
       - { color: "green", min: 0, max: 60 }
@@ -406,7 +430,7 @@ metrics:
       - { color: "red", min: 75, max: 9999 }
 
   - name: node_temp_pyro01
-    query: round(max(nvidia_smi_temperature_gpu), 1) OR round(max(node_hwmon_temp_celsius{kubernetes_node="pyro-01",chip=~"coretemp.*"}), 1) OR vector(0)
+    query: round(max(nvidia_smi_temperature_gpu), 1) OR round(max(node_hwmon_temp_celsius{kubernetes_node="pyro-01",chip=~".*coretemp.*"}), 1) OR vector(0)
     suffix: "°C"
     colors:
       - { color: "green", min: 0, max: 70 }
