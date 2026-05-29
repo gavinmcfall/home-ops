@@ -58,6 +58,8 @@ spec:
         runAsUser: 65532
         runAsGroup: 65532
         runAsNonRoot: true
+        fsGroup: 65532 # so the PVC mount at /data is writable by the nonroot user
+        fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
     service:
