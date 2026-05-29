@@ -1,0 +1,80 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: spyglass
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: spyglass
+  interval: 1h
+  values:
+    controllers:
+      spyglass:
+        strategy: Recreate # single-replica: SQLite RWO + in-process aging loop + in-process event bus
+        replicas: 1
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/spyglass
+              tag: latest # TODO: pin to a digest after the first GHA image build (`@sha256:…`)
+            envFrom:
+              - secretRef:
+                  name: spyglass-secret
+            env:
+              TZ: ${TIMEZONE}
+              SPYGLASS_LISTEN: ":8080"
+              SPYGLASS_DATA_DIR: "/data"
+              SPYGLASS_STALE_WINDOW: "15m"
+              SPYGLASS_RETENTION_WINDOW: "168h"
+              SPYGLASS_AGE_TICK: "30s"
+              SPYGLASS_COST_MODE: "quota"
+              # SPYGLASS_LIMIT_5H / SPYGLASS_LIMIT_WEEKLY: token caps go here once tuned
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: 8080
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: ["ALL"]
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+    service:
+      app:
+        controller: spyglass
+        ports:
+          http:
+            port: 8080
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

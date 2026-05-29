@@ -24,4 +24,5 @@ resources:
   - ./paperless/ks.yaml
   - ./searxng/ks.yaml
   - ./smtp-relay/ks.yaml
+  - ./spyglass/ks.yaml
   - ./thelounge/ks.yaml
