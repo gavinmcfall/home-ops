@@ -476,3 +476,51 @@ metrics:
   - name: citadel_power_state
     # 1 = powered on, 0 = off. Useful for dashboard "node is offline" badge.
     query: max(ipmi_chassis_power_state{host="citadel"}) OR vector(0)
+
+  # ─────────────────────────────────────────────────────────────────────
+  # TrueNAS / Citadel NAS capacity (ZFS pool storage0)
+  # Fed by the truenas-capacity CronJob → graphite-exporter →
+  # truenas_pool_*_bytes / truenas_dataset_*_bytes. SCALE 24.10 dropped the
+  # native graphite push, so the CronJob pulls the TrueNAS REST API instead.
+  # Divisor 1099511627776 = 1024^4 = bytes→TiB; round()'s 2nd arg is
+  # "nearest multiple" so 0.01/0.1 give 2dp/1dp. Values stay at 0 until the
+  # first CronJob push lands.
+  # ─────────────────────────────────────────────────────────────────────
+  - name: nas_capacity_total
+    query: round(sum(truenas_pool_size_bytes) / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"
+
+  - name: nas_capacity_used
+    query: round(sum(truenas_pool_allocated_bytes) / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"
+
+  - name: nas_capacity_free
+    query: round(sum(truenas_pool_free_bytes) / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"
+
+  - name: nas_capacity_used_pct
+    query: round(sum(truenas_pool_allocated_bytes) / sum(truenas_pool_size_bytes) * 100, 0.1) OR vector(0)
+    suffix: "%"
+    colors:
+      - { color: "green", min: 0, max: 70 }
+      - { color: "orange", min: 70, max: 85 }
+      - { color: "red", min: 85, max: 9999 }
+
+  # Per-dataset used (TiB) — headline datasets. Per-dataset "available" all
+  # equals pool-free (no quotas), so only "used" is meaningful here. The full
+  # breakdown lives in Prometheus as truenas_dataset_used_bytes{dataset=...}.
+  - name: nas_dataset_media_used
+    query: round(truenas_dataset_used_bytes{dataset="storage0_media"} / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"
+
+  - name: nas_dataset_backups_used
+    query: round(truenas_dataset_used_bytes{dataset="storage0_backups"} / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"
+
+  - name: nas_dataset_minio_used
+    query: round(truenas_dataset_used_bytes{dataset="storage0_minio"} / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"
+
+  - name: nas_dataset_game_servers_used
+    query: round(truenas_dataset_used_bytes{dataset="storage0_game-servers"} / 1099511627776, 0.01) OR vector(0)
+    suffix: " TiB"

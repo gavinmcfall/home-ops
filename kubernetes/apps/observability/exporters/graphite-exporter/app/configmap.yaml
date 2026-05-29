@@ -657,3 +657,25 @@ data:
         mountpoint: "$${2}"
         instance: "$${1}"
         unit: "inodes"
+
+    ################################################
+    # pool + dataset capacity
+    # Pushed by the truenas-capacity CronJob (TrueNAS REST API), NOT netdata.
+    # Paths: truenas.capacity.pool.<pool>.{size,allocated,free}
+    #        truenas.capacity.dataset.<dataset>.{used,available}
+    # Dataset "/" is flattened to "_" (storage0/media -> storage0_media).
+    ################################################
+
+    - match: 'truenas\.capacity\.pool\.(.*)\.(size|allocated|free)'
+      match_type: "regex"
+      name: "truenas_pool_$${2}_bytes"
+      labels:
+        job: "truenas"
+        pool: "$${1}"
+
+    - match: 'truenas\.capacity\.dataset\.(.*)\.(used|available)'
+      match_type: "regex"
+      name: "truenas_dataset_$${2}_bytes"
+      labels:
+        job: "truenas"
+        dataset: "$${1}"
