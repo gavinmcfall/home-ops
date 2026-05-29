@@ -21,7 +21,7 @@ spec:
               # Pinned to the multi-arch manifest digest published by GHA on push to main.
               # Bump on every release — kubelet sometimes serves a cached :latest layer even
               # with imagePullPolicy: Always, so digests are the reliable trigger.
-              tag: latest@sha256:f521a746952cf4cc1f3453586ede8d1591910e8ac6c13b889455577b678d6710
+              tag: latest@sha256:a2b176d927c75e482046a41b1de9a1f109f9cadf59d8e4fa165995478746ca2d
             envFrom:
               - secretRef:
                   name: spyglass-secret
@@ -29,8 +29,6 @@ spec:
               TZ: ${TIMEZONE}
               SPYGLASS_LISTEN: ":8080"
               SPYGLASS_DATA_DIR: "/data"
-              SPYGLASS_STALE_WINDOW: "15m"
-              SPYGLASS_RETENTION_WINDOW: "168h"
               SPYGLASS_AGE_TICK: "30s"
               SPYGLASS_COST_MODE: "quota"
               # Plan label shown on the masthead chip. Free-form string (e.g. "MAX 20x", "PRO", "API").
