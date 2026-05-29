@@ -18,7 +18,10 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/spyglass
-              tag: latest # TODO: pin to a digest after the first GHA image build (`@sha256:…`)
+              # Pinned to the multi-arch manifest digest published by GHA on push to main.
+              # Bump on every release — kubelet sometimes serves a cached :latest layer even
+              # with imagePullPolicy: Always, so digests are the reliable trigger.
+              tag: latest@sha256:abd3f2e94bbb31207dea295a8486612daa17a572a92ab1acde9350b8e78260d4
             envFrom:
               - secretRef:
                   name: spyglass-secret
