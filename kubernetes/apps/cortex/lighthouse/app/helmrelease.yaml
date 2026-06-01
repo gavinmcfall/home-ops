@@ -137,7 +137,7 @@ spec:
           model-serve:
             image:
               repository: ghcr.io/gavinmcfall/model-serve
-              tag: 0.1.0@sha256:a52603e552f2abe32fe58b286056b7aeff6c49b09583260873c02ccd6ea3c355
+              tag: 0.2.0@sha256:8fd38fe94b706195dd33ce59bb809b2662312f232a35cfec80b16d8548c69c89
             env:
               MODELSERVE_LISTEN: ":9090"
               MODELSERVE_ROOT: "/models"
