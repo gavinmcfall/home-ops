@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/httproute_v1.json
+# Family image surface. Routes to the licence-gate proxy (:8000) ONLY — ComfyUI's
+# :8188 is never Service-exposed. OIDC is enforced by lighthouse-oidc SecurityPolicy
+# targeting this route.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: lighthouse
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+spec:
+  hostnames:
+    - lighthouse.${SECRET_DOMAIN}
+  parentRefs:
+    - name: external
+      namespace: network
+      sectionName: https
+  rules:
+    - matches:
+        - path: { type: PathPrefix, value: / }
+      backendRefs:
+        - name: lighthouse
+          port: 8000

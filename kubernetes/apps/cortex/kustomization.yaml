@@ -11,3 +11,4 @@ resources:
   # Applications
   - ./mem0/ks.yaml
   - ./mempalace/ks.yaml
+  - ./lighthouse/ks.yaml

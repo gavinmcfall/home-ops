@@ -1,0 +1,34 @@
+{
+  "master": {
+    "host": "localhost"
+  },
+  "workers": [
+    {
+      "id": "gpu-vengeance",
+      "name": "Vengeance (4080S)",
+      "host": "vengeancepc.internal",
+      "port": 8188,
+      "enabled": true,
+      "type": "remote",
+      "cuda_device": 0,
+      "extra_args": ""
+    },
+    {
+      "id": "gpu-vixen",
+      "name": "Vixen (4080S)",
+      "host": "vixenpc.internal",
+      "port": 8188,
+      "enabled": true,
+      "type": "remote",
+      "cuda_device": 0,
+      "extra_args": ""
+    }
+  ],
+  "settings": {
+    "debug": false,
+    "auto_launch_workers": false,
+    "stop_workers_on_master_exit": false,
+    "master_delegate_only": true,
+    "websocket_orchestration": true
+  }
+}

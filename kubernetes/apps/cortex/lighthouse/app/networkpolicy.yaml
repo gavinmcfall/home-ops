@@ -1,0 +1,34 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/networking.k8s.io/networkpolicy_v1.json
+# Only-via-Envoy: the licence-gate proxy (:8000) accepts ingress ONLY from the
+# Envoy Gateway pods (network ns). This is the guarantee that makes the proxy's
+# decode-not-verify JWT handling safe — nothing can hand it an unverified token
+# by bypassing Envoy. ComfyUI :8188 and model-serve :9090 take no cluster ingress.
+#
+# Egress is intentionally NOT restricted here: the master must reach the external
+# LAN GPU workers (vengeancepc.internal / vixenpc.internal :8188), and the
+# "workers accept only from the cluster" guarantee is enforced Windows-side
+# (firewall), per cluster-deploy-contract §5 — vanilla NetworkPolicy can't express
+# FQDN egress and the repo has no CiliumNetworkPolicy precedent.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: lighthouse-only-from-envoy
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: lighthouse
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: network
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: envoy
+              gateway.envoyproxy.io/owning-gateway-namespace: network
+      ports:
+        - port: 8000
+          protocol: TCP

@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.envoyproxy.io/backend_v1alpha1.json
+# Envoy Gateway Backend pointing the SecurityPolicy OIDC provider at Pocket-ID.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: lighthouse-oidc-provider
+spec:
+  endpoints:
+    - fqdn:
+        hostname: pocket-id.security.svc.cluster.local
+        port: 1411
