@@ -1,0 +1,66 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: truenas-capacity
+spec:
+  # graphite-exporter holds pushed gauges with a TTL, and kromgo reads instant
+  # values, so a 5-minute push keeps the capacity numbers fresh without load.
+  schedule: "*/5 * * * *"
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          automountServiceAccountToken: false
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          containers:
+            - name: push
+              image: alpine:3.23
+              command:
+                - /bin/sh
+                - -c
+                - apk add --no-cache curl jq > /dev/null 2>&1 && /scripts/push.sh
+              env:
+                - name: TRUENAS_URL
+                  value: "http://citadel.internal"
+                - name: GRAPHITE_HOST
+                  value: "graphite-exporter.observability.svc.cluster.local"
+                - name: GRAPHITE_PORT
+                  value: "9109"
+                - name: TRUENAS_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: truenas-capacity-secret
+                      key: TRUENAS_API_KEY
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+                capabilities: { drop: ["ALL"] }
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
+              volumeMounts:
+                - name: script
+                  mountPath: /scripts
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: script
+              configMap:
+                name: truenas-capacity-script
+                defaultMode: 0555
+            - name: tmp
+              emptyDir: {}

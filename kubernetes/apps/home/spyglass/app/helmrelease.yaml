@@ -1,0 +1,86 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: spyglass
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: spyglass
+  interval: 1h
+  values:
+    controllers:
+      spyglass:
+        strategy: Recreate # single-replica: SQLite RWO + in-process aging loop + in-process event bus
+        replicas: 1
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/spyglass
+              # Pinned to the multi-arch manifest digest published by GHA on push to main.
+              # Bump on every release — kubelet sometimes serves a cached :latest layer even
+              # with imagePullPolicy: Always, so digests are the reliable trigger.
+              tag: latest@sha256:f5debef28601480cac8707aa4060235388c06ca5bd7cb2ba9a83d10111797d08
+            envFrom:
+              - secretRef:
+                  name: spyglass-secret
+            env:
+              TZ: ${TIMEZONE}
+              SPYGLASS_LISTEN: ":8080"
+              SPYGLASS_DATA_DIR: "/data"
+              SPYGLASS_AGE_TICK: "30s"
+              SPYGLASS_COST_MODE: "quota"
+              # Plan label shown on the masthead chip. Free-form string (e.g. "MAX 20x", "PRO", "API").
+              SPYGLASS_PLAN: "MAX 20x"
+              # SPYGLASS_LIMIT_5H / SPYGLASS_LIMIT_WEEKLY: token caps go here once tuned
+              # against the published or empirically-observed plan ceiling.
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: 8080
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: ["ALL"]
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true
+        fsGroup: 65532 # so the PVC mount at /data is writable by the nonroot user
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+    service:
+      app:
+        controller: spyglass
+        ports:
+          http:
+            port: 8080
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
