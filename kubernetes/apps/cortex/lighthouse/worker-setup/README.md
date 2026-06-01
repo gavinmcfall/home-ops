@@ -99,18 +99,24 @@ wsl --terminate lighthouse        # applies on next start
 
 ### 3b. Install + enable the service
 
-Copy `comfyui-worker.service` (in this folder) into the distro, **replace
-`<WSL_USER>`** with the distro's UNIX user (owns `~/ComfyUI`), then enable it.
-From a shell **inside the distro** (`wsl -d lighthouse`):
+Copy `comfyui-worker.service` (in this folder) into the distro and substitute the
+service user. From a shell **inside the distro** (`wsl -d lighthouse`):
 
 ```bash
 sudo cp /mnt/c/Users/<you>/Downloads/comfyui-worker.service /etc/systemd/system/comfyui-worker.service
-sudo sed -i "s/<WSL_USER>/$USER/g" /etc/systemd/system/comfyui-worker.service
+# Paste the next line EXACTLY — `<WSL_USER>` is the literal placeholder to find;
+# $USER auto-fills the current user. Do NOT type your own name on the left side.
+sudo sed -i "s|<WSL_USER>|$USER|g" /etc/systemd/system/comfyui-worker.service
+grep -E "^User=|^ExecStart=" /etc/systemd/system/comfyui-worker.service   # verify: no "<WSL_USER>" left
 sudo systemctl daemon-reload
 sudo systemctl enable --now comfyui-worker.service
 systemctl status comfyui-worker.service        # → active (running)
 curl -sf http://localhost:8188/ >/dev/null && echo "ComfyUI up"
 ```
+
+> If `status` shows `(code=exited, status=217/USER)`, the `<WSL_USER>` placeholder
+> wasn't replaced — the `sed` search string must be `<WSL_USER>`, not your username.
+> Re-run the `sed` + `daemon-reload` + `restart`.
 
 The unit launches ComfyUI with `--listen 0.0.0.0 --enable-cors-header` (both
 **required** for a ComfyUI-Distributed remote worker) and `Restart=always`.
