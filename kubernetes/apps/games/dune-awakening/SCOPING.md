@@ -1,132 +1,144 @@
 # Dune Awakening Self-Hosted Server — Cluster Deployment Scoping
 
-> **Status: SCOPING ONLY.** Nothing here is wired into `games/kustomization.yaml`, so Flux will not deploy it. This branch (`feat/dune-awakening-scoping`) documents *what a deployment would look like* and where the hard problems are. Decide direction before any of this becomes real.
+> **Status: SCOPING ONLY.** Nothing here is wired into `games/kustomization.yaml`, so Flux will not deploy it. This branch (`feat/dune-awakening-scoping`) documents *what a deployment would look like*. Decide direction before any of this becomes real.
 
 Companion research: `~/scratch/Dune Awakening/research-self-hosted-server.md`
 
 ---
 
-## TL;DR
+## Corrected premise (supersedes the earlier "K8s-in-K8s" framing)
 
-- **Capacity is not the problem.** The cluster has ample headroom (see below). A 20–40 GB server fits comfortably on one node.
-- **The architecture is the problem.** The Dune server *is itself a k3s/Kubernetes cluster* (custom operators + CRDs + Postgres + RabbitMQ + per-map game pods). You'd be running Kubernetes-inside-Kubernetes, or translating an immature community decomposition into native manifests. Neither is clean.
-- **AVX2 ✅, GPU ✅** — hardware is fine.
-- **Recommendation:** if this gets built, the least-bad path is **KubeVirt VM** (run Funcom's Linux stack as a black-box VM the cluster schedules) *or* **a dedicated Talos/Linux worker** rather than shoehorning it into the shared workload plane. The "translate Compose to app-template" path is GitOps-native but leans on unsupported community projects and forfeits Funcom's lifecycle operators.
+k3s **is** Kubernetes. Everything Funcom deploys *into* their k3s is ordinary Kubernetes API objects (Deployments, StatefulSets, Services, CRDs, operators) — portable to any conformant cluster. The bundled k3s is Funcom's **packaging convenience** for people without a cluster, not a technical requirement. There is no nested-Kubernetes here: we transplant the workloads onto the existing Talos cluster and let Flux own them. **It does not matter which Kubernetes runs underneath.**
+
+The community project **`snapetech/DuneAwakeningSelfHost`** already proves this: it flattens the stack into explicit containers via `compose.yaml`, **dropping Funcom's operators entirely**. That `compose.yaml` is the single best blueprint — translate it to `bjw-s/app-template` HelmReleases.
+
+---
+
+## The plan in one paragraph
+
+Obtain the Funcom server **image tarballs** from the Steam depot (app `4754530`), push them to **a registry we control**, then run the components as plain Flux-managed workloads in the `games` namespace: Postgres + RabbitMQ (StatefulSets), director/gateway/text-router (Deployments), and **one game-server Deployment per map partition** (operator-free, per snapetech). Swap k3s's bundled infra (local-path storage, NodePort/klipper, Traefik) for Ceph + Cilium L2 (UDP) + cert-manager. Inject the Funcom Live Services JWT as a Secret. Patch the advertised public IP. Done.
 
 ---
 
 ## 1. Cluster fit (measured 2026-06-02)
 
-| Resource | Per node | Cluster (×3) | Headroom |
-|---|---|---|---|
-| Nodes | `stanton-01/02/03` (Talos v1.12.6, k8s v1.33.1) | 3 control-plane | — |
-| CPU | 20 vCPU (i9-12900H) | 60 vCPU | ~9% used → ~18 vCPU free/node |
-| RAM | ~98 GB cap / ~94 GB alloc | ~282 GB alloc | ~20–23 GB used/node → **~70 GB free/node** |
-| **AVX2** | ✅ confirmed (Alder Lake) | — | Hard requirement met |
-| GPU | Intel iGPU present (NFD label) | — | Not needed by server |
+| Resource | Per node | Headroom |
+|---|---|---|
+| Nodes | `stanton-01/02/03` (Talos v1.12.6, k8s v1.33.1) | — |
+| CPU | 20 vCPU (i9-12900H) | ~9% used → ~18 free/node |
+| RAM | ~98 GB cap / ~94 GB alloc | **~70 GB free/node** |
+| **AVX2** | ✅ confirmed (Alder Lake) | hard requirement met |
+| Storage | `ceph-block` (RWO), `ceph-filesystem` (RWX), `openebs-hostpath` (local), `ceph-bucket` (S3) | — |
 
-**Storage classes available:**
-- `ceph-block` (default, RWO) — for Postgres / per-server save data
-- `ceph-filesystem` (RWX) — for shared `Saved/` mount across map pods (Funcom mounts a shared save dir to all game servers)
-- `openebs-hostpath` (local, WaitForFirstConsumer) — fastest, node-pinned; good for the game-server scratch if pinned
-- `ceph-bucket` — n/a
-
-**Verdict:** A single map (Hagga Basin, ~20 GB) or full set (~40 GB) sits inside one node's free RAM with room to spare. Resource capacity does **not** block this.
+A 20 GB (single map) → 40 GB (all maps) server fits inside one node's free RAM. **Capacity is not a constraint.**
 
 ---
 
-## 2. The architecture problem
+## 2. The workloads (from snapetech `compose.yaml`)
 
-From the research: the server decomposes into ~7 services + N game-server pods:
+All images live under the internal tag `registry.funcom.com/funcom/self-hosting/` (see §3 — that host is **not public DNS**, confirmed; it's a local containerd tag).
 
-```
-postgres ─┐
-admin-rmq ─┤
-game-rmq  ─┼─ director ── gateway ── [game-server pod per map partition]
-rmq-auth  ─┤        │
-text-router┘        └── (Funcom k8s operators spawn/destroy map pods via the k8s API)
-```
+| Component | Image (internal tag) | k8s shape |
+|---|---|---|
+| Game server (every map) | `…/seabass-server:<build>-0-shipping` | Deployment per map partition |
+| PostgreSQL | `…/igw-postgres:17.4-alpine-fc-13` | StatefulSet + Ceph PVC |
+| RabbitMQ ×2 (admin + game) | `…/seabass-server-rabbitmq:<build>-0-shipping` | StatefulSet(s) |
+| DB init/utils | `…/seabass-server-db-utils:<build>-0-shipping` | Job |
+| Battlegroup Director | `…/seabass-server-bg-director:<build>-0-shipping` | Deployment |
+| Text Router | `…/seabass-server-text-router:<build>-0-shipping` | Deployment |
+| Gateway | `…/seabass-server-gateway:<build>-0-shipping` | Deployment |
 
-Funcom ships this as an **Alpine Linux + k3s VHDX**. The official "self-host" experience is: a single-node k3s cluster with four custom operators that watch CRDs and spawn one game-server pod per map. **The operators talk to the k8s API to manage pod lifecycle** — that's the part that resists being dropped into an existing cluster.
+`<build>` is a Steam build number, e.g. `1968181-0-shipping`. Tags change every Funcom update.
 
-### Why it fights our cluster
-
-1. **Talos is immutable & locked down.** No host shell, PodSecurity-capable, designed to run *workloads* — not to host a nested k3s with its own privileged kubelet/cgroup management. Nesting k3s-in-a-pod needs privileged + cgroupv2/mount gymnastics that are fragile on Talos.
-2. **CRD/operator collision.** Funcom's operators install cluster-scoped CRDs and watch the API. Running them in our cluster pollutes the cluster-wide CRD space and gives a third-party operator API access. Their operators assume they *own* the cluster.
-3. **GitOps mismatch.** Flux wants declarative HelmReleases it reconciles. Funcom's flow is an imperative `battlegroup` CLI bootstrap that mutates its own k3s. These two models don't compose.
+**Operators: skip them.** Funcom ships 4 operators (`BattleGroup`, `Database`, `Server`, `Utilities`) + CRDs (`BattleGroup`, `ServerSet`, `ServerSetScale`, `ServerGateway`, `MessageQueue`, `Database`) baked into the VHDX. Their *only* job is spawning one game pod per map. snapetech replaces that with static Deployments. This sidesteps two unknowns at once: the operator image names and the CRD schemas are **not publicly documented** (would require dumping from a live instance). Operator-free = nothing to extract.
 
 ---
 
-## 3. Three deployment strategies
+## 3. THE blocker: image delivery (registry is internal-only)
 
-### Strategy A — KubeVirt VM (treat it as a black box) ★ least-bad official path
-Run the Alpine+k3s Linux image as a **VM** via KubeVirt; the cluster just schedules the VM, the Dune stack lives entirely inside it (its own k3s, untouched).
+**Confirmed 2026-06-02:** `registry.funcom.com` returns nothing from public resolvers (1.1.1.1 and 8.8.8.8), while `funcom.com` resolves. The images are **not internet-pullable**. Funcom delivers them as **OCI tarballs in the Steam depot**, imported into containerd via `ctr images import` with that internal tag.
 
-- ✅ Matches Funcom's supported shape exactly (their k3s, their operators, their CRDs — all isolated inside the VM).
-- ✅ No CRD pollution, no privileged pods on the host plane.
-- ✅ Survives Funcom updates to the bootstrap with minimal rework.
-- ❌ **KubeVirt is not installed** — adds a substantial new platform component (`kubevirt`, CDI) to the cluster.
-- ❌ VM RAM is statically reserved (no k8s bin-packing of the game's own pods).
-- ❌ Need to import/convert the Funcom VHDX → KubeVirt DataVolume.
+Implication for Talos (immutable OS — can't casually `ctr import` per node in a GitOps way): **we host the images ourselves.**
 
-### Strategy B — Translate the Compose stack to app-template HelmReleases ★ GitOps-native
-Use the community decomposition (Red-Blink / snapetech) — discrete containers for postgres, rabbitmq, text-router, director, gateway, and **statically-defined game-server Deployments per map** — rendered as `bjw-s/app-template` HelmReleases in the `games` namespace.
+**Delivery design:**
+1. **Download** — SteamCMD `+app_update 4754530 validate` to fetch the depot (~5 GB). The *live* app needs an authenticated Steam login (game-owning account) — anonymous only confirmed for PTC `3104830`. Run on a helper box or a one-off Job with Steam creds in a Secret.
+2. **Extract & push** — load the tarballs, retag to a registry we control, push.
+3. **Reference** — HelmReleases pull from our registry with normal `imagePullPolicy`.
+4. **Updates** — re-download + re-push on each Funcom build; automatable (CronJob / n8n) since tags are build-stamped.
 
-- ✅ Fully GitOps-native, fits home-ops conventions, k8s bin-packs everything.
-- ✅ No nested k3s; uses our Ceph storage, our secrets, our gateways.
-- ❌ **Relies on unsupported community projects** (snapetech ~0 stars, Red-Blink "experimental").
-- ❌ **Replaces Funcom's operators** — you statically declare each map pod instead of the operator spawning them; lose dynamic map lifecycle (Deep Desert reset cadence etc. needs custom handling).
-- ❌ High maintenance: every Funcom server update can break the hand-rolled translation.
-- ❌ Steam depot download + `FLS_SECRET` token bootstrap must be modeled (initContainer pulling via SteamCMD into a Ceph PVC).
-
-### Strategy C — Dedicated host / VM outside the cluster ★ simplest, honest
-Run Funcom's stack on a dedicated Linux box (or a Proxmox/libvirt VM) the *normal* supported way; leave the Talos cluster out of it.
-
-- ✅ Supported, simplest, most robust; no platform changes.
-- ✅ Easy to give 40 GB + pin AVX2 CPU.
-- ❌ Not GitOps, not in-cluster — outside the home-ops model entirely.
-- ❌ New host to manage (or steal capacity from a stanton node, which are Talos and not VM hosts).
+**Where to host the images** (pick one):
+- In-cluster **`zot`/`registry:2`** backed by **`ceph-bucket`** (Rook S3) — clean, GitOps-native, no external dep. *(Recommended.)*
+- Existing registry if you already run one (Harbor/Gitea/etc.).
+- `talosctl image` preload per node — works but imperative, not declarative; re-do on every node wipe.
 
 ---
 
-## 4. If we go Strategy B — sketch of the app directory
+## 4. k3s-isms to swap
+
+| k3s default | Our cluster | Action |
+|---|---|---|
+| `local-path` StorageClass | `ceph-block` (Postgres/RabbitMQ RWO), `ceph-filesystem` (shared `Saved/` RWX) | set `storageClassName` on PVCs |
+| NodePort / klipper-lb | Cilium L2 `LoadBalancer` (UDP-capable) | LB services for game UDP + RabbitMQ game TLS |
+| Traefik | not used by the stack | ignore; Gateway API if a Director UI is wanted |
+| cert-manager | **already present — keep** | RabbitMQ game queue needs TLS-AMQP |
+| `imagePullPolicy: Always` on placeholder `0-0-shipping` | pin real tag from our registry | the VHDX auto-retag hack is irrelevant once we host images |
+
+---
+
+## 5. Networking
+
+- **Game traffic: UDP.** Funcom k3s default ≈ `27015-27050` (per-partition) + `27115-27150` (inter-gateway/IGW). Configurable via `K8S_POOL_GAME_PORT_BASE` / `GAME_UDP_PORT_RANGE` (community Docker uses `7777+`). One UDP port per active map partition.
+- **RabbitMQ game subscription:** TCP `31982` (TLS-AMQP, must be WAN-reachable).
+- **Admin/management** (Director UI, RabbitMQ mgmt): LAN-only.
+- **Public IP advertisement:** game binary takes `-ExternalAddress`; config also hardcodes `HOST_DATACENTER_IP_ADDRESS: 127.0.0.1` in ~3 places — **must** be set to the real public IPv4 or clients can't connect. In k8s inject via downward API / stable LB IP.
+- **hostNetwork?** Unconfirmed whether game pods need `hostNetwork: true` vs Cilium UDP LB for stable port advertisement. Cilium supports UDP LB; resolve during first bring-up.
+
+---
+
+## 6. Auth flow
+
+- **Steam download:** app `4754530`, authenticated (buyer's Steam account). No separate token for the download itself.
+- **FLS JWT:** obtained from `account.duneawakening.com`; becomes `FLS_SECRET` / `DUNE_JWT` env injected into director, gateway, and game pods. Store as a Kubernetes Secret (SOPS or `onepassword-connect` ExternalSecret).
+
+---
+
+## 7. Proposed app directory (operator-free, Strategy "just deployments")
 
 ```
 kubernetes/apps/games/dune-awakening/
-├── ks.yaml                         # Flux Kustomization (depends-on: rook-ceph)
+├── ks.yaml                         # Flux Kustomization (dependsOn: rook-ceph, cert-manager)
 └── app/
-    ├── helmrelease.yaml            # app-template: multi-controller (postgres, rmq, director, gateway, text-router, game-hagga)
-    ├── externalsecret.yaml         # FLS_SECRET (Funcom self-host token) + steam creds from 1Password (onepassword-connect)
-    ├── pvc-saved.yaml              # ceph-filesystem RWX, shared Saved/ across map pods
+    ├── helmrelease.yaml            # app-template multi-controller (postgres, rmq x2, director, gateway, text-router, game-<map> x N)
+    ├── externalsecret.yaml         # FLS_SECRET / DUNE_JWT + steam creds (onepassword-connect)
+    ├── pvc-saved.yaml              # ceph-filesystem RWX shared Saved/
     └── kustomization.yaml
+# plus (separate app) an in-cluster registry if we go that route:
+kubernetes/apps/<ns>/dune-registry/  # zot backed by ceph-bucket
 ```
 
-Key wiring decisions to resolve before writing real manifests:
-- **SteamCMD bootstrap**: initContainer runs `steamcmd +login anonymous +app_update 4754530 validate` into a Ceph PVC (verify anonymous works for live app, not just PTC).
-- **Secret**: `FLS_SECRET` token → `onepassword-connect` ExternalSecret. The token is per-server and tied to a game-owning Steam account.
-- **Networking**: game traffic is UDP (UE5) — needs a `LoadBalancer`/Cilium L2 or NodePort, **not** the HTTP Gateway. Confirm ports (query/game UDP range).
-- **Game-server pods**: one Deployment per map partition; shared `Saved/` on `ceph-filesystem` (RWX), per-pod scratch on `openebs-hostpath`.
-- **RAM**: set requests/limits per map (~12–20 GB Hagga Basin). Consider Funcom's experimental swap flag to halve it — but swap on Talos nodes is a separate decision.
-
-A non-wired draft `helmrelease.yaml` placeholder lives in `app/` for reference. **It is intentionally incomplete and not in any kustomization.**
+A non-wired DRAFT `app/helmrelease.yaml` sketch lives alongside this file. **Intentionally incomplete, not in any kustomization.**
 
 ---
 
-## 5. Open questions / blockers (decide these first)
+## 8. Decisions to make (in order)
 
-1. **Which strategy?** A (KubeVirt), B (translate), or C (dedicated host)? This dominates everything else.
-2. **Is the extra platform weight worth it?** Strategy A means owning KubeVirt+CDI forever for one game server.
-3. **Live depot anonymous pull?** Research only confirmed anonymous SteamCMD for the *PTC* depot (3104830); the live app (4754530) may need authenticated Steam login. Blocks the initContainer design.
-4. **UDP ingress**: does Cilium L2 announcement / the LB pool have spare IPs + the right UDP ports for game traffic?
-5. **Swap on Talos**: the >50% RAM reduction flag wants swap; Talos swap config is a node-level change (machine config), not trivial.
-6. **Do you even want it in-cluster?** Capacity says yes; operational sanity may say "Strategy C, dedicated box." Worth an honest gut-check.
+1. **Operator-free static Deployments** (snapetech model, matches your "just deployments" goal) vs. transplanting Funcom's operators+CRDs. → **Recommend operator-free.** Sidesteps undocumented operator images/CRD schemas; cost is hand-managing the per-map Deployment list.
+2. **Image hosting:** in-cluster `zot` on `ceph-bucket` (recommended) vs. existing registry vs. `talosctl` preload.
+3. **Which maps to run:** Hagga Basin only (~20 GB) vs. full set incl. Deep Desert (~40 GB).
+4. **UDP exposure:** Cilium L2 LoadBalancer vs. hostNetwork — settle at first bring-up.
+5. **Update automation:** manual re-push vs. CronJob/n8n on Funcom build bumps.
 
 ---
 
-## 6. Recommendation
+## 9. Hard dependencies / what we still can't get from the desk
 
-If the goal is *"learn / GitOps-purity / it's already k3s so it feels native"* → **Strategy B**, accepting it's experimental and high-maintenance.
+- **The image tarballs require owning the game + an authenticated SteamCMD pull.** Can't be fetched anonymously for the live app. This is the gate to *any* real work.
+- **Exact `compose.yaml` env/wiring** — pull directly from snapetech before writing manifests (it's the source of truth for ports, env vars, service dependencies).
+- **CRD schemas / operator images** — only needed if we *keep* operators. Operator-free path makes this moot.
+- **Live confirmation of hostNetwork vs LB, and the real UDP port base** — first-deploy empirical.
 
-If the goal is *"a server that just works and stays working"* → **Strategy C** (dedicated host), or **Strategy A** if you specifically want it inside the cluster and are willing to adopt KubeVirt.
+---
 
-Capacity, CPU (AVX2), and storage are all green. The decision is purely **architectural philosophy + maintenance appetite**, not resources.
+## Bottom line
+
+Your instinct holds: this is **just containers and manifests**, and the underlying Kubernetes is irrelevant. The work is (a) hosting the Steam-delivered images on our own registry, (b) translating snapetech's `compose.yaml` to app-template HelmReleases, (c) swapping k3s-bundled infra for Ceph/Cilium/cert-manager, (d) injecting the FLS token and public IP. Capacity, CPU, and storage are all green. The only true gate is the authenticated Steam image pull.

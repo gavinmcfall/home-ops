@@ -1,11 +1,12 @@
 # =============================================================================
-# DRAFT — STRATEGY B SKETCH ONLY. NOT WIRED INTO FLUX. DO NOT DEPLOY AS-IS.
+# DRAFT — "just deployments" sketch. NOT WIRED INTO FLUX. DO NOT DEPLOY AS-IS.
 # =============================================================================
-# This is an illustrative skeleton for the "translate the Compose stack to
-# app-template" path described in ../SCOPING.md §3-B and §4. It shows the
-# multi-controller SHAPE only. Image digests, real ports, the SteamCMD
-# bootstrap, the FLS_SECRET wiring, and the Funcom-operator replacement are
-# ALL unresolved (see SCOPING.md §5). Treat every value below as a placeholder.
+# Operator-free transplant of the Funcom stack (per snapetech/DuneAwakeningSelfHost
+# compose.yaml). See ../SCOPING.md. Every value is a placeholder until:
+#   - images are mirrored to a registry we control (Funcom registry is internal-only)
+#   - the real compose.yaml env/ports are copied in
+#   - public IP + UDP exposure are settled at first bring-up
+# ${DUNE_REGISTRY} = our own registry (e.g. zot on ceph-bucket); ${DUNE_TAG} = <build>-0-shipping
 # =============================================================================
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
@@ -17,79 +18,93 @@ spec:
   interval: 1h
   chartRef:
     kind: OCIRepository
-    name: app-template       # bjw-s app-template, per home-ops convention
+    name: app-template
   values:
     controllers:
-      # --- data plane -------------------------------------------------------
+      # --- data plane ------------------------------------------------------
       postgres:
-        # TODO: prefer the cluster's CloudNativePG operator instead of a
-        # sidecar postgres? Funcom expects a specific schema/version — verify.
+        type: statefulset
         containers:
           app:
-            image:
-              repository: ghcr.io/PLACEHOLDER/postgres
-              tag: PLACEHOLDER@sha256:PLACEHOLDER   # crane digest before real use
-      rabbitmq:
+            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/igw-postgres", tag: "17.4-alpine-fc-13" }
+      rabbitmq-game:
+        type: statefulset
         containers:
           app:
-            image:
-              repository: ghcr.io/PLACEHOLDER/rabbitmq
-              tag: PLACEHOLDER@sha256:PLACEHOLDER
+            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-rabbitmq", tag: "${DUNE_TAG}" }
+            # TLS-AMQP on 31982 — needs cert-manager-issued cert (dependency).
+      rabbitmq-admin:
+        type: statefulset
+        containers:
+          app:
+            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-rabbitmq", tag: "${DUNE_TAG}" }
 
-      # --- control plane (Funcom services) ---------------------------------
+      # --- one-shot DB init -----------------------------------------------
+      db-utils:
+        type: job
+        containers:
+          app:
+            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-db-utils", tag: "${DUNE_TAG}" }
+
+      # --- control plane (Funcom services, NO operators) ------------------
       director:
         containers:
           app:
-            image: { repository: PLACEHOLDER/dune-director, tag: PLACEHOLDER }
-            # NOTE: director normally drives Funcom's k8s operator to spawn
-            # map pods. Without the operator, map pods are static (below).
+            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-bg-director", tag: "${DUNE_TAG}" }
+            envFrom: [{ secretRef: { name: dune-awakening-secret } }]   # FLS_SECRET / DUNE_JWT
       gateway:
         containers:
           app:
-            image: { repository: PLACEHOLDER/dune-gateway, tag: PLACEHOLDER }
+            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-gateway", tag: "${DUNE_TAG}" }
+            envFrom: [{ secretRef: { name: dune-awakening-secret } }]
       text-router:
         containers:
           app:
-            image: { repository: PLACEHOLDER/dune-text-router, tag: PLACEHOLDER }
+            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-text-router", tag: "${DUNE_TAG}" }
 
-      # --- game server: one controller per map partition --------------------
+      # --- game server: ONE controller per map partition ------------------
+      # operator-free: each map is a static Deployment. Start with Hagga Basin.
       game-hagga:
         containers:
           app:
-            image: { repository: PLACEHOLDER/dune-sandbox, tag: PLACEHOLDER }
-            # DuneSandbox UE5 process. Requires AVX2 (cluster ✅).
+            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server", tag: "${DUNE_TAG}" }
+            # requires AVX2 (cluster ✅). -ExternalAddress + HOST_DATACENTER_IP_ADDRESS
+            # MUST be the real public IPv4 (downward API / stable LB IP).
             env:
-              FLS_SECRET:
-                valueFrom:
-                  secretKeyRef: { name: dune-awakening-secret, key: FLS_SECRET }
+              HOST_DATACENTER_IP_ADDRESS: "PLACEHOLDER_PUBLIC_IPV4"
+            envFrom: [{ secretRef: { name: dune-awakening-secret } }]
             resources:
               requests: { cpu: 2, memory: 12Gi }
-              limits: { memory: 20Gi }   # Hagga Basin ~12-20Gi; swap flag halves
-        initContainers:
-          steamcmd:
-            # TODO: confirm anonymous works for LIVE app 4754530 (research only
-            # confirmed PTC 3104830). May need authenticated Steam login.
-            image: { repository: PLACEHOLDER/steamcmd, tag: PLACEHOLDER }
-            command: ["bash", "-c", "steamcmd +login anonymous +force_install_dir /server +app_update 4754530 validate +quit"]
+              limits: { memory: 20Gi }   # Hagga Basin ~12-20Gi
 
     service:
       game-hagga:
         controller: game-hagga
-        type: LoadBalancer        # UDP game traffic — NOT the HTTP Gateway
-        # TODO: Cilium L2 IP + real UDP port range. annotations for LB pool.
+        type: LoadBalancer          # Cilium L2, UDP — NOT the HTTP Gateway
+        annotations:
+          io.cilium/lb-ipam-pool: PLACEHOLDER   # confirm pool + spare IP
         ports:
           game:
-            port: 7777            # PLACEHOLDER — verify actual UE5 ports
+            port: 27015             # Funcom default base; configurable via K8S_POOL_GAME_PORT_BASE
             protocol: UDP
+      rabbitmq-game:
+        controller: rabbitmq-game
+        type: LoadBalancer
+        ports:
+          amqps:
+            port: 31982
+            protocol: TCP
 
     persistence:
       saved:
-        existingClaim: dune-awakening-saved   # ceph-filesystem RWX, shared Saved/
+        existingClaim: dune-awakening-saved   # ceph-filesystem RWX, shared Saved/ across maps
         globalMounts:
-          - path: /server/DuneSandbox/Saved
-      steam:
+          - path: /home/dune/server/DuneSandbox/Saved
+      pgdata:
         accessMode: ReadWriteOnce
-        size: 30Gi
+        size: 10Gi
         storageClass: ceph-block
-        globalMounts:
-          - path: /server
+        advancedMounts:
+          postgres:
+            app:
+              - path: /var/lib/postgresql/data
