@@ -11,3 +11,4 @@ resources:
   - ./pelican/ks.yaml
   - ./pelican-dev/ks.yaml
   - ./romm/ks.yaml
+  - ./zot/ks.yaml
