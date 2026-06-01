@@ -52,25 +52,50 @@ behind NAT, so ComfyUI on `:8188` is NOT reachable on the PC's LAN IP — a clus
 host's network interfaces, putting `:8188` directly on the LAN IP. (Needs Windows
 11 22H2+.)
 
-Check for an existing `.wslconfig` first (don't clobber it):
+> ⚠️ **fstab pre-flight (do not skip).** `.wslconfig` is **global to every WSL2
+> distro** on the Windows user, and mirrored mode can break a **network mount
+> (NFS/CIFS) in `/etc/fstab`** → next boot hangs in `mount -a` and the distro won't
+> start (this bricked the home-ops distro on VengeancePC 2026-05-28; recovery needs a
+> rescue distro). Check **every** distro on the box first:
+> ```powershell
+> wsl -l -v    # list all distro names
+> # for EACH name:
+> wsl -d <distro> --user root -- sh -c "echo '== fstab =='; grep -vE '^\s*#|^\s*$' /etc/fstab; echo '== wsl.conf =='; cat /etc/wsl.conf 2>/dev/null"
+> ```
+> No `nfs`/`cifs` lines anywhere → safe to proceed. If a network mount exists, first
+> make it mirrored-safe (`vers=3,proto=tcp,mountproto=tcp,noresvport,x-systemd.automount`)
+> or set `[automount] mountFsTab=false` in that distro's `/etc/wsl.conf`, and back up
+> `/etc/fstab`.
+
+Check for an existing `.wslconfig` — if present it likely has memory/swap/processor
+settings you must **not** clobber:
 
 ```powershell
 Get-Content "$env:USERPROFILE\.wslconfig" -ErrorAction SilentlyContinue
 ```
 
-If none, create it; if it already has a `[wsl2]` section, just add the
-`networkingMode` line under it:
+- **No file** → create it:
+  ```powershell
+  "[wsl2]`r`nnetworkingMode=mirrored" | Set-Content "$env:USERPROFILE\.wslconfig" -Encoding ascii
+  ```
+- **File exists with a `[wsl2]` section** → **append** the line (don't overwrite):
+  ```powershell
+  Add-Content "$env:USERPROFILE\.wslconfig" "networkingMode=mirrored"
+  Get-Content "$env:USERPROFILE\.wslconfig"   # confirm your existing settings are intact
+  ```
+
+Apply + verify **every** distro still boots (catches an fstab hang per-distro before
+you rely on it):
 
 ```powershell
-@"
-[wsl2]
-networkingMode=mirrored
-"@ | Set-Content "$env:USERPROFILE\.wslconfig" -Encoding ascii
-wsl --shutdown            # applies on next start (you can combine with the step-2 move)
+wsl --shutdown                       # can combine with the step-2 move
+wsl -d lighthouse -- echo ok         # boots under mirrored; repeat for any other distro on the box
+wsl -d lighthouse --user root -- hostname -I   # expect a 10.90.x LAN address in the list
 ```
 
-Verify after restart — the distro should hold the host's LAN IP:
-`wsl -d lighthouse --user root -- hostname -I` (expect a `10.90.x` address in the list).
+> Recovery if a distro hangs on boot after this: export → unregister → mount the VHD
+> from a rescue Ubuntu distro → fix `/etc/fstab` + `/etc/wsl.conf` → import-in-place.
+> (Full recipe in the `C--Users-gavin-temp` memory project, `reference-wsl-distro-recovery-via-rescue`.)
 
 ---
 
