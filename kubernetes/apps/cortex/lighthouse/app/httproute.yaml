@@ -20,5 +20,5 @@ spec:
     - matches:
         - path: { type: PathPrefix, value: / }
       backendRefs:
-        - name: lighthouse
+        - name: lighthouse-app
           port: 8000
