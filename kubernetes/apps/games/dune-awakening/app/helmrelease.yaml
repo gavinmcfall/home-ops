@@ -1,0 +1,95 @@
+# =============================================================================
+# DRAFT — STRATEGY B SKETCH ONLY. NOT WIRED INTO FLUX. DO NOT DEPLOY AS-IS.
+# =============================================================================
+# This is an illustrative skeleton for the "translate the Compose stack to
+# app-template" path described in ../SCOPING.md §3-B and §4. It shows the
+# multi-controller SHAPE only. Image digests, real ports, the SteamCMD
+# bootstrap, the FLS_SECRET wiring, and the Funcom-operator replacement are
+# ALL unresolved (see SCOPING.md §5). Treat every value below as a placeholder.
+# =============================================================================
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dune-awakening
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template       # bjw-s app-template, per home-ops convention
+  values:
+    controllers:
+      # --- data plane -------------------------------------------------------
+      postgres:
+        # TODO: prefer the cluster's CloudNativePG operator instead of a
+        # sidecar postgres? Funcom expects a specific schema/version — verify.
+        containers:
+          app:
+            image:
+              repository: ghcr.io/PLACEHOLDER/postgres
+              tag: PLACEHOLDER@sha256:PLACEHOLDER   # crane digest before real use
+      rabbitmq:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/PLACEHOLDER/rabbitmq
+              tag: PLACEHOLDER@sha256:PLACEHOLDER
+
+      # --- control plane (Funcom services) ---------------------------------
+      director:
+        containers:
+          app:
+            image: { repository: PLACEHOLDER/dune-director, tag: PLACEHOLDER }
+            # NOTE: director normally drives Funcom's k8s operator to spawn
+            # map pods. Without the operator, map pods are static (below).
+      gateway:
+        containers:
+          app:
+            image: { repository: PLACEHOLDER/dune-gateway, tag: PLACEHOLDER }
+      text-router:
+        containers:
+          app:
+            image: { repository: PLACEHOLDER/dune-text-router, tag: PLACEHOLDER }
+
+      # --- game server: one controller per map partition --------------------
+      game-hagga:
+        containers:
+          app:
+            image: { repository: PLACEHOLDER/dune-sandbox, tag: PLACEHOLDER }
+            # DuneSandbox UE5 process. Requires AVX2 (cluster ✅).
+            env:
+              FLS_SECRET:
+                valueFrom:
+                  secretKeyRef: { name: dune-awakening-secret, key: FLS_SECRET }
+            resources:
+              requests: { cpu: 2, memory: 12Gi }
+              limits: { memory: 20Gi }   # Hagga Basin ~12-20Gi; swap flag halves
+        initContainers:
+          steamcmd:
+            # TODO: confirm anonymous works for LIVE app 4754530 (research only
+            # confirmed PTC 3104830). May need authenticated Steam login.
+            image: { repository: PLACEHOLDER/steamcmd, tag: PLACEHOLDER }
+            command: ["bash", "-c", "steamcmd +login anonymous +force_install_dir /server +app_update 4754530 validate +quit"]
+
+    service:
+      game-hagga:
+        controller: game-hagga
+        type: LoadBalancer        # UDP game traffic — NOT the HTTP Gateway
+        # TODO: Cilium L2 IP + real UDP port range. annotations for LB pool.
+        ports:
+          game:
+            port: 7777            # PLACEHOLDER — verify actual UE5 ports
+            protocol: UDP
+
+    persistence:
+      saved:
+        existingClaim: dune-awakening-saved   # ceph-filesystem RWX, shared Saved/
+        globalMounts:
+          - path: /server/DuneSandbox/Saved
+      steam:
+        accessMode: ReadWriteOnce
+        size: 30Gi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /server
