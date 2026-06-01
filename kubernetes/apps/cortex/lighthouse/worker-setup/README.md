@@ -44,6 +44,36 @@ Revert if ever needed: `wsl -d lighthouse --user root -- mv /etc/pam.d/login.bak
 
 ---
 
+## 1b. Enable mirrored WSL networking (so the LAN/cluster can reach :8188)
+
+**Required for the cluster to reach the worker.** By default WSL2 runs the distro
+behind NAT, so ComfyUI on `:8188` is NOT reachable on the PC's LAN IP — a cluster
+`curl http://<host>.internal:8188/...` just **hangs**. Mirrored mode shares the
+host's network interfaces, putting `:8188` directly on the LAN IP. (Needs Windows
+11 22H2+.)
+
+Check for an existing `.wslconfig` first (don't clobber it):
+
+```powershell
+Get-Content "$env:USERPROFILE\.wslconfig" -ErrorAction SilentlyContinue
+```
+
+If none, create it; if it already has a `[wsl2]` section, just add the
+`networkingMode` line under it:
+
+```powershell
+@"
+[wsl2]
+networkingMode=mirrored
+"@ | Set-Content "$env:USERPROFILE\.wslconfig" -Encoding ascii
+wsl --shutdown            # applies on next start (you can combine with the step-2 move)
+```
+
+Verify after restart — the distro should hold the host's LAN IP:
+`wsl -d lighthouse --user root -- hostname -I` (expect a `10.90.x` address in the list).
+
+---
+
 ## 2. (Recommended) Move the distro off C: to a bigger drive
 
 Models are large, and `~/ComfyUI/models` lives **inside the distro's `ext4.vhdx`**.
