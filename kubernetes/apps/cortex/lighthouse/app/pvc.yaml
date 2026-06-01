@@ -1,19 +1,19 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/persistentvolumeclaim_v1.json
-# Cluster-canonical model store (ADR 018). Mounted RW by the model-serve sidecar
-# (admin upload + serve to workers) and RO by the comfyui-master container in the
-# same pod. ceph-block RWO is fine for a single-replica master; allowVolumeExpansion
-# lets us `kubectl patch pvc` to grow when ~80% full.
+# Cluster-canonical model store (ADR 018). Served + ingested by the model-serve
+# sidecar (RW, POST /models/ingest) and read by the comfyui-master container (RO).
+# RWX ceph-filesystem so the ingest path (and future readers) co-mount without the
+# RWO single-attach constraint — i.e. add models live, no scale-down/exec.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: lighthouse-models
 spec:
-  accessModes: ["ReadWriteOnce"]
+  accessModes: ["ReadWriteMany"]
   resources:
     requests:
       storage: 300Gi
-  storageClassName: ceph-block
+  storageClassName: ceph-filesystem
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/persistentvolumeclaim_v1.json
 # Per-user output buckets (/output/<user>/). RWX so Plan 6 portal can multi-read.
