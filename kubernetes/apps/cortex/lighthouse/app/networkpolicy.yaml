@@ -21,6 +21,7 @@ spec:
   policyTypes:
     - Ingress
   ingress:
+    # licence-gate proxy — only from Envoy Gateway (network ns).
     - from:
         - namespaceSelector:
             matchLabels:
@@ -31,4 +32,15 @@ spec:
               gateway.envoyproxy.io/owning-gateway-namespace: network
       ports:
         - port: 8000
+          protocol: TCP
+    # model-serve (:9090) — only from the GPU worker LAN subnet, so external
+    # workers can fetch models (ADR 018). Bearer-token gated on top of this.
+    # NOTE: confirm 10.90.101.0/24 is the worker subnet; relies on the Service's
+    # externalTrafficPolicy: Local preserving the worker source IP. Fails closed
+    # (workers blocked) if the CIDR is wrong — not an exposure.
+    - from:
+        - ipBlock:
+            cidr: 10.90.101.0/24
+      ports:
+        - port: 9090
           protocol: TCP

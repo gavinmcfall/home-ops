@@ -178,10 +178,23 @@ spec:
       app:
         controller: lighthouse
         ports:
-          # ONLY the licence-gate proxy is exposed. ComfyUI :8188 and
-          # model-serve :9090 are deliberately absent from the Service.
+          # The licence-gate proxy — the OIDC-gated family surface (via Envoy).
+          # ComfyUI :8188 is never Service-exposed.
           http:
             port: 8000
+      # model-serve gets a LAN IP (Cilium LB-IPAM) so the external GPU workers can
+      # fetch models (ADR 018). externalTrafficPolicy: Local preserves the worker
+      # source IP so the NetworkPolicy can scope :9090 to the worker subnet; the
+      # endpoint is also bearer-token gated (LIGHTHOUSE_WORKER_TOKEN).
+      model-serve:
+        controller: lighthouse
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        annotations:
+          io.cilium/lb-ipam-ips: ${LIGHTHOUSE_MODELSERVE_LBIP}
+        ports:
+          http:
+            port: 9090
     persistence:
       models:
         existingClaim: lighthouse-models
