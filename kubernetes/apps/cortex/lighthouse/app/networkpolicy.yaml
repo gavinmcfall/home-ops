@@ -1,0 +1,46 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/networking.k8s.io/networkpolicy_v1.json
+# Only-via-Envoy: the licence-gate proxy (:8000) accepts ingress ONLY from the
+# Envoy Gateway pods (network ns). This is the guarantee that makes the proxy's
+# decode-not-verify JWT handling safe — nothing can hand it an unverified token
+# by bypassing Envoy. ComfyUI :8188 and model-serve :9090 take no cluster ingress.
+#
+# Egress is intentionally NOT restricted here: the master must reach the external
+# LAN GPU workers (vengeancepc.internal / vixenpc.internal :8188), and the
+# "workers accept only from the cluster" guarantee is enforced Windows-side
+# (firewall), per cluster-deploy-contract §5 — vanilla NetworkPolicy can't express
+# FQDN egress and the repo has no CiliumNetworkPolicy precedent.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: lighthouse-only-from-envoy
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: lighthouse
+  policyTypes:
+    - Ingress
+  ingress:
+    # licence-gate proxy — only from Envoy Gateway (network ns).
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: network
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: envoy
+              gateway.envoyproxy.io/owning-gateway-namespace: network
+      ports:
+        - port: 8000
+          protocol: TCP
+    # model-serve (:9090) — only from the GPU worker LAN subnet, so external
+    # workers can fetch models (ADR 018). Bearer-token gated on top of this.
+    # NOTE: confirm 10.90.101.0/24 is the worker subnet; relies on the Service's
+    # externalTrafficPolicy: Local preserving the worker source IP. Fails closed
+    # (workers blocked) if the CIDR is wrong — not an exposure.
+    - from:
+        - ipBlock:
+            cidr: 10.90.101.0/24
+      ports:
+        - port: 9090
+          protocol: TCP

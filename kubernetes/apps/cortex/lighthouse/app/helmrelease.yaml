@@ -1,0 +1,244 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: lighthouse
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    defaultPodOptions:
+      # UID 568 matches the comfyui-master image (its passwd entry + torch
+      # getpwuid). The distroless sidecars run fine as 568 too (no passwd lookup).
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    controllers:
+      lighthouse:
+        # RWO ceph-block models PVC can't be multi-attached during a rolling
+        # update → Recreate.
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          # ── ComfyUI orchestrator-only master ──────────────────────────────
+          main:
+            image:
+              repository: ghcr.io/gavinmcfall/lighthouse
+              tag: 0.22.0@sha256:16a45ddfa747f270ec38cf1c33b8132441e70db8bd327ace34b9617070dd06b4
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket: { port: 8188 }
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket: { port: 8188 }
+                  initialDelaySeconds: 15
+                  periodSeconds: 15
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket: { port: 8188 }
+                  initialDelaySeconds: 10
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 60
+            resources:
+              requests:
+                cpu: 500m
+                memory: 2Gi
+              limits:
+                memory: 8Gi
+            securityContext:
+              # ComfyUI + torch write caches under HOME=/app (image rootfs), so
+              # this container can NOT use a read-only root filesystem.
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: { drop: ["ALL"] }
+          # ── licence-gate reverse proxy (the only Service-exposed port) ────
+          licence-gate:
+            image:
+              repository: ghcr.io/gavinmcfall/licence-gate
+              tag: 0.1.1@sha256:9605b5da3d83ebd6256900f0c5c2c1672d642d3ddae9833f72c3c0ba7c831e54
+            env:
+              LIGHTHOUSE_LISTEN: ":8000"
+              LIGHTHOUSE_UPSTREAM: "http://127.0.0.1:8188"
+              LIGHTHOUSE_REGISTRY_PATH: "/etc/lighthouse/registry.json"
+              # Mounted allowlist includes DistributedCollector/DistributedSeed so
+              # ComfyUI-Distributed (GPU) workflows pass the gate; the built-in
+              # default would reject them.
+              LIGHTHOUSE_ALLOWLIST_PATH: "/etc/lighthouse/allowlist.json"
+              LIGHTHOUSE_DR_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: lighthouse-secret
+                    key: LIGHTHOUSE_DR_TOKEN
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket: { port: 8000 }
+                  initialDelaySeconds: 5
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket: { port: 8000 }
+                  initialDelaySeconds: 5
+                  periodSeconds: 15
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+          # ── model-serve sidecar (ADR 018; LAN exposure is a follow-up) ────
+          model-serve:
+            image:
+              repository: ghcr.io/gavinmcfall/model-serve
+              tag: 0.1.0@sha256:a52603e552f2abe32fe58b286056b7aeff6c49b09583260873c02ccd6ea3c355
+            env:
+              MODELSERVE_LISTEN: ":9090"
+              MODELSERVE_ROOT: "/models"
+              MODELSERVE_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: lighthouse-secret
+                    key: LIGHTHOUSE_WORKER_TOKEN
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /healthz, port: 9090 }
+                  initialDelaySeconds: 5
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /healthz, port: 9090 }
+                  initialDelaySeconds: 5
+                  periodSeconds: 15
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+    service:
+      app:
+        controller: lighthouse
+        ports:
+          # The licence-gate proxy — the OIDC-gated family surface (via Envoy).
+          # ComfyUI :8188 is never Service-exposed.
+          http:
+            port: 8000
+      # model-serve gets a LAN IP (Cilium LB-IPAM) so the external GPU workers can
+      # fetch models (ADR 018). externalTrafficPolicy: Local preserves the worker
+      # source IP so the NetworkPolicy can scope :9090 to the worker subnet; the
+      # endpoint is also bearer-token gated (LIGHTHOUSE_WORKER_TOKEN).
+      model-serve:
+        controller: lighthouse
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        annotations:
+          io.cilium/lb-ipam-ips: ${LIGHTHOUSE_MODELSERVE_LBIP}
+        ports:
+          http:
+            port: 9090
+    persistence:
+      models:
+        existingClaim: lighthouse-models
+        advancedMounts:
+          lighthouse:
+            main:
+              - path: /app/models
+                readOnly: true
+            model-serve:
+              - path: /models
+      output:
+        existingClaim: lighthouse-output
+        advancedMounts:
+          lighthouse:
+            main:
+              - path: /app/output
+      workflows:
+        existingClaim: lighthouse-workflows
+        advancedMounts:
+          lighthouse:
+            main:
+              - path: /app/workflows
+                readOnly: true
+      registry:
+        type: configMap
+        name: lighthouse-registry
+        advancedMounts:
+          lighthouse:
+            licence-gate:
+              - path: /etc/lighthouse
+      gpu-config:
+        type: configMap
+        name: lighthouse-comfyui-distributed
+        advancedMounts:
+          lighthouse:
+            main:
+              - path: /app/custom_nodes/ComfyUI-Distributed/gpu_config.json
+                subPath: gpu_config.json
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          lighthouse:
+            licence-gate:
+              - path: /tmp
+            model-serve:
+              - path: /tmp

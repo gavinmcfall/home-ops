@@ -1,0 +1,236 @@
+[
+  {
+    "filename": "v1-5-pruned-emaonly.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL-M",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy",
+      "light"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "sd_xl_base_1.0.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL++-M",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "illustrious-xl-2.0.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL (SDXL)",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "animagine-xl-4.0-opt.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL++-M",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "wai-illustrious-sdxl-v16.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "Fair AI Public License 1.0-SD (commercial permitted)",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "flux1-schnell-Q4_K_S.gguf",
+    "sha256": "TBD-on-acquisition",
+    "licence": "Apache 2.0",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy",
+      "light"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "flux2-klein-4b-distilled-fp8.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "Apache 2.0",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy",
+      "light"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "juggernaut-xl-v13.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL++-M",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "realvisxl-v5.0.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL++-M",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "epicrealism-xl-pure-fix.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL++-M with Addendum",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "realistic-vision-v6.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL-M",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy",
+      "light"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "sd3.5_medium.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "Stability Community (commercial under ~$1M revenue) + Stability AUP",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "lumina-image-2.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "Apache 2.0",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "chroma1-hd.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "Apache 2.0",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": []
+  },
+  {
+    "filename": "flux1-dev-Q8.gguf",
+    "sha256": "TBD-on-acquisition",
+    "licence": "FLUX.1 [dev] Non-Commercial",
+    "commercial_ok": false,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": [
+      "flux1-schnell-Q4_K_S.gguf",
+      "flux2-klein-4b-distilled-fp8.safetensors"
+    ]
+  },
+  {
+    "filename": "flux1-krea-dev-fp8.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "FLUX.1 [dev] Non-Commercial",
+    "commercial_ok": false,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": [
+      "lumina-image-2.safetensors",
+      "chroma1-hd.safetensors"
+    ]
+  },
+  {
+    "filename": "pony-diffusion-v6-xl.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "Modified Fair AI Public License 1.0-SD (creator addendum: non-commercial without explicit auth)",
+    "commercial_ok": false,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": [
+      "animagine-xl-4.0-opt.safetensors",
+      "wai-illustrious-sdxl-v16.safetensors"
+    ]
+  },
+  {
+    "filename": "noobai-xl-epsilon-1.1.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "Fair AI Public License 1.0-SD + creator non-commercial addendum",
+    "commercial_ok": false,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": [
+      "animagine-xl-4.0-opt.safetensors",
+      "wai-illustrious-sdxl-v16.safetensors"
+    ]
+  },
+  {
+    "filename": "nova-furry-xl-il-v18.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "FAIPL 1.0 (creator rider: unedited generated images not commercial)",
+    "commercial_ok": false,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": [
+      "pony-diffusion-v6-xl.safetensors"
+    ]
+  },
+  {
+    "filename": "cyberrealistic-xl-v10.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL++-M with Addendum",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": [
+      "realvisxl-v5.0.safetensors",
+      "epicrealism-xl-pure-fix.safetensors"
+    ]
+  },
+  {
+    "filename": "cyberrealistic-pony-v18.safetensors",
+    "sha256": "TBD-on-acquisition",
+    "licence": "CreativeML Open RAIL++-M",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy"
+    ],
+    "substitutes": [
+      "realvisxl-v5.0.safetensors",
+      "cyberrealistic-xl-v10.safetensors"
+    ]
+  }
+]

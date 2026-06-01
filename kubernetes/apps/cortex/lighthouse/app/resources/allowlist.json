@@ -1,0 +1,18 @@
+{
+  "CheckpointLoaderSimple": { "model_fields": [{ "field": "ckpt_name", "folder": "checkpoints" }] },
+  "UNETLoader": { "model_fields": [{ "field": "unet_name", "folder": "diffusion_models" }] },
+  "VAELoader": { "model_fields": [{ "field": "vae_name", "folder": "vae" }] },
+  "LoraLoader": { "model_fields": [{ "field": "lora_name", "folder": "loras" }] },
+  "CLIPLoader": { "model_fields": [{ "field": "clip_name", "folder": "text_encoders" }] },
+  "DualCLIPLoader": { "model_fields": [{ "field": "clip_name1", "folder": "text_encoders" }, { "field": "clip_name2", "folder": "text_encoders" }] },
+  "ControlNetLoader": { "model_fields": [{ "field": "control_net_name", "folder": "controlnet" }] },
+  "SaveImage": { "output_field": "filename_prefix" },
+  "SaveAnimatedWEBP": { "output_field": "filename_prefix" },
+  "SaveAnimatedPNG": { "output_field": "filename_prefix" },
+  "CLIPTextEncode": {},
+  "KSampler": {},
+  "EmptyLatentImage": {},
+  "VAEDecode": {},
+  "DistributedCollector": {},
+  "DistributedSeed": {}
+}

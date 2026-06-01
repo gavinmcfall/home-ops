@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./pvc.yaml
+  - ./externalsecret.yaml
+  - ./backend.yaml
+  - ./securitypolicy.yaml
+  - ./helmrelease.yaml
+  - ./httproute.yaml
+  - ./networkpolicy.yaml
+configMapGenerator:
+  # licence-gate config mounted at /etc/lighthouse: the licence registry
+  # (registry.json) + the node allowlist (allowlist.json, = the intrinsic node
+  # set + DistributedCollector/DistributedSeed so distributed workflows validate).
+  - name: lighthouse-registry
+    files:
+      - ./resources/registry.json
+      - ./resources/allowlist.json
+  # ComfyUI-Distributed worker config + master_delegate_only (orchestrator-only),
+  # mounted as gpu_config.json into the plugin dir.
+  - name: lighthouse-comfyui-distributed
+    files:
+      - ./resources/gpu_config.json
+generatorOptions:
+  disableNameSuffixHash: true

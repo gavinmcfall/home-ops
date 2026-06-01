@@ -1,0 +1,27 @@
+# ComfyUI distributed worker — systemd unit (runs INSIDE the WSL2 `lighthouse` distro).
+#
+# Install on each GPU worker (VengeancePC, VixenPC) so ComfyUI starts on boot
+# with the flags ComfyUI-Distributed REQUIRES for a remote worker:
+#   --listen 0.0.0.0      bind on the LAN so the cluster master can reach it
+#   --enable-cors-header  REQUIRED by ComfyUI-Distributed for remote workers
+#                         (Phase-0 launched with --listen only — this was missing)
+#
+# Replace <WSL_USER> with the distro's UNIX user (the one that owns ~/ComfyUI).
+# See worker-setup/README.md for the full install (wsl.conf systemd + Task
+# Scheduler at-boot + firewall).
+
+[Unit]
+Description=ComfyUI distributed GPU worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=<WSL_USER>
+WorkingDirectory=/home/<WSL_USER>/ComfyUI
+ExecStart=/home/<WSL_USER>/ComfyUI/.venv/bin/python /home/<WSL_USER>/ComfyUI/main.py --listen 0.0.0.0 --enable-cors-header
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

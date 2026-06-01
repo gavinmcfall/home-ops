@@ -10,3 +10,4 @@ components:
 resources:
   # Applications
   - ./mempalace/ks.yaml
+  - ./lighthouse/ks.yaml
