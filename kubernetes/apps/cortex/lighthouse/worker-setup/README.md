@@ -99,12 +99,16 @@ wsl -d lighthouse --user root -- hostname -I   # expect a 10.90.x LAN address in
 
 ---
 
-## 2. (Recommended) Move the distro off C: to a bigger drive
+## 2. (Optional) Move the distro off C: to a bigger drive
 
-Models are large, and `~/ComfyUI/models` lives **inside the distro's `ext4.vhdx`**.
-By default that VHDX is on C:. Move the whole distro to a roomy drive **before**
-placing models (smaller, faster move). Replace `D:` with whatever drive has space
-on that box (`Get-PSDrive -PSProvider FileSystem` to check).
+Models live **inside the distro's `ext4.vhdx`**, which sits on C: by default. Moving
+the distro keeps a big SDXL library off C:. **Only worth it on the heavy boxes** —
+the kids' light-tier boxes hold one ~4 GB SD-1.5 model, so if C: has space, **skip
+this step on them.** Check space with `Get-PSDrive -PSProvider FileSystem`; replace
+`D:` below with whatever drive has room.
+
+Do the move **while the distro is fresh/empty** (before CUDA/ComfyUI) if you can —
+it's smaller and faster.
 
 > **Do NOT** symlink `~/ComfyUI/models` to `/mnt/d/...`. WSL reads Windows drives
 > over a slow 9P layer and safetensors uses mmap — large model loads are painful and
@@ -136,8 +140,25 @@ wsl -l -v
 
 ```powershell
 (Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss | ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object DistributionName -eq 'lighthouse').BasePath   # → D:\wsl\lighthouse
-wsl -d lighthouse --user gavin -- df -h /                                  # root should be the big volume
+wsl -d lighthouse --user root -- df -h /                                   # root fs should be the big volume
 ```
+
+> **If `--move` fails with `ERROR_FILE_NOT_FOUND`:** some distro layouts park the
+> `ext4.vhdx` away from the registry `BasePath`, and `--move`/`--export` can't find
+> it. **Do not keep retrying `--move`** — it can leave the distro registered but
+> disk-less (boot then fails `attach disk … ERROR_FILE_NOT_FOUND`, and the vhdx may
+> be gone). If C: has space, just **leave it on C:**. If you must relocate, the
+> bulletproof method on a *healthy* distro is export → re-register in place:
+> ```powershell
+> wsl --shutdown
+> New-Item -ItemType Directory -Force -Path "D:\wsl\lighthouse" | Out-Null
+> wsl --export --vhd lighthouse "D:\wsl\lighthouse\ext4.vhdx"
+> Get-Item "D:\wsl\lighthouse\ext4.vhdx"          # CONFIRM a real, multi-GB file BEFORE the next line
+> wsl --unregister lighthouse
+> wsl --import-in-place lighthouse "D:\wsl\lighthouse\ext4.vhdx"
+> ```
+> Cheapest of all: do the relocation on a **fresh empty distro** (install with
+> `--no-launch`, move, *then* set up) so a failure costs nothing.
 
 ---
 
@@ -199,21 +220,38 @@ New-NetFirewallRule -DisplayName "ComfyUI worker 8188 (cluster)" -Direction Inbo
 
 ---
 
-## 4. Place the model(s)
+## 4. Place the model(s) — **match the model to the tier**
 
-The worker executes the graph, so it needs the workflow's model locally:
+The worker executes the graph, so it needs the workflow's model locally. **Which
+model depends on the box's GPU — do NOT put SDXL on the 3050s.**
+
+**Heavy tier (Vengeance / Vixen, RTX 4080S 16 GB)** — SDXL base (the workshop smoke
+fixture's model):
 
 ```bash
 cd ~/ComfyUI/models/checkpoints
-# Heavy tier (Vengeance/Vixen, 4080S 16 GB) — the workshop smoke fixture's model:
 wget -O sd_xl_base_1.0.safetensors \
   https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors
 ```
 
-> **Light tier (Nova/Blaze, 3050 8 GB):** use SD 1.5, not SDXL (SDXL is borderline on
-> 8 GB). The model a worker needs == whatever the curated workflow references.
-> Per ADR 018 the worker-side fetch-from-`model-serve` client will automate this
-> later; for now place it manually.
+**Light tier (Nova / Blaze, RTX 3050 8 GB)** — SD 1.5 **only**. SDXL (~7 GB) will OOM
+an 8 GB card. SD 1.5 is ~4 GB and fits comfortably:
+
+```bash
+cd ~/ComfyUI/models/checkpoints
+wget -O v1-5-pruned-emaonly.safetensors \
+  https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors
+```
+
+> ⚠️ **Light-tier boxes stay OUT of the master's `gpu_config.json` worker pool for
+> now.** ComfyUI-Distributed fans every job out to **all enabled workers with no
+> per-job tier routing** — so if a 3050 is in the pool and an SDXL job runs, it gets
+> handed work it can't fit and the render fails. Mixing tiers in one pool **breaks**
+> the heavy-tier smoke rather than helping it. The kids' boxes are valid prep, but
+> they only join the pool once there's tier-aware dispatch and/or SD-1.5-only
+> workflows (the "light tier deferred" milestone line). Per ADR 018 the worker-side
+> fetch-from-`model-serve` client will automate model placement later; for now place
+> it manually.
 
 ---
 
@@ -239,6 +277,11 @@ JSON back = good. If it hangs: recheck `--listen` (step 3b), the firewall rule
 | Nova | `pc-nova.internal` | light (deferred) |
 | Blaze | `pc-blaze.internal` | light (deferred) |
 
-Worker registration is **static** — the cluster master already lists all workers in
-its `gpu_config.json` (`master_delegate_only: true`); there's no auto-discovery. A
-worker is "active" the moment it's a running ComfyUI reachable at its `:8188`.
+Worker registration is **static** — workers only participate when listed in the
+master's `gpu_config.json` (`master_delegate_only: true`) **and** reachable on
+`:8188`; there's no auto-discovery, and adding a box to the LAN does NOT auto-enroll
+it. **`gpu_config.json` currently lists only the two heavy workers
+(`vengeancepc.internal`, `vixenpc.internal`).** The light boxes (`pc-nova.internal`,
+`pc-blaze.internal`) are intentionally absent — see the tier warning in step 4: a
+3050 in the pool would be handed SDXL jobs it can't fit. They get added when
+light-tier routing exists.
