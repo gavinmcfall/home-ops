@@ -11,10 +11,13 @@ resources:
   - ./httproute.yaml
   - ./networkpolicy.yaml
 configMapGenerator:
-  # licence-gate registry (consumed at /etc/lighthouse/registry.json)
+  # licence-gate config mounted at /etc/lighthouse: the licence registry
+  # (registry.json) + the node allowlist (allowlist.json, = the intrinsic node
+  # set + DistributedCollector/DistributedSeed so distributed workflows validate).
   - name: lighthouse-registry
     files:
       - ./resources/registry.json
+      - ./resources/allowlist.json
   # ComfyUI-Distributed worker config + master_delegate_only (orchestrator-only),
   # mounted as gpu_config.json into the plugin dir.
   - name: lighthouse-comfyui-distributed

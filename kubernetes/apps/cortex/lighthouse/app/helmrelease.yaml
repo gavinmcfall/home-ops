@@ -90,14 +90,15 @@ spec:
           licence-gate:
             image:
               repository: ghcr.io/gavinmcfall/licence-gate
-              tag: 0.1.0@sha256:8c43981f875a31ecbc5ed0dabc2cbb2f234d329403e2506d7a4d78a1b8ca4012
+              tag: 0.1.1@sha256:9605b5da3d83ebd6256900f0c5c2c1672d642d3ddae9833f72c3c0ba7c831e54
             env:
               LIGHTHOUSE_LISTEN: ":8000"
               LIGHTHOUSE_UPSTREAM: "http://127.0.0.1:8188"
               LIGHTHOUSE_REGISTRY_PATH: "/etc/lighthouse/registry.json"
-              # LIGHTHOUSE_ALLOWLIST_PATH unset → falls back to the built-in
-              # DefaultAllowlist (the minimal SDXL workshop node set). The
-              # CI-generated allowlist from curated workflows is a follow-up.
+              # Mounted allowlist includes DistributedCollector/DistributedSeed so
+              # ComfyUI-Distributed (GPU) workflows pass the gate; the built-in
+              # default would reject them.
+              LIGHTHOUSE_ALLOWLIST_PATH: "/etc/lighthouse/allowlist.json"
               LIGHTHOUSE_DR_TOKEN:
                 valueFrom:
                   secretKeyRef:

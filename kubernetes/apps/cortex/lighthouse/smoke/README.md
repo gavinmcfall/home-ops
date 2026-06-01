@@ -6,23 +6,30 @@ resource** — this `smoke/` dir is outside the Flux Kustomization path
 
 ## `workshop-prompt.json`
 
-A minimal, standard SDXL text2img graph wrapped in the ComfyUI `POST /prompt`
-envelope. Validated against the licence-gate logic (parse → node allowlist →
-licence gate): all 7 nodes are on the built-in `DefaultAllowlist`, it references
-`sd_xl_base_1.0.safetensors` (registry: commercial-OK), and a commercial job is
+A minimal SDXL text2img graph with a **`DistributedCollector`** node (so the
+master delegates the render to a GPU worker rather than running it CPU-only),
+wrapped in the ComfyUI-Distributed **`POST /distributed/queue`** envelope
+(`enabled_worker_ids` + `delegate_master`). Validated against the licence-gate
+logic with the mounted allowlist: all nodes allowlisted, references
+`sd_xl_base_1.0.safetensors` (registry: commercial-OK), commercial job
 **allowed**.
 
-Use it to drive the first end-to-end render through the deployed surface, e.g.:
+> The collector node is why this targets `/distributed/queue`, not `/prompt`: a
+> plain `/prompt` runs the whole graph on the CPU-only master. Both endpoints are
+> licence-gated by the proxy.
+
+Use it to drive the first end-to-end render through the deployed surface:
 
 ```bash
 # Through the OIDC-gated proxy (browser session / forwarded id_token):
-curl -sS https://lighthouse.nerdz.cloud/prompt \
+curl -sS https://lighthouse.nerdz.cloud/distributed/queue \
   -H "Authorization: Bearer <id_token>" \
   -H "Content-Type: application/json" \
   --data @workshop-prompt.json
 
-# The proxy rewrites SaveImage filename_prefix to "<user>/workshop" and forwards
-# to the orchestrator-only ComfyUI master, which delegates the render to a worker.
+# The proxy rewrites SaveImage filename_prefix to "<user>/workshop", forwards to
+# the orchestrator-only ComfyUI master, which delegates the render to a worker
+# and collects the result back; the master's SaveImage writes to /output/<user>/.
 ```
 
 Pre-conditions: cluster deployed (lighthouse-impl merged to main), the model
