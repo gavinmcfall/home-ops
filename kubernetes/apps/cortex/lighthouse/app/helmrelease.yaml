@@ -184,9 +184,20 @@ spec:
     service:
       app:
         controller: lighthouse
+        # LoadBalancer with Cilium LB-IPAM IP so ComfyUI workers (on LAN, outside
+        # cluster) can POST /distributed/job_complete callbacks back to master.
+        # The licence-gate proxy on :8000 forwards everything to master :8188 by
+        # default, so callback paths pass through transparently — workers never
+        # touch master :8188 directly (only-via-licence-gate posture preserved).
+        # externalTrafficPolicy: Local preserves worker source IP for NetworkPolicy.
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        annotations:
+          io.cilium/lb-ipam-ips: ${LIGHTHOUSE_APP_LBIP}
         ports:
-          # The licence-gate proxy — the OIDC-gated family surface (via Envoy).
-          # ComfyUI :8188 is never Service-exposed.
+          # The licence-gate proxy — OIDC-gated family surface (via Envoy for
+          # browsers) AND worker-callback surface (direct LAN IP for workers
+          # POSTing /distributed/job_complete). ComfyUI :8188 is never Service-exposed.
           http:
             port: 8000
       # model-serve gets a LAN IP (Cilium LB-IPAM) so the external GPU workers can

@@ -46,6 +46,7 @@ data:
   POSTGRES18_CLUSTER_LBIP: "10.99.8.213"
   ANYTYPE_SYNC_LBIP: "10.99.8.214"
   LIGHTHOUSE_MODELSERVE_LBIP: "10.99.8.215"
+  LIGHTHOUSE_APP_LBIP: "10.99.8.216"  # licence-gate :8000 exposed to LAN so ComfyUI workers can POST /distributed/job_complete callbacks back to master (proxy forwards transparently to master :8188)
 
   # Dragonfly Redis DB Index Allocation:
   # | Index | App                      |

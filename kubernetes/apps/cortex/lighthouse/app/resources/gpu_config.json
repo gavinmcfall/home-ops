@@ -1,6 +1,6 @@
 {
   "master": {
-    "host": "localhost"
+    "host": "http://10.99.8.216:8000"
   },
   "workers": [
     {
