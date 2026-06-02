@@ -77,9 +77,15 @@ spec:
             resources:
               requests:
                 cpu: 500m
-                memory: 2Gi
+                memory: 4Gi
               limits:
-                memory: 8Gi
+                # Bumped 8Gi → 24Gi after OOMKill 2026-06-02 during first /distributed/queue
+                # smoke (exit 137). Master is --cpu orchestrator-only per design but the
+                # comfy-aimdo plugin pins ~14GB host RAM regardless of --cpu, AND ComfyUI
+                # appears to load the checkpoint (~6.5GB for SDXL) at validation time
+                # before dispatch. 24Gi covers comfy-aimdo pin + SDXL load + ~3-4Gi buffer.
+                # Node stanton-03 has 95GB memory, 51% allocated — comfortable.
+                memory: 24Gi
             securityContext:
               # ComfyUI + torch write caches under HOME=/app (image rootfs), so
               # this container can NOT use a read-only root filesystem.
