@@ -59,6 +59,8 @@ spec:
               FLASK_PORT: "8084"
               # Downloads drop straight into the Calibre inbox on NFS.
               INGEST_DIR: /media/Library/Books/_inbox
+              # Log to stdout only; /var/log isn't writable by UID 568.
+              ENABLE_LOGGING: "false"
               # --- SSO via pocket-id (OIDC) ---
               # Callback to register in pocket-id:
               #   https://shelfmark.${SECRET_DOMAIN}/api/auth/oidc/callback

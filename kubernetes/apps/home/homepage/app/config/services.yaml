@@ -22,9 +22,6 @@
             - type: radarr
               service_group: Downloads
               service_name: Radarr UHD
-            - type: readarr
-              service_group: Downloads
-              service_name: Readarr
 - Infrastructure:
     - Cloudflared:
         href: https://dash.cloudflare.com/
@@ -104,14 +101,6 @@
           type: radarr
           url: http://radarr-uhd.downloads
           key: {{HOMEPAGE_VAR_RADARR_UHD_TOKEN}}
-    - Readarr:
-        href: https://readarr.${SECRET_DOMAIN}
-        icon: readarr.png
-        description: eBook downloads
-        widget:
-          type: readarr
-          url: http://readarr.downloads
-          key: {{HOMEPAGE_VAR_READARR_TOKEN}}
     - Bazarr:
         href: https://bazarr.${SECRET_DOMAIN}
         icon: bazarr.png
