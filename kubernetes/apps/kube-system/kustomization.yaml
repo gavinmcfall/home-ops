@@ -20,3 +20,4 @@ resources:
   - ./nvidia-device-plugin/ks.yaml
   - ./reloader/ks.yaml
   - ./spegel/ks.yaml
+  - ./zot/ks.yaml
