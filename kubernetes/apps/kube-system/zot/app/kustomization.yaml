@@ -6,6 +6,7 @@ resources:
   - ./objectbucketclaim.yaml
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+  - ./backendtrafficpolicy.yaml
 configMapGenerator:
   - name: zot-config
     files:
