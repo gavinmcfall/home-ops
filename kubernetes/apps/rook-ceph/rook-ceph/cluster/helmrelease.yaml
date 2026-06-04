@@ -220,9 +220,11 @@ spec:
             resources:
               requests:
                 cpu: 1000m
-                memory: 320Mi
+                memory: 512Mi
               limits:
-                memory: 640Mi
+                # 640Mi OOM-killed (exit 137) when finalizing large multipart
+                # objects (e.g. a 3.6GB container-image blob → zot S3 backend).
+                memory: 2Gi
             instances: 2
           healthCheck:
             bucket:
