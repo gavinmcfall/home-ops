@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.envoyproxy.io/backendtrafficpolicy_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: zot-backend
+spec:
+  # Large container-image blobs (the Dune seabass-server layer is ~3.6GB) take
+  # minutes to upload; the default request timeout cuts them off (zot logs an
+  # i/o timeout reading from Envoy → 503). Same pattern as audiobookshelf/truenas.
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: zot
+  connection:
+    bufferLimit: 16Mi
+  timeout:
+    http:
+      requestTimeout: 0s
+      connectionIdleTimeout: 3600s
+  tcpKeepalive:
+    probes: 3
+    idleTime: 60s
+    interval: 60s
