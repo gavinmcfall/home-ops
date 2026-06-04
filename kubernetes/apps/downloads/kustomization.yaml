@@ -21,6 +21,7 @@ resources:
   - ./heybuilds-downloader/ks.yaml
   - ./heybuilds-viewer/ks.yaml
   - ./kapowarr/ks.yaml
+  - ./lncrawl/ks.yaml
   - ./metube/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml  # Restic restore from Dec 10
