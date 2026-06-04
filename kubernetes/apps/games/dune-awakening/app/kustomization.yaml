@@ -1,0 +1,10 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./rbac.yaml
+  - ./externalsecret.yaml
+  - ./helmrelease.yaml
+# NOTE: image-sync/ (the SteamCMD→zot pull tooling) is intentionally NOT included
+# here — it's separate operational tooling, not part of the server deployment.

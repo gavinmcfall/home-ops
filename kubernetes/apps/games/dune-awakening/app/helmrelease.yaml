@@ -1,16 +1,24 @@
 # =============================================================================
-# DRAFT — grounded in snapetech/DuneAwakeningSelfHost compose.yaml, but NOT
-# deployable yet and NOT wired into Flux. See ../PORT-NOTES.md for the blockers
-# (wrapper scripts run_server_safe.sh/bootstrap_db.py, vendor userland, game-rmq
-# TLS, the full -ini: arg list). ${DUNE_REGISTRY}=zot, ${DUNE_TAG}=<build>-0-shipping.
-# This is a faithful SKELETON of the topology, not a finished release.
+# DRAFT first-cut — operator-free transplant of the Funcom Dune server, grounded
+# in the extracted image (run.sh, Config INIs) + snapetech compose env wiring.
+# NOT wired into Flux. Needs before going live (see ../PORT-NOTES.md + TODOs):
+#   1. 1Password item "dune-awakening" (FLS token + pg/rmq secrets)
+#   2. EXTERNAL ADDRESS: Talos nodes have no ExternalIP → run.sh can't derive a
+#      routable -ExternalAddress. Must set node ExternalIP or inject public IP.
+#   3. SECRET-IN-ARGS: the game server's FLS token / DB password are passed here
+#      via ENV (FuncomLiveServices__* / DuneDatabaseInterfacePSQL_*). If the UE5
+#      binary ONLY honours -ini: CLI args (not env), a wrapper/initContainer must
+#      build args from env so secrets don't sit in the pod spec. VALIDATE on first run.
+#   4. DB bootstrap mechanism (db-init) — native image db setup, unconfirmed.
+#   5. game-rmq TLS cert (cert-manager).
+# Substitution vars (${DUNE_*}) come from ks.yaml postBuild.
 # =============================================================================
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app dune-awakening
+  name: dune-awakening
 spec:
   interval: 30m
   chart:
@@ -22,8 +30,11 @@ spec:
         name: bjw-s
         namespace: flux-system
   values:
+    defaultPodOptions:
+      # run.sh needs the SA token to read its node + patch its pod (see rbac.yaml)
+      serviceAccountName: dune-awakening
     controllers:
-      # --- data plane ------------------------------------------------------
+      # ---------------- data plane -------------------------------------------
       postgres:
         type: statefulset
         containers:
@@ -35,7 +46,7 @@ spec:
               POSTGRES_DB: dune
               POSTGRES_USER: dune
             envFrom:
-              - secretRef: { name: dune-awakening-secret }  # POSTGRES_PASSWORD / _SUPER_PASSWORD
+              - secretRef: { name: dune-awakening-secret }   # POSTGRES_PASSWORD / _SUPER_PASSWORD
 
       admin-rmq:
         type: statefulset
@@ -48,7 +59,7 @@ spec:
               RMQ_AUTH_BACKEND_1: cache
               FuncomLiveServices__RmqTlsEnabled: "false"
             envFrom:
-              - secretRef: { name: dune-awakening-secret }  # RMQ_HTTP_TOKEN_AUTH_SECRET
+              - secretRef: { name: dune-awakening-secret }   # RMQ_HTTP_TOKEN_AUTH_SECRET
 
       game-rmq:
         type: statefulset
@@ -59,11 +70,11 @@ spec:
               tag: "${DUNE_TAG}"
             env:
               RMQ_AUTH_BACKEND_1: cache
-              FuncomLiveServices__RmqTlsEnabled: "true"     # mounts ca/cert/key — see persistence.rmq-tls
+              FuncomLiveServices__RmqTlsEnabled: "true"       # mounts ca/cert/key (persistence.rmq-tls)
             envFrom:
               - secretRef: { name: dune-awakening-secret }
 
-      # --- one-shot DB bootstrap ------------------------------------------
+      # ---------------- one-shot DB bootstrap (TODO: confirm native invocation) --
       db-init:
         type: job
         containers:
@@ -71,60 +82,153 @@ spec:
             image:
               repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-db-utils"
               tag: "${DUNE_TAG}"
-            # command: bootstrap_db.py — TODO: provide via scripts ConfigMap (PORT-NOTES blocker #1)
-            envFrom:
-              - secretRef: { name: dune-awakening-secret }
+            # TODO: native image ships home/dune/server/PSQL/ToolsDB/setupdb.py — confirm
+            #   the correct invocation (snapetech used its own /workspace bootstrap_db.py).
+            env:
+              POSTGRES_DUNE_PASSWORD:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_DUNE_PASSWORD } }
 
-      # --- control plane ---------------------------------------------------
-      text-router:
-        containers:
-          app:
-            image:
-              repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-text-router"
-              tag: "${DUNE_TAG}"
+      # ---------------- control plane ----------------------------------------
       director:
         containers:
           app:
             image:
               repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-bg-director"
               tag: "${DUNE_TAG}"
-            envFrom:
-              - secretRef: { name: dune-awakening-secret }  # FLS_SECRET
+            args:
+              - --RMQGameHostname
+              - game-rmq
+              - --RMQGamePort
+              - "5672"
+              - --RMQAdminHostname
+              - admin-rmq
+              - --RMQAdminPort
+              - "5672"
+            env:
+              Database__address: postgres
+              Database__port: "5432"
+              Database__user: dune
+              BATTLEGROUP_DISPLAY_NAME: "${DUNE_WORLD_UNIQUE_NAME}"
+              WORLD_NAME: "${DUNE_WORLD_NAME}"
+              OPT_SERVERNAME: "${DUNE_WORLD_UNIQUE_NAME}"
+              OPT_DISPLAY_NAME: "${DUNE_WORLD_NAME}"
+              BATTLEGROUP_REGION_NAME: "${DUNE_WORLD_REGION}"
+              HOST_DATACENTER_ID: "${DUNE_WORLD_DATACENTER_ID}"
+              HOST_DATACENTER_IP_ADDRESS: "${DUNE_EXTERNAL_ADDRESS}"   # TODO #2
+              FuncomLiveServices__RmqTlsEnabled: "true"
+              FuncomLiveServices__DefaultFlsEnvironment: retail
+              Database__password:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_DUNE_PASSWORD } }
+              FuncomLiveServices__ServiceAuthToken:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: FLS_SECRET } }
+              RMQ_HTTP_TOKEN_AUTH_SECRET:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: RMQ_HTTP_TOKEN_AUTH_SECRET } }
+
+      text-router:
+        containers:
+          app:
+            image:
+              repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-text-router"
+              tag: "${DUNE_TAG}"
+            args: ["--RMQGameHostname", "game-rmq", "--RMQGamePort", "5672", "--RMQAdminHostname", "admin-rmq", "--RMQAdminPort", "5672"]
+            env:
+              DuneDatabaseInterfacePSQL_DatabaseHost: postgres
+              DuneDatabaseInterfacePSQL_DatabasePort: "5432"
+              DuneDatabaseInterfacePSQL_DatabaseUser: dune
+              DuneDatabaseInterfacePSQL_DatabaseName: "${DUNE_DB_NAME}"   # e.g. dune_sb_1_4_0_0
+              Database__address: postgres
+              Database__port: "5432"
+              Database__user: dune
+              WORLD_NAME: "${DUNE_WORLD_NAME}"
+              OPT_SERVERNAME: "${DUNE_WORLD_UNIQUE_NAME}"
+              BATTLEGROUP_REGION_NAME: "${DUNE_WORLD_REGION}"
+              BATTLEGROUP_LANGUAGE: en-US
+              FuncomLiveServices__RmqTlsEnabled: "true"
+              FuncomLiveServices__DefaultFlsEnvironment: retail
+              HOST_DATACENTER_ID: "${DUNE_WORLD_DATACENTER_ID}"
+              HOST_DATACENTER_IP_ADDRESS: "${DUNE_EXTERNAL_ADDRESS}"
+              DuneDatabaseInterfacePSQL_DatabasePassword:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_DUNE_PASSWORD } }
+              Database__password:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_DUNE_PASSWORD } }
+              FuncomLiveServices__ServiceAuthToken:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: FLS_SECRET } }
+              RMQ_HTTP_TOKEN_AUTH_SECRET:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: RMQ_HTTP_TOKEN_AUTH_SECRET } }
+
       gateway:
         containers:
           app:
             image:
               repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-gateway"
               tag: "${DUNE_TAG}"
-            envFrom:
-              - secretRef: { name: dune-awakening-secret }
+            # gateway is the client-facing piece; advertises game-rmq public endpoint
+            command: ["sh", "-lc"]
+            args:
+              - >-
+                sleep 30;
+                exec python -m service
+                -c /Tools/Battlegroups/GatewayService/service/configs/service.conf
+                --RMQGameHostname ${DUNE_EXTERNAL_ADDRESS}
+                --RMQGamePort 31982
+                --RMQGameHttpPort 15673
+            env:
+              DuneDatabaseInterfacePSQL_DatabaseHost: postgres
+              DuneDatabaseInterfacePSQL_DatabasePort: "5432"
+              DuneDatabaseInterfacePSQL_DatabaseUser: dune
+              DuneDatabaseInterfacePSQL_DatabaseName: "${DUNE_DB_NAME}"
+              FuncomLiveServices__RmqTlsEnabled: "true"
+              FuncomLiveServices__BattlegroupAuthorizationPreset: BattlegroupInternal
+              FuncomLiveServices__DefaultFlsEnvironment: retail
+              BATTLEGROUP_DISPLAY_NAME: "${DUNE_WORLD_NAME}"
+              OPT_SERVERNAME: "${DUNE_WORLD_UNIQUE_NAME}"
+              OPT_DISPLAY_NAME: "${DUNE_WORLD_NAME}"
+              HOST_DATACENTER_ID: "${DUNE_WORLD_DATACENTER_ID}"
+              HOST_DATACENTER_IP_ADDRESS: "${DUNE_EXTERNAL_ADDRESS}"
+              DuneDatabaseInterfacePSQL_DatabasePassword:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_DUNE_PASSWORD } }
+              FuncomLiveServices__ServiceAuthToken:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: FLS_SECRET } }
+              gateway_farm_api_key:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: FLS_SECRET } }
+              RMQ_HTTP_TOKEN_AUTH_SECRET:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: RMQ_HTTP_TOKEN_AUTH_SECRET } }
 
-      # --- game server: one controller per map (start: survival = Hagga Basin) ---
+      # ---------------- game server: one controller per map (start: survival) ----
       game-survival:
         containers:
           app:
             image:
               repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server"
               tag: "${DUNE_TAG}"
-            # TODO: command is snapetech's wrapper + the full -ini: arg list (PORT-NOTES blocker #1/#4).
-            # Shape (from compose anchors):
-            #   /workspace/scripts/run_server_safe.sh
-            #   -FarmRegion=$WORLD_REGION
-            #   -ini:engine:[FuncomLiveServices]:ServiceAuthToken=$FLS_SECRET
-            #   -ini:game:[DuneDatabaseInterfacePSQL]:DatabaseHost=postgres:5432 (user=dune, pw=$POSTGRES_DUNE_PASSWORD)
-            #   --RMQGameHostname=game-rmq --RMQGamePort=5672 --RMQAdminHostname=admin-rmq --RMQAdminPort=5672
-            #   -RMQGameTlsEnabled=true  -ExternalAddress=$EXTERNAL_ADDRESS  -MultiHome=$POD_IP
+            # NOTE: do NOT override command — image Cmd is /home/dune/run.sh, which
+            # does the k8s external-address/pod-patch dance then execs the UE5 binary
+            # with these args. Secrets passed via env (TODO #3: confirm UE5 honours
+            # FuncomLiveServices__ServiceAuthToken env; else inject via -ini: in a wrapper).
+            args:
+              - -FarmRegion=${DUNE_WORLD_REGION}
+              - -ini:engine:[OnlineSubsystem]:ServerName=${DUNE_WORLD_UNIQUE_NAME}
+              - -ini:engine:[OnlineSubsystem]:DatacenterId=${DUNE_WORLD_DATACENTER_ID}
+              - -ini:engine:[FuncomLiveServices]:DefaultFlsEnvironment=retail
+              - -ini:game:[DuneDatabaseInterfacePSQL]:DatabaseHost=postgres:5432
+              - -ini:game:[DuneDatabaseInterfacePSQL]:DatabaseUser=dune
+              - -RMQGameTlsEnabled=true
+              - --RMQGameHostname=game-rmq
+              - --RMQGamePort=5672
+              - --RMQAdminHostname=admin-rmq
+              - --RMQAdminPort=5672
+              - -MultiHome=$POD_IP          # run.sh rewrites with node ExternalIP if available
             env:
-              WORLD_NAME: "${DUNE_WORLD_NAME}"
-              WORLD_UNIQUE_NAME: "${DUNE_WORLD_UNIQUE_NAME}"
-              WORLD_REGION: "${DUNE_WORLD_REGION}"
-              WORLD_DATACENTER_ID: "${DUNE_WORLD_REGION}"
+              FuncomLiveServices__ServiceAuthToken:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: FLS_SECRET } }
+              POSTGRES_DUNE_PASSWORD:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_DUNE_PASSWORD } }
               POD_IP:
-                valueFrom:
-                  fieldRef:
-                    fieldPath: status.podIP        # -> -MultiHome
-            envFrom:
-              - secretRef: { name: dune-awakening-secret }  # FLS_SECRET, EXTERNAL_ADDRESS, POSTGRES_DUNE_PASSWORD
+                valueFrom: { fieldRef: { fieldPath: status.podIP } }
+              POD_NAME:
+                valueFrom: { fieldRef: { fieldPath: metadata.name } }
+              NODE_NAME:
+                valueFrom: { fieldRef: { fieldPath: spec.nodeName } }
             resources:
               requests: { cpu: 2, memory: 12Gi }
               limits: { memory: 20Gi }
@@ -132,16 +236,19 @@ spec:
     service:
       game-survival:
         controller: game-survival
-        type: LoadBalancer            # Cilium L2, UDP
+        type: LoadBalancer            # Cilium L2, UDP game traffic (7xxx/8xxx per run.sh)
         annotations:
-          io.cilium/lb-ipam-pool: PLACEHOLDER
+          io.cilium/lb-ipam-pool: PLACEHOLDER   # TODO: pool + spare IP
         ports:
           game:
-            port: 27015               # Funcom default base; configurable
+            port: 7777
+            protocol: UDP
+          igw:
+            port: 8888
             protocol: UDP
       game-rmq:
         controller: game-rmq
-        type: LoadBalancer            # AMQPS, WAN-reachable
+        type: LoadBalancer            # AMQPS, client-reachable
         ports:
           amqps:
             port: 31982
@@ -157,14 +264,16 @@ spec:
             app:
               - path: /var/lib/postgresql/data
       saved:
-        existingClaim: dune-awakening-saved   # ceph-filesystem RWX, shared Saved/ across maps
+        accessMode: ReadWriteMany
+        size: 20Gi
+        storageClass: ceph-filesystem      # shared Saved/ across map servers
         advancedMounts:
           game-survival:
             app:
               - path: /home/dune/server/DuneSandbox/Saved
       rmq-tls:
         type: secret
-        name: dune-game-rmq-tls               # cert-manager Certificate (TODO)
+        name: dune-game-rmq-tls             # TODO #5: cert-manager Certificate
         advancedMounts:
           game-rmq:
             app:
