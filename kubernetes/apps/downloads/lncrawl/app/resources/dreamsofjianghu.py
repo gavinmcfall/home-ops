@@ -16,8 +16,14 @@ logger = logging.getLogger(__name__)
 
 class DreamsOfJianghu(LegacyCrawler):
     base_url = ["https://dreamsofjianghu.ca/"]
+    language = "en"
     has_mtl = False
     has_manga = False
+
+    def initialize(self):
+        # WordPress/Jetpack host throttles concurrent scraping; pace requests
+        # to avoid mass 429/403 failures (default 5 workers is too aggressive).
+        self.init_executor(ratelimit=2)
 
     def read_novel_info(self):
         # lncrawl reuses the cached crawler instance and may call this more than
