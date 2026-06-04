@@ -7,6 +7,8 @@ full chapter list as dated permalinks (``/YYYY/MM/DD/...-chapter-N/``) inside
 """
 import logging
 import re
+import threading
+import time
 import urllib.parse
 
 from lncrawl.core import Chapter, LegacyCrawler
@@ -20,10 +22,22 @@ class DreamsOfJianghu(LegacyCrawler):
     has_mtl = False
     has_manga = False
 
-    def initialize(self):
-        # WordPress/Jetpack host throttles concurrent scraping; pace requests
-        # to avoid mass 429/403 failures (default 5 workers is too aggressive).
-        self.init_executor(ratelimit=2)
+    # lncrawl downloads chapters as parallel child-jobs (runner_concurrency,
+    # default 5) that bypass the crawler taskman, so a crawler-level ratelimit
+    # has no effect. Cap the request rate across all job threads with a shared
+    # lock + min-interval to avoid mass 429/403 failures.
+    _rate_lock = threading.Lock()
+    _next_request = 0.0
+    _min_interval = 0.5  # seconds between requests (~2/s)
+
+    def _pace(self):
+        cls = type(self)
+        with cls._rate_lock:
+            now = time.monotonic()
+            if now < cls._next_request:
+                time.sleep(cls._next_request - now)
+                now = time.monotonic()
+            cls._next_request = now + cls._min_interval
 
     def read_novel_info(self):
         # lncrawl reuses the cached crawler instance and may call this more than
@@ -67,6 +81,7 @@ class DreamsOfJianghu(LegacyCrawler):
                 )
 
     def download_chapter_body(self, chapter):
+        self._pace()
         soup = self.get_soup(chapter["url"])
         content = soup.select_one("div.entry-content")
         return self.cleaner.extract_contents(content)

@@ -7,6 +7,8 @@ chapter as a dated permalink (``/YYYY/MM/DD/mdd-chapter-N-...``) inside
 """
 import logging
 import re
+import threading
+import time
 
 from lncrawl.core import Chapter, LegacyCrawler
 
@@ -19,10 +21,23 @@ class BloomingTranslation(LegacyCrawler):
     has_mtl = False
     has_manga = False
 
-    def initialize(self):
-        # WordPress.com throttles aggressive concurrent scraping: the default
-        # 5 workers fails ~half the chapters with 429/403. Pace the requests.
-        self.init_executor(ratelimit=2)
+    # lncrawl downloads chapters as parallel child-jobs (runner_concurrency,
+    # default 5) that call the crawler directly, bypassing its taskman — so a
+    # crawler-level executor/ratelimit has no effect. WordPress.com 429s under
+    # that concurrency (~47% failures). A shared lock + min-interval caps the
+    # request rate across all concurrent job threads.
+    _rate_lock = threading.Lock()
+    _next_request = 0.0
+    _min_interval = 0.5  # seconds between requests (~2/s)
+
+    def _pace(self):
+        cls = type(self)
+        with cls._rate_lock:
+            now = time.monotonic()
+            if now < cls._next_request:
+                time.sleep(cls._next_request - now)
+                now = time.monotonic()
+            cls._next_request = now + cls._min_interval
 
     def read_novel_info(self):
         # lncrawl reuses the cached crawler instance and may call this more than
@@ -67,6 +82,7 @@ class BloomingTranslation(LegacyCrawler):
                 )
 
     def download_chapter_body(self, chapter):
+        self._pace()
         soup = self.get_soup(chapter["url"])
         content = soup.select_one("div.entry-content")
         return self.cleaner.extract_contents(content)
