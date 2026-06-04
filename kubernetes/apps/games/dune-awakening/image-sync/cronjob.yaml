@@ -1,0 +1,82 @@
+# =============================================================================
+# DRAFT — headless image-sync CronJob. NOT WIRED INTO FLUX. Finalize after the
+# first manual `pull-to-zot.sh` run confirms the depot layout + a working image.
+# =============================================================================
+# Headless re-pull of Funcom server images into zot on a schedule, using the
+# Steam session captured to 1Password (item "steam-dune"; see RUNBOOK). Restores
+# the cached SteamCMD session so no Steam Guard code is needed at run time.
+#
+# IMAGE: needs steamcmd + skopeo in one image. There's no stock one — build a
+# tiny image (debian + steamcmd + skopeo) and host it in zot itself, then pin it
+# here. Placeholder below.
+# =============================================================================
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dune-image-sync
+  namespace: games
+spec:
+  schedule: "0 5 * * 1"            # weekly Mon 05:00 — Funcom build bumps are infrequent
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+            seccompProfile: { type: RuntimeDefault }
+          containers:
+            - name: sync
+              image: PLACEHOLDER_ZOT/tools/steamcmd-skopeo:TODO   # build + host in zot
+              command: ["/bin/bash", "/scripts/pull-to-zot.sh"]
+              env:
+                - name: ZOT_REGISTRY
+                  value: zot.${SECRET_DOMAIN}
+                - name: REPO_PREFIX
+                  value: funcom/self-hosting
+                - name: INSTALL_DIR
+                  value: /work/depot
+                # Steam user + session restored from 1Password (see initContainer)
+                - name: STEAM_USER
+                  valueFrom: { secretKeyRef: { name: steam-dune, key: STEAM_USER } }
+                # zot admin creds (reuse zot-auth? it only holds htpasswd — store
+                # plaintext admin pw in the steam-dune/ zot item for skopeo push)
+                - name: ZOT_USER
+                  value: admin
+                - name: ZOT_PASS
+                  valueFrom: { secretKeyRef: { name: steam-dune, key: ZOT_PASS } }
+              volumeMounts:
+                - { name: scripts, mountPath: /scripts, readOnly: true }
+                - { name: work, mountPath: /work }
+                - { name: steamhome, mountPath: /home/steam }
+          initContainers:
+            # restore cached SteamCMD session (config.vdf + ssfn*) so login is headless
+            - name: restore-session
+              image: PLACEHOLDER_ZOT/tools/steamcmd-skopeo:TODO
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  mkdir -p /home/steam/Steam
+                  base64 -d /secret/steam-session.tgz.b64 | tar -xz -C /home/steam/Steam
+                  echo "session restored"
+              volumeMounts:
+                - { name: session, mountPath: /secret, readOnly: true }
+                - { name: steamhome, mountPath: /home/steam }
+          volumes:
+            - name: scripts
+              configMap: { name: dune-image-sync-scripts, defaultMode: 0755 }
+            - name: session
+              secret: { secretName: steam-dune }
+            - name: work
+              emptyDir: { sizeLimit: 20Gi }
+            - name: steamhome
+              emptyDir: {}
