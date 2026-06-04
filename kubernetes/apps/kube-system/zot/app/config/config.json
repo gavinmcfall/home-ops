@@ -1,0 +1,46 @@
+{
+  "distSpecVersion": "1.1.1",
+  "storage": {
+    "rootDirectory": "/var/lib/zot",
+    "dedupe": true,
+    "gc": true,
+    "gcDelay": "1h",
+    "gcInterval": "24h",
+    "storageDriver": {
+      "name": "s3",
+      "rootdirectory": "/zot",
+      "region": "us-east-1",
+      "regionendpoint": "rook-ceph-rgw-ceph-objectstore.rook-ceph.svc:80",
+      "bucket": "zot",
+      "forcepathstyle": true,
+      "secure": false,
+      "skipverify": false
+    }
+  },
+  "http": {
+    "address": "0.0.0.0",
+    "port": "5000",
+    "realm": "zot",
+    "auth": {
+      "htpasswd": {
+        "path": "/etc/zot/htpasswd"
+      },
+      "failDelay": 1
+    },
+    "accessControl": {
+      "repositories": {
+        "**": {
+          "anonymousPolicy": ["read"],
+          "defaultPolicy": []
+        }
+      },
+      "adminPolicy": {
+        "users": ["admin"],
+        "actions": ["read", "create", "update", "delete"]
+      }
+    }
+  },
+  "log": {
+    "level": "info"
+  }
+}

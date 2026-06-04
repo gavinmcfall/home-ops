@@ -1,0 +1,95 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app zot
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      zot:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/project-zot/zot
+              tag: v2.1.17@sha256:48b0c11c8c61a07246e047f22e02aad615816683fd8d8073b2862fb7ed0a3cc0
+            envFrom:
+              # ObjectBucketClaim-generated secret: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
+              - secretRef:
+                  name: zot
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: {type: RuntimeDefault}
+    service:
+      app:
+        controller: zot
+        ports:
+          http:
+            port: 5000
+    route:
+      app:
+        annotations:
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+    persistence:
+      config:
+        type: configMap
+        name: zot-config
+        globalMounts:
+          - path: /etc/zot/config.json
+            subPath: config.json
+            readOnly: true
+      htpasswd:
+        type: secret
+        name: zot-auth
+        globalMounts:
+          - path: /etc/zot/htpasswd
+            subPath: htpasswd
+            readOnly: true
+      data:
+        type: emptyDir
+        globalMounts:
+          - path: /var/lib/zot
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
