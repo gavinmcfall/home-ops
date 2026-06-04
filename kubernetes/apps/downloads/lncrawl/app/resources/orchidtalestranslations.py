@@ -16,8 +16,14 @@ logger = logging.getLogger(__name__)
 
 class OrchidTalesTranslations(LegacyCrawler):
     base_url = ["https://orchidtalestranslations.wordpress.com/"]
+    language = "en"
     has_mtl = False
     has_manga = False
+
+    def initialize(self):
+        # WordPress.com throttles aggressive concurrent scraping: the default
+        # 5 workers fails ~half the chapters with 429/403. Pace the requests.
+        self.init_executor(ratelimit=2)
 
     def read_novel_info(self):
         # lncrawl reuses the cached crawler instance and may call this more than
