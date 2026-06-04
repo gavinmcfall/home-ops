@@ -105,6 +105,15 @@ spec:
         existingClaim: *app
         globalMounts:
           - path: /data
+      # Custom crawler modules for translator sites lncrawl ships no source for.
+      # lncrawl globs /app/sources/**/*.py and loads any it finds as non-indexed
+      # crawlers; mounting under en/ registers them as English-language sources.
+      custom-sources:
+        type: configMap
+        name: lncrawl-custom-sources
+        globalMounts:
+          - path: /app/sources/en/custom
+            readOnly: true
       # Mount the shared library so EPUBs can be sent to the Calibre inbox
       media:
         type: nfs

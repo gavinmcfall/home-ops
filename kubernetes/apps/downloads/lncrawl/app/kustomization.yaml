@@ -8,3 +8,14 @@ components:
   - ../../../../components/keda/nfs-scaler
   - ../../../../components/volsync-standard
   - ../../../../components/priority/priority-06
+configMapGenerator:
+  # Custom crawler modules for translator sites lncrawl ships no source for.
+  # Mounted into /app/sources/en/custom so lncrawl auto-loads them as
+  # non-indexed crawlers (see helmrelease persistence: custom-sources).
+  - name: lncrawl-custom-sources
+    files:
+      - ./resources/dreamsofjianghu.py
+      - ./resources/bloomingtranslation.py
+      - ./resources/orchidtalestranslations.py
+generatorOptions:
+  disableNameSuffixHash: true
