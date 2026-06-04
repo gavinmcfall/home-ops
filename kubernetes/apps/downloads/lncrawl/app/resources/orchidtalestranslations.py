@@ -16,11 +16,14 @@ logger = logging.getLogger(__name__)
 
 class OrchidTalesTranslations(LegacyCrawler):
     base_url = ["https://orchidtalestranslations.wordpress.com/"]
-    language = "en"
     has_mtl = False
     has_manga = False
 
     def read_novel_info(self):
+        # lncrawl reuses the cached crawler instance and may call this more than
+        # once (preview + download); reset so chapters don't accumulate.
+        self.chapters.clear()
+        self.volumes.clear()
         soup = self.get_soup(self.novel_url)
 
         title_tag = soup.select_one("h1.entry-title, .entry-title")

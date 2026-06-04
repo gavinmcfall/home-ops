@@ -16,11 +16,14 @@ logger = logging.getLogger(__name__)
 
 class DreamsOfJianghu(LegacyCrawler):
     base_url = ["https://dreamsofjianghu.ca/"]
-    language = "en"
     has_mtl = False
     has_manga = False
 
     def read_novel_info(self):
+        # lncrawl reuses the cached crawler instance and may call this more than
+        # once (preview + download); reset so chapters don't accumulate.
+        self.chapters.clear()
+        self.volumes.clear()
         soup = self.get_soup(self.novel_url)
 
         # The TOC page <h1> is just "Table of Contents", so derive the title
