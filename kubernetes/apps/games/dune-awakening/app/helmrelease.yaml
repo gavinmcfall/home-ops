@@ -1,24 +1,26 @@
 # =============================================================================
-# DRAFT — "just deployments" sketch. NOT WIRED INTO FLUX. DO NOT DEPLOY AS-IS.
-# =============================================================================
-# Operator-free transplant of the Funcom stack (per snapetech/DuneAwakeningSelfHost
-# compose.yaml). See ../SCOPING.md. Every value is a placeholder until:
-#   - images are mirrored to a registry we control (Funcom registry is internal-only)
-#   - the real compose.yaml env/ports are copied in
-#   - public IP + UDP exposure are settled at first bring-up
-# ${DUNE_REGISTRY} = our own registry (e.g. zot on ceph-bucket); ${DUNE_TAG} = <build>-0-shipping
+# DRAFT — grounded in snapetech/DuneAwakeningSelfHost compose.yaml, but NOT
+# deployable yet and NOT wired into Flux. See ../PORT-NOTES.md for the blockers
+# (wrapper scripts run_server_safe.sh/bootstrap_db.py, vendor userland, game-rmq
+# TLS, the full -ini: arg list). ${DUNE_REGISTRY}=zot, ${DUNE_TAG}=<build>-0-shipping.
+# This is a faithful SKELETON of the topology, not a finished release.
 # =============================================================================
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: dune-awakening
+  name: &app dune-awakening
 spec:
-  interval: 1h
-  chartRef:
-    kind: OCIRepository
-    name: app-template
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
   values:
     controllers:
       # --- data plane ------------------------------------------------------
@@ -26,80 +28,126 @@ spec:
         type: statefulset
         containers:
           app:
-            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/igw-postgres", tag: "17.4-alpine-fc-13" }
-      rabbitmq-game:
-        type: statefulset
-        containers:
-          app:
-            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-rabbitmq", tag: "${DUNE_TAG}" }
-            # TLS-AMQP on 31982 — needs cert-manager-issued cert (dependency).
-      rabbitmq-admin:
-        type: statefulset
-        containers:
-          app:
-            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-rabbitmq", tag: "${DUNE_TAG}" }
+            image:
+              repository: "${DUNE_REGISTRY}/funcom/self-hosting/igw-postgres"
+              tag: "17.4-alpine-fc-13"
+            env:
+              POSTGRES_DB: dune
+              POSTGRES_USER: dune
+            envFrom:
+              - secretRef: { name: dune-awakening-secret }  # POSTGRES_PASSWORD / _SUPER_PASSWORD
 
-      # --- one-shot DB init -----------------------------------------------
-      db-utils:
+      admin-rmq:
+        type: statefulset
+        containers:
+          app:
+            image:
+              repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-rabbitmq"
+              tag: "${DUNE_TAG}"
+            env:
+              RMQ_AUTH_BACKEND_1: cache
+              FuncomLiveServices__RmqTlsEnabled: "false"
+            envFrom:
+              - secretRef: { name: dune-awakening-secret }  # RMQ_HTTP_TOKEN_AUTH_SECRET
+
+      game-rmq:
+        type: statefulset
+        containers:
+          app:
+            image:
+              repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-rabbitmq"
+              tag: "${DUNE_TAG}"
+            env:
+              RMQ_AUTH_BACKEND_1: cache
+              FuncomLiveServices__RmqTlsEnabled: "true"     # mounts ca/cert/key — see persistence.rmq-tls
+            envFrom:
+              - secretRef: { name: dune-awakening-secret }
+
+      # --- one-shot DB bootstrap ------------------------------------------
+      db-init:
         type: job
         containers:
           app:
-            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-db-utils", tag: "${DUNE_TAG}" }
+            image:
+              repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-db-utils"
+              tag: "${DUNE_TAG}"
+            # command: bootstrap_db.py — TODO: provide via scripts ConfigMap (PORT-NOTES blocker #1)
+            envFrom:
+              - secretRef: { name: dune-awakening-secret }
 
-      # --- control plane (Funcom services, NO operators) ------------------
-      director:
-        containers:
-          app:
-            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-bg-director", tag: "${DUNE_TAG}" }
-            envFrom: [{ secretRef: { name: dune-awakening-secret } }]   # FLS_SECRET / DUNE_JWT
-      gateway:
-        containers:
-          app:
-            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-gateway", tag: "${DUNE_TAG}" }
-            envFrom: [{ secretRef: { name: dune-awakening-secret } }]
+      # --- control plane ---------------------------------------------------
       text-router:
         containers:
           app:
-            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-text-router", tag: "${DUNE_TAG}" }
-
-      # --- game server: ONE controller per map partition ------------------
-      # operator-free: each map is a static Deployment. Start with Hagga Basin.
-      game-hagga:
+            image:
+              repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-text-router"
+              tag: "${DUNE_TAG}"
+      director:
         containers:
           app:
-            image: { repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server", tag: "${DUNE_TAG}" }
-            # requires AVX2 (cluster ✅). -ExternalAddress + HOST_DATACENTER_IP_ADDRESS
-            # MUST be the real public IPv4 (downward API / stable LB IP).
+            image:
+              repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-bg-director"
+              tag: "${DUNE_TAG}"
+            envFrom:
+              - secretRef: { name: dune-awakening-secret }  # FLS_SECRET
+      gateway:
+        containers:
+          app:
+            image:
+              repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server-gateway"
+              tag: "${DUNE_TAG}"
+            envFrom:
+              - secretRef: { name: dune-awakening-secret }
+
+      # --- game server: one controller per map (start: survival = Hagga Basin) ---
+      game-survival:
+        containers:
+          app:
+            image:
+              repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server"
+              tag: "${DUNE_TAG}"
+            # TODO: command is snapetech's wrapper + the full -ini: arg list (PORT-NOTES blocker #1/#4).
+            # Shape (from compose anchors):
+            #   /workspace/scripts/run_server_safe.sh
+            #   -FarmRegion=$WORLD_REGION
+            #   -ini:engine:[FuncomLiveServices]:ServiceAuthToken=$FLS_SECRET
+            #   -ini:game:[DuneDatabaseInterfacePSQL]:DatabaseHost=postgres:5432 (user=dune, pw=$POSTGRES_DUNE_PASSWORD)
+            #   --RMQGameHostname=game-rmq --RMQGamePort=5672 --RMQAdminHostname=admin-rmq --RMQAdminPort=5672
+            #   -RMQGameTlsEnabled=true  -ExternalAddress=$EXTERNAL_ADDRESS  -MultiHome=$POD_IP
             env:
-              HOST_DATACENTER_IP_ADDRESS: "PLACEHOLDER_PUBLIC_IPV4"
-            envFrom: [{ secretRef: { name: dune-awakening-secret } }]
+              WORLD_NAME: "${DUNE_WORLD_NAME}"
+              WORLD_UNIQUE_NAME: "${DUNE_WORLD_UNIQUE_NAME}"
+              WORLD_REGION: "${DUNE_WORLD_REGION}"
+              WORLD_DATACENTER_ID: "${DUNE_WORLD_REGION}"
+              POD_IP:
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.podIP        # -> -MultiHome
+            envFrom:
+              - secretRef: { name: dune-awakening-secret }  # FLS_SECRET, EXTERNAL_ADDRESS, POSTGRES_DUNE_PASSWORD
             resources:
               requests: { cpu: 2, memory: 12Gi }
-              limits: { memory: 20Gi }   # Hagga Basin ~12-20Gi
+              limits: { memory: 20Gi }
 
     service:
-      game-hagga:
-        controller: game-hagga
-        type: LoadBalancer          # Cilium L2, UDP — NOT the HTTP Gateway
+      game-survival:
+        controller: game-survival
+        type: LoadBalancer            # Cilium L2, UDP
         annotations:
-          io.cilium/lb-ipam-pool: PLACEHOLDER   # confirm pool + spare IP
+          io.cilium/lb-ipam-pool: PLACEHOLDER
         ports:
           game:
-            port: 27015             # Funcom default base; configurable via K8S_POOL_GAME_PORT_BASE
+            port: 27015               # Funcom default base; configurable
             protocol: UDP
-      rabbitmq-game:
-        controller: rabbitmq-game
-        type: LoadBalancer
+      game-rmq:
+        controller: game-rmq
+        type: LoadBalancer            # AMQPS, WAN-reachable
         ports:
           amqps:
             port: 31982
             protocol: TCP
 
     persistence:
-      saved:
-        existingClaim: dune-awakening-saved   # ceph-filesystem RWX, shared Saved/ across maps
-        globalMounts:
-          - path: /home/dune/server/DuneSandbox/Saved
       pgdata:
         accessMode: ReadWriteOnce
         size: 10Gi
@@ -108,3 +156,17 @@ spec:
           postgres:
             app:
               - path: /var/lib/postgresql/data
+      saved:
+        existingClaim: dune-awakening-saved   # ceph-filesystem RWX, shared Saved/ across maps
+        advancedMounts:
+          game-survival:
+            app:
+              - path: /home/dune/server/DuneSandbox/Saved
+      rmq-tls:
+        type: secret
+        name: dune-game-rmq-tls               # cert-manager Certificate (TODO)
+        advancedMounts:
+          game-rmq:
+            app:
+              - path: /etc/rabbitmq/tls
+                readOnly: true
