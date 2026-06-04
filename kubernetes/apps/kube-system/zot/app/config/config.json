@@ -2,7 +2,7 @@
   "distSpecVersion": "1.1.1",
   "storage": {
     "rootDirectory": "/var/lib/zot",
-    "dedupe": true,
+    "dedupe": false,
     "gc": true,
     "gcDelay": "1h",
     "gcInterval": "24h",
