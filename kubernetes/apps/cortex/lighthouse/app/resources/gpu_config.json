@@ -24,6 +24,28 @@
       "cuda_device": 0,
       "extra_args": "",
       "tier": "heavy"
+    },
+    {
+      "id": "gpu-nova",
+      "name": "Nova (3050)",
+      "host": "pc-nova.internal",
+      "port": 8188,
+      "enabled": false,
+      "type": "remote",
+      "cuda_device": 0,
+      "extra_args": "",
+      "tier": "light"
+    },
+    {
+      "id": "gpu-blaze",
+      "name": "Blaze (3050)",
+      "host": "pc-blaze.internal",
+      "port": 8188,
+      "enabled": false,
+      "type": "remote",
+      "cuda_device": 0,
+      "extra_args": "",
+      "tier": "light"
     }
   ],
   "settings": {
