@@ -251,6 +251,11 @@ spec:
             main:
               - path: /app/custom_nodes/ComfyUI-Distributed/gpu_config.json
                 subPath: gpu_config.json
+            # Same gpu_config feeds the proxy's tier-aware dispatch (workers[].tier);
+            # default LIGHTHOUSE_GPU_CONFIG_PATH is /config/gpu_config.json (ADR 019).
+            licence-gate:
+              - path: /config/gpu_config.json
+                subPath: gpu_config.json
       tmp:
         type: emptyDir
         advancedMounts:
