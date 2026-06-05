@@ -82,4 +82,11 @@ class OrchidTalesTranslations(LegacyCrawler):
         self._pace()
         soup = self.get_soup(chapter["url"])
         content = soup.select_one("div.entry-content")
+        if content:
+            # Strip images. These are text novels; embedded <img> are ko-fi/
+            # support badges or dividers repeated across chapters. lncrawl derives
+            # chapter_images.id from the image URL, so a shared image collides on
+            # the UNIQUE id and fails chapters with sqlite3.IntegrityError.
+            for img in content.select("img"):
+                img.decompose()
         return self.cleaner.extract_contents(content)
