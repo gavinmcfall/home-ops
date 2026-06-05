@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./rbac.yaml
   - ./externalsecret.yaml
+  - ./services.yaml
   - ./helmrelease.yaml
 # NOTE: image-sync/ (the SteamCMD→zot pull tooling) is intentionally NOT included
 # here — it's separate operational tooling, not part of the server deployment.

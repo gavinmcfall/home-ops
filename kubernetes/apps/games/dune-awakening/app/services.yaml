@@ -1,0 +1,49 @@
+# Bare-named ClusterIP services so the components resolve each other by the short
+# hostnames baked into the compose/INI defaults (postgres, game-rmq, admin-rmq,
+# text-router) — app-template's own services are named dune-awakening-<ctrl>.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app.kubernetes.io/name: dune-awakening
+    app.kubernetes.io/controller: postgres
+  ports:
+    - { name: postgres, port: 5432, targetPort: 5432 }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-rmq
+spec:
+  selector:
+    app.kubernetes.io/name: dune-awakening
+    app.kubernetes.io/controller: admin-rmq
+  ports:
+    - { name: amqp, port: 5672, targetPort: 5672 }
+    - { name: management, port: 15672, targetPort: 15672 }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-rmq
+spec:
+  selector:
+    app.kubernetes.io/name: dune-awakening
+    app.kubernetes.io/controller: game-rmq
+  ports:
+    - { name: amqp, port: 5672, targetPort: 5672 }
+    - { name: management, port: 15672, targetPort: 15672 }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: text-router
+spec:
+  selector:
+    app.kubernetes.io/name: dune-awakening
+    app.kubernetes.io/controller: text-router
+  ports:
+    - { name: http, port: 8080, targetPort: 8080 }
