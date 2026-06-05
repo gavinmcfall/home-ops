@@ -41,7 +41,7 @@
       "name": "Blaze (3050)",
       "host": "pc-blaze.internal",
       "port": 8188,
-      "enabled": false,
+      "enabled": true,
       "type": "remote",
       "cuda_device": 0,
       "extra_args": "",
