@@ -36,5 +36,7 @@ spec:
       DUNE_WORLD_REGION: "Oceania"
       DUNE_WORLD_DATACENTER_ID: "Oceania"
       DUNE_DB_NAME: "dune_sb_1_4_0_0"          # TODO: confirm branch-specific DB name
-      # --- TODO #2: real routable public/LAN IP players connect to ---
-      DUNE_EXTERNAL_ADDRESS: "PLACEHOLDER_PUBLIC_IPV4"
+      # --- networking (Cilium lb-pool 10.99.8.0/24; play.nerdz.cloud → 210.54.38.155) ---
+      DUNE_GAME_LBIP: "10.99.8.217"            # next free in lb-pool (UDP game/igw)
+      DUNE_RMQ_LBIP: "10.99.8.218"             # game-rmq AMQPS 31982
+      DUNE_EXTERNAL_ADDRESS: "play.nerdz.cloud"  # public; router forwards to the LB IPs above

@@ -206,6 +206,7 @@ spec:
             # with these args. Secrets passed via env (TODO #3: confirm UE5 honours
             # FuncomLiveServices__ServiceAuthToken env; else inject via -ini: in a wrapper).
             args:
+              - -Port=7777                  # pin game UDP port (UE5 default; [URL] empty)
               - -FarmRegion=${DUNE_WORLD_REGION}
               - -ini:engine:[OnlineSubsystem]:ServerName=${DUNE_WORLD_UNIQUE_NAME}
               - -ini:engine:[OnlineSubsystem]:DatacenterId=${DUNE_WORLD_DATACENTER_ID}
@@ -238,8 +239,10 @@ spec:
         controller: game-survival
         type: LoadBalancer            # Cilium L2, UDP game traffic (7xxx/8xxx per run.sh)
         annotations:
-          io.cilium/lb-ipam-pool: PLACEHOLDER   # TODO: pool + spare IP
+          io.cilium/lb-ipam-ips: ${DUNE_GAME_LBIP}
         ports:
+          # TODO: pin the game/igw UDP ports (run.sh currently discovers them via
+          # lsof). These must be deterministic to match the LB + router forward.
           game:
             port: 7777
             protocol: UDP
@@ -248,7 +251,9 @@ spec:
             protocol: UDP
       game-rmq:
         controller: game-rmq
-        type: LoadBalancer            # AMQPS, client-reachable
+        type: LoadBalancer            # AMQPS, client-reachable at ${DUNE_EXTERNAL_ADDRESS}:31982
+        annotations:
+          io.cilium/lb-ipam-ips: ${DUNE_RMQ_LBIP}
         ports:
           amqps:
             port: 31982
