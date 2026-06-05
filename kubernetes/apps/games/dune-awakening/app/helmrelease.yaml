@@ -46,6 +46,8 @@ spec:
             env:
               POSTGRES_DB: dune
               POSTGRES_USER: dune
+              # Ceph RBD mount has lost+found → initdb refuses root; use a subdir
+              PGDATA: /var/lib/postgresql/data/pgdata
               # igw-postgres uses the standard postgres entrypoint → needs POSTGRES_PASSWORD
               POSTGRES_PASSWORD:
                 valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_DUNE_PASSWORD } }
