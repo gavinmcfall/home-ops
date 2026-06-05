@@ -30,7 +30,7 @@
       "name": "Nova (3050)",
       "host": "pc-nova.internal",
       "port": 8188,
-      "enabled": false,
+      "enabled": true,
       "type": "remote",
       "cuda_device": 0,
       "extra_args": "",
