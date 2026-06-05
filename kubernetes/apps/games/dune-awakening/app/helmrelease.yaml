@@ -46,6 +46,8 @@ spec:
             env:
               POSTGRES_DB: dune
               POSTGRES_USER: dune
+              # Ceph RBD mount has lost+found → initdb refuses root; use a subdir
+              PGDATA: /var/lib/postgresql/data/pgdata
               # igw-postgres uses the standard postgres entrypoint → needs POSTGRES_PASSWORD
               POSTGRES_PASSWORD:
                 valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_DUNE_PASSWORD } }
@@ -208,10 +210,10 @@ spec:
             image:
               repository: "${DUNE_REGISTRY}/funcom/self-hosting/seabass-server"
               tag: "${DUNE_TAG}"
-            # NOTE: do NOT override command — image Cmd is /home/dune/run.sh, which
-            # does the k8s external-address/pod-patch dance then execs the UE5 binary
-            # with these args. Secrets passed via env (TODO #3: confirm UE5 honours
-            # FuncomLiveServices__ServiceAuthToken env; else inject via -ini: in a wrapper).
+            # Image has NO entrypoint (only Cmd=/home/dune/run.sh), so app-template's
+            # args alone get exec'd as the command. Must set command explicitly; args
+            # are then passed through to run.sh → DuneSandboxServer.sh → UE5 binary.
+            command: ["/home/dune/run.sh"]
             args:
               - -Port=7777                  # pin game UDP port (UE5 default; [URL] empty)
               - -FarmRegion=${DUNE_WORLD_REGION}
@@ -283,11 +285,6 @@ spec:
           game-survival:
             app:
               - path: /home/dune/server/DuneSandbox/Saved
-      rmq-tls:
-        type: secret
-        name: dune-game-rmq-tls             # TODO #5: cert-manager Certificate
-        advancedMounts:
-          game-rmq:
-            app:
-              - path: /etc/rabbitmq/tls
-                readOnly: true
+# NOTE: game-rmq TLS uses the cert.pem/cacert.pem baked into the rabbitmq image
+# (no external mount). If a custom cert is needed later, add a cert-manager
+# Certificate + mount here.
