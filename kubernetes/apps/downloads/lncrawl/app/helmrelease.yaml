@@ -67,6 +67,33 @@ spec:
                 memory: 512Mi
               limits:
                 memory: 3Gi
+          # lncrawl stores built EPUBs in /data/novels/<uuid>/artifacts/ and has
+          # no setting to write elsewhere. This sidecar copies each newly-built
+          # EPUB into the Calibre inbox on the NFS share. The -newer marker means
+          # each artifact syncs once (and again only if lncrawl rebuilds it), so
+          # processed books removed from the inbox are not re-copied.
+          inbox-sync:
+            image:
+              repository: docker.io/library/busybox
+              tag: "1.36"
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                [ -f /data/.inbox-marker ] || touch /data/.inbox-marker
+                while true; do
+                  find /data/novels -name '*.epub' -type f -newer /data/.inbox-marker -exec cp {} /media/Library/Books/_inbox/ \;
+                  touch /data/.inbox-marker
+                  sleep 120
+                done
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+                memory: 16Mi
+              limits:
+                memory: 64Mi
     defaultPodOptions:
       labels:
         nfsMount: "true"
