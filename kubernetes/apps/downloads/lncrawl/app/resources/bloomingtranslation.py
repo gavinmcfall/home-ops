@@ -85,4 +85,12 @@ class BloomingTranslation(LegacyCrawler):
         self._pace()
         soup = self.get_soup(chapter["url"])
         content = soup.select_one("div.entry-content")
+        if content:
+            # Strip images. These are text novels; the only <img> is the
+            # translator's ko-fi/support badge, repeated in most chapters. lncrawl
+            # derives chapter_images.id from the image URL, so that one shared
+            # image collides on the UNIQUE id and fails ~half the chapters with
+            # "Failed to fetch chapter" (sqlite3.IntegrityError).
+            for img in content.select("img"):
+                img.decompose()
         return self.cleaner.extract_contents(content)
