@@ -197,11 +197,10 @@ curl -sf http://localhost:8188/ >/dev/null && echo "ComfyUI up"
 The unit launches ComfyUI with `--listen 0.0.0.0 --enable-cors-header` (both
 **required** for a ComfyUI-Distributed remote worker) and `Restart=always`.
 
-### 3c. Boot autostart — ⚠️ the old SYSTEM task is BROKEN; rely on sleep/wake
+### 3c. Worker autostart — hidden VBS launcher in Startup (no window)
 
-> **Correction 2026-06-05 (verified live on Nova + Blaze):** the SYSTEM /
-> `-AtStartup` task this section used to document **does not work** — and the
-> design doesn't need it.
+> **Verified live on Nova 2026-06-05.** Use the hidden-launcher method below. The
+> SYSTEM/`-AtStartup` task this section used to document is **BROKEN** — see why.
 
 **Why it's broken:** WSL2 distros are registered **per Windows user**. `lighthouse`
 belongs to the box's user (`kieran` on Nova, `ariana` on Blaze); the **SYSTEM**
@@ -217,13 +216,30 @@ Start the distro once (`wsl -d lighthouse`), then sleep/wake the PC — the dist
 autostart task is needed for normal operation. After a *rare hard reboot*, start it
 manually; robust unattended-after-reboot lifecycle is **Plan 2's wol-agent**.
 
-**If you ever do need true headless-on-boot:** it must run as the **owning user**
-(not SYSTEM), with **"run whether user is logged on or not"** (stored creds → no
-window) **and** a keep-alive (`-e sleep infinity`). MS-account users make the
-stored-cred path painful (`MicrosoftAccount\you@email` + real password; Hello PIN
-won't work). Cleaner alternatives: auto-login + a hidden launcher
-(`conhost --headless` / VBS `Run(...,0)`) at logon, or **NSSM** wrapping WSL as a
-Windows service. Don't re-add the SYSTEM task.
+**Recommended: hidden VBS launcher in the user's Startup folder.** No window, no
+stored password, survives sleep/wake. Run on the worker as its normal user (NOT
+elevated):
+
+```powershell
+$vbs  = 'CreateObject("WScript.Shell").Run "wsl.exe -d lighthouse -e sleep infinity", 0, False'
+$dest = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\lighthouse-worker.vbs"
+Set-Content -Path $dest -Value $vbs -Encoding ASCII
+# test now (no reboot): should show Running, with NO window
+wscript.exe $dest; Start-Sleep 20; wsl -l -v
+```
+
+Why this works where SYSTEM/`-AtStartup` didn't: it runs in the **user's own
+logged-in session** (so the per-user distro is visible — no SYSTEM problem, no
+stored MS-account creds), `Run(...,0,...)` makes it **windowless**, and
+`sleep infinity` is the **held process** that keeps the distro up (systemd alone
+isn't enough). `comfyui-worker.service` then starts via systemd. Once up, **sleep
+preserves it and WoL-wake brings it straight back**.
+
+**Limitation:** Startup runs at **login**, so a cold boot with nobody logging in
+won't start it. For the kids' PCs, pair with **auto-login** (security trade-off),
+or accept that unattended-after-reboot is **Plan 2's wol-agent** job. Do NOT re-add
+the SYSTEM `-AtStartup` task — it's a silent no-op (per-user distro invisible to
+SYSTEM).
 
 ### 3d. Firewall — allow the cluster to reach :8188
 
