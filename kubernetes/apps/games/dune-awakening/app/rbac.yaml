@@ -1,0 +1,55 @@
+# =============================================================================
+# RBAC the game server needs. /home/dune/run.sh (the image's native entrypoint)
+# uses the pod ServiceAccount token to:
+#   - GET its node           → reads status.addresses[ExternalIP] for -ExternalAddress
+#   - PATCH its own pod/status → writes gamePid/gamePort/igwPort/sshPort annotations
+# Operator-free: we provide what Funcom's Server operator normally would.
+# =============================================================================
+# NOTE: the ServiceAccount "dune-awakening" is created by the app-template chart
+# (values.serviceAccount). These bind to it.
+---
+# nodes are cluster-scoped → ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dune-awakening-node-reader
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dune-awakening-node-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dune-awakening-node-reader
+subjects:
+  - kind: ServiceAccount
+    name: dune-awakening
+    namespace: games
+---
+# patch own pod annotations/status → namespaced Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dune-awakening-pod-patcher
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/status"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dune-awakening-pod-patcher
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dune-awakening-pod-patcher
+subjects:
+  - kind: ServiceAccount
+    name: dune-awakening
+    namespace: games

@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app dune-awakening
+  namespace: &namespace games
+spec:
+  targetNamespace: *namespace
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  dependsOn:
+    - name: cluster-apps-rook-ceph-cluster
+      namespace: rook-ceph
+    - name: external-secrets-stores
+      namespace: external-secrets
+  prune: true
+  interval: 30m
+  path: "./kubernetes/apps/games/dune-awakening/app"
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  wait: false
+  retryInterval: 1m
+  timeout: 5m
+  postBuild:
+    substitute:
+      # --- image source (zot) ---
+      DUNE_REGISTRY: "zot.nerdz.cloud"
+      DUNE_TAG: "1979201-0-shipping"
+      # --- world config (edit to taste) ---
+      DUNE_WORLD_NAME: "Nerdz Dune Awakening Server"
+      DUNE_WORLD_UNIQUE_NAME: "sh-nerdz-dune"
+      DUNE_WORLD_REGION: "Oceania"
+      DUNE_WORLD_DATACENTER_ID: "Oceania"
+      DUNE_DB_NAME: "dune_sb_1_4_0_0"          # TODO: confirm branch-specific DB name
+      # --- networking (Cilium lb-pool 10.99.8.0/24; play.nerdz.cloud → 210.54.38.155) ---
+      DUNE_GAME_LBIP: "10.99.8.217"            # next free in lb-pool (UDP game/igw)
+      DUNE_RMQ_LBIP: "10.99.8.218"             # game-rmq AMQPS 31982
+      DUNE_EXTERNAL_ADDRESS: "play.nerdz.cloud"  # public; router forwards to the LB IPs above
