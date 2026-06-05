@@ -197,26 +197,49 @@ curl -sf http://localhost:8188/ >/dev/null && echo "ComfyUI up"
 The unit launches ComfyUI with `--listen 0.0.0.0 --enable-cors-header` (both
 **required** for a ComfyUI-Distributed remote worker) and `Restart=always`.
 
-### 3c. Start the distro at Windows boot (Task Scheduler)
+### 3c. Boot autostart — ⚠️ the old SYSTEM task is BROKEN; rely on sleep/wake
 
-WSL only runs when invoked, so a Windows-side trigger boots the distro at startup;
-systemd then keeps the service alive. **Elevated** PowerShell:
+> **Correction 2026-06-05 (verified live on Nova + Blaze):** the SYSTEM /
+> `-AtStartup` task this section used to document **does not work** — and the
+> design doesn't need it.
 
-```powershell
-$action  = New-ScheduledTaskAction -Execute "wsl.exe" -Argument "-d lighthouse -u root -e /bin/true"
-$trigger = New-ScheduledTaskTrigger -AtStartup
-$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-Register-ScheduledTask -TaskName "WSL-lighthouse-boot" -Action $action -Trigger $trigger -Principal $principal
-```
+**Why it's broken:** WSL2 distros are registered **per Windows user**. `lighthouse`
+belongs to the box's user (`kieran` on Nova, `ariana` on Blaze); the **SYSTEM**
+account can't see it, so `wsl -d lighthouse …` as SYSTEM is a silent no-op (distro
+never starts; `LastTaskResult` may still read `0`). Separately,
+`wsl -d lighthouse -e /bin/true` boots the distro, runs `true`, and WSL tears it
+down seconds later — `systemd=true` alone does **not** hold it up; only a **held
+process** (`-e sleep infinity`) or active use does.
+
+**What we actually do (the design):** workers run **sleep/wake, not boot/shutdown**.
+Start the distro once (`wsl -d lighthouse`), then sleep/wake the PC — the distro +
+`comfyui-worker.service` survive sleep (CUDA-resume restores the GPU), so no
+autostart task is needed for normal operation. After a *rare hard reboot*, start it
+manually; robust unattended-after-reboot lifecycle is **Plan 2's wol-agent**.
+
+**If you ever do need true headless-on-boot:** it must run as the **owning user**
+(not SYSTEM), with **"run whether user is logged on or not"** (stored creds → no
+window) **and** a keep-alive (`-e sleep infinity`). MS-account users make the
+stored-cred path painful (`MicrosoftAccount\you@email` + real password; Hello PIN
+won't work). Cleaner alternatives: auto-login + a hidden launcher
+(`conhost --headless` / VBS `Run(...,0)`) at logon, or **NSSM** wrapping WSL as a
+Windows service. Don't re-add the SYSTEM task.
 
 ### 3d. Firewall — allow the cluster to reach :8188
 
 ```powershell
-# Scope RemoteAddress to the cluster. 10.90.0.0/16 is the core LAN; tighten to the
-# Talos node IPs for strict "allow-only-from-cluster".
+# Allow only the cluster node IPs (master pod egress SNATs to the node it runs on;
+# it can run on any node). Tighter than the whole LAN.
 New-NetFirewallRule -DisplayName "ComfyUI worker 8188 (cluster)" -Direction Inbound `
-  -Action Allow -Protocol TCP -LocalPort 8188 -RemoteAddress 10.90.0.0/16
+  -Action Allow -Protocol TCP -LocalPort 8188 `
+  -RemoteAddress @("10.90.3.101","10.90.3.102","10.90.3.103")
 ```
+
+> **Verify-source-first:** before adding any *blocking* rule, run a render and watch
+> the worker's ComfyUI console for the incoming source IP — confirm it's one of the
+> node IPs above, so you don't cut off dispatch. And **keep `--enable-cors-header`**
+> in the worker launch — the master's dispatch requires it (bypasses ComfyUI's
+> Origin/Host check); do NOT remove it as "hardening".
 
 ---
 
