@@ -46,8 +46,11 @@ spec:
             env:
               POSTGRES_DB: dune
               POSTGRES_USER: dune
-            envFrom:
-              - secretRef: { name: dune-awakening-secret }   # POSTGRES_PASSWORD / _SUPER_PASSWORD
+              # igw-postgres uses the standard postgres entrypoint → needs POSTGRES_PASSWORD
+              POSTGRES_PASSWORD:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_DUNE_PASSWORD } }
+              POSTGRES_SUPER_PASSWORD:
+                valueFrom: { secretKeyRef: { name: dune-awakening-secret, key: POSTGRES_SUPER_PASSWORD } }
 
       admin-rmq:
         type: statefulset
@@ -140,6 +143,7 @@ spec:
               Database__address: postgres
               Database__port: "5432"
               Database__user: dune
+              BATTLEGROUP_DISPLAY_NAME: "${DUNE_WORLD_UNIQUE_NAME}"   # IGWO bgName
               WORLD_NAME: "${DUNE_WORLD_NAME}"
               OPT_SERVERNAME: "${DUNE_WORLD_UNIQUE_NAME}"
               BATTLEGROUP_REGION_NAME: "${DUNE_WORLD_REGION}"
