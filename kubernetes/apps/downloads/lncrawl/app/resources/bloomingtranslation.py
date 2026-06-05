@@ -9,6 +9,7 @@ import logging
 import re
 import threading
 import time
+import urllib.parse
 
 from lncrawl.core import Chapter, LegacyCrawler
 
@@ -57,10 +58,19 @@ class BloomingTranslation(LegacyCrawler):
         content = soup.select_one("div.entry-content") or soup
         self.volumes.append({"id": 1, "title": self.novel_title})
 
+        home_host = urllib.parse.urlparse(self.home_url).netloc
         seen = set()
         for a in content.select("a[href]"):
             href = self.absolute_url(a.get("href"))
-            if not href or href in seen:
+            if not href:
+                continue
+            # Some TOC links have a malformed host (a source typo, e.g.
+            # http://g/2026/05/21/mdd-chapter-209-part-4); rebuild from the path
+            # against the real site host so the chapter is still reachable.
+            parsed = urllib.parse.urlparse(href)
+            if parsed.netloc and parsed.netloc != home_host:
+                href = self.home_url.rstrip("/") + parsed.path
+            if href in seen:
                 continue
             if re.search(r"/20\d\d/\d\d/\d\d/", href) and "chapter" in href.lower():
                 seen.add(href)

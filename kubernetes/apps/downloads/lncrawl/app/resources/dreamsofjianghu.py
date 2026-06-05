@@ -62,10 +62,17 @@ class DreamsOfJianghu(LegacyCrawler):
         content = soup.select_one("div.entry-content") or soup
         self.volumes.append({"id": 1, "title": self.novel_title})
 
+        home_host = urllib.parse.urlparse(self.home_url).netloc
         seen = set()
         for a in content.select("a[href]"):
             href = self.absolute_url(a.get("href"))
-            if not href or href in seen:
+            if not href:
+                continue
+            # repair malformed off-host links (source typos) from the path
+            parsed = urllib.parse.urlparse(href)
+            if parsed.netloc and parsed.netloc != home_host:
+                href = self.home_url.rstrip("/") + parsed.path
+            if href in seen:
                 continue
             # chapter permalinks are dated and contain 'chapter'
             if re.search(r"/20\d\d/\d\d/\d\d/", href) and "chapter" in href.lower():
