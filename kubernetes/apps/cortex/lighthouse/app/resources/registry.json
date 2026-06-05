@@ -171,6 +171,7 @@
   },
   {
     "filename": "pony-diffusion-v6-xl.safetensors",
+    "requires_group": "mature-content",
     "sha256": "TBD-on-acquisition",
     "licence": "Modified Fair AI Public License 1.0-SD (creator addendum: non-commercial without explicit auth)",
     "commercial_ok": false,
@@ -184,6 +185,7 @@
   },
   {
     "filename": "noobai-xl-epsilon-1.1.safetensors",
+    "requires_group": "mature-content",
     "sha256": "TBD-on-acquisition",
     "licence": "Fair AI Public License 1.0-SD + creator non-commercial addendum",
     "commercial_ok": false,
@@ -197,6 +199,7 @@
   },
   {
     "filename": "nova-furry-xl-il-v18.safetensors",
+    "requires_group": "mature-content",
     "sha256": "TBD-on-acquisition",
     "licence": "FAIPL 1.0 (creator rider: unedited generated images not commercial)",
     "commercial_ok": false,
@@ -209,6 +212,7 @@
   },
   {
     "filename": "cyberrealistic-xl-v10.safetensors",
+    "requires_group": "mature-content",
     "sha256": "TBD-on-acquisition",
     "licence": "CreativeML Open RAIL++-M with Addendum",
     "commercial_ok": true,
@@ -222,6 +226,7 @@
   },
   {
     "filename": "cyberrealistic-pony-v18.safetensors",
+    "requires_group": "mature-content",
     "sha256": "TBD-on-acquisition",
     "licence": "CreativeML Open RAIL++-M",
     "commercial_ok": true,

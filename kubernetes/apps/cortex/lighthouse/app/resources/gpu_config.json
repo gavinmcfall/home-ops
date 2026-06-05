@@ -11,7 +11,8 @@
       "enabled": true,
       "type": "remote",
       "cuda_device": 0,
-      "extra_args": ""
+      "extra_args": "",
+      "tier": "heavy"
     },
     {
       "id": "gpu-vixen",
@@ -21,7 +22,8 @@
       "enabled": true,
       "type": "remote",
       "cuda_device": 0,
-      "extra_args": ""
+      "extra_args": "",
+      "tier": "heavy"
     }
   ],
   "settings": {
