@@ -5,11 +5,8 @@
 #   - PATCH its own pod/status → writes gamePid/gamePort/igwPort/sshPort annotations
 # Operator-free: we provide what Funcom's Server operator normally would.
 # =============================================================================
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: dune-awakening
+# NOTE: the ServiceAccount "dune-awakening" is created by the app-template chart
+# (values.serviceAccount). These bind to it.
 ---
 # nodes are cluster-scoped → ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1

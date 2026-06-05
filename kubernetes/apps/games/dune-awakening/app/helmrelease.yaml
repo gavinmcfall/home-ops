@@ -30,9 +30,10 @@ spec:
         name: bjw-s
         namespace: flux-system
   values:
-    defaultPodOptions:
-      # run.sh needs the SA token to read its node + patch its pod (see rbac.yaml)
-      serviceAccountName: dune-awakening
+    # SA the chart creates; rbac.yaml binds it (get nodes + patch pods). Only the
+    # game server (run.sh) needs it — attached per-controller below.
+    serviceAccount:
+      dune-awakening: {}
     controllers:
       # ---------------- data plane -------------------------------------------
       postgres:
@@ -196,6 +197,8 @@ spec:
 
       # ---------------- game server: one controller per map (start: survival) ----
       game-survival:
+        serviceAccount:
+          identifier: dune-awakening
         containers:
           app:
             image:
