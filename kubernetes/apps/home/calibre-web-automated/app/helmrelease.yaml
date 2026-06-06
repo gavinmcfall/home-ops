@@ -191,16 +191,17 @@ spec:
         globalMounts:
           - path: /config
       # Single NFS export (proven by audiobookshelf), sub-pathed to the eval-only
-      # folders so the real 459G Books library is never touched.
+      # Production Calibre lib + ingest under a dot-prefixed sibling of Books/
+      # (hidden from AudiobookShelf scans), same dataset → hardlinks work.
       media:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
           - path: /cwa-book-ingest
-            subPath: Library/Books/_cwa-eval/ingest
+            subPath: Library/Books/.calibre/ingest
           - path: /calibre-library
-            subPath: Library/Books/_cwa-eval/library
+            subPath: Library/Books/.calibre/library
       tmpfs:
         type: emptyDir
         globalMounts:
