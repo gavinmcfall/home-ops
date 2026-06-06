@@ -110,3 +110,9 @@ spec:
         path: /mnt/storage0/media
         globalMounts:
           - path: /media
+          # Non-dot view of the Calibre library so Readarr's DiskScanService
+          # will scan it — it ignores hidden/dot-prefixed dirs, and the library
+          # lives under .calibre/ (hidden from AudiobookShelf). Readarr's Calibre
+          # root folder points at /calibre-library.
+          - path: /calibre-library
+            subPath: Library/Books/.calibre/library
