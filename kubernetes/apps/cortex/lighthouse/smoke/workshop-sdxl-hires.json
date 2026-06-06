@@ -1,0 +1,58 @@
+{
+  "client_id": "lighthouse-smoke-hires",
+  "enabled_worker_ids": ["gpu-vengeance", "gpu-vixen"],
+  "delegate_master": true,
+  "prompt": {
+    "4": {
+      "class_type": "CheckpointLoaderSimple",
+      "inputs": { "ckpt_name": "sd_xl_base_1.0.safetensors" }
+    },
+    "6": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "a serene mountain landscape at golden hour, highly detailed",
+        "clip": ["4", 1]
+      }
+    },
+    "7": {
+      "class_type": "CLIPTextEncode",
+      "inputs": { "text": "blurry, low quality, watermark", "clip": ["4", 1] }
+    },
+    "5": {
+      "class_type": "EmptyLatentImage",
+      "inputs": { "width": 1024, "height": 1024, "batch_size": 1 }
+    },
+    "3": {
+      "class_type": "KSampler",
+      "inputs": {
+        "seed": 42, "steps": 20, "cfg": 7.0,
+        "sampler_name": "euler", "scheduler": "normal", "denoise": 1.0,
+        "model": ["4", 0], "positive": ["6", 0], "negative": ["7", 0], "latent_image": ["5", 0]
+      }
+    },
+    "11": {
+      "class_type": "LatentUpscaleBy",
+      "inputs": { "samples": ["3", 0], "upscale_method": "nearest-exact", "scale_by": 1.5 }
+    },
+    "12": {
+      "class_type": "KSampler",
+      "inputs": {
+        "seed": 42, "steps": 20, "cfg": 7.0,
+        "sampler_name": "euler", "scheduler": "normal", "denoise": 0.45,
+        "model": ["4", 0], "positive": ["6", 0], "negative": ["7", 0], "latent_image": ["11", 0]
+      }
+    },
+    "8": {
+      "class_type": "VAEDecode",
+      "inputs": { "samples": ["12", 0], "vae": ["4", 2] }
+    },
+    "10": {
+      "class_type": "DistributedCollector",
+      "inputs": { "images": ["8", 0], "load_balance": false }
+    },
+    "9": {
+      "class_type": "SaveImage",
+      "inputs": { "filename_prefix": "workshop-hires", "images": ["10", 0] }
+    }
+  }
+}
