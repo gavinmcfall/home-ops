@@ -38,6 +38,20 @@ spec:
       calibre-web-automated:
         annotations:
           reloader.stakater.com/auto: "true"
+        initContainers:
+          init-cs-config:
+            image:
+              repository: ghcr.io/crocodilestick/calibre-web-automated
+              tag: v4.0.6@sha256:c31a738b6d5ec6982c050063dd3f063b6943eb1051fc81144789f840d9093a8d
+            command:
+              - sh
+              - -c
+              - mkdir -p /config/calibre-server/tmp && chown -R 568:568 /config/calibre-server
+            securityContext:
+              runAsUser: 0
+              runAsNonRoot: false
+              allowPrivilegeEscalation: true
+              capabilities: { drop: ["ALL"], add: ["CHOWN", "DAC_OVERRIDE", "FOWNER"] }
         containers:
           app:
             image:
@@ -78,12 +92,59 @@ spec:
                 memory: 256Mi
               limits:
                 memory: 1Gi
+          # Headless Calibre Content Server (the API Readarr integrates with).
+          # Same image (calibre-server is at /app/calibre/calibre-server), same
+          # library volume. Runs as 568 (the NFS file owner) so writes stay
+          # consistent with CWA. NOTE: two writers on one metadata.db — see design doc.
+          calibre-server:
+            image:
+              repository: ghcr.io/crocodilestick/calibre-web-automated
+              tag: v4.0.6@sha256:c31a738b6d5ec6982c050063dd3f063b6943eb1051fc81144789f840d9093a8d
+            command:
+              - /app/calibre/calibre-server
+              - /calibre-library
+              - --listen-on=0.0.0.0
+              - --port=8081
+              - --enable-local-write
+            env:
+              TZ: ${TIMEZONE}
+              HOME: /config/calibre-server
+              CALIBRE_CONFIG_DIRECTORY: /config/calibre-server
+              CALIBRE_TEMP_DIR: /config/calibre-server/tmp
+            probes:
+              liveness: &csprobes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    port: &csport 8081
+                    path: /
+                  initialDelaySeconds: 20
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              readiness: *csprobes
+            securityContext:
+              runAsUser: 568
+              runAsGroup: 568
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
     service:
       app:
         controller: *app
         ports:
           http:
             port: *port
+          content-server:
+            port: *csport
     route:
       app:
         annotations:
