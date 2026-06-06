@@ -45,7 +45,7 @@ spec:
           main:
             image:
               repository: ghcr.io/gavinmcfall/lighthouse
-              tag: 0.22.0@sha256:a1c492ecb450eeac4196d288e96f3bec6f8f8dbfc60ef25c7b761aaed791d106
+              tag: 0.22.0@sha256:f17070987e2397878df92485f13fe5fc01a5b048efdb98c1841717d3dd42cb31
             probes:
               liveness:
                 enabled: true
