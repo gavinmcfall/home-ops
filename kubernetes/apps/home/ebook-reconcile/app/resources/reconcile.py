@@ -29,12 +29,15 @@ DEST = os.environ["DEST"]
 STATE = os.environ.get("STATE", "/state/abs_paths.json")
 TAG = os.environ.get("TAG", "→abs")
 GENRE_FIELD = os.environ.get("GENRE_FIELD", "*genre")
+# In the CWA image `/usr/bin/calibredb` is a symlink created by s6 at runtime; a
+# command-override container (no s6 init) won't have it, so point at the real binary.
+CALIBREDB = os.environ.get("CALIBREDB", "calibredb")
 FIELDS = f"id,title,authors,series,series_index,{GENRE_FIELD},formats"
 
 
 def calibredb(*args):
     return subprocess.run(
-        ["calibredb", "--with-library", LIB, *args],
+        [CALIBREDB, "--with-library", LIB, *args],
         capture_output=True, text=True, check=True,
     ).stdout
 
