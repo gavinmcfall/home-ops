@@ -43,10 +43,26 @@ spec:
             image:
               repository: ghcr.io/crocodilestick/calibre-web-automated
               tag: v4.0.6@sha256:c31a738b6d5ec6982c050063dd3f063b6943eb1051fc81144789f840d9093a8d
+            # Prep the content-server config dir AND (re)create its single auth
+            # user idempotently so a password rotation in 1Password propagates.
+            # password via STDIN (sys.stdin.read() to EOF) → safe for any symbols.
             command:
               - sh
               - -c
-              - mkdir -p /config/calibre-server/tmp && chown -R 568:568 /config/calibre-server
+              - |
+                set -eu
+                DB=/config/calibre-server/users.sqlite
+                mkdir -p /config/calibre-server/tmp
+                /app/calibre/calibre-server --userdb "$DB" --manage-users -- remove "$CALIBRE_SERVER_USER" 2>/dev/null || true
+                printf '%s' "$CALIBRE_SERVER_PASSWORD" | /app/calibre/calibre-server --userdb "$DB" --manage-users -- add "$CALIBRE_SERVER_USER"
+                chown -R 568:568 /config/calibre-server
+            env:
+              HOME: /config/calibre-server
+              CALIBRE_CONFIG_DIRECTORY: /config/calibre-server
+              CALIBRE_TEMP_DIR: /config/calibre-server/tmp
+            envFrom:
+              - secretRef:
+                  name: calibre-web-automated-secret
             securityContext:
               runAsUser: 0
               runAsNonRoot: false
@@ -105,20 +121,28 @@ spec:
               - /calibre-library
               - --listen-on=0.0.0.0
               - --port=8081
-              - --enable-local-write
+              # Auth governs remote writes: --enable-local-write only covers
+              # un-authenticated *localhost*, so it's moot once auth is on and
+              # Readarr connects from another pod. The auth user is read-write by
+              # default. basic auth (over internal HTTP) for Readarr compatibility.
+              - --enable-auth
+              - --auth-mode=basic
+              - --userdb=/config/calibre-server/users.sqlite
+              - --disable-use-bonjour
             env:
               TZ: ${TIMEZONE}
               HOME: /config/calibre-server
               CALIBRE_CONFIG_DIRECTORY: /config/calibre-server
               CALIBRE_TEMP_DIR: /config/calibre-server/tmp
+            # TCP probe, not HTTP: with --enable-auth every path returns 401,
+            # which a k8s httpGet probe scores as failure. Port-open = healthy.
             probes:
               liveness: &csprobes
                 enabled: true
                 custom: true
                 spec:
-                  httpGet:
+                  tcpSocket:
                     port: &csport 8081
-                    path: /
                   initialDelaySeconds: 20
                   periodSeconds: 30
                   timeoutSeconds: 5
