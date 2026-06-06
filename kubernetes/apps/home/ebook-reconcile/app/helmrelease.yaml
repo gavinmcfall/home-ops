@@ -57,6 +57,8 @@ spec:
               TZ: ${TIMEZONE}
               HOME: /tmp
               CALIBRE_CONFIG_DIRECTORY: /tmp/calibre
+              # /usr/bin/calibredb is an s6-created runtime symlink; command-override skips s6
+              CALIBREDB: /app/calibre/calibredb
               LIB: /media/Library/Books/_cwa-eval/library      # staging Calibre library (CWA workbench)
               DEST: /media/Library/Books/Books                 # AudiobookShelf books root
               STATE: /state/abs_paths.json
