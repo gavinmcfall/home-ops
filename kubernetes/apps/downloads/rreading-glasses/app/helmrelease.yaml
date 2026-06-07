@@ -1,0 +1,97 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app rreading-glasses
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      rreading-glasses:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          # Creates the rreading_glasses DB + user on the shared CNPG cluster
+          # (same pattern as bookshelf). Super pass from the cloudnative-pg item;
+          # the new user's pass comes from the SOPS secret.
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
+              pullPolicy: IfNotPresent
+            envFrom: &envFrom
+              - secretRef:
+                  name: rreading-glasses-secret
+              - secretRef:
+                  name: rreading-glasses-db
+        containers:
+          app:
+            # Self-hosted metadata proxy for the bookshelf (Readarr) stack — own
+            # Hardcover backend + own cache, replacing the flaky public
+            # hardcover.bookinfo.pro. Entrypoint is /main.
+            image:
+              repository: docker.io/blampe/rreading-glasses
+              tag: hardcover@sha256:3489e722a73c9cbab5b9ba530cf8a60c2280367fb03db1fb649261dfb064b52f
+            command: ["/main", "serve"]
+            args: ["--verbose"]
+            env:
+              TZ: ${TIMEZONE}
+              POSTGRES_HOST: postgres18-cluster-rw.database.svc.cluster.local
+              POSTGRES_PORT: "5432"
+              POSTGRES_DATABASE: rreading_glasses
+              POSTGRES_USER: rreading_glasses
+              # HARDCOVER_AUTH (Bearer …) + POSTGRES_PASSWORD come from the secrets
+            envFrom: *envFrom
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: &port 8788
+                  initialDelaySeconds: 20
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              readiness: *probe
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
