@@ -29,6 +29,7 @@ resources:
   - ./radarr/ks.yaml
   - ./radarr-uhd/ks.yaml
   - ./recyclarr/ks.yaml
+  - ./rreading-glasses/ks.yaml
   - ./sabnzbd/ks.yaml
   - ./shelfmark/ks.yaml
   - ./sonarr/ks.yaml
