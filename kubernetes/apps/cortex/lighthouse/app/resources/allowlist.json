@@ -15,5 +15,8 @@
   "VAEDecode": {},
   "LatentUpscaleBy": {},
   "DistributedCollector": {},
-  "DistributedSeed": {}
+  "DistributedSeed": {},
+  "UltralyticsDetectorProvider": {},
+  "SAMLoader": {},
+  "FaceDetailer": {}
 }
