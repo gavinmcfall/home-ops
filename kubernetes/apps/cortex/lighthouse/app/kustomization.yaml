@@ -23,5 +23,14 @@ configMapGenerator:
   - name: lighthouse-comfyui-distributed
     files:
       - ./resources/gpu_config.json
+  # Curated App Mode workflows (licence-gate LIGHTHOUSE_CURATION_DIR): the manifest
+  # + each vetted workflow JSON, served role-filtered + read-only into every
+  # caller's workflow sidebar. Canonical source is ../workflows/ (sibling to
+  # smoke/). The cross-dir ref relies on Flux kustomize-controller's default
+  # LoadRestrictionsNone; a local `kustomize build` needs --load-restrictor=none.
+  - name: lighthouse-curation
+    files:
+      - ../workflows/curation.json
+      - ../workflows/portrait-sdxl-hires-facedetailer.workflow.json
 generatorOptions:
   disableNameSuffixHash: true
