@@ -96,7 +96,7 @@ spec:
           licence-gate:
             image:
               repository: ghcr.io/gavinmcfall/licence-gate
-              tag: 0.1.8@sha256:c20f533717fedd960abe7dadbd1a7be2a5067564cfcf520f9c77312f54542d25
+              tag: 0.1.9@sha256:3aa750210bc1f47ae9807982c1048a1ea97335daf752e3eaee8a9f74380e5191
             env:
               LIGHTHOUSE_LISTEN: ":8000"
               LIGHTHOUSE_UPSTREAM: "http://127.0.0.1:8188"
