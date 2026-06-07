@@ -14,6 +14,7 @@ resources:
   - ./bazarr/ks.yaml
   - ./bazarr-foreign/ks.yaml
   - ./bazarr-uhd/ks.yaml
+  - ./bindery/ks.yaml
   - ./bookshelf/ks.yaml
   - ./cross-seed/ks.yaml
   - ./dashbrr/ks.yaml

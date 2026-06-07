@@ -1,0 +1,113 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app bindery
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      bindery:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            # SPIKE: evaluating Bindery (clean Readarr replacement) alongside the
+            # parked bookshelf. Single Go binary + embedded SQLite, no external DB.
+            # Reads the existing Calibre library (configured in the web UI) and
+            # imports to a TEST dir so the real ABS folders are untouched.
+            image:
+              repository: ghcr.io/vavallee/bindery
+              tag: v1.17.0@sha256:1087b3433517e43465b1b59998060e89b235d631a1de58489a0a946663d63435
+            env:
+              TZ: ${TIMEZONE}
+              BINDERY_PORT: &port "8787"
+              BINDERY_DATA_DIR: /config
+              BINDERY_DB_PATH: /config/bindery.db
+              # import targets point at a throwaway test tree (not the real library)
+              BINDERY_LIBRARY_DIR: /media/Library/Books/.calibre/_bindery-test/library
+              BINDERY_AUDIOBOOK_DIR: /media/Library/Books/.calibre/_bindery-test/audiobooks
+              BINDERY_DOWNLOAD_DIR: /media/Library/Books/.calibre/_bindery-test/downloads
+              BINDERY_TELEMETRY_DISABLED: "true"
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    port: 8787
+                    path: /
+                  initialDelaySeconds: 20
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              readiness: *probe
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+    persistence:
+      config:
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /config
+      media:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /media
