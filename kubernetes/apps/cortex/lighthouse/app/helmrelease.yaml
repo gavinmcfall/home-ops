@@ -96,7 +96,7 @@ spec:
           licence-gate:
             image:
               repository: ghcr.io/gavinmcfall/licence-gate
-              tag: 0.1.7@sha256:aad5aeaac403832ea117cf1dcccc35bc3cd10b987886ef9d1bc0ce123c0fedeb
+              tag: 0.1.8@sha256:c20f533717fedd960abe7dadbd1a7be2a5067564cfcf520f9c77312f54542d25
             env:
               LIGHTHOUSE_LISTEN: ":8000"
               LIGHTHOUSE_UPSTREAM: "http://127.0.0.1:8188"
@@ -105,6 +105,10 @@ spec:
               # ComfyUI-Distributed (GPU) workflows pass the gate; the built-in
               # default would reject them.
               LIGHTHOUSE_ALLOWLIST_PATH: "/etc/lighthouse/allowlist.json"
+              # Persistent output dir (mounted ro below) → durable per-user
+              # completed-jobs gallery synthesized from /output/<user>/, surviving
+              # master restarts that wipe ComfyUI's in-memory /api/jobs history.
+              LIGHTHOUSE_OUTPUT_DIR: "/output"
               LIGHTHOUSE_DR_TOKEN:
                 valueFrom:
                   secretKeyRef:
@@ -229,6 +233,11 @@ spec:
           lighthouse:
             main:
               - path: /app/output
+            # Read-only into the proxy for the durable per-user jobs gallery
+            # (LIGHTHOUSE_OUTPUT_DIR=/output). Read-side only; the proxy never writes.
+            licence-gate:
+              - path: /output
+                readOnly: true
       workflows:
         existingClaim: lighthouse-workflows
         advancedMounts:
