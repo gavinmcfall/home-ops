@@ -249,6 +249,15 @@ spec:
             main:
               - path: /app/workflows
                 readOnly: true
+      # ComfyUI user-data (/app/user): each caller's SAVED workflows + settings.
+      # Persisted so they survive pod restarts (previously on ephemeral rootfs →
+      # wiped every roll). RW for the master.
+      userdata:
+        existingClaim: lighthouse-userdata
+        advancedMounts:
+          lighthouse:
+            main:
+              - path: /app/user
       registry:
         type: configMap
         name: lighthouse-registry
