@@ -40,3 +40,19 @@ spec:
     requests:
       storage: 5Gi
   storageClassName: ceph-filesystem
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/persistentvolumeclaim_v1.json
+# ComfyUI user-data dir (/app/user → user/default/<user>/workflows/, settings, …).
+# ComfyUI persists each caller's SAVED workflows here; it is on the pod rootfs by
+# default, so every pod restart wiped them (data loss surfaced 2026-06-08). RWX
+# ceph-filesystem so it survives restarts and a future multi-replica/portal reader.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lighthouse-userdata
+spec:
+  accessModes: ["ReadWriteMany"]
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: ceph-filesystem
