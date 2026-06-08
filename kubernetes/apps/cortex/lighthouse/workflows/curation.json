@@ -1,0 +1,10 @@
+{
+  "_comment": "Curated App Mode workflow registry (licence-gate LIGHTHOUSE_CURATION_DIR). Each entry is overlaid, role-filtered, into every caller's ComfyUI workflow sidebar and served read-only from this configMap. 'path' is the logical userdata path (workflows/lighthouse/... groups curated graphs); 'file' is the configMap key holding the workflow JSON; 'role_allowlist' is the VISIBILITY layer (empty = all authenticated callers) — enforcement is by model tag at the gate. See app-mode-curation.md.",
+  "entries": [
+    {
+      "path": "workflows/lighthouse/portrait-sdxl-hires-facedetailer.json",
+      "file": "portrait-sdxl-hires-facedetailer.workflow.json",
+      "role_allowlist": ["family-adult"]
+    }
+  ]
+}

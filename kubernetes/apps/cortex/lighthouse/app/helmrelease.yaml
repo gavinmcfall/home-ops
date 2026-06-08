@@ -96,7 +96,7 @@ spec:
           licence-gate:
             image:
               repository: ghcr.io/gavinmcfall/licence-gate
-              tag: 0.1.9@sha256:3aa750210bc1f47ae9807982c1048a1ea97335daf752e3eaee8a9f74380e5191
+              tag: 0.1.10@sha256:2a644e24d00676b880ae790b8aa9d4da76c0d7acf1f36d8e0252a75cae55d99e
             env:
               LIGHTHOUSE_LISTEN: ":8000"
               LIGHTHOUSE_UPSTREAM: "http://127.0.0.1:8188"
@@ -109,6 +109,10 @@ spec:
               # completed-jobs gallery synthesized from /output/<user>/, surviving
               # master restarts that wipe ComfyUI's in-memory /api/jobs history.
               LIGHTHOUSE_OUTPUT_DIR: "/output"
+              # Curated-workflow dir (configMap below): role-scoped App Mode
+              # curation overlaid onto each caller's workflow sidebar, served
+              # read-only from this gate. Empty would disable curation.
+              LIGHTHOUSE_CURATION_DIR: "/etc/lighthouse/curation"
               LIGHTHOUSE_DR_TOKEN:
                 valueFrom:
                   secretKeyRef:
@@ -252,6 +256,16 @@ spec:
           lighthouse:
             licence-gate:
               - path: /etc/lighthouse
+      # Curated App Mode workflows (manifest + JSONs) → role-scoped, read-only
+      # overlay served by the gate (LIGHTHOUSE_CURATION_DIR). Separate mount dir
+      # so it doesn't shadow the registry/allowlist configMap at /etc/lighthouse.
+      curation:
+        type: configMap
+        name: lighthouse-curation
+        advancedMounts:
+          lighthouse:
+            licence-gate:
+              - path: /etc/lighthouse/curation
       gpu-config:
         type: configMap
         name: lighthouse-comfyui-distributed
