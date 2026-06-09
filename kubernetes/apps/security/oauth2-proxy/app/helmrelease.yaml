@@ -57,7 +57,16 @@ spec:
               OAUTH2_PROXY_PASS_ACCESS_TOKEN: "true" # keep token available during transition
               OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true" # straight to Pocket-ID, no landing page
               OAUTH2_PROXY_CODE_CHALLENGE_METHOD: S256 # PKCE (Pocket-ID supports it)
-              # ── Cookie/session (stateless; no redis at family scale) ──
+              # ── Session: server-side (Redis/Dragonfly) ──
+              # Pocket-ID's tokens (ID + refresh, fat with the groups claim) overflow
+              # a cookie-store: the chunked RefreshToken cookie exceeds ComfyUI's
+              # aiohttp 8190-byte header limit on the upstream hop ("Got more than
+              # 8190 bytes" on first authed request, 2026-06-09). A Redis session
+              # store keeps the full session server-side; the browser cookie becomes
+              # a small ticket. Dragonfly is shared + unauthed (like plane/immich).
+              OAUTH2_PROXY_SESSION_STORE_TYPE: redis
+              OAUTH2_PROXY_REDIS_CONNECTION_URL: redis://dragonfly.database.svc.cluster.local:6379
+              # ── Cookie ──
               OAUTH2_PROXY_COOKIE_SECURE: "true"
               OAUTH2_PROXY_COOKIE_DOMAINS: ".${SECRET_DOMAIN}"
               OAUTH2_PROXY_WHITELIST_DOMAINS: ".${SECRET_DOMAIN}"
