@@ -96,11 +96,10 @@ spec:
           licence-gate:
             image:
               repository: ghcr.io/gavinmcfall/licence-gate
-              # ⚠ PHASE-3 MERGE-BLOCKER: bump to 0.1.11@<digest from containers#17>
-              # BEFORE merging. The TRUST_FORWARDED_HEADERS flag below REQUIRES the
-              # 0.1.11 code (header-identity); merging on 0.1.10 + flag + oauth2-proxy
-              # routing = no identity → broken. PR stays DRAFT until this is bumped.
-              tag: 0.1.10@sha256:2a644e24d00676b880ae790b8aa9d4da76c0d7acf1f36d8e0252a75cae55d99e
+              # 0.1.11 adds forward-auth header identity (X-Forwarded-User/Groups),
+              # enabled by LIGHTHOUSE_TRUST_FORWARDED_HEADERS below now that
+              # oauth2-proxy fronts this gate.
+              tag: 0.1.11@sha256:cc695bf5d34d8cf65426b00180b6bfb5f083047bdb7caca4f06becb341af3bb6
             env:
               LIGHTHOUSE_LISTEN: ":8000"
               LIGHTHOUSE_UPSTREAM: "http://127.0.0.1:8188"
