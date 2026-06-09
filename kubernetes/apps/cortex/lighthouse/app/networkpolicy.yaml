@@ -1,9 +1,11 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/networking.k8s.io/networkpolicy_v1.json
 # licence-gate proxy (:8000) accepts ingress from TWO sources:
-#   1. Envoy Gateway pods (network ns) — OIDC-gated family/browser surface where
-#      Envoy verifies the JWT before forwarding. Guarantee that makes the proxy's
-#      decode-not-verify safe for family identities.
+#   1. oauth2-proxy pods (security ns) — the OIDC-gated family/browser surface.
+#      oauth2-proxy authenticates against Pocket-ID and reverse-proxies here with
+#      X-Forwarded-User/Groups identity headers; being the only client-facing hop
+#      that can set those headers is what makes the gate's trust of them safe
+#      (Phase-3 cutover; replaced the prior Envoy SecurityPolicy OIDC path).
 #   2. GPU worker LAN subnet (10.90.101.0/24) — required for ComfyUI workers to
 #      POST /distributed/job_complete callbacks back to master after rendering.
 #      Workers authenticate with the brand bearer token (LIGHTHOUSE_DR_TOKEN),
@@ -27,15 +29,14 @@ spec:
   policyTypes:
     - Ingress
   ingress:
-    # licence-gate proxy (:8000) — Envoy Gateway path (family/browser identities).
+    # licence-gate proxy (:8000) — oauth2-proxy path (family/browser identities).
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: network
+              kubernetes.io/metadata.name: security
           podSelector:
             matchLabels:
-              app.kubernetes.io/name: envoy
-              gateway.envoyproxy.io/owning-gateway-namespace: network
+              app.kubernetes.io/name: oauth2-proxy
       ports:
         - port: 8000
           protocol: TCP

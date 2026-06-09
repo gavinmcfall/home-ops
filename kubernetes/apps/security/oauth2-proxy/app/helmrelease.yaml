@@ -38,6 +38,12 @@ spec:
               OAUTH2_PROXY_REDIRECT_URL: https://lighthouse.${SECRET_DOMAIN}/oauth2/callback
               OAUTH2_PROXY_SCOPE: "openid profile email groups"
               OAUTH2_PROXY_OIDC_GROUPS_CLAIM: groups
+              # Key identity on the Pocket-ID `sub` (stable, opaque) rather than
+              # email/preferred_username, so X-Forwarded-User = sub (matches the
+              # gate's existing per-user bucket key). VERIFY at cutover that
+              # oauth2-proxy accepts a non-email-format value here; if it rejects
+              # the UUID, fall back to default (email) keying.
+              OAUTH2_PROXY_OIDC_EMAIL_CLAIM: sub
               OAUTH2_PROXY_EMAIL_DOMAINS: "*" # gate by groups downstream, not email
               # ── Reverse-proxy mode: forward to the licence-gate, inject identity ──
               # Upstream pre-set for Phase 3; nothing routes to oauth2-proxy yet
