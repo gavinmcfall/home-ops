@@ -62,8 +62,12 @@ spec:
                   httpGet: { path: /healthz, port: 8080 }
                   initialDelaySeconds: 20
                   periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 3
+                  timeoutSeconds: 10
+                  # Tolerant of a blocked event loop while the 320k-drawer HNSW
+                  # index loads on the first query (~minutes). 6×30s = 3min
+                  # before a restart. The threadpool fix in the app keeps the
+                  # loop responsive; this is the safety margin.
+                  failureThreshold: 6
               readiness:
                 enabled: true
                 custom: true
