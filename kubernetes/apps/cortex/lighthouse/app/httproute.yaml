@@ -1,8 +1,11 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/httproute_v1.json
-# Family image surface. Routes to the licence-gate proxy (:8000) ONLY — ComfyUI's
-# :8188 is never Service-exposed. OIDC is enforced by lighthouse-oidc SecurityPolicy
-# targeting this route.
+# Family image surface. Routes to oauth2-proxy (security ns), which does the OIDC
+# dance with Pocket-ID, injects X-Forwarded-User/Groups identity headers, and
+# reverse-proxies to its upstream (the licence-gate :8000 → ComfyUI :8188, never
+# Service-exposed). Replaces the previous Envoy SecurityPolicy OIDC, which only
+# forwarded the access token (no groups). The cross-namespace backendRef is allowed
+# by the ReferenceGrant in the security namespace (oauth2-proxy app).
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -20,5 +23,6 @@ spec:
     - matches:
         - path: { type: PathPrefix, value: / }
       backendRefs:
-        - name: lighthouse-app
-          port: 8000
+        - name: oauth2-proxy
+          namespace: security
+          port: 4180

@@ -96,7 +96,10 @@ spec:
           licence-gate:
             image:
               repository: ghcr.io/gavinmcfall/licence-gate
-              tag: 0.1.10@sha256:2a644e24d00676b880ae790b8aa9d4da76c0d7acf1f36d8e0252a75cae55d99e
+              # 0.1.11 adds forward-auth header identity (X-Forwarded-User/Groups),
+              # enabled by LIGHTHOUSE_TRUST_FORWARDED_HEADERS below now that
+              # oauth2-proxy fronts this gate.
+              tag: 0.1.11@sha256:cc695bf5d34d8cf65426b00180b6bfb5f083047bdb7caca4f06becb341af3bb6
             env:
               LIGHTHOUSE_LISTEN: ":8000"
               LIGHTHOUSE_UPSTREAM: "http://127.0.0.1:8188"
@@ -113,6 +116,11 @@ spec:
               # curation overlaid onto each caller's workflow sidebar, served
               # read-only from this gate. Empty would disable curation.
               LIGHTHOUSE_CURATION_DIR: "/etc/lighthouse/curation"
+              # Phase-3 cutover: trust X-Forwarded-User/Groups from oauth2-proxy
+              # (now in the request path, stripping client-supplied X-Forwarded-*).
+              # This is what finally delivers the `groups` claim to the gate, so
+              # curation + mature gating come alive. Requires licence-gate ≥ 0.1.11.
+              LIGHTHOUSE_TRUST_FORWARDED_HEADERS: "true"
               LIGHTHOUSE_DR_TOKEN:
                 valueFrom:
                   secretKeyRef:

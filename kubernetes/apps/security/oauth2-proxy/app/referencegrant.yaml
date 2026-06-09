@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/referencegrant_v1beta1.json
+# Allows the lighthouse HTTPRoute (cortex namespace) to backendRef the oauth2-proxy
+# Service in this (security) namespace — the Phase-3 cutover routes the family
+# image surface through oauth2-proxy.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: oauth2-proxy-from-cortex
+  namespace: security
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: cortex
+  to:
+    - group: ""
+      kind: Service
+      name: oauth2-proxy
