@@ -1,0 +1,43 @@
+---
+# Role password for the mempalace pgvector database.
+# 1Password item `mempalace` must provide fields: username, password.
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/external-secrets.io/externalsecret_v1.json
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: mempalace-pg-role
+  namespace: database
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword-connect
+  target:
+    name: mempalace-pg-role
+    template:
+      engineVersion: v2
+      data:
+        # CNPG managed-role passwordSecret expects username + password keys.
+        username: "{{ .MEMPALACE_POSTGRES_USER }}"
+        password: "{{ .MEMPALACE_POSTGRES_PASS }}"
+  dataFrom:
+    - extract:
+        key: mempalace
+---
+# The mempalace database, owned by the managed `mempalace` role (declared in
+# postgres18-cluster.yaml spec.managed.roles), with the pgvector extension.
+# Created declaratively so it outlives any application pod (Path B retires the
+# mempalace HTTP deployment; the DB must persist independently).
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: mempalace
+  namespace: database
+spec:
+  cluster:
+    name: postgres18-cluster
+  name: mempalace
+  owner: mempalace
+  ensure: present
+  extensions:
+    - name: vector
+      ensure: present
