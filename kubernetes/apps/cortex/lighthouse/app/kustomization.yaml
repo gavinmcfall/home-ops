@@ -5,8 +5,8 @@ kind: Kustomization
 resources:
   - ./pvc.yaml
   - ./externalsecret.yaml
-  - ./backend.yaml
-  - ./securitypolicy.yaml
+  # OIDC moved to oauth2-proxy (security ns) at the Phase-3 cutover — the Envoy
+  # SecurityPolicy + its Backend (backend.yaml/securitypolicy.yaml) were removed.
   - ./helmrelease.yaml
   - ./httproute.yaml
   - ./networkpolicy.yaml
