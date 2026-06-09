@@ -50,6 +50,16 @@ spec:
         stanzaRef: postgres18-cluster-stanza
         pluginConfigRef: postgres18-cluster-pluginconfig
 
+  # Managed roles. `mempalace` owns the mempalace pgvector database
+  # (see mempalace-db.yaml). Password sourced from the mempalace-pg-role secret.
+  managed:
+    roles:
+      - name: mempalace
+        ensure: present
+        login: true
+        passwordSecret:
+          name: mempalace-pg-role
+
   bootstrap:
     initdb:
       database: postgres
