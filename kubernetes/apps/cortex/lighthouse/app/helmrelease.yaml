@@ -45,7 +45,8 @@ spec:
           main:
             image:
               repository: ghcr.io/gavinmcfall/lighthouse
-              tag: 0.22.0@sha256:67c7e38e7a0e21d536cd7d8ee7556d6c5de4871b7c62e5d18cf4222ee357cc91
+              # Rebuild bakes the lighthouse-identity badge web extension (Phase 5).
+              tag: 0.22.0@sha256:40a49d75112db4b43bad88a10c45877c873aa4639e1d31f3b279a15e3f70a814
             probes:
               liveness:
                 enabled: true
