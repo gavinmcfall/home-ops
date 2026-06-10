@@ -98,6 +98,18 @@ spec:
             url: http://alertmanager-operated.observability.svc.cluster.local:9093
             jsonData:
               implementation: prometheus
+          - name: InfluxDB
+            type: influxdb
+            uid: influxdb-vitals
+            access: proxy
+            url: http://influxdb.vitals.svc.cluster.local:8086
+            jsonData:
+              version: Flux
+              organization: vitals
+              defaultBucket: claude-code
+              tlsSkipVerify: true
+            secureJsonData:
+              token: $INFLUXDB_TOKEN
     dashboardProviders:
       dashboardproviders.yaml:
         apiVersion: 1
@@ -191,8 +203,20 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/entertainment
+          - name: devpod
+            orgId: 1
+            folder: Dev Telemetry
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/devpod
 
     dashboards:
+      devpod:
+        devpod-telemetry:
+          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/devpod-telemetry.json
+          datasource: InfluxDB
       default:
         external-secrets:
           url: https://raw.githubusercontent.com/external-secrets/external-secrets/main/docs/snippets/dashboard.json
