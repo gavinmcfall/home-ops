@@ -1,0 +1,23 @@
+# Lighthouse worker model auto-fetch (ADR 018). Install (in the lighthouse WSL
+# distro, alongside comfyui-worker.service):
+#   sudo cp lighthouse-model-sync.{service,timer} /etc/systemd/system/
+#   sudo cp lighthouse-model-sync.sh /usr/local/bin/ && sudo chmod +x /usr/local/bin/lighthouse-model-sync.sh
+#   sudo tee /etc/lighthouse-worker.conf >/dev/null <<EOF
+#   MASTER=10.99.8.215:9090
+#   TOKEN=<LIGHTHOUSE_WORKER_TOKEN from op://Kubernetes/lighthouse>
+#   TIER=heavy        # heavy (Vengeance/Vixen) | light (Nova/Blaze)
+#   MODELS_DIR=/home/<user>/ComfyUI/models
+#   EOF
+#   sudo chmod 600 /etc/lighthouse-worker.conf
+#   sudo systemctl daemon-reload && sudo systemctl enable --now lighthouse-model-sync.timer
+# Manual run: sudo systemctl start lighthouse-model-sync.service
+[Unit]
+Description=Lighthouse model auto-fetch from cluster model-serve
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/lighthouse-model-sync.sh
+# Long downloads are normal on first sync (tens of GB) — no timeout.
+TimeoutStartSec=infinity
