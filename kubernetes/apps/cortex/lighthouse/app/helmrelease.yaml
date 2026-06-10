@@ -160,10 +160,13 @@ spec:
           model-serve:
             image:
               repository: ghcr.io/gavinmcfall/model-serve
-              tag: 0.3.0@sha256:45003e76eb41eea52331483c20646b1907f03fdf1e3099baf4f6a0e88e3e015c
+              tag: 0.4.0@sha256:f7283a545b144784c121ad02de1795d4ced7d7fae89abc114ec3a8c41109c78d
             env:
               MODELSERVE_LISTEN: ":9090"
               MODELSERVE_ROOT: "/models"
+              # Licence registry (mounted below) → tier-filtered /models/manifest:
+              # workers sync aux models + only the checkpoints their tier can run.
+              MODELSERVE_REGISTRY_PATH: "/etc/lighthouse/registry.json"
               MODELSERVE_TOKEN:
                 valueFrom:
                   secretKeyRef:
@@ -274,6 +277,10 @@ spec:
           lighthouse:
             licence-gate:
               - path: /etc/lighthouse
+            # model-serve reads registry.json for tier-filtered /models/manifest.
+            model-serve:
+              - path: /etc/lighthouse
+                readOnly: true
       # Curated App Mode workflows (manifest + JSONs) → role-scoped, read-only
       # overlay served by the gate (LIGHTHOUSE_CURATION_DIR). Separate mount dir
       # so it doesn't shadow the registry/allowlist configMap at /etc/lighthouse.

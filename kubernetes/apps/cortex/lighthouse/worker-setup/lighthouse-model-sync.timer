@@ -1,0 +1,12 @@
+# Sync on boot + every 30 minutes (Gavin 2026-06-10). New models propagate to
+# every worker within a timer tick of `POST /models/ingest` on the master.
+[Unit]
+Description=Periodic Lighthouse model auto-fetch
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=30min
+RandomizedDelaySec=2min
+
+[Install]
+WantedBy=timers.target
