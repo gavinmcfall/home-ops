@@ -9,6 +9,7 @@ CONF=/etc/lighthouse-worker.conf
 # shellcheck disable=SC1090
 source "$CONF" # MASTER=10.99.8.215:9090  TOKEN=...  TIER=heavy|light  MODELS_DIR=/home/<u>/ComfyUI/models
 : "${MASTER:?}" "${TOKEN:?}" "${TIER:?}" "${MODELS_DIR:?}"
+TIER=${TIER,,} # registry tier_fit slugs are lowercase; TIER=HEAVY must not silently match nothing
 
 AUTH=(-H "Authorization: Bearer $TOKEN")
 BASE="http://$MASTER"
