@@ -11,5 +11,6 @@ resources:
   # Applications
   - ./cloudnative-pg/ks.yaml
   - ./dragonfly/ks.yaml
+  - ./influxdb3/ks.yaml
   - ./mosquitto/ks.yaml
   - ./mariadb/ks.yaml

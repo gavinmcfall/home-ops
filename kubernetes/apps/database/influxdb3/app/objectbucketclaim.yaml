@@ -1,0 +1,8 @@
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: influxdb3
+spec:
+  bucketName: influxdb-telemetry
+  storageClassName: ceph-bucket
