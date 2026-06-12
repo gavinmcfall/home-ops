@@ -33,5 +33,6 @@ configMapGenerator:
       - ../workflows/curation.json
       - ../workflows/portrait-sdxl-hires-facedetailer.workflow.json
       - ../workflows/standard-sdxl-hires.workflow.json
+      - ../workflows/illustrious-booru.workflow.json
 generatorOptions:
   disableNameSuffixHash: true
