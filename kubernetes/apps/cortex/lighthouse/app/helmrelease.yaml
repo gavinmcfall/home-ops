@@ -110,10 +110,12 @@ spec:
           licence-gate:
             image:
               repository: ghcr.io/gavinmcfall/licence-gate
-              # 0.1.11 adds forward-auth header identity (X-Forwarded-User/Groups),
-              # enabled by LIGHTHOUSE_TRUST_FORWARDED_HEADERS below now that
-              # oauth2-proxy fronts this gate.
-              tag: 0.1.11@sha256:cc695bf5d34d8cf65426b00180b6bfb5f083047bdb7caca4f06becb341af3bb6
+              # 0.1.12 makes the gallery delete real: POST /history with one of the
+              # gate's synthetic disk ids removes the caller's own render file from
+              # /output (ownership-checked, fail closed) — previously the frontend's
+              # delete only cleared master's in-memory history and the disk-scan
+              # gallery resurrected the image. Needs the /output mount RW below.
+              tag: 0.1.12@sha256:9d7d0d1813041923fe3d2be41ab931cf00c7c053d67bd0bccc29e0ca145eb532
             env:
               LIGHTHOUSE_LISTEN: ":8000"
               LIGHTHOUSE_UPSTREAM: "http://127.0.0.1:8188"
@@ -122,9 +124,10 @@ spec:
               # ComfyUI-Distributed (GPU) workflows pass the gate; the built-in
               # default would reject them.
               LIGHTHOUSE_ALLOWLIST_PATH: "/etc/lighthouse/allowlist.json"
-              # Persistent output dir (mounted ro below) → durable per-user
+              # Persistent output dir (mounted RW below) → durable per-user
               # completed-jobs gallery synthesized from /output/<user>/, surviving
               # master restarts that wipe ComfyUI's in-memory /api/jobs history.
+              # RW since 0.1.12: gallery delete removes the caller's own files.
               LIGHTHOUSE_OUTPUT_DIR: "/output"
               # Curated-workflow dir (configMap below): role-scoped App Mode
               # curation overlaid onto each caller's workflow sidebar, served
@@ -262,11 +265,12 @@ spec:
           lighthouse:
             main:
               - path: /app/output
-            # Read-only into the proxy for the durable per-user jobs gallery
-            # (LIGHTHOUSE_OUTPUT_DIR=/output). Read-side only; the proxy never writes.
+            # RW into the proxy for the durable per-user jobs gallery
+            # (LIGHTHOUSE_OUTPUT_DIR=/output): reads to synthesize the listing,
+            # deletes (0.1.12 gallery delete) confined to the caller's own bucket
+            # by the gate's ownership checks. The gate never creates files here.
             licence-gate:
               - path: /output
-                readOnly: true
       workflows:
         existingClaim: lighthouse-workflows
         advancedMounts:
