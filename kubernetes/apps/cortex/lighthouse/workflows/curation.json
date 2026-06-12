@@ -1,10 +1,48 @@
 {
-  "_comment": "Curated App Mode workflow registry (licence-gate LIGHTHOUSE_CURATION_DIR). Each entry is overlaid, role-filtered, into every caller's ComfyUI workflow sidebar and served read-only from this configMap. 'path' is the logical userdata path (workflows/lighthouse/... groups curated graphs); 'file' is the configMap key holding the workflow JSON; 'role_allowlist' is the VISIBILITY layer (empty = all authenticated callers) — enforcement is by model tag at the gate. See app-mode-curation.md.",
+  "_comment": "Curated App Mode workflow registry (licence-gate LIGHTHOUSE_CURATION_DIR). Each entry is overlaid, role-filtered, into every caller's ComfyUI workflow sidebar and served read-only from this configMap. 'path' is the logical userdata path (workflows/lighthouse/... groups curated graphs); 'file' is the configMap key holding the workflow JSON; 'role_allowlist' is the VISIBILITY layer (empty = all authenticated callers) \u2014 enforcement is by model tag at the gate. See app-mode-curation.md.",
   "entries": [
     {
       "path": "workflows/lighthouse/portrait-sdxl-hires-facedetailer.json",
       "file": "portrait-sdxl-hires-facedetailer.workflow.json",
-      "role_allowlist": ["family_adult"]
+      "role_allowlist": [
+        "family_adult"
+      ]
+    },
+    {
+      "path": "workflows/lighthouse/standard-sdxl-hires.json",
+      "file": "standard-sdxl-hires.workflow.json",
+      "role_allowlist": []
+    },
+    {
+      "path": "workflows/lighthouse/illustrious-booru.json",
+      "file": "illustrious-booru.workflow.json",
+      "role_allowlist": []
+    },
+    {
+      "path": "workflows/lighthouse/restyle-canny.json",
+      "file": "restyle-canny.workflow.json",
+      "role_allowlist": []
+    },
+    {
+      "path": "workflows/lighthouse/mature-booru.json",
+      "file": "mature-booru.workflow.json",
+      "role_allowlist": [
+        "content-mature"
+      ]
+    },
+    {
+      "path": "workflows/lighthouse/mature-photoreal.json",
+      "file": "mature-photoreal.workflow.json",
+      "role_allowlist": [
+        "content-mature"
+      ]
+    },
+    {
+      "path": "workflows/lighthouse/mature-restyle.json",
+      "file": "mature-restyle.workflow.json",
+      "role_allowlist": [
+        "content-mature"
+      ]
     }
   ]
 }
