@@ -22,6 +22,27 @@
       "path": "workflows/lighthouse/restyle-canny.json",
       "file": "restyle-canny.workflow.json",
       "role_allowlist": []
+    },
+    {
+      "path": "workflows/lighthouse/mature-booru.json",
+      "file": "mature-booru.workflow.json",
+      "role_allowlist": [
+        "content-mature"
+      ]
+    },
+    {
+      "path": "workflows/lighthouse/mature-photoreal.json",
+      "file": "mature-photoreal.workflow.json",
+      "role_allowlist": [
+        "content-mature"
+      ]
+    },
+    {
+      "path": "workflows/lighthouse/mature-restyle.json",
+      "file": "mature-restyle.workflow.json",
+      "role_allowlist": [
+        "content-mature"
+      ]
     }
   ]
 }
