@@ -229,6 +229,9 @@ spec:
         devpod-telemetry:
           url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/devpod-telemetry.json
           datasource: InfluxDB
+        dev-telemetry-ai:
+          url: https://raw.githubusercontent.com/gavinmcfall/home-ops/refs/heads/main/dashboards/grafana/dev-telemetry-ai.json
+          datasource: InfluxDB-Telemetry
       default:
         external-secrets:
           url: https://raw.githubusercontent.com/external-secrets/external-secrets/main/docs/snippets/dashboard.json

@@ -1,0 +1,79 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "AI coding telemetry (Claude Code / Codex / Gemini) via the OTel backbone → InfluxDB 3. Starter board; richer panels land once real CLI metrics flow.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": { "type": "datasource", "uid": "grafana" },
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "code": { "language": "html", "showLineNumbers": false, "showMiniMap": false },
+        "content": "<div style=\"display:flex;align-items:center;gap:16px;padding:14px 22px;border-radius:10px;background:linear-gradient(90deg,#1b2a4a 0%,#3a1d5e 100%);box-shadow:0 2px 10px rgba(0,0,0,.35)\">\n  <div style=\"font-size:30px\">🧠</div>\n  <div>\n    <div style=\"font-size:22px;font-weight:700;color:#fff;letter-spacing:.5px\">AI Coding Telemetry</div>\n    <div style=\"font-size:13px;color:#b9c4e0\">Claude Code &middot; Codex &middot; Gemini &nbsp;→&nbsp; OTel Collector → InfluxDB 3 (dev-telemetry) on Ceph RGW</div>\n  </div>\n</div>",
+        "mode": "html"
+      },
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "description": "Most recent rows written to the dev-telemetry `prometheus` table (the telegraf-prometheus-v2 schema stores every metric as a column here).",
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 16, "w": 24, "x": 0, "y": 4 },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true,
+        "sortBy": [{ "displayName": "time", "desc": true }]
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+          "query": "SELECT * FROM prometheus ORDER BY time DESC LIMIT 200",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Recent telemetry (dev-telemetry.prometheus)",
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["dev-telemetry", "influxdb3", "ai"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Dev Telemetry — AI Coding (v3)",
+  "uid": "dev-telemetry-ai-v3",
+  "version": 1,
+  "weekStart": ""
+}
