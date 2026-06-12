@@ -110,6 +110,18 @@ spec:
               tlsSkipVerify: true
             secureJsonData:
               token: $INFLUXDB_TOKEN
+          - name: InfluxDB-Telemetry
+            type: influxdb
+            uid: influxdb-telemetry
+            access: proxy
+            url: http://influxdb3.database.svc.cluster.local:8181
+            jsonData:
+              version: SQL
+              dbName: dev-telemetry
+              httpMode: POST
+              insecureGrpc: true
+            secureJsonData:
+              token: $INFLUXDB3_TELEMETRY_TOKEN
     dashboardProviders:
       dashboardproviders.yaml:
         apiVersion: 1
