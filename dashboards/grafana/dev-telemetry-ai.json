@@ -55,10 +55,12 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+          "rawSql": "SELECT * FROM prometheus ORDER BY time DESC LIMIT 200",
           "query": "SELECT * FROM prometheus ORDER BY time DESC LIMIT 200",
           "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "table"
+          "format": "table",
+          "resultFormat": "table",
+          "refId": "A"
         }
       ],
       "title": "Recent telemetry (dev-telemetry.prometheus)",
