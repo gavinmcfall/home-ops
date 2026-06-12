@@ -17,6 +17,11 @@
       "path": "workflows/lighthouse/illustrious-booru.json",
       "file": "illustrious-booru.workflow.json",
       "role_allowlist": []
+    },
+    {
+      "path": "workflows/lighthouse/restyle-canny.json",
+      "file": "restyle-canny.workflow.json",
+      "role_allowlist": []
     }
   ]
 }

@@ -237,5 +237,16 @@
       "realvisxl-v5.0.safetensors",
       "cyberrealistic-xl-v10.safetensors"
     ]
+  },
+  {
+    "filename": "controlnet-union-sdxl-promax.safetensors",
+    "sha256": "9fae2e50cb431bfcbe05822b59ec2228df545ef27f711dea8949e9f4ed9f7cdc",
+    "licence": "Apache-2.0 (xinsir/controlnet-union-sdxl-1.0)",
+    "commercial_ok": true,
+    "tier_fit": [
+      "heavy",
+      "light"
+    ],
+    "substitutes": []
   }
 ]
