@@ -68,11 +68,13 @@ spec:
     config:
       extensions:
         # health_check is mandatory for this chart (drives the probes).
+        # NOTE: $$ escapes Flux's ${VAR} postBuild substitution so the collector's
+        # own ${env:...} runtime expansion survives. Flux renders $$ -> $.
         health_check:
-          endpoint: ${env:MY_POD_IP}:13133
+          endpoint: $${env:MY_POD_IP}:13133
         bearertokenauth:
           scheme: Bearer
-          token: ${env:OTEL_BEARER_TOKEN}
+          token: $${env:OTEL_BEARER_TOKEN}
       receivers:
         # Null out chart defaults we don't use so they aren't merged back in.
         jaeger: null
@@ -105,7 +107,7 @@ spec:
         # exporter README for collector 0.153.0. Adjust org/bucket/metrics_schema if needed.
         influxdb:
           endpoint: http://influxdb3.database.svc.cluster.local:8181
-          token: ${env:INFLUXDB3_TOKEN}
+          token: $${env:INFLUXDB3_TOKEN}
           org: telemetry
           bucket: dev-telemetry
           metrics_schema: telegraf-prometheus-v2
