@@ -1,81 +1,119 @@
 {
-  "annotations": {
-    "list": [
-      {
-        "builtIn": 1,
-        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
-        "enable": true,
-        "hide": true,
-        "iconColor": "rgba(0, 211, 255, 1)",
-        "name": "Annotations & Alerts",
-        "type": "dashboard"
-      }
-    ]
-  },
-  "description": "AI coding telemetry (Claude Code / Codex / Gemini) via the OTel backbone → InfluxDB 3. Starter board; richer panels land once real CLI metrics flow.",
+  "annotations": { "list": [ { "builtIn": 1, "datasource": { "type": "grafana", "uid": "-- Grafana --" }, "enable": true, "hide": true, "iconColor": "rgba(0, 211, 255, 1)", "name": "Annotations & Alerts", "type": "dashboard" } ] },
+  "description": "AI coding telemetry (Claude Code) via the OTel backbone → InfluxDB 3. Counters are delta temporality, so sum() gives true totals.",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": { "type": "datasource", "uid": "grafana" },
-      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
+      "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
       "id": 1,
-      "options": {
-        "code": { "language": "html", "showLineNumbers": false, "showMiniMap": false },
-        "content": "<div style=\"display:flex;align-items:center;gap:16px;padding:14px 22px;border-radius:10px;background:linear-gradient(90deg,#1b2a4a 0%,#3a1d5e 100%);box-shadow:0 2px 10px rgba(0,0,0,.35)\">\n  <div style=\"font-size:30px\">🧠</div>\n  <div>\n    <div style=\"font-size:22px;font-weight:700;color:#fff;letter-spacing:.5px\">AI Coding Telemetry</div>\n    <div style=\"font-size:13px;color:#b9c4e0\">Claude Code &middot; Codex &middot; Gemini &nbsp;→&nbsp; OTel Collector → InfluxDB 3 (dev-telemetry) on Ceph RGW</div>\n  </div>\n</div>",
-        "mode": "html"
-      },
+      "options": { "mode": "html", "content": "<div style=\"display:flex;align-items:center;gap:16px;padding:12px 22px;border-radius:10px;background:linear-gradient(90deg,#1b2a4a 0%,#3a1d5e 100%);box-shadow:0 2px 10px rgba(0,0,0,.35)\"><div style=\"font-size:28px\">🧠</div><div><div style=\"font-size:21px;font-weight:700;color:#fff;letter-spacing:.5px\">AI Coding Telemetry</div><div style=\"font-size:12px;color:#b9c4e0\">Claude Code → OTel Collector → InfluxDB 3 (dev-telemetry) on Ceph RGW</div></div></div>" },
       "title": "",
       "transparent": true,
       "type": "text"
     },
     {
       "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
-      "description": "Most recent rows written to the dev-telemetry `prometheus` table (the telegraf-prometheus-v2 schema stores every metric as a column here).",
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 16, "w": 24, "x": 0, "y": 4 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "green" }, "unit": "currencyUSD", "decimals": 2 }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 3 },
       "id": 2,
-      "options": {
-        "cellHeight": "sm",
-        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
-        "showHeader": true,
-        "sortBy": [{ "displayName": "time", "desc": true }]
-      },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
       "pluginVersion": "11.0.0",
-      "targets": [
-        {
-          "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
-          "rawSql": "SELECT * FROM prometheus ORDER BY time DESC LIMIT 200",
-          "query": "SELECT * FROM prometheus ORDER BY time DESC LIMIT 200",
-          "rawQuery": true,
-          "format": "table",
-          "resultFormat": "table",
-          "refId": "A"
-        }
-      ],
-      "title": "Recent telemetry (dev-telemetry.prometheus)",
+      "targets": [ { "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" }, "rawSql": "SELECT sum(\"claude_code.cost.usage\") AS \"Total cost\" FROM prometheus WHERE \"claude_code.cost.usage\" IS NOT NULL", "rawQuery": true, "format": "table", "resultFormat": "table", "refId": "A" } ],
+      "title": "Total Cost",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "blue" }, "unit": "short", "decimals": 0 }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 3 },
+      "id": 3,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.0.0",
+      "targets": [ { "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" }, "rawSql": "SELECT sum(\"claude_code.token.usage\") AS \"Total tokens\" FROM prometheus WHERE \"claude_code.token.usage\" IS NOT NULL", "rawQuery": true, "format": "table", "resultFormat": "table", "refId": "A" } ],
+      "title": "Total Tokens",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "purple" }, "unit": "short", "decimals": 0 }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 3 },
+      "id": 4,
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.0.0",
+      "targets": [ { "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" }, "rawSql": "SELECT count(DISTINCT \"session.id\") AS \"Sessions\" FROM prometheus WHERE \"session.id\" IS NOT NULL", "rawQuery": true, "format": "table", "resultFormat": "table", "refId": "A" } ],
+      "title": "Sessions",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "orange" }, "unit": "h", "decimals": 1 }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 3 },
+      "id": 5,
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.0.0",
+      "targets": [ { "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" }, "rawSql": "SELECT round(sum(\"claude_code.active_time.total\")/3600.0, 2) AS \"Active hours\" FROM prometheus WHERE \"claude_code.active_time.total\" IS NOT NULL", "rawQuery": true, "format": "table", "resultFormat": "table", "refId": "A" } ],
+      "title": "Active Time",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "bars", "fillOpacity": 70, "lineWidth": 1, "stacking": { "mode": "normal" } }, "unit": "currencyUSD" }, "overrides": [] },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 7 },
+      "id": 6,
+      "options": { "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "right", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "pluginVersion": "11.0.0",
+      "targets": [ { "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" }, "rawSql": "SELECT date_bin(INTERVAL '10 minutes', time) AS \"time\", \"model\", sum(\"claude_code.cost.usage\") AS \"cost\" FROM prometheus WHERE \"claude_code.cost.usage\" IS NOT NULL GROUP BY 1, \"model\" ORDER BY 1", "rawQuery": true, "format": "time_series", "resultFormat": "time_series", "refId": "A" } ],
+      "title": "Cost over time (by model)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "bars", "fillOpacity": 70, "lineWidth": 1, "stacking": { "mode": "normal" } }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 7 },
+      "id": 7,
+      "options": { "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "right", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "pluginVersion": "11.0.0",
+      "targets": [ { "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" }, "rawSql": "SELECT date_bin(INTERVAL '10 minutes', time) AS \"time\", \"type\", sum(\"claude_code.token.usage\") AS \"tokens\" FROM prometheus WHERE \"claude_code.token.usage\" IS NOT NULL GROUP BY 1, \"type\" ORDER BY 1", "rawQuery": true, "format": "time_series", "resultFormat": "time_series", "refId": "A" } ],
+      "title": "Token usage over time (by type)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "fieldConfig": { "defaults": { "custom": { "align": "auto", "cellOptions": { "type": "auto" } } }, "overrides": [ { "matcher": { "id": "byName", "options": "cost_usd" }, "properties": [ { "id": "unit", "value": "currencyUSD" }, { "id": "decimals", "value": 2 }, { "id": "custom.cellOptions", "value": { "type": "color-background" } }, { "id": "color", "value": { "mode": "continuous-GrYlRd" } } ] }, { "matcher": { "id": "byName", "options": "tokens" }, "properties": [ { "id": "unit", "value": "short" } ] } ] },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 16 },
+      "id": 8,
+      "options": { "cellHeight": "sm", "footer": { "show": true, "reducer": ["sum"], "fields": ["tokens", "cost_usd"] }, "showHeader": true, "sortBy": [ { "displayName": "cost_usd", "desc": true } ] },
+      "pluginVersion": "11.0.0",
+      "targets": [ { "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" }, "rawSql": "SELECT \"model\", sum(\"claude_code.token.usage\") AS \"tokens\", round(sum(\"claude_code.cost.usage\"), 2) AS \"cost_usd\" FROM prometheus WHERE \"model\" IS NOT NULL GROUP BY \"model\" ORDER BY \"cost_usd\" DESC", "rawQuery": true, "format": "table", "resultFormat": "table", "refId": "A" } ],
+      "title": "By model",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "fieldConfig": { "defaults": { "custom": { "align": "auto", "cellOptions": { "type": "auto" } }, "unit": "short" }, "overrides": [ { "matcher": { "id": "byName", "options": "tokens" }, "properties": [ { "id": "custom.cellOptions", "value": { "type": "gauge", "mode": "gradient" } } ] } ] },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 16 },
+      "id": 9,
+      "options": { "cellHeight": "sm", "footer": { "show": false }, "showHeader": true, "sortBy": [ { "displayName": "tokens", "desc": true } ] },
+      "pluginVersion": "11.0.0",
+      "targets": [ { "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" }, "rawSql": "SELECT \"type\", sum(\"claude_code.token.usage\") AS \"tokens\" FROM prometheus WHERE \"type\" IS NOT NULL AND \"claude_code.token.usage\" IS NOT NULL GROUP BY \"type\" ORDER BY \"tokens\" DESC", "rawQuery": true, "format": "table", "resultFormat": "table", "refId": "A" } ],
+      "title": "Tokens by type (input / output / cache)",
       "type": "table"
     }
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["dev-telemetry", "influxdb3", "ai"],
+  "tags": ["dev-telemetry", "influxdb3", "ai", "claude-code"],
   "templating": { "list": [] },
-  "time": { "from": "now-6h", "to": "now" },
+  "time": { "from": "now-24h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
   "title": "Dev Telemetry — AI Coding (v3)",
   "uid": "dev-telemetry-ai-v3",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
