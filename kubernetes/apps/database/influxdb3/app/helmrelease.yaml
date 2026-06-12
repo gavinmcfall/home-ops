@@ -36,10 +36,6 @@ spec:
             image:
               repository: docker.io/library/influxdb
               tag: 3-enterprise@sha256:835229f278ea2dd7e139450d90ffa5af00dc731cb3dd9379ba42faa250b8a697
-            # DEPLOY-VERIFY: confirm the exact `serve` flags against the running
-            # image (`kubectl exec ... -- influxdb3 serve --help`) before first boot.
-            # In particular confirm whether Enterprise single-node requires
-            # `--cluster-id`, and the health endpoint path.
             args:
               - serve
               - --node-id=influxdb3-node0
@@ -51,6 +47,9 @@ spec:
               - --aws-endpoint=http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc:80
               - --aws-default-region=us-east-1
               - --aws-allow-http
+              # Auth stays ON for data; exempt the health endpoint so the k8s probe
+              # (which sends no token) doesn't get rejected with MissingToken.
+              - --disable-authz=health
             env:
               AWS_ALLOW_HTTP: "true"
             envFrom:
