@@ -24,6 +24,11 @@
       "role_allowlist": []
     },
     {
+      "path": "workflows/lighthouse/restyle-depth.json",
+      "file": "restyle-depth.workflow.json",
+      "role_allowlist": []
+    },
+    {
       "path": "workflows/lighthouse/mature-booru.json",
       "file": "mature-booru.workflow.json",
       "role_allowlist": [

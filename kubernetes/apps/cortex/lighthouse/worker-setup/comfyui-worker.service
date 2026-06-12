@@ -19,6 +19,11 @@ Wants=network-online.target
 Type=simple
 User=<WSL_USER>
 WorkingDirectory=/home/<WSL_USER>/ComfyUI
+# Point comfyui_controlnet_aux annotator weights (DepthAnythingV2 etc.) into the
+# models tree so lighthouse-model-sync distributes them (annotators/...) and the
+# pack never tries a runtime HuggingFace download. The env var wins over the
+# pack's config.yaml (utils.py reads it via os.getenv).
+Environment=AUX_ANNOTATOR_CKPTS_PATH=/home/<WSL_USER>/ComfyUI/models/annotators
 ExecStart=/home/<WSL_USER>/ComfyUI/.venv/bin/python /home/<WSL_USER>/ComfyUI/main.py --listen 0.0.0.0 --enable-cors-header
 Restart=always
 RestartSec=5

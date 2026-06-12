@@ -47,6 +47,19 @@ spec:
               repository: ghcr.io/gavinmcfall/lighthouse
               # Bakes the lighthouse-identity sidebar tab (Phase 5; sidebar-icon rework).
               tag: 0.22.0@sha256:25fd91ae0cba5dd8c753463577e82e1dfe506d87ac540a54849447e5d696b158
+            env:
+              # comfyui_controlnet_aux annotator weights (DepthAnythingV2 etc.) live
+              # on the models PVC under annotators/ — the env var wins over the
+              # pack's config.yaml, so the pack finds them there and never attempts
+              # a runtime HuggingFace download. Workers get the same weights via
+              # lighthouse-model-sync + the matching env in comfyui-worker.service.
+              AUX_ANNOTATOR_CKPTS_PATH: /app/models/annotators
+              # Belt-and-braces for the Phase-2a pack vetting: the master image
+              # docs promise "HF_HUB_OFFLINE at runtime" (auto-download paths fail
+              # safe); these make that promise real. All weights are pre-staged on
+              # the PVC / worker model dirs.
+              HF_HUB_OFFLINE: "1"
+              TRANSFORMERS_OFFLINE: "1"
             probes:
               liveness:
                 enabled: true
