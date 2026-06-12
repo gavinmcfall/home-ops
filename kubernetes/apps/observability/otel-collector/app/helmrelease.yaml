@@ -1,0 +1,123 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app otel-collector
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: opentelemetry-collector
+      version: 0.158.1
+      sourceRef:
+        kind: HelmRepository
+        name: opentelemetry
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    mode: deployment
+    replicaCount: 1
+    fullnameOverride: otel-collector
+    image:
+      repository: otel/opentelemetry-collector-contrib
+      tag: 0.153.0
+      digest: sha256:93aad750175cbf1a973ae1c5886c3371f4d800f61be25cdd26870b8441ffe9fa
+    command:
+      name: otelcol-contrib
+    extraEnvs:
+      - name: OTEL_BEARER_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: otel-collector-secret
+            key: OTEL_BEARER_TOKEN
+      - name: INFLUXDB3_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: otel-collector-secret
+            key: INFLUXDB3_TOKEN
+    # Disable receiver ports the chart enables by default but we don't use.
+    ports:
+      jaeger-compact: { enabled: false }
+      jaeger-thrift: { enabled: false }
+      jaeger-grpc: { enabled: false }
+      zipkin: { enabled: false }
+      otlp:
+        enabled: true
+        containerPort: 4317
+        servicePort: 4317
+        protocol: TCP
+        appProtocol: grpc
+      otlp-http:
+        enabled: true
+        containerPort: 4318
+        servicePort: 4318
+        protocol: TCP
+    # Single LoadBalancer service serves both in-cluster (ClusterIP/DNS) and LAN
+    # (Cilium LB IP). Off-LAN is via the external gateway HTTPRoute.
+    service:
+      type: LoadBalancer
+      annotations:
+        io.cilium/lb-ipam-ips: ${OTEL_COLLECTOR_LBIP}
+    config:
+      extensions:
+        # health_check is mandatory for this chart (drives the probes).
+        health_check:
+          endpoint: ${env:MY_POD_IP}:13133
+        bearertokenauth:
+          scheme: Bearer
+          token: ${env:OTEL_BEARER_TOKEN}
+      receivers:
+        # Null out chart defaults we don't use so they aren't merged back in.
+        jaeger: null
+        zipkin: null
+        prometheus: null
+        otlp:
+          protocols:
+            grpc:
+              endpoint: 0.0.0.0:4317
+              auth:
+                authenticator: bearertokenauth
+            http:
+              endpoint: 0.0.0.0:4318
+              auth:
+                authenticator: bearertokenauth
+      processors:
+        memory_limiter:
+          check_interval: 5s
+          limit_percentage: 80
+          spike_limit_percentage: 25
+        resource:
+          attributes:
+            - key: deployment.environment
+              value: homelab
+              action: upsert
+        batch: {}
+      exporters:
+        # DEPLOY-VERIFY: confirm the contrib influxdb exporter maps `bucket` to the
+        # InfluxDB 3 database `dev-telemetry` and that `org` is accepted, against the
+        # exporter README for collector 0.153.0. Adjust org/bucket/metrics_schema if needed.
+        influxdb:
+          endpoint: http://influxdb3.database.svc.cluster.local:8181
+          token: ${env:INFLUXDB3_TOKEN}
+          org: telemetry
+          bucket: dev-telemetry
+          metrics_schema: telegraf-prometheus-v2
+      service:
+        extensions:
+          - health_check
+          - bearertokenauth
+        pipelines:
+          metrics:
+            receivers: [otlp]
+            processors: [memory_limiter, resource, batch]
+            exporters: [influxdb]
+          # traces + logs pipelines stubbed — Tempo wired in spec 3, logs stay on Loki.
+          traces: null
+          logs: null

@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: otel-collector
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+spec:
+  parentRefs:
+    - name: external
+      namespace: network
+      sectionName: https
+  hostnames:
+    - "otel.${SECRET_DOMAIN}"
+  rules:
+    # OTLP/HTTP (:4318) only off-LAN — no gRPC externally.
+    # Protected at the edge by Cloudflare Access (service token); the collector
+    # still enforces the bearer token behind it.
+    - backendRefs:
+        - name: otel-collector
+          port: 4318

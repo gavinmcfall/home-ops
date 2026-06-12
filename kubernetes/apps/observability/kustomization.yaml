@@ -21,6 +21,7 @@ resources:
   - ./notifiarr/ks.yaml
   - ./ntfy/ks.yaml
   - ./ntfy-alertmanager/ks.yaml
+  - ./otel-collector/ks.yaml
   - ./prometheus-operator-crds/ks.yaml
   - ./promtail/ks.yaml
   - ./redisinsight/ks.yaml
