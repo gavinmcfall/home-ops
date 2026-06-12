@@ -195,7 +195,19 @@ curl -sf http://localhost:8188/ >/dev/null && echo "ComfyUI up"
 > Re-run the `sed` + `daemon-reload` + `restart`.
 
 The unit launches ComfyUI with `--listen 0.0.0.0 --enable-cors-header` (both
-**required** for a ComfyUI-Distributed remote worker) and `Restart=always`.
+**required** for a ComfyUI-Distributed remote worker) and `Restart=always`. It
+also sets `AUX_ANNOTATOR_CKPTS_PATH=~/ComfyUI/models/annotators` so the
+controlnet_aux preprocessor weights (DepthAnythingV2 etc.) land inside the
+model-sync scope instead of the pack's own `ckpts/` dir.
+
+**Already-installed workers (units predating 2026-06-13) need the env line added
+once** — run inside the distro (no placeholders; `$USER` auto-fills):
+
+```bash
+sudo sed -i "\|^WorkingDirectory=|a Environment=AUX_ANNOTATOR_CKPTS_PATH=/home/$USER/ComfyUI/models/annotators" /etc/systemd/system/comfyui-worker.service
+grep Environment= /etc/systemd/system/comfyui-worker.service   # verify: one line, your real username in the path
+sudo systemctl daemon-reload && sudo systemctl restart comfyui-worker.service
+```
 
 ### 3c. Worker autostart — hidden VBS launcher in Startup (no window)
 
