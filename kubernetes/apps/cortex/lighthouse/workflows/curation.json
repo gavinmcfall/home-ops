@@ -12,6 +12,11 @@
       "path": "workflows/lighthouse/standard-sdxl-hires.json",
       "file": "standard-sdxl-hires.workflow.json",
       "role_allowlist": []
+    },
+    {
+      "path": "workflows/lighthouse/illustrious-booru.json",
+      "file": "illustrious-booru.workflow.json",
+      "role_allowlist": []
     }
   ]
 }
