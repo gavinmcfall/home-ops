@@ -32,5 +32,6 @@ configMapGenerator:
     files:
       - ../workflows/curation.json
       - ../workflows/portrait-sdxl-hires-facedetailer.workflow.json
+      - ../workflows/standard-sdxl-hires.workflow.json
 generatorOptions:
   disableNameSuffixHash: true
