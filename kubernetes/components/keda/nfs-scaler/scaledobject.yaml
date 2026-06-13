@@ -26,6 +26,11 @@ spec:
     - type: prometheus
       metadata:
         serverAddress: http://prometheus-operated.observability.svc.cluster.local:9090
-        query: probe_success{instance=~".+:2049"}
+        # max_over_time keeps the app up as long as the NFS probe succeeded at
+        # least once in the window, so a transient probe blip (a failed scrape
+        # or two) can't scale it to zero — only a sustained NFS outage does.
+        query: max_over_time(probe_success{instance=~".+:2049"}[10m])
         threshold: "1"
-        ignoreNullValues: "0"
+        # Ignore a missing/null metric (e.g. a Prometheus scrape gap) rather
+        # than treating it as 0 and scaling down.
+        ignoreNullValues: "1"
