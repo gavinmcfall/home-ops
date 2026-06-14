@@ -38,7 +38,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/mangarr
-              tag: sha-3593ce4@sha256:a63d56a323f7ae1391f12700d2e8c26a0366e684c805815104f9fb21b579b809
+              tag: sha-204f51a@sha256:8c14d68fcaf6a60f80bd537424b09d5db28051de1624da00136f2bfe6132fff1
             env:
               TZ: ${TIMEZONE}
               MANGARR_DOWNLOAD_ROOTS: >-
