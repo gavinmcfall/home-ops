@@ -46,10 +46,16 @@ data is queryable and historical in Grafana, independent of Spyglass.
    throttled OTLP/HTTP metrics POST to the existing collector, alongside (not
    replacing) the existing Spyglass POST.
 2. **Grafana limit panels** — 5h / 7d / 7d-Opus gauges with reset countdowns on
-   the `dev-telemetry` dashboard, reading the new measurement from InfluxDB.
-3. **Dashboard durability** — provision `dev-telemetry-ai` as a GitOps-managed
-   ConfigMap dashboard (replacing the current fragile URL-download path) so the
-   new panels land durably, not as another manual UI import.
+   the `dev-telemetry-ai` dashboard, reading the new measurement from InfluxDB.
+3. **Dashboard durability (all dashboards)** — convert the **entire**
+   `dashboards/grafana/` set off the fragile `download_dashboards.sh`
+   URL-download path to ConfigMap-sidecar provisioning, so every dashboard
+   (the new panels included) is reproducible from git and no longer truncates.
+4. **Retire the legacy profiler dashboard** — drop `devpod-telemetry.json` and
+   its Grafana registration. This **gives up host-process PSS memory sampling**
+   (accepted 2026-06-14): that data comes only from the bespoke WSL2 script
+   feeding the old InfluxDB 2 `claude-code` bucket, which native OTLP cannot
+   reproduce. The new dashboard lives entirely on the OTLP/InfluxDB 3 plane.
 
 ### Out of scope (deferred — written down so it is not lost)
 
@@ -62,6 +68,11 @@ data is queryable and historical in Grafana, independent of Spyglass.
 - **Spyglass decommission** — once these panels prove out, Spyglass's
   `internal/usage` quota wheel / dollar / 5h-window becomes legacy and is
   removed (separate Spyglass-repo work). Spyglass keeps the session fleet view.
+- **WSL2 PSS script + old `claude-code` bucket teardown** — retiring
+  `devpod-telemetry.json` (in scope) removes the *dashboard*; stopping the
+  bespoke WSL2 memory-sampling script and dropping the old InfluxDB 2
+  `claude-code` bucket is downstream Gavin-side cleanup, done once nothing else
+  reads that source.
 
 ## Why this split (Spyglass vs Grafana)
 
@@ -212,18 +223,33 @@ These render only for the machine(s) actually running Claude; multi-machine is
 handled by the `machine` tag and a dashboard variable if more than one ever
 reports.
 
-## Dashboard durability (fold-in)
+## Dashboard durability — migrate ALL dashboards to the sidecar
 
-The `dev-telemetry-ai` dashboard currently only exists as a **manual UI import**
-because Grafana's `download_dashboards.sh` truncates URL-downloaded JSON
-(observed: 7815/10860 bytes; cert-manager.json 0 bytes). Rather than re-import
-manually after adding panels, switch this dashboard to **ConfigMap-sidecar
-provisioning**: ship the JSON as a ConfigMap labelled for the Grafana dashboard
-sidecar, GitOps-managed in `kubernetes/apps/observability/grafana/`. The exact
-sidecar wiring (label, folder annotation, whether the sidecar is already enabled
-in the Grafana HelmRelease) is confirmed during planning; the outcome is that
-`dev-telemetry-ai` — limit panels included — is reproducible from git, not a
-hand-imported artifact.
+Today every dashboard in `dashboards/grafana/` is pulled at Grafana start by
+`download_dashboards.sh` from raw-GitHub URLs registered in the Grafana
+HelmRelease (`devpod-telemetry` and `dev-telemetry-ai` at lines ~229–233, plus
+the cortex/cnpg/unifi/etc. set). That path **truncates** large files (observed:
+`dev-telemetry-ai` 7815/10860 bytes; `cert-manager.json` 0 bytes), which is why
+the new dashboard only ever rendered via **manual UI import**.
+
+The fix (scoped to **all** dashboards, decided 2026-06-14): convert the whole
+set to **ConfigMap-sidecar provisioning**. Each `dashboards/grafana/*.json`
+becomes a ConfigMap (via a kustomize `configMapGenerator`) labelled for the
+Grafana dashboard sidecar; the sidecar mounts them into Grafana's provisioning
+path. The URL-download `dashboards:` provider entries are removed.
+
+Confirmed during planning:
+
+- whether the kiwigrid/k8s-sidecar dashboard sidecar is already enabled in the
+  Grafana HelmRelease (`sidecar.dashboards.enabled`), and its search label;
+- folder annotations so dashboards keep their current folder placement;
+- that no dashboard exceeds the **1 MiB ConfigMap limit** (largest today is
+  `cloudnative-pg-cluster.json` ≈ 251 KiB — comfortable);
+- generator naming so a changed JSON triggers a rollout (kustomize hash suffix).
+
+Outcome: every Grafana dashboard — limit panels included — is reproducible from
+git, no truncation, no manual import. `devpod-telemetry.json` is **not** carried
+across; it is deleted as part of the retirement above.
 
 ## Testing
 
