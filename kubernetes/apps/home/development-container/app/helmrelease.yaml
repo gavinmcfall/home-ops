@@ -24,8 +24,8 @@ spec:
   values:
     defaultPodOptions:
       # Tailscale SSH needs tailscaled running as root to open login sessions;
-      # your SSH sessions land as gavin (uid 1000) per the tailnet ACL ssh-user.
-      # fsGroup 1000 keeps the PVC files (owned by gavin) writable to his group.
+      # SSH sessions land as gavin (uid 1000) per the tailnet ACL ssh-user.
+      # fsGroup 1000 keeps the PVC files (owned by gavin) writable to my group.
       securityContext:
         runAsUser: 0
         runAsGroup: 0
@@ -44,7 +44,7 @@ spec:
               repository: ghcr.io/gavinmcfall/development-container
               tag: latest
             # Bring up tailscaled (userspace) + Tailscale SSH as `development`,
-            # then idle. SSH into `development` lands you HERE as gavin; attach
+            # then idle. SSH into `development` lands me HERE as gavin; attach
             # tmux from there.
             command:
               - /bin/bash
