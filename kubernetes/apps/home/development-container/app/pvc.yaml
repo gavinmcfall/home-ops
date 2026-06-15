@@ -11,7 +11,9 @@ spec:
       storage: 50Gi
   storageClassName: ceph-block
 ---
-# Home — ~/.claude (history+memory), dotfiles, ~/.config, ~/.ssh, ~/.secrets.
+# Home — WHOLE /home/gavin (so every CLI's state + toolchains survive a restart;
+# see helmrelease persistence note). Seed ~18G after the denylist; sized to also
+# absorb caches that regenerate in-pod (.npm, .local/lib) onto this PVC.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -20,5 +22,5 @@ spec:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 15Gi
+      storage: 60Gi
   storageClassName: ceph-block

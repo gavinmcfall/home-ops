@@ -51,7 +51,7 @@ spec:
               - -c
               - |
                 set -e
-                tailscaled --tun=userspace-networking --statedir=/var/lib/tailscale \
+                tailscaled --tun=userspace-networking --statedir=/home/gavin/.tailscale \
                   --socks5-server=localhost:1055 >/var/log/tailscaled.log 2>&1 &
                 until tailscale up --ssh --hostname="${TS_HOSTNAME:-development}" \
                   --authkey="${TS_AUTHKEY}" --accept-routes --accept-dns=false; do
@@ -73,23 +73,18 @@ spec:
               limits:
                 memory: 28Gi
     persistence:
-      # Persist ONLY personal state via subPaths — mounting the whole of
-      # /home/gavin would shadow the image's toolchains (.nvm/.cargo/.local/
-      # bin/claude/.oh-my-zsh). Toolchains come from the image (rebuilt, correct
-      # arch); these dirs are the things that must survive a pod restart.
+      # Persist the WHOLE of /home/gavin so no CLI's state is ever stepped over
+      # (.claude/.claude.json, .codex, .gemini, .secrets, .zshrc, .config, .ssh,
+      # tailscale identity at ~/.tailscale, etc.). The trade-off: this mount
+      # shadows the image's toolchains, so .nvm/.cargo/.rustup/.local/bin are
+      # seeded onto the PVC from WSL2 (same arch) and live here. The denylist
+      # (development-container repo: config/seed-excludes.txt) keeps the seed to
+      # ~18G by dropping regenerable caches; ~/code and ~/.cache are separate
+      # mounts below so they are excluded from this PVC.
       home:
         existingClaim: development-container-home
         globalMounts:
-          - path: /home/gavin/.claude        # conversations + memory
-            subPath: claude
-          - path: /home/gavin/.config         # app configs
-            subPath: config
-          - path: /home/gavin/.ssh            # keys
-            subPath: ssh
-          - path: /home/gavin/.local/share    # atuin db, etc.
-            subPath: local-share
-          - path: /var/lib/tailscale          # tailnet node identity (no re-auth on restart)
-            subPath: tailscale
+          - path: /home/gavin
       code:
         existingClaim: development-container-code
         globalMounts:
