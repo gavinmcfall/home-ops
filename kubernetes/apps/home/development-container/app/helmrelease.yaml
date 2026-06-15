@@ -23,11 +23,12 @@ spec:
       retries: 3
   values:
     defaultPodOptions:
-      # Be Gavin (uid 1000) so /home/gavin paths + PVC ownership line up.
+      # Tailscale SSH needs tailscaled running as root to open login sessions;
+      # your SSH sessions land as gavin (uid 1000) per the tailnet ACL ssh-user.
+      # fsGroup 1000 keeps the PVC files (owned by gavin) writable to his group.
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
+        runAsUser: 0
+        runAsGroup: 0
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
     controllers:
@@ -42,17 +43,29 @@ spec:
             image:
               repository: ghcr.io/gavinmcfall/development-container
               tag: latest
-            # tmux is attached over SSH; PID 1 just stays alive.
-            command: ["/usr/bin/zsh", "-lc", "sleep infinity"]
+            # Bring up tailscaled (userspace) + Tailscale SSH as `development`,
+            # then idle. SSH into `development` lands you HERE as gavin; attach
+            # tmux from there.
+            command:
+              - /bin/bash
+              - -c
+              - |
+                set -e
+                tailscaled --tun=userspace-networking --statedir=/var/lib/tailscale \
+                  --socks5-server=localhost:1055 >/var/log/tailscaled.log 2>&1 &
+                until tailscale up --ssh --hostname="${TS_HOSTNAME:-development}" \
+                  --authkey="${TS_AUTHKEY}" --accept-routes --accept-dns=false; do
+                  echo "waiting for tailscale up..."; sleep 3
+                done
+                exec sleep infinity
             env:
               TZ: ${TIMEZONE}
+              TS_HOSTNAME: development
+            envFrom:
+              - secretRef:
+                  name: development-container-secret
             securityContext:
-              # dev shell needs sudo + a writable root fs
-              allowPrivilegeEscalation: true
               readOnlyRootFilesystem: false
-              capabilities:
-                drop: ["ALL"]
-                add: ["SETUID", "SETGID", "CHOWN", "DAC_OVERRIDE", "FOWNER"]
             resources:
               requests:
                 cpu: "2"
@@ -75,6 +88,8 @@ spec:
             subPath: ssh
           - path: /home/gavin/.local/share    # atuin db, etc.
             subPath: local-share
+          - path: /var/lib/tailscale          # tailnet node identity (no re-auth on restart)
+            subPath: tailscale
       code:
         existingClaim: development-container-code
         globalMounts:
