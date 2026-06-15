@@ -1,0 +1,85 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: devpod
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    defaultPodOptions:
+      # Be Gavin (uid 1000) so /home/gavin paths + PVC ownership line up.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    controllers:
+      devpod:
+        type: deployment
+        # RWO PVCs: release before re-attach on restart.
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/devpod
+              tag: latest
+            # tmux is attached over SSH; PID 1 just stays alive.
+            command: ["/usr/bin/zsh", "-lc", "sleep infinity"]
+            env:
+              TZ: ${TIMEZONE}
+            securityContext:
+              # dev shell needs sudo + a writable root fs
+              allowPrivilegeEscalation: true
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop: ["ALL"]
+                add: ["SETUID", "SETGID", "CHOWN", "DAC_OVERRIDE", "FOWNER"]
+            resources:
+              requests:
+                cpu: "2"
+                memory: 16Gi
+              limits:
+                memory: 28Gi
+    persistence:
+      # Persist ONLY personal state via subPaths — mounting the whole of
+      # /home/gavin would shadow the image's toolchains (.nvm/.cargo/.local/
+      # bin/claude/.oh-my-zsh). Toolchains come from the image (rebuilt, correct
+      # arch); these dirs are the things that must survive a pod restart.
+      home:
+        existingClaim: devpod-home
+        globalMounts:
+          - path: /home/gavin/.claude        # conversations + memory
+            subPath: claude
+          - path: /home/gavin/.config         # app configs
+            subPath: config
+          - path: /home/gavin/.ssh            # keys
+            subPath: ssh
+          - path: /home/gavin/.local/share    # atuin db, etc.
+            subPath: local-share
+      code:
+        existingClaim: devpod-code
+        globalMounts:
+          - path: /home/gavin/code
+      cache:
+        type: emptyDir
+        globalMounts:
+          - path: /home/gavin/.cache
