@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: devpod-code
+  name: development-container-code
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:
@@ -15,7 +15,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: devpod-home
+  name: development-container-home
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:

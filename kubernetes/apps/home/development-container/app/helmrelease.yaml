@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: devpod
+  name: development-container
 spec:
   interval: 30m
   chart:
@@ -31,7 +31,7 @@ spec:
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
     controllers:
-      devpod:
+      development-container:
         type: deployment
         # RWO PVCs: release before re-attach on restart.
         strategy: Recreate
@@ -40,7 +40,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/gavinmcfall/devpod
+              repository: ghcr.io/gavinmcfall/development-container
               tag: latest
             # tmux is attached over SSH; PID 1 just stays alive.
             command: ["/usr/bin/zsh", "-lc", "sleep infinity"]
@@ -65,7 +65,7 @@ spec:
       # bin/claude/.oh-my-zsh). Toolchains come from the image (rebuilt, correct
       # arch); these dirs are the things that must survive a pod restart.
       home:
-        existingClaim: devpod-home
+        existingClaim: development-container-home
         globalMounts:
           - path: /home/gavin/.claude        # conversations + memory
             subPath: claude
@@ -76,7 +76,7 @@ spec:
           - path: /home/gavin/.local/share    # atuin db, etc.
             subPath: local-share
       code:
-        existingClaim: devpod-code
+        existingClaim: development-container-code
         globalMounts:
           - path: /home/gavin/code
       cache:
