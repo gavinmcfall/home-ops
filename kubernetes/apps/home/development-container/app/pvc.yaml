@@ -1,0 +1,24 @@
+---
+# Repos (~/code) — sized for code + kept data dirs + regenerated deps.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: development-container-code
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: ceph-block
+---
+# Home — ~/.claude (history+memory), dotfiles, ~/.config, ~/.ssh, ~/.secrets.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: development-container-home
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 15Gi
+  storageClassName: ceph-block
