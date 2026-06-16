@@ -19,8 +19,6 @@ resources:
   - ./cross-seed/ks.yaml
   - ./dashbrr/ks.yaml
   - ./flaresolverr/ks.yaml
-  - ./heybuilds-downloader/ks.yaml
-  - ./heybuilds-viewer/ks.yaml
   - ./kapowarr/ks.yaml
   - ./lncrawl/ks.yaml
   - ./metube/ks.yaml
