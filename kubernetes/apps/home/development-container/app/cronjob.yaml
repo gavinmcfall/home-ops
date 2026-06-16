@@ -1,0 +1,53 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: development-container-dotfiles-sync
+  namespace: home
+spec:
+  # Hourly. autoCommit+autoPush already cover chezmoi-driven changes; this only
+  # captures DIRECT edits to managed files (e.g. `vim ~/.zshrc`) back to the repo.
+  schedule: "17 * * * *"
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: development-container-dotfiles-sync
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: kubectl
+              image: registry.k8s.io/kubectl:v1.33.1
+              # Exec into the running dev pod and re-capture managed dotfiles.
+              # `runuser -l gavin` gives a login env (PATH, op token); chezmoi's
+              # autoCommit+autoPush then push any drift. Templates (.secrets) are
+              # skipped by re-add, so no 1Password resolution is needed here.
+              args:
+                - exec
+                - deployment/development-container
+                - --
+                - runuser
+                - -l
+                - gavin
+                - -c
+                - chezmoi re-add
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
