@@ -1,0 +1,145 @@
+# Scheduled jobs migrated from the WSL2 home-ops crontab (which didn't carry
+# over — cron is per-machine and the pod has no cron daemon). Each execs the
+# existing script inside the dev pod via `runuser -l gavin` (login env: PATH,
+# ~/.secrets, op token). ~/.local/bin is prepended so the recent rclone/mempalace
+# binaries win. All reuse the development-container-dotfiles-sync ServiceAccount
+# (pods/exec in ns home — see rbac.yaml); the name is shared, not dotfiles-specific.
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: development-container-claude-b2-backup
+  namespace: home
+spec:
+  # Nightly 02:00 NZ — non-destructive rclone copy of ~/.claude to Backblaze B2.
+  schedule: "0 2 * * *"
+  timeZone: "Pacific/Auckland"
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: development-container-dotfiles-sync
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: kubectl
+              image: registry.k8s.io/kubectl:v1.33.1
+              args:
+                - exec
+                - deployment/development-container
+                - --
+                - runuser
+                - -l
+                - gavin
+                - -c
+                - export PATH="$HOME/.local/bin:$PATH"; /home/gavin/.claude/backup-to-b2.sh
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests: {cpu: 10m, memory: 32Mi}
+                limits: {memory: 64Mi}
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: development-container-mempalace-sync
+  namespace: home
+spec:
+  # Weekly Sunday 04:00 NZ — safety-net resync of transcripts to mempalace
+  # (the stop-hook does the primary sync; shares its flock so they never race).
+  schedule: "0 4 * * 0"
+  timeZone: "Pacific/Auckland"
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: development-container-dotfiles-sync
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: kubectl
+              image: registry.k8s.io/kubectl:v1.33.1
+              args:
+                - exec
+                - deployment/development-container
+                - --
+                - runuser
+                - -l
+                - gavin
+                - -c
+                - export PATH="$HOME/.local/bin:$PATH"; /home/gavin/.local/bin/mempalace-sync.sh
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests: {cpu: 10m, memory: 32Mi}
+                limits: {memory: 64Mi}
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: development-container-abms-lifecycle
+  namespace: home
+spec:
+  # Weekly Monday 09:00 NZ — ABMS correction lifecycle review (rules-engine).
+  schedule: "0 9 * * 1"
+  timeZone: "Pacific/Auckland"
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: development-container-dotfiles-sync
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: kubectl
+              image: registry.k8s.io/kubectl:v1.33.1
+              args:
+                - exec
+                - deployment/development-container
+                - --
+                - runuser
+                - -l
+                - gavin
+                - -c
+                - /home/gavin/.claude/rules-engine/lifecycle.sh >> /tmp/abms-lifecycle.log 2>&1
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests: {cpu: 10m, memory: 32Mi}
+                limits: {memory: 64Mi}

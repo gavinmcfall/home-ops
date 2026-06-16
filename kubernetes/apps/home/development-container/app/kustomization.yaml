@@ -8,5 +8,6 @@ resources:
   - ./helmrelease.yaml
   - ./rbac.yaml
   - ./cronjob.yaml
+  - ./cronjobs-scheduled.yaml
 components:
   - ../../../../components/priority/priority-08
