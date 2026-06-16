@@ -46,6 +46,14 @@ spec:
                 /media/Downloads/tranga
               MANGARR_DB_PATH: /config/mangarr.db
               MANGARR_HTTP_ADDR: :8590
+              # Recycle bin must live on the SAME filesystem as the media it
+              # bins — /media is the NFS export (downloads + Kavita library),
+              # /config is a separate Ceph RBD PVC, so the default
+              # /config/recycle-bin caused os.Rename "invalid cross-device
+              # link" on delete-with-files. A bin under /media/Downloads (but
+              # outside the suwayomi/tranga scan roots) makes deletes an
+              # instant same-device move and keeps binned media off /config.
+              MANGARR_RECYCLE_BIN_PATH: /media/Downloads/.recyclebin
             probes:
               liveness: &probes
                 enabled: true
