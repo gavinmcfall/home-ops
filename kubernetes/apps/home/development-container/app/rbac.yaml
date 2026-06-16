@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: &app development-container-dotfiles-sync
+  namespace: home
+  labels:
+    app.kubernetes.io/instance: *app
+    app.kubernetes.io/name: *app
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: &app development-container-dotfiles-sync
+  namespace: home
+  labels:
+    app.kubernetes.io/instance: *app
+    app.kubernetes.io/name: *app
+rules:
+  # Resolve the deployment's pod, then exec `chezmoi re-add` into it
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: &app development-container-dotfiles-sync
+  namespace: home
+  labels:
+    app.kubernetes.io/instance: *app
+    app.kubernetes.io/name: *app
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: *app
+subjects:
+  - kind: ServiceAccount
+    name: *app
+    namespace: home
