@@ -15,6 +15,7 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 2
+      ttlSecondsAfterFinished: 86400  # clean finished jobs after 24h (stops stale KubeJobFailed alerts)
       template:
         spec:
           restartPolicy: OnFailure

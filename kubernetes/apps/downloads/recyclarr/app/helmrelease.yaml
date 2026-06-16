@@ -37,6 +37,7 @@ spec:
           schedule: "@daily"
           successfulJobsHistory: 1
           failedJobsHistory: 1
+          ttlSecondsAfterFinished: 86400  # clean finished jobs after 24h (stops stale KubeJobFailed alerts)
         containers:
           app:
             image:
