@@ -143,3 +143,51 @@ spec:
               resources:
                 requests: {cpu: 10m, memory: 32Mi}
                 limits: {memory: 64Mi}
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: development-container-doctor
+  namespace: home
+spec:
+  # Weekly Monday 08:00 NZ — proactive gap-finder. Runs devpod-doctor in the pod;
+  # on any FAIL it POSTs the failures to Discord ($DISCORD_DOCTOR_WEBHOOK from
+  # ~/.secrets). Silent when healthy.
+  schedule: "0 8 * * 1"
+  timeZone: "Pacific/Auckland"
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: development-container-dotfiles-sync
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: kubectl
+              image: registry.k8s.io/kubectl:v1.33.1
+              args:
+                - exec
+                - deployment/development-container
+                - --
+                - runuser
+                - -l
+                - gavin
+                - -c
+                - devpod-doctor --notify
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests: {cpu: 10m, memory: 32Mi}
+                limits: {memory: 64Mi}
