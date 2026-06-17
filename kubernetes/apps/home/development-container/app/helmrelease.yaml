@@ -72,9 +72,9 @@ spec:
             resources:
               requests:
                 cpu: "2"
-                memory: 16Gi
+                memory: 20Gi
               limits:
-                memory: 28Gi
+                memory: 48Gi
     persistence:
       # Persist the WHOLE of /home/gavin so no CLI's state is ever stepped over
       # (.claude/.claude.json, .codex, .gemini, .secrets, .zshrc, .config, .ssh,
