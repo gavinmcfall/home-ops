@@ -12,6 +12,19 @@ spec:
   imageName: ghcr.io/cloudnative-pg/postgresql:18@sha256:7f374e054e46fdefd64b52904e32362949703a75c05302dca8ffa1eb78d41891
   primaryUpdateStrategy: unsupervised
 
+  # Tolerate brief pod-network blips before failing over. On 2026-06-16 a ~45s
+  # stanton-02 network disruption tripped the default 1s isolation check and
+  # fenced the primary, cascading restarts across every DB-dependent app.
+  # Loosen the trigger so short stalls don't cause a failover; genuine outages
+  # (sustained past failoverDelay) still promote a replica.
+  failoverDelay: 30
+  probes:
+    liveness:
+      isolationCheck:
+        enabled: true          # keep split-brain protection
+        connectionTimeout: 3000  # was 1000ms default
+        requestTimeout: 3000     # was 1000ms default
+
   storage:
     size: 20Gi
     storageClass: openebs-hostpath
