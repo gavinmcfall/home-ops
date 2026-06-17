@@ -27,6 +27,21 @@ spec:
   values:
     hubble:
       enabled: true
+      export:
+        # Persist dropped/errored flows so the next network blip is diagnosable at
+        # the datapath level (file is node-local: /var/run/cilium/hubble/ on each
+        # agent; read it from the cilium pod after an event). DROPPED+ERROR only;
+        # baseline FORWARDED traffic is excluded. Activates after the cilium
+        # DaemonSet is rolled.
+        fileMaxSizeMb: 50
+        fileMaxBackups: 5
+        static:
+          enabled: true
+          filePath: /var/run/cilium/hubble/events.log
+          fieldMask: []
+          allowList:
+            - '{"verdict":["DROPPED","ERROR"]}'
+          denyList: []
       metrics:
         enabled:
           - dns:query
