@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/networking.k8s.io/networkpolicy_v1.json
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dragonfly-allow-metrics-scrape
+  namespace: database
+spec:
+  # The Dragonfly operator auto-creates a NetworkPolicy that restricts the admin
+  # metrics port (9999) to the operator + dragonfly pods, which blocks Prometheus
+  # and leaves all instances up=0 (no dragonfly metrics). NetworkPolicies are
+  # additive, so this supplementary policy restores scraping without fighting the
+  # operator-owned policy (which would revert any direct edit).
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: dragonfly
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+      ports:
+        - port: 9999
+          protocol: TCP
