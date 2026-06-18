@@ -25,7 +25,7 @@ spec:
             runAsGroup: 0
           containers:
             - name: push
-              image: alpine:3.23
+              image: alpine:3.24
               command:
                 - /bin/sh
                 - -c
