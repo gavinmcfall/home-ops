@@ -92,7 +92,7 @@ spec:
               - |
                 apk add --no-cache cifs-utils >/dev/null 2>&1 || true
                 TARGET=/mnt/e/SCBridge
-                OPTS="credentials=/etc/smb/creds,uid=1000,gid=1000,file_mode=0664,dir_mode=0775,noserverino,soft,vers=3.0,mfsymlinks,nobrl,echo_interval=10"
+                OPTS="credentials=/etc/smb/creds,uid=1000,gid=1000,file_mode=0664,dir_mode=0775,noserverino,soft,vers=3.0,mfsymlinks,nobrl,noperm,echo_interval=10"
                 mkdir -p "$TARGET"
                 while true; do
                   if mountpoint -q "$TARGET" && ! timeout 10 ls "$TARGET" >/dev/null 2>&1; then
