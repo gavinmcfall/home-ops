@@ -72,9 +72,9 @@ spec:
             resources:
               requests:
                 cpu: "2"
-                memory: 16Gi
+                memory: 20Gi
               limits:
-                memory: 28Gi
+                memory: 48Gi
           # ---- SMB mount sidecar (non-blocking by design) ----
           # Mounts \\vengeancepc\SC Bridge to /mnt/e/SCBridge in a retry loop and
           # shares it into `app` via mountPropagation. The shared volume is an
