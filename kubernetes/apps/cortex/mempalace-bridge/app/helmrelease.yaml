@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mempalace-bridge
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    controllers:
+      mempalace-bridge:
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/mempalace-bridge
+              tag: feat-pgvector-bridge@sha256:5a854504efdf1b7b2191caa77a8483b9a3dd1e1be2a9fea392126e6256b1d5ec
+            # Entrypoint (bridge/entrypoint.sh) builds the DSN from PGUSER/PGPASSWORD,
+            # writes palace markers once, then runs mcp-proxy -> patched serve.py.
+            # MEMPALACE_BACKEND / PALACE_PATH / EMBEDDING_MODEL / HOME baked in image.
+            envFrom:
+              - secretRef:
+                  name: mempalace-bridge-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket: { port: 8080 }
+                  initialDelaySeconds: 40
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket: { port: 8080 }
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 40
+            resources:
+              requests:
+                cpu: 250m
+                memory: 1Gi
+              limits:
+                cpu: "2"
+                memory: 3Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+    service:
+      app:
+        controller: mempalace-bridge
+        ports:
+          http:
+            port: 8080
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 2Gi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
