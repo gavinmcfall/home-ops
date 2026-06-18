@@ -94,6 +94,11 @@ spec:
                 TARGET=/mnt/e/SCBridge
                 OPTS="credentials=/etc/smb/creds,uid=1000,gid=1000,file_mode=0664,dir_mode=0775,noserverino,soft,vers=3.0,mfsymlinks,nobrl,noperm,echo_interval=10"
                 mkdir -p "$TARGET"
+                # On SIGTERM (pod teardown), stop the loop and unmount, so the
+                # mount can't be re-laid in the race between preStop and SIGKILL.
+                # preStop alone left that remount race -> leaked cifs in the
+                # kubelet ns -> stuck (un-terminating) pods. This closes it.
+                trap 'echo "[smb-mount] SIGTERM: unmounting and exiting"; umount -l "$TARGET" 2>/dev/null; exit 0' TERM INT
                 while true; do
                   if mountpoint -q "$TARGET" && ! timeout 10 ls "$TARGET" >/dev/null 2>&1; then
                     echo "[smb-mount] stale mount; unmounting"; umount -l "$TARGET" 2>/dev/null || true
