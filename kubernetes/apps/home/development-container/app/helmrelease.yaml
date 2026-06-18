@@ -105,6 +105,18 @@ spec:
                   fi
                   sleep 15
                 done
+            # Lazy-unmount the cifs share before the sidecar dies so the mount
+            # never leaks into the host/kubelet mount namespace and blocks pod
+            # teardown (this scbridge mount is Bidirectional, so the umount
+            # propagates back to the host). `umount -l` returns instantly even
+            # when the PC is off, so preStop can't hang the termination either.
+            lifecycle:
+              preStop:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -c
+                    - umount -l /mnt/e/SCBridge 2>/dev/null || true
             securityContext:
               privileged: true
             resources:
