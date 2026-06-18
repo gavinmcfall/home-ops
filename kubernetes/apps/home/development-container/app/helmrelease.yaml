@@ -75,6 +75,44 @@ spec:
                 memory: 16Gi
               limits:
                 memory: 28Gi
+          # ---- SMB mount sidecar (non-blocking by design) ----
+          # Mounts \\vengeancepc\SC Bridge to /mnt/e/SCBridge in a retry loop and
+          # shares it into `app` via mountPropagation. The shared volume is an
+          # emptyDir (always mounts instantly), so the pod NEVER blocks on startup
+          # if the PC is off — the sidecar just keeps retrying and /mnt/e/SCBridge
+          # stays empty until vengeancepc is reachable. `soft` mount opts + a stale
+          # check mean runtime drop-outs fail fast and remount instead of hanging.
+          smb-mount:
+            image:
+              repository: docker.io/library/alpine
+              tag: "3.21"
+            command:
+              - /bin/sh
+              - -c
+              - |
+                apk add --no-cache cifs-utils >/dev/null 2>&1 || true
+                TARGET=/mnt/e/SCBridge
+                OPTS="credentials=/etc/smb/creds,uid=1000,gid=1000,file_mode=0664,dir_mode=0775,noserverino,soft,vers=3.0,mfsymlinks,nobrl,echo_interval=10"
+                mkdir -p "$TARGET"
+                while true; do
+                  if mountpoint -q "$TARGET" && ! timeout 10 ls "$TARGET" >/dev/null 2>&1; then
+                    echo "[smb-mount] stale mount; unmounting"; umount -l "$TARGET" 2>/dev/null || true
+                  fi
+                  if ! mountpoint -q "$TARGET"; then
+                    echo "[smb-mount] mounting //10.90.101.86/SC Bridge -> $TARGET"
+                    mount.cifs "//10.90.101.86/SC Bridge" "$TARGET" -o "$OPTS" \
+                      && echo "[smb-mount] mounted" || echo "[smb-mount] mount failed (PC off?); will retry"
+                  fi
+                  sleep 15
+                done
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
     persistence:
       # Persist the WHOLE of /home/gavin so no CLI's state is ever stepped over
       # (.claude/.claude.json, .codex, .gemini, .secrets, .zshrc, .config, .ssh,
@@ -96,3 +134,23 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /home/gavin/.cache
+      # Shared target for the SMB sidecar. emptyDir mounts instantly (pod never
+      # blocks); the cifs mount the sidecar lays inside it propagates into `app`.
+      scbridge:
+        type: emptyDir
+        advancedMounts:
+          development-container:
+            app:
+              - path: /mnt/e
+                mountPropagation: HostToContainer
+            smb-mount:
+              - path: /mnt/e
+                mountPropagation: Bidirectional
+      # cifs credentials file (username/password) — sidecar only.
+      smb-creds:
+        type: secret
+        name: development-container-smb-creds
+        advancedMounts:
+          development-container:
+            smb-mount:
+              - path: /etc/smb
