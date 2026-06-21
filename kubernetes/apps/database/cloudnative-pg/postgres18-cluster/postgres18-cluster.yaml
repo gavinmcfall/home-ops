@@ -65,6 +65,7 @@ spec:
 
   # Managed roles. `mempalace` owns the mempalace pgvector database
   # (see mempalace-db.yaml). Password sourced from the mempalace-pg-role secret.
+  # `affine` owns the affine pgvector database (see affine-db.yaml).
   managed:
     roles:
       - name: mempalace
@@ -72,6 +73,11 @@ spec:
         login: true
         passwordSecret:
           name: mempalace-pg-role
+      - name: affine
+        ensure: present
+        login: true
+        passwordSecret:
+          name: affine-pg-role
 
   bootstrap:
     initdb:

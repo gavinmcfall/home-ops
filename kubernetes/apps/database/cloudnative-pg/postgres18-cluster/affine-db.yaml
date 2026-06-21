@@ -1,0 +1,42 @@
+---
+# Role password for the affine database.
+# 1Password item `affine` must provide fields: AFFINE_DB_USER, AFFINE_DB_PASSWORD.
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/external-secrets.io/externalsecret_v1.json
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: affine-pg-role
+  namespace: database
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword-connect
+  target:
+    name: affine-pg-role
+    template:
+      engineVersion: v2
+      data:
+        # CNPG managed-role passwordSecret expects username + password keys.
+        username: "{{ .AFFINE_DB_USER }}"
+        password: "{{ .AFFINE_DB_PASSWORD }}"
+  dataFrom:
+    - extract:
+        key: affine
+---
+# The affine database, owned by the managed `affine` role (declared in
+# postgres18-cluster.yaml spec.managed.roles), with the pgvector extension that
+# AFFiNE requires. Created declaratively so it persists independently of the app.
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: affine
+  namespace: database
+spec:
+  cluster:
+    name: postgres18-cluster
+  name: affine
+  owner: affine
+  ensure: present
+  extensions:
+    - name: vector
+      ensure: present

@@ -1,0 +1,123 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app affine
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: storage
+  values:
+    controllers:
+      affine:
+        # RWO ceph-block volumes → only one pod may mount at a time.
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          # Runs AFFiNE's schema migrations against the (already-provisioned)
+          # `affine` database before the server starts. Must run to completion;
+          # app-template orders initContainers ahead of the app container.
+          migrate:
+            image: &image
+              repository: ghcr.io/toeverything/affine
+              tag: 0.26.3@sha256:725aaceb0ed94d4b832ae6ef9414503291c9b2b4f60bd6f3c7eef571b6149add
+            command: ["sh", "-c", "node ./scripts/self-host-predeploy.js"]
+            envFrom: &envFrom
+              - secretRef:
+                  name: affine-secret
+        containers:
+          app:
+            image: *image
+            envFrom: *envFrom
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                # Doc merges scale with edit count; upstream notes a 10k-edit doc
+                # can peak ~1Gi. 2Gi gives headroom.
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: { drop: ["ALL"] }
+    defaultPodOptions:
+      # NOTE: the AFFiNE image is built to run as root with HOME=/root and
+      # hard-codes its data paths under /root/.affine. A non-root UID (the repo
+      # default 568) cannot traverse /root, so the container runs as root but
+      # unprivileged (caps dropped, no privilege escalation). Revisit if a future
+      # AFFiNE release supports relocating its data dir for a non-root UID.
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 3010
+    route:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+    persistence:
+      # Uploaded + AI-generated blobs (filesystem provider). AFFiNE's S3/R2
+      # provider is configured in the Admin Panel, not via env, so a PVC keeps
+      # the base deploy fully declarative. Switch to rook-ceph S3 / R2 later in
+      # /admin → Settings → Storage if blob volume grows.
+      storage:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 50Gi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /root/.affine/storage
+      # Persists Admin-Panel config (OAuth/OIDC client, SMTP, storage provider).
+      config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /root/.affine/config
