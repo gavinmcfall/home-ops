@@ -7,6 +7,7 @@ resources:
   - ./pluginconfig.yaml
   - ./postgres18-cluster.yaml
   - ./mempalace-db.yaml
+  - ./affine-db.yaml
   - ./pooler.yaml
   - ./scheduledbackup.yaml
   - ./scheduledbackup-weekly-full.yaml
