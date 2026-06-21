@@ -49,6 +49,14 @@ spec:
         containers:
           app:
             image: *image
+            env:
+              # Mailer (password reset, invites, OIDC). Internal relay, no auth.
+              # AFFiNE maps each Admin-Panel mailer field to a MAILER_* env var,
+              # so SMTP can be set declaratively here instead of via the GUI.
+              MAILER_HOST: smtp-relay.home.svc.cluster.local
+              MAILER_PORT: "25"
+              MAILER_SENDER: AFFiNE <affine@${SECRET_DOMAIN}>
+              MAILER_IGNORE_TLS: "true"
             envFrom: *envFrom
             probes:
               liveness:
