@@ -69,10 +69,13 @@ spec:
             resources:
               requests:
                 cpu: 250m
-                memory: 1Gi
+                memory: 2Gi
               limits:
                 cpu: "2"
-                memory: 3Gi
+                # supergateway(node) + python + minilm onnxruntime baseline is
+                # ~1.2Gi idle; embedding (search/write) and server-side mining
+                # spike well above that. 3Gi OOM-killed; 6Gi gives headroom.
+                memory: 6Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
