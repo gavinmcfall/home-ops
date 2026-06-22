@@ -40,7 +40,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/mempalace-bridge
-              tag: feat-pgvector-bridge@sha256:c3d82612d71bba665cfc45c58c2bbfdd8281d2c9d0d8fed01e5737e81979ec3d
+              tag: feat-pgvector-bridge@sha256:aac814065d8afcd0bcd63db8de3bd1f43227c551872d98700759ec6b16a070d3
             # Entrypoint (bridge/entrypoint.sh) builds the DSN from PGUSER/PGPASSWORD,
             # writes palace markers once, then runs supergateway -> patched serve.py.
             # MEMPALACE_BACKEND / PALACE_PATH / EMBEDDING_MODEL / HOME baked in image.
