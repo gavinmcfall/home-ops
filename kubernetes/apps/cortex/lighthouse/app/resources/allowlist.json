@@ -78,7 +78,7 @@
   "UltralyticsDetectorProvider": {},
   "SAMLoader": {},
   "FaceDetailer": {},
-  "LoadImage": {},
+  "LoadImage": { "input_field": "image" },
   "VAEEncode": {},
   "CannyEdgePreprocessor": {},
   "DepthAnythingV2Preprocessor": {},

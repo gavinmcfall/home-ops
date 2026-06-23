@@ -110,13 +110,13 @@ spec:
           licence-gate:
             image:
               repository: ghcr.io/gavinmcfall/licence-gate
-              # 0.1.13 logs denials (401/403/400/5xx with method/path/user); the
-              # gate was previously silent on rejects, which made a forward-auth
-              # mis-wire an hour of blind debugging. 404 + success stay unlogged.
-              # 0.1.12 made the gallery delete real: POST /history with one of the
-              # gate's synthetic disk ids removes the caller's own render file from
-              # /output (ownership-checked, fail closed). Needs the /output mount RW below.
-              tag: 0.1.13@sha256:cf5eee7536358461b72f832a316a0e92414ea60a023a87e91aaa6b0fb6101849
+              # 0.1.14 isolates LoadImage uploads per user: /upload/image forces
+              # subfolder=<user>, /object_info lists only the caller's own uploads,
+              # /view?type=input is own-bucket only, and /prompt enforces own-bucket
+              # input refs. Enabled by LIGHTHOUSE_INPUT_DIR + the input mount below.
+              # 0.1.13 logs denials (401/403/400/5xx with method/path/user).
+              # 0.1.12 made the gallery delete real (needs the /output mount RW below).
+              tag: 0.1.14@sha256:94abe9c1ce9201017aee55cef0e330bbbdcfc9185a9d93978749835b9c674e7a
             env:
               LIGHTHOUSE_LISTEN: ":8000"
               LIGHTHOUSE_UPSTREAM: "http://127.0.0.1:8188"
@@ -130,6 +130,10 @@ spec:
               # master restarts that wipe ComfyUI's in-memory /api/jobs history.
               # RW since 0.1.12: gallery delete removes the caller's own files.
               LIGHTHOUSE_OUTPUT_DIR: "/output"
+              # Per-user input bucket root (mounted below): enables LoadImage upload
+              # isolation — uploads land in /input/<user>/, object_info lists only
+              # the caller's own, /prompt enforces own-bucket refs. Requires ≥ 0.1.14.
+              LIGHTHOUSE_INPUT_DIR: "/input"
               # Curated-workflow dir (configMap below): role-scoped App Mode
               # curation overlaid onto each caller's workflow sidebar, served
               # read-only from this gate. Empty would disable curation.
@@ -272,6 +276,18 @@ spec:
             # by the gate's ownership checks. The gate never creates files here.
             licence-gate:
               - path: /output
+      input:
+        existingClaim: lighthouse-input
+        advancedMounts:
+          lighthouse:
+            # Master writes uploads here (ComfyUI's input dir); the gate forces each
+            # upload into /input/<user>/ and reads the dir to list the caller's own
+            # files in object_info (LIGHTHOUSE_INPUT_DIR=/input). Per-user upload
+            # isolation (0.1.14); also makes uploads durable across pod rolls.
+            main:
+              - path: /app/input
+            licence-gate:
+              - path: /input
       workflows:
         existingClaim: lighthouse-workflows
         advancedMounts:
