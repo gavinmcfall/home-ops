@@ -40,7 +40,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/mempalace-bridge
-              tag: feat-pgvector-bridge@sha256:aac814065d8afcd0bcd63db8de3bd1f43227c551872d98700759ec6b16a070d3
+              tag: feat-pgvector-bridge@sha256:8fd91a6015748494cafa6753882e27a5029b859da3982432682a68ded4bc9d3e
             # Entrypoint (bridge/entrypoint.sh) builds the DSN from PGUSER/PGPASSWORD,
             # writes palace markers once, then runs supergateway -> patched serve.py.
             # MEMPALACE_BACKEND / PALACE_PATH / EMBEDDING_MODEL / HOME baked in image.
@@ -75,7 +75,7 @@ spec:
                 # supergateway(node) + python + minilm onnxruntime baseline is
                 # ~1.2Gi idle; embedding (search/write) and server-side mining
                 # spike well above that. 3Gi OOM-killed; 6Gi gives headroom.
-                memory: 6Gi
+                memory: 8Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
