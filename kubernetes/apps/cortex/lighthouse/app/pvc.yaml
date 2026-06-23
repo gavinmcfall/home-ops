@@ -16,6 +16,23 @@ spec:
   storageClassName: ceph-filesystem
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/persistentvolumeclaim_v1.json
+# Per-user input buckets (/input/<user>/) for LoadImage uploads. RW to the master
+# (/app/input) and read by the licence-gate (/input) for per-user upload isolation.
+# Previously uploads were on the master's ephemeral rootfs (wiped every roll); this
+# also makes them durable. RWX ceph-filesystem so master + gate co-mount. Small +
+# expandable (scale on demand) — uploads are reference images, not a model store.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lighthouse-input
+spec:
+  accessModes: ["ReadWriteMany"]
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: ceph-filesystem
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/persistentvolumeclaim_v1.json
 # Per-user output buckets (/output/<user>/). RWX so Plan 6 portal can multi-read.
 apiVersion: v1
 kind: PersistentVolumeClaim
