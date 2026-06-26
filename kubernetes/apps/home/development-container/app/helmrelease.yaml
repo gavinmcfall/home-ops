@@ -45,7 +45,7 @@ spec:
               # Pinned by digest so the node pulls this exact image (a plain
               # `:latest` got served from the node cache and never updated).
               # Renovate (or a digest bump) advances this on each rebuild.
-              tag: latest@sha256:94f6bd49eb4e8f5e1ffa8f0bd5be4e588f4cda2cc74d1931061e9cdc707f82e7
+              tag: latest@sha256:d2c1e63c2b68bf1f958e56438a303f5dea9116b23b58ab19d5c223b42bc5a960
             # Bring up tailscaled (userspace) + Tailscale SSH as `development`,
             # then idle. SSH into `development` lands me HERE as gavin; attach
             # tmux from there.
