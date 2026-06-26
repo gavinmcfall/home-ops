@@ -41,7 +41,7 @@ spec:
           migrate:
             image: &image
               repository: ghcr.io/toeverything/affine
-              tag: 0.26.3@sha256:725aaceb0ed94d4b832ae6ef9414503291c9b2b4f60bd6f3c7eef571b6149add
+              tag: 0.26.7@sha256:74baac632031260f8c1c8ba34d9734b5addba0b8e72d6d9b9721e39f77738e94
             command: ["sh", "-c", "node ./scripts/self-host-predeploy.js"]
             envFrom: &envFrom
               - secretRef:
