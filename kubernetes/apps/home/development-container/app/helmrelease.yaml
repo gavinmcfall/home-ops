@@ -85,7 +85,7 @@ spec:
           smb-mount:
             image:
               repository: docker.io/library/alpine
-              tag: "3.21"
+              tag: "3.24"
             command:
               - /bin/sh
               - -c
