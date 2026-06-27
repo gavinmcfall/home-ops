@@ -89,7 +89,7 @@ spec:
                 - -l
                 - gavin
                 - -c
-                - export PATH="$HOME/.local/bin:$PATH"; /home/gavin/.local/bin/mempalace-sync.sh
+                - export PATH="$HOME/.local/bin:$HOME/.mempalace-venv/bin:$PATH"; /home/gavin/.local/bin/mempalace-sync.sh
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
@@ -183,7 +183,7 @@ spec:
                 - -l
                 - gavin
                 - -c
-                - devpod-doctor --notify
+                - export PATH="$HOME/.local/bin:$PATH"; devpod-doctor --notify
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
