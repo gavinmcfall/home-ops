@@ -151,6 +151,16 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /home/gavin/.cache
+      # mempalace pgvector marker dir. The shared palace lives in cluster Postgres;
+      # mempalace keys the table off sha256(palace_path), so clients must use
+      # MEMPALACE_PALACE_PATH=/data/palace (the server's path) to hit the shared
+      # 418k-drawer table. This dir only holds the tiny, regenerable backend +
+      # embedder markers — no drawer data — so emptyDir is fine (fsGroup 1000
+      # lets gavin's hooks/cron write the marker on first mine after a roll).
+      palace:
+        type: emptyDir
+        globalMounts:
+          - path: /data/palace
       # Shared target for the SMB sidecar. emptyDir mounts instantly (pod never
       # blocks); the cifs mount the sidecar lays inside it propagates into `app`.
       scbridge:
