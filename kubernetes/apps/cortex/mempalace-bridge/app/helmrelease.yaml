@@ -81,10 +81,13 @@ spec:
                 # backlog drain glacially; 6 cores (matched by OMP_NUM_THREADS)
                 # lets a mine finish in a sensible time.
                 cpu: "6"
-                # supergateway(node) + python + minilm onnxruntime baseline is
-                # ~1.2Gi idle; embedding (search/write) and server-side mining
-                # spike well above that. 3Gi OOM-killed; 6Gi gives headroom.
-                memory: 8Gi
+                # Idle is ~0.5Gi, but now that writes actually land, each mine
+                # subprocess loads onnxruntime fresh (~2Gi) and big sessions
+                # (700+ drawers) + onnxruntime arenas spike past 8Gi → OOMKilled
+                # several times/day. Node has ~75Gi free, so give generous
+                # headroom over the observed spikes. (Deeper fix: a persistent
+                # embed worker / v3.5.0 daemon so the model loads once, not per mine.)
+                memory: 16Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
