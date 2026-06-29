@@ -40,10 +40,16 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/mempalace-bridge
-              tag: feat-pgvector-bridge@sha256:81a8bd3ddb0596982a033d5ce7eb5b008791522d5ad5de7c7e831a573250177d
+              tag: feat-pgvector-bridge@sha256:ca8d3be639dac65d99daa90d5354291cae4e5ddf797c9e7cf966428478f79b4d
             # Entrypoint (bridge/entrypoint.sh) builds the DSN from PGUSER/PGPASSWORD,
             # writes palace markers once, then runs supergateway -> patched serve.py.
             # MEMPALACE_BACKEND / PALACE_PATH / EMBEDDING_MODEL / HOME baked in image.
+            env:
+              # Cap onnxruntime/BLAS threads to the CPU budget. Without this the
+              # embedder spawns ~1 thread per node core (20+) onto a 6-core cgroup
+              # and thrashes; matching threads to the limit keeps mining efficient.
+              OMP_NUM_THREADS: "6"
+              OPENBLAS_NUM_THREADS: "6"
             envFrom:
               - secretRef:
                   name: mempalace-bridge-secret
@@ -68,10 +74,13 @@ spec:
                   failureThreshold: 40
             resources:
               requests:
-                cpu: 250m
+                cpu: 500m
                 memory: 2Gi
               limits:
-                cpu: "2"
+                # Mining embeds transcripts on CPU (onnxruntime). 2 cores made the
+                # backlog drain glacially; 6 cores (matched by OMP_NUM_THREADS)
+                # lets a mine finish in a sensible time.
+                cpu: "6"
                 # supergateway(node) + python + minilm onnxruntime baseline is
                 # ~1.2Gi idle; embedding (search/write) and server-side mining
                 # spike well above that. 3Gi OOM-killed; 6Gi gives headroom.
