@@ -16,7 +16,7 @@ resources:
   - ./bookstack/ks.yaml
   - ./calibre-web-automated/ks.yaml
   - ./cdn-sync/ks.yaml
-  - ./development-container/ks.yaml
+  # - ./development-container/ks.yaml  # retired 2026-06-29 → moved to native Windows. Flux prunes the deployment, CronJobs, RBAC, ExternalSecrets, AND the home/code PVCs (prune: true). Dir kept for archival — delete after confidence.
   - ./ebook-reconcile/ks.yaml
   - ./homepage/ks.yaml
   - ./filebrowser/ks.yaml
