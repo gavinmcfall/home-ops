@@ -113,8 +113,6 @@ spec:
                 subPath: assets
               - path: /romm/resources
                 subPath: resources
-              - path: /var/lib/romm/sync
-                subPath: sync
       nginx-conf:
         type: emptyDir
         globalMounts:
