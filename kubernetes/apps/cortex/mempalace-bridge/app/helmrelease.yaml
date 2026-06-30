@@ -50,6 +50,13 @@ spec:
               # and thrashes; matching threads to the limit keeps mining efficient.
               OMP_NUM_THREADS: "6"
               OPENBLAS_NUM_THREADS: "6"
+              # Per-file chunk admission cap. A mine loads the whole transcript
+              # into memory + holds all chunks/entities, so a single huge session
+              # (a 14MB debugging marathon re-saved across sessions) spiked >16Gi
+              # and OOMKilled the daemon. Files over this cap are skipped (logged),
+              # bounding any single mine to well under the limit. Normal sessions
+              # are far below 3000 chunks; only pathological transcripts skip.
+              MEMPALACE_MAX_CHUNKS_PER_FILE: "3000"
             envFrom:
               - secretRef:
                   name: mempalace-bridge-secret
