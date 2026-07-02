@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: ghcr.io/project-zot/zot
-              tag: v2.1.17@sha256:48b0c11c8c61a07246e047f22e02aad615816683fd8d8073b2862fb7ed0a3cc0
+              tag: v2.1.18@sha256:6f7bf2b8e43437c7c3a121bc80214845c85f27321e66f2ff4be6bf4220775fd7
             envFrom:
               # ObjectBucketClaim-generated secret: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
               - secretRef:
