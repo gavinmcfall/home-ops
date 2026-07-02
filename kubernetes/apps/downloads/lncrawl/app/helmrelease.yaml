@@ -40,7 +40,7 @@ spec:
             # (NovelUpdates + translator sites) as EPUBs. SQLite in /data.
             image:
               repository: ghcr.io/lncrawl/lightnovel-crawler
-              tag: 4.6.0@sha256:445d8da2accd2803125e391773bb927f972c21d05f961ec4d4c9b114d90d84be
+              tag: 4.6.0@sha256:e8ba3d0e136255df080cf987f4c523f3006470f169eccad8b1bf3eaf6eab5455
             args: ["-ll", "server", "-p", "8080"]
             env:
               LNCRAWL_DATA_PATH: /data
