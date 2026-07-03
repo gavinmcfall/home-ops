@@ -78,8 +78,11 @@ spec:
         containers:
           igir:
             image:
+              # Debian/glibc, NOT alpine/musl: igir's native modules (archive
+              # extraction + hashing) silently no-op on musl, so the gate would
+              # quarantine everything. Verified against real ROMs on bookworm.
               repository: docker.io/library/node
-              tag: 22-alpine@sha256:16e22a550f3863206a3f701448c45f7912c6896a62de43add43bb9c86130c3e2
+              tag: 22-bookworm-slim@sha256:813a7480f28fdadac1f7f5c824bcdad435b5bc1322a5968bbbdef8d058f9dff4
             command: ["/bin/sh", "/scripts/ingest.sh"]
             env:
               TZ: *timeZone
