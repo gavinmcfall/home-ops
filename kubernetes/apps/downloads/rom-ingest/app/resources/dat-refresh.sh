@@ -54,6 +54,14 @@ if [ "$DOS_ENABLED" = "true" ]; then
   rm -rf "$TMP"
 fi
 
+# --- drop non-physical / digital-distribution DATs -----------------------
+# These describe multi-file digital packages and contain 0-byte and generic
+# component files with well-known hashes that false-match real ROMs (e.g. a
+# 0-byte .ARC matching a PSN DLC entry). No use for a physical-dump gate.
+for pat in '(PSN)' '(PSX2PSP)' '(UMD Music)' '(UMD Video)' '(Download Play)' '(Digital)' '(Games on Demand)' '(Title Updates)'; do
+  find "$STAGE" -name "*$pat*.dat" -type f -delete 2>/dev/null || true
+done
+
 # --- swap staged DATs into place -----------------------------------------
 found=$(find "$STAGE" -name '*.dat' | wc -l)
 echo "[dat-refresh] staged $found DAT(s)"
