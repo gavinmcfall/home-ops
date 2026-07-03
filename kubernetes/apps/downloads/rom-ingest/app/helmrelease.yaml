@@ -1,0 +1,134 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rom-ingest
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      # -- Weekly refresh of Logiqx DAT files into the shared /dats PVC.
+      dat-refresh:
+        type: cronjob
+        cronjob:
+          schedule: "0 4 * * 0" # Sundays 04:00
+          timeZone: &timeZone ${TIMEZONE}
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 3
+          ttlSecondsAfterFinished: 86400
+        containers:
+          git:
+            image:
+              repository: docker.io/alpine/git
+              tag: latest@sha256:e043be20669db13cbcfb6190192babee4cf2dca98709bb0c2d08ca2d35a0a06a
+            command: ["/bin/sh", "/scripts/dat-refresh.sh"]
+            env:
+              TZ: *timeZone
+              HOME: /tmp
+              # Sources (see dat-refresh.sh): libretro metadat/* = cart+disc DATs,
+              # PureDOS = DOS games. All git repos, so refresh stays automatic.
+              LIBRETRO_SUBDIRS: "metadat/no-intro metadat/redump"
+              DOS_ENABLED: "true"
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+        pod:
+          restartPolicy: OnFailure
+      # -- Hourly validate-before-promote gate (cart/disc via igir).
+      ingest:
+        type: cronjob
+        annotations:
+          reloader.stakater.com/auto: "true"
+        cronjob:
+          schedule: "@hourly"
+          timeZone: *timeZone
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 3
+          ttlSecondsAfterFinished: 86400
+        containers:
+          igir:
+            image:
+              repository: docker.io/library/node
+              tag: 22-alpine@sha256:16e22a550f3863206a3f701448c45f7912c6896a62de43add43bb9c86130c3e2
+            command: ["/bin/sh", "/scripts/ingest.sh"]
+            env:
+              TZ: *timeZone
+              HOME: /tmp
+              npm_config_cache: /tmp/.npm
+              IGIR_VERSION: "5.3.0"
+            envFrom:
+              - secretRef:
+                  name: rom-ingest-secret
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+        pod:
+          restartPolicy: OnFailure
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    persistence:
+      scripts:
+        type: configMap
+        name: rom-ingest-scripts
+        defaultMode: 0755
+        globalMounts:
+          - path: /scripts
+            readOnly: true
+      dats:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteMany
+        size: 2Gi
+        storageClass: ceph-filesystem
+        globalMounts:
+          - path: /dats
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+      media:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media
+        advancedMounts:
+          ingest:
+            igir:
+              - path: /media
