@@ -45,8 +45,12 @@ spec:
               HOME: /tmp
               # Sources (see dat-refresh.sh): libretro metadat/* = cart+disc DATs,
               # PureDOS = DOS games. All git repos, so refresh stays automatic.
+              # Scripts are brace-free, so every var must be defined here.
+              LIBRETRO_REPO: "https://github.com/libretro/libretro-database.git"
               LIBRETRO_SUBDIRS: "metadat/no-intro metadat/redump"
               DOS_ENABLED: "true"
+              DOS_REPO: "https://github.com/PureDOS/DAT.git"
+              DOS_FILES: "PureDOSDAT.xml"
             resources:
               requests:
                 cpu: 25m

@@ -6,14 +6,16 @@
 # promoted files automatically.
 set -u
 
-IGIR_VERSION="${IGIR_VERSION:-5.3.0}"
-DATS_GLOB="/dats/**/*.dat"
+# BRACE-FREE (use $VAR, not the dollar-brace form): Flux post-build
+# substitution rewrites dollar-brace tokens inside the ConfigMap.
+# IGIR_VERSION/DISCORD_WEBHOOK come from env.
+DATS_GLOB="/dats/*.dat"
 LIBRARY="/media/Library/Emulation/roms"
 BASE="/media/Downloads/rom-ingest"
 WORK="$BASE/work"
 QUARANTINE="$BASE/quarantine"
 STAGING="/media/Downloads/sabnzbd/complete/roms /media/Downloads/qbittorrent/complete/roms"
-WEBHOOK="${DISCORD_WEBHOOK:-}"
+WEBHOOK="$DISCORD_WEBHOOK"
 
 log() { echo "[rom-ingest] $*"; }
 
@@ -47,11 +49,11 @@ if [ -z "$INPUTS" ]; then
 fi
 
 # --- validate + move matched ROMs into WORK, organised by DAT name -------
-log "validating staged ROMs against DATs (igir ${IGIR_VERSION})..."
+log "validating staged ROMs against DATs (igir $IGIR_VERSION)..."
 # igir moves recognised ROMs to --output (extracting them from any archive);
 # anything it does not recognise is left in the input dirs (swept to
 # quarantine below).
-npx --yes "igir@${IGIR_VERSION}" move extract report \
+npx --yes "igir@$IGIR_VERSION" move extract report \
   --dat "$DATS_GLOB" \
   $INPUTS \
   --output "$WORK" \
@@ -98,12 +100,12 @@ for sysdir in "$WORK"/*/; do
     mkdir -p "$LIBRARY/$slug"
     find "$sysdir" -mindepth 1 -maxdepth 1 -exec mv -f {} "$LIBRARY/$slug/" \; 2>/dev/null || true
     promoted=$((promoted + n))
-    log "promoted ${n} file(s): ${name} -> roms/${slug}"
+    log "promoted $n file(s): $name -> roms/$slug"
   else
     mkdir -p "$QUARANTINE/_unmapped/$name"
     find "$sysdir" -mindepth 1 -maxdepth 1 -exec mv -f {} "$QUARANTINE/_unmapped/$name/" \; 2>/dev/null || true
     unmapped=$((unmapped + n))
-    log "no slug mapping for '${name}' -> quarantine/_unmapped (${n} file(s))"
+    log "no slug mapping for '$name' -> quarantine/_unmapped ($n file(s))"
   fi
   rmdir "$sysdir" 2>/dev/null || true
 done
@@ -119,7 +121,7 @@ for d in $STAGING; do
 done
 unmatched=$(find "$QUARANTINE/_unmatched" -type f 2>/dev/null | wc -l)
 
-summary="ROM gate: promoted ${promoted}, unmapped ${unmapped}, quarantined(unmatched) ${unmatched}"
+summary="ROM gate: promoted $promoted, unmapped $unmapped, quarantined(unmatched) $unmatched"
 log "$summary"
 if [ "$promoted" -gt 0 ] || [ "$unmapped" -gt 0 ] || [ "$unmatched" -gt 0 ]; then
   notify "$summary"
