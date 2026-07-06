@@ -1,0 +1,95 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app maloja
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    controllers:
+      maloja:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              # NOTE: digest lifted from a community mirror — verify against docker.io before prod.
+              repository: docker.io/krateng/maloja
+              tag: 3.2.4@sha256:4ecea26058d2ca5168a8d53820279942d28f0606664cea6425f42371d5d88f95
+            env:
+              MALOJA_DATA_DIRECTORY: /data
+            envFrom:
+              - secretRef:
+                  name: maloja-secret
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            securityContext:
+              # maloja (Python app) is not verified against a read-only rootfs; relaxed to avoid crashloop.
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: {type: RuntimeDefault}
+    service:
+      app:
+        controller: maloja
+        ports:
+          http:
+            port: &port 42010
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Entertainment
+          gethomepage.dev/name: Maloja
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: maloja.png
+          gethomepage.dev/description: Listening Stats
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+    persistence:
+      data:
+        existingClaim: maloja
+        globalMounts:
+          - path: /data

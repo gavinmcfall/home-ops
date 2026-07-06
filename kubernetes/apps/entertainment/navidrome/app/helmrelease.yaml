@@ -1,0 +1,116 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app navidrome
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    controllers:
+      navidrome:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/navidrome/navidrome
+              tag: 0.60.3@sha256:a5dce8f33304714dd138e870cca0dcab3d937ca236be1a9f2b97da009d1a0048
+            env:
+              TZ: ${TIMEZONE}
+              ND_DATAFOLDER: /data
+              ND_MUSICFOLDER: /media/music
+              ND_PORT: &port 4533
+              ND_SCANSCHEDULE: 30m
+              ND_LOGLEVEL: info
+              ND_ENABLEINSIGHTSCOLLECTOR: "false"
+              ND_ENABLEDOWNLOADS: "true"
+              ND_ENABLESHARING: "false"
+              ND_BASEURL: "https://navidrome.${SECRET_DOMAIN}"
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: {type: RuntimeDefault}
+    service:
+      app:
+        controller: navidrome
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Entertainment
+          gethomepage.dev/name: Navidrome
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: navidrome.png
+          gethomepage.dev/description: Music Streaming
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: external
+            namespace: network
+            sectionName: https
+    persistence:
+      data:
+        existingClaim: navidrome
+        globalMounts:
+          - path: /data
+      tmp:
+        type: emptyDir
+      media:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /media
+            readOnly: true

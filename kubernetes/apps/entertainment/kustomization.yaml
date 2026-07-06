@@ -13,7 +13,9 @@ resources:
   - ./immich/ks.yaml
   - ./kavita/ks.yaml
   - ./komf/ks.yaml
+  - ./maloja/ks.yaml
   - ./mangarr/ks.yaml
+  - ./navidrome/ks.yaml
   - ./seerr/ks.yaml
   - ./pasta/ks.yaml
   - ./plex/ks.yaml

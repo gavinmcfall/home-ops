@@ -1,0 +1,10 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+# PHASE 2 — add ./secret.sops.yaml here (soularr-config) before enabling. See README.md.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./helmrelease.yaml
+components:
+  - ../../../../components/keda/nfs-scaler
+  - ../../../../components/priority/priority-06

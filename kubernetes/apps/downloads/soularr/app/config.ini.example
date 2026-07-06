@@ -1,0 +1,29 @@
+# soularr config template — copy to config.ini, fill in API keys, then SOPS-encrypt as a secret.
+# Do NOT commit a filled-in copy of this file unencrypted.
+
+[Lidarr]
+url = http://lidarr.downloads
+api_key = REPLACE_WITH_LIDARR_API_KEY
+download_dir = /media/downloads/slskd/complete
+
+[Slskd]
+url = http://slskd.downloads
+api_key = REPLACE_WITH_SLSKD_API_KEY
+download_dir = /media/downloads/slskd/complete
+delete_searches = False
+
+[Search Settings]
+search_timeout = 5000
+maximum_peer_queue = 50
+minimum_peer_upload_speed = 0
+allow_multi_disc = True
+number_of_albums_to_grab = 10
+remove_wanted_on_failure = False
+
+[Release Settings]
+use_most_common_tracknum = True
+allow_missing_tracks = False
+accepted_countries = Europe,USA,United Kingdom,Australia,[Worldwide],""
+
+[Search Source]
+use_most_wanted = False
