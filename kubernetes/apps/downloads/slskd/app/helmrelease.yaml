@@ -74,6 +74,51 @@ spec:
                 memory: 256Mi
               limits:
                 memory: 1Gi
+          gluetun:
+            image:
+              repository: ghcr.io/qdm12/gluetun
+              tag: v3.41.1
+            env:
+              VPN_SERVICE_PROVIDER: custom
+              VPN_TYPE: wireguard
+              VPN_INTERFACE: wg0
+              VPN_ENDPOINT_PORT: 51820
+              DOT: off
+              DOT_IPV6: off
+              DNS_ADDRESS: 10.96.0.10 # cluster CoreDNS
+              FIREWALL_INPUT_PORTS: 80 # slskd web/API reachable in-cluster
+              FIREWALL_OUTBOUND_SUBNETS: 10.69.0.0/16,10.96.0.0/16 # k8s pod+service subnets
+            envFrom:
+              - secretRef:
+                  name: slskd-secret
+            securityContext:
+              runAsUser: 0
+              runAsNonRoot: false
+              capabilities:
+                add: ["NET_ADMIN"]
+              allowPrivilegeEscalation: false
+            probes:
+              liveness: &gluetunProbe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /v1/publicip/ip
+                    port: 8000
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
+              readiness: *gluetunProbe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /v1/publicip/ip
+                    port: 8000
+                  timeoutSeconds: 10
+                  failureThreshold: 30
+                  periodSeconds: 5
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -89,10 +134,6 @@ spec:
         ports:
           http:
             port: *port
-          soulseek:
-            port: *soulseekPort
-            protocol: TCP
-            targetPort: *soulseekPort
     route:
       app:
         annotations:
