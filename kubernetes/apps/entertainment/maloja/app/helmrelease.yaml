@@ -48,24 +48,14 @@ spec:
                 enabled: false
               startup:
                 enabled: false
-            securityContext:
-              # maloja (Python app) is not verified against a read-only rootfs; relaxed to avoid crashloop.
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
-              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
                 memory: 256Mi
               limits:
                 memory: 1Gi
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
-        fsGroupChangePolicy: OnRootMismatch
-        seccompProfile: {type: RuntimeDefault}
+    # No securityContext override: the krateng/maloja image is s6-overlay based and inits as
+    # root (then drops privileges internally). Forcing non-root breaks s6 (/run uid check).
     service:
       app:
         controller: maloja

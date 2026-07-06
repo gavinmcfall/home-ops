@@ -37,6 +37,9 @@ spec:
               tag: 0.24.4@sha256:4031fc99b824ed2eec3bdbd92914fe6071539f3f71f0742052276afc2c69353d
             env:
               TZ: ${TIMEZONE}
+              # slskd is a .NET single-file app; with a read-only rootfs it must extract its
+              # bundle somewhere writable, else it fails on $HOME/.net.
+              DOTNET_BUNDLE_EXTRACT_BASE_DIR: /tmp
               SLSKD_HTTP_PORT: &port 80
               SLSKD_NO_HTTPS: "true"
               SLSKD_NO_VERSION_CHECK: "true"
@@ -111,6 +114,8 @@ spec:
         existingClaim: slskd
       tmp:
         type: emptyDir
+        globalMounts:
+          - path: /tmp
       media:
         type: nfs
         server: citadel.internal
