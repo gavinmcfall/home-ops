@@ -86,7 +86,7 @@ spec:
               DOT: off
               DOT_IPV6: off
               DNS_ADDRESS: 10.96.0.10 # cluster CoreDNS
-              FIREWALL_INPUT_PORTS: 80 # slskd web/API reachable in-cluster
+              FIREWALL_INPUT_PORTS: 80,8000 # 80=slskd web/API, 8000=gluetun control server (health probe)
               FIREWALL_OUTBOUND_SUBNETS: 10.69.0.0/16,10.96.0.0/16 # k8s pod+service subnets
             envFrom:
               - secretRef:
