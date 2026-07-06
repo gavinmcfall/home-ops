@@ -47,9 +47,9 @@ spec:
               SLSKD_NO_AUTH: "true"
               SLSKD_APP_DIR: /config
               SLSKD_SLSK_LISTEN_PORT: &soulseekPort 50300
-              SLSKD_SHARED_DIR: /media/downloads/slskd/shared
-              SLSKD_DOWNLOADS_DIR: /media/downloads/slskd/complete
-              SLSKD_INCOMPLETE_DIR: /media/downloads/slskd/incomplete
+              SLSKD_SHARED_DIR: /media/Downloads/slskd/shared
+              SLSKD_DOWNLOADS_DIR: /media/Downloads/slskd/complete
+              SLSKD_INCOMPLETE_DIR: /media/Downloads/slskd/incomplete
               SLSKD_SHARE_FILTER: Thumbs.db$;\.DS_Store$
             envFrom:
               - secretRef:
