@@ -46,7 +46,12 @@ spec:
               SLSKD_REMOTE_CONFIGURATION: "true"
               SLSKD_NO_AUTH: "true"
               SLSKD_APP_DIR: /config
-              SLSKD_SLSK_LISTEN_PORT: &soulseekPort 50300
+              # VPN integration: slskd polls gluetun's control server for the dynamically
+              # forwarded port and uses it as its Soulseek listen port. Without a reachable
+              # port, peers can't return search results (0 responses).
+              SLSKD_VPN: "true"
+              SLSKD_VPN_PORT_FORWARDING: "true"
+              SLSKD_VPN_GLUETUN_URL: http://localhost:8000
               SLSKD_SHARED_DIR: /media/Downloads/slskd/shared
               SLSKD_DOWNLOADS_DIR: /media/Downloads/slskd/complete
               SLSKD_INCOMPLETE_DIR: /media/Downloads/slskd/incomplete
@@ -83,6 +88,8 @@ spec:
               VPN_TYPE: wireguard
               VPN_INTERFACE: wg0
               VPN_ENDPOINT_PORT: 51820
+              VPN_PORT_FORWARDING: on # ProtonVPN NAT-PMP; gluetun opens the forwarded port
+              VPN_PORT_FORWARDING_PROVIDER: protonvpn
               DOT: off
               DOT_IPV6: off
               DNS_ADDRESS: 10.96.0.10 # cluster CoreDNS
