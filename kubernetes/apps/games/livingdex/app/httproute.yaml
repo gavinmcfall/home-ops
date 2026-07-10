@@ -5,7 +5,11 @@ kind: HTTPRoute
 metadata:
   name: livingdex
   annotations:
-    external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+    # internal-dns (UniFi/LAN) — NOT external-dns (Cloudflare). Using the
+    # external-dns key here publishes a proxied public CNAME to the
+    # non-resolvable internal origin → Cloudflare 1016. LAN-only, matching
+    # weave-gitops / blackbox-exporter.
+    internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
 spec:
   # LAN-only: the app has no auth (single-owner v1). Everything goes to the web
   # (nginx) service, which proxies /api to livingdex-api internally (one origin,
