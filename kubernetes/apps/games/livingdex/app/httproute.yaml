@@ -25,4 +25,4 @@ spec:
         - path: { type: PathPrefix, value: / }
       backendRefs:
         - name: livingdex-web
-          port: 80
+          port: 8080
