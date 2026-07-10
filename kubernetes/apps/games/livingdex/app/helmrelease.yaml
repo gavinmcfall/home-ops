@@ -34,7 +34,9 @@ spec:
     controllers:
       # ---- API (Hono) -------------------------------------------------------
       api:
-        strategy: RollingUpdate
+        # Recreate, not RollingUpdate: the api owns the RWO sprite PVC, so the
+        # old pod must release it before the new one mounts.
+        strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -51,9 +53,10 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 704f144ac8061f6b27020b8feba7593e839bd2b4
+              tag: 07d10ecb80e0ad5c761f64dc5205fbb02616cc05
             env:
               PORT: "8080"
+              SPRITE_DIR: /sprites # enables the offline sprite mirror
             envFrom: *envFrom
             probes:
               liveness:
@@ -99,22 +102,20 @@ spec:
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
-        # Stock nginx binds :80 and writes its pid/cache/templated conf at
-        # runtime, so this controller runs as root with a writable rootfs. The
-        # `games` namespace is pod-security: privileged, so this is permitted.
-        # Hardening follow-up: switch the web image to unprivileged nginx (:8080).
+        # Unprivileged nginx image: runs as its non-root user (uid 101) and
+        # binds :8080, so no root / no writable-rootfs override is needed.
         pod:
           securityContext:
-            runAsNonRoot: false
-            runAsUser: 0
-            runAsGroup: 0
-            fsGroup: 0
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            fsGroup: 101
             seccompProfile: { type: RuntimeDefault }
         containers:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-web
-              tag: 704f144ac8061f6b27020b8feba7593e839bd2b4
+              tag: 07d10ecb80e0ad5c761f64dc5205fbb02616cc05
             env:
               API_UPSTREAM: livingdex-api.games.svc.cluster.local:8080
             probes:
@@ -122,7 +123,7 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet: { path: /healthz, port: 80 }
+                  httpGet: { path: /healthz, port: 8080 }
                   initialDelaySeconds: 5
                   periodSeconds: 30
                   failureThreshold: 3
@@ -130,7 +131,7 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet: { path: /healthz, port: 80 }
+                  httpGet: { path: /healthz, port: 8080 }
                   initialDelaySeconds: 5
                   periodSeconds: 10
                   failureThreshold: 3
@@ -143,9 +144,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
-              capabilities:
-                drop: ["ALL"]
-                add: ["CHOWN", "SETGID", "SETUID", "NET_BIND_SERVICE", "DAC_OVERRIDE"]
+              capabilities: { drop: ["ALL"] }
 
       # ---- Seed (weekly catalogue refresh from PokéAPI) ---------------------
       seed:
@@ -159,7 +158,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 704f144ac8061f6b27020b8feba7593e839bd2b4
+              tag: 07d10ecb80e0ad5c761f64dc5205fbb02616cc05
             command: ["node", "dist/seed/run.js"]
             env:
               SEED_TIER: full
@@ -187,7 +186,7 @@ spec:
         controller: web
         ports:
           http:
-            port: 80
+            port: 8080
 
     persistence:
       # readOnlyRootFilesystem needs writable scratch; the seed also caches
@@ -207,3 +206,14 @@ spec:
           seed:
             app:
               - path: /cache
+      # Offline sprite mirror target — populated on demand via the UI "Mirror"
+      # button (POST /api/sprites/mirror). Re-fetchable, so no volsync backup.
+      sprites:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 2Gi
+        storageClass: ceph-block
+        advancedMounts:
+          api:
+            app:
+              - path: /sprites
