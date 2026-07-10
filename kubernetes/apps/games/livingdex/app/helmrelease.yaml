@@ -34,9 +34,10 @@ spec:
     controllers:
       # ---- API (Hono) -------------------------------------------------------
       api:
-        # Recreate, not RollingUpdate: the api owns the RWO sprite PVC, so the
-        # old pod must release it before the new one mounts.
-        strategy: Recreate
+        # RollingUpdate is fine because the sprite PVC is ReadWriteMany (CephFS)
+        # — a rolling update's brief two-pod overlap can share it. (Recreate is
+        # avoided: app-template 4.4.0 emits an invalid rollingUpdate block with it.)
+        strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -208,11 +209,12 @@ spec:
               - path: /cache
       # Offline sprite mirror target — populated on demand via the UI "Mirror"
       # button (POST /api/sprites/mirror). Re-fetchable, so no volsync backup.
+      # ReadWriteMany (CephFS) so the api can roll without a volume hand-off stall.
       sprites:
         type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
+        accessMode: ReadWriteMany
         size: 2Gi
-        storageClass: ceph-block
+        storageClass: ceph-filesystem
         advancedMounts:
           api:
             app:
