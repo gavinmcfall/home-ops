@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/httproute_v1.json
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: livingdex
+  annotations:
+    external-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+spec:
+  # LAN-only: the app has no auth (single-owner v1). Everything goes to the web
+  # (nginx) service, which proxies /api to livingdex-api internally (one origin,
+  # no CORS). Switch parentRefs to the `external` gateway to publish it.
+  hostnames:
+    - livingdex.${SECRET_DOMAIN}
+  parentRefs:
+    - name: internal
+      namespace: network
+      sectionName: https
+  rules:
+    - matches:
+        - path: { type: PathPrefix, value: / }
+      backendRefs:
+        - name: livingdex-web
+          port: 80

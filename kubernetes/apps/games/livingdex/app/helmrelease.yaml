@@ -1,0 +1,209 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: livingdex
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    controllers:
+      # ---- API (Hono) -------------------------------------------------------
+      api:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          # Creates the `livingdex` role + database in the shared cluster before
+          # the API starts (which then runs its own migrations on boot).
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
+            envFrom: &envFrom
+              - secretRef:
+                  name: livingdex-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/livingdex-api
+              tag: 704f144ac8061f6b27020b8feba7593e839bd2b4
+            env:
+              PORT: "8080"
+            envFrom: *envFrom
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /healthz, port: 8080 }
+                  initialDelaySeconds: 5
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /readyz, port: 8080 }
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /healthz, port: 8080 }
+                  initialDelaySeconds: 3
+                  periodSeconds: 3
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+
+      # ---- Web (nginx static SPA + /api proxy) ------------------------------
+      web:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        # Stock nginx binds :80 and writes its pid/cache/templated conf at
+        # runtime, so this controller runs as root with a writable rootfs. The
+        # `games` namespace is pod-security: privileged, so this is permitted.
+        # Hardening follow-up: switch the web image to unprivileged nginx (:8080).
+        pod:
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+            runAsGroup: 0
+            fsGroup: 0
+            seccompProfile: { type: RuntimeDefault }
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/livingdex-web
+              tag: 704f144ac8061f6b27020b8feba7593e839bd2b4
+            env:
+              API_UPSTREAM: livingdex-api.games.svc.cluster.local:8080
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /healthz, port: 80 }
+                  initialDelaySeconds: 5
+                  periodSeconds: 30
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /healthz, port: 80 }
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 5m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop: ["ALL"]
+                add: ["CHOWN", "SETGID", "SETUID", "NET_BIND_SERVICE", "DAC_OVERRIDE"]
+
+      # ---- Seed (weekly catalogue refresh from PokéAPI) ---------------------
+      seed:
+        type: cronjob
+        cronjob:
+          schedule: "0 3 * * 1" # Monday 03:00 — picks up new species/forms/games
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 1
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/livingdex-api
+              tag: 704f144ac8061f6b27020b8feba7593e839bd2b4
+            command: ["node", "dist/seed/run.js"]
+            env:
+              SEED_TIER: full
+              SEED_CACHE_DIR: /cache
+              SEED_CONCURRENCY: "8"
+            envFrom: *envFrom
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+
+    service:
+      api:
+        controller: api
+        ports:
+          http:
+            port: 8080
+      web:
+        controller: web
+        ports:
+          http:
+            port: 80
+
+    persistence:
+      # readOnlyRootFilesystem needs writable scratch; the seed also caches
+      # PokéAPI responses here (ephemeral per run — no PVC for v1).
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          api:
+            app:
+              - path: /tmp
+          seed:
+            app:
+              - path: /tmp
+      cache:
+        type: emptyDir
+        advancedMounts:
+          seed:
+            app:
+              - path: /cache
