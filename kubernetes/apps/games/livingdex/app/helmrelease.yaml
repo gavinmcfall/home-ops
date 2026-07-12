@@ -116,7 +116,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-web
-              tag: 07d10ecb80e0ad5c761f64dc5205fbb02616cc05
+              tag: 953785d6f676b2d7a411cf1788b127b657bf122a
             env:
               API_UPSTREAM: livingdex-api.games.svc.cluster.local:8080
             probes:
