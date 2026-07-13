@@ -1,0 +1,180 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app dev-box
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    defaultPodOptions:
+      # Both containers need root: gluetun for NET_ADMIN, app for sshd host keys.
+      # This pod has NO tailscale — it is reached over the cluster subnet router
+      # via the ClusterIP service below. Its ONLY internet egress is gluetun (wg0).
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+        fsGroupChangePolicy: OnRootMismatch
+    controllers:
+      dev-box:
+        type: deployment
+        # RWO PVC: release before re-attach on restart.
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          # ---- shell/git box: sshd on 2222, all egress rides gluetun ----
+          # Alpine + git + openssh, set up inline so the manifest is fully
+          # transparent (no baked image needed). Host key persists on the PVC
+          # so the client host-key fingerprint is stable across restarts.
+          # NOTE: git identity (user.name/email) and the github remote are set
+          # INSIDE the box on the PVC — deliberately never in this public repo.
+          app:
+            image:
+              repository: docker.io/library/alpine
+              tag: "3.21"
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -e
+                apk add --no-cache git openssh openssh-client tmux ca-certificates
+                # Privilege-separation dir for sshd.
+                mkdir -p /var/empty
+                # Persisted host key (stable client fingerprint across restarts).
+                mkdir -p /config/ssh
+                [ -f /config/ssh/ssh_host_ed25519_key ] \
+                  || ssh-keygen -t ed25519 -f /config/ssh/ssh_host_ed25519_key -N ""
+                # Inbound access: authorize your laptop's PUBLIC key (from secret).
+                mkdir -p /root/.ssh && chmod 700 /root/.ssh
+                install -m 600 /secrets/authorized_keys /root/.ssh/authorized_keys
+                # Outbound git auth: generate a box-local key ONCE, persisted on the
+                # PVC. It never leaves the pod — no private key in 1Password or the
+                # repo. Add the PUBLIC key (printed below / in logs) to the git host.
+                mkdir -p /config/.ssh && chmod 700 /config/.ssh
+                [ -f /config/.ssh/id_ed25519 ] \
+                  || ssh-keygen -t ed25519 -N "" -C "dev-box" -f /config/.ssh/id_ed25519
+                cat > /root/.ssh/config <<'EOF'
+                Host github.com
+                  HostName github.com
+                  User git
+                  IdentityFile /config/.ssh/id_ed25519
+                  IdentitiesOnly yes
+                EOF
+                echo "===== dev-box git public key — add this to the git host ====="
+                cat /config/.ssh/id_ed25519.pub
+                echo "============================================================="
+                # Persistent working dir for cloned repos.
+                mkdir -p /config/code
+                exec /usr/sbin/sshd -D -e -p 2222 \
+                  -h /config/ssh/ssh_host_ed25519_key \
+                  -o PasswordAuthentication=no \
+                  -o PermitRootLogin=prohibit-password \
+                  -o AuthorizedKeysFile=/root/.ssh/authorized_keys
+            env:
+              TZ: ${TIMEZONE}
+            securityContext:
+              readOnlyRootFilesystem: false
+              capabilities:
+                add: ["NET_BIND_SERVICE"]
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 4Gi
+          # ---- gluetun: the pod's only door to the internet (Proton WireGuard) ----
+          # Identical pattern to the qbittorrent sidecar. Killswitch (default) means
+          # if the tunnel drops, egress is BLOCKED, not leaked. FIREWALL_INPUT_PORTS
+          # opens 2222 so the ClusterIP service can reach sshd; FIREWALL_OUTBOUND_SUBNETS
+          # whitelists the cluster so subnet-router inbound + replies route locally.
+          gluetun:
+            image:
+              repository: ghcr.io/qdm12/gluetun
+              tag: v3.41.1
+            env:
+              VPN_SERVICE_PROVIDER: custom
+              VPN_TYPE: wireguard
+              VPN_INTERFACE: wg0
+              VPN_ENDPOINT_PORT: 51820
+              DOT: off
+              DOT_IPV6: off
+              DNS_ADDRESS: 10.96.0.10 # cluster CoreDNS
+              FIREWALL_INPUT_PORTS: "2222"
+              FIREWALL_OUTBOUND_SUBNETS: 10.69.0.0/16,10.96.0.0/16 # allow k8s subnets
+            envFrom:
+              - secretRef:
+                  name: dev-box-secret
+            securityContext:
+              runAsUser: 0
+              runAsNonRoot: false
+              capabilities:
+                add: ["NET_ADMIN"]
+              allowPrivilegeEscalation: false
+            probes:
+              liveness: &gluetunProbe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /v1/publicip/ip
+                    port: 8000
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
+              readiness: *gluetunProbe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /v1/publicip/ip
+                    port: 8000
+                  timeoutSeconds: 10
+                  failureThreshold: 30
+                  periodSeconds: 5
+    service:
+      app:
+        primary: true
+        controller: dev-box
+        type: ClusterIP
+        ports:
+          ssh:
+            port: 22
+            targetPort: 2222
+    persistence:
+      # Host key + cloned repos live here; survives restarts.
+      config:
+        existingClaim: dev-box-config
+        globalMounts:
+          - path: /config
+      # Your laptop's authorized public key, from the single ExternalSecret.
+      # subPath surfaces ONLY this key as a file (the WireGuard values in the
+      # same Secret are consumed by gluetun via envFrom, not written to disk here).
+      secrets:
+        type: secret
+        name: dev-box-secret
+        globalMounts:
+          - path: /secrets/authorized_keys
+            subPath: authorized_keys
+            readOnly: true

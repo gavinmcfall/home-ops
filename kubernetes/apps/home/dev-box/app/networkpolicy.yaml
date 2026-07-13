@@ -1,0 +1,43 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dev-box
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: dev-box
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # SSH in, via the cluster (reached over the tailscale subnet router).
+    # Broad on purpose so the subnet-router source works regardless of its
+    # namespace; tighten to that namespace/pod selector if you want.
+    - ports:
+        - port: 2222
+          protocol: TCP
+  #######################################
+  #            EGRESS                   #
+  #######################################
+  egress:
+    # kube-dns
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+    # Internet (the Proton WireGuard endpoint handshake). Replies to inbound
+    # SSH are stateful/auto-allowed, so no private-range egress rule is needed.
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16

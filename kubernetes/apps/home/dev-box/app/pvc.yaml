@@ -1,0 +1,14 @@
+---
+# Persistent state for the dev-box: sshd host key (stable client fingerprint)
+# plus cloned repos under /config/code. Sized for a handful of repos + toolchain
+# caches; bump if you clone large histories.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dev-box-config
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: ceph-block
