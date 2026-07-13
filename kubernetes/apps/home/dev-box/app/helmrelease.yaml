@@ -58,7 +58,11 @@ spec:
               - -c
               - |
                 set -e
-                apk add --no-cache git openssh openssh-client tmux ca-certificates
+                # apk runs THROUGH gluetun's tunnel, which flaps for the first few
+                # seconds of boot — retry until the tunnel is up instead of dying.
+                until apk add --no-cache git openssh openssh-client tmux ca-certificates curl; do
+                  echo "apk failed (tunnel not up yet?); retrying in 5s..."; sleep 5
+                done
                 # Privilege-separation dir for sshd.
                 mkdir -p /var/empty
                 # Persisted host key (stable client fingerprint across restarts).
@@ -93,6 +97,30 @@ spec:
                   -o AuthorizedKeysFile=/root/.ssh/authorized_keys
             env:
               TZ: ${TIMEZONE}
+            # Readiness = sshd is actually listening on 2222. Without an explicit
+            # probe, app-template's default targets the wrong port and the pod
+            # never leaves 1/2. Startup allows generous time for the apk-over-tunnel
+            # install to complete on first boot.
+            probes:
+              liveness: &appProbe
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 2222
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              readiness: *appProbe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 2222
+                  failureThreshold: 60
+                  periodSeconds: 5
             securityContext:
               readOnlyRootFilesystem: false
               capabilities:
