@@ -134,8 +134,10 @@ spec:
           # ---- gluetun: the pod's only door to the internet (Proton WireGuard) ----
           # Identical pattern to the qbittorrent sidecar. Killswitch (default) means
           # if the tunnel drops, egress is BLOCKED, not leaked. FIREWALL_INPUT_PORTS
-          # opens 2222 so the ClusterIP service can reach sshd; FIREWALL_OUTBOUND_SUBNETS
-          # whitelists the cluster so subnet-router inbound + replies route locally.
+          # opens 2222 for sshd AND 8000 for gluetun's OWN control-server healthcheck
+          # (without 8000 the kubelet probe is firewalled off → gluetun never ready →
+          # pod stuck 1/2). FIREWALL_OUTBOUND_SUBNETS whitelists the cluster so
+          # subnet-router inbound + replies route locally.
           gluetun:
             image:
               repository: ghcr.io/qdm12/gluetun
@@ -148,7 +150,7 @@ spec:
               DOT: off
               DOT_IPV6: off
               DNS_ADDRESS: 10.96.0.10 # cluster CoreDNS
-              FIREWALL_INPUT_PORTS: "2222"
+              FIREWALL_INPUT_PORTS: "2222,8000"
               FIREWALL_OUTBOUND_SUBNETS: 10.69.0.0/16,10.96.0.0/16 # allow k8s subnets
             envFrom:
               - secretRef:
