@@ -187,7 +187,12 @@ spec:
       app:
         primary: true
         controller: dev-box
-        type: ClusterIP
+        type: LoadBalancer
+        annotations:
+          # Dedicated Cilium LB IP from the Services VLAN (cluster-settings var,
+          # same as the other apps). No DNS record on purpose — keeps the box
+          # low-key; use an ssh Host alias locally.
+          io.cilium/lb-ipam-ips: ${DEV_BOX_LBIP}
         ports:
           ssh:
             port: 22
