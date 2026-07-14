@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: pgbackrest-controller
-          image: registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller:0.0.2@sha256:6ada97fdc4b797ef03abe656ff66f5ba27ac9d6784f3bc9abfa75a0d4807105e
+          image: registry.hub.docker.com/dalibo/cnpg-pgbackrest-controller:0.0.3@sha256:9563249502db7c1ae22c5e1979ab7ffd040559ea8c7544bfad25c5254c7ceb2e
           imagePullPolicy: IfNotPresent
           args:
             - operator
