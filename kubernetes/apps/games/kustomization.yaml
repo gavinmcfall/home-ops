@@ -11,6 +11,7 @@ resources:
   # - ./dune-awakening/ks.yaml   # SHELVED — manifests kept under ./dune-awakening/;
   #   re-add this line to redeploy. Operator-free hit the FLS battlegroup-registration
   #   wall; images remain in zot. See dune-awakening/PORT-NOTES.md + memory.
+  - ./game-scout/ks.yaml
   - ./livingdex/ks.yaml
   - ./pelican/ks.yaml
   - ./pelican-dev/ks.yaml
