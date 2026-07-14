@@ -22,7 +22,7 @@ spec:
             fsGroup: 1000
           containers:
             - name: kopia-sync
-              image: ghcr.io/home-operations/kopia:0.22.3@sha256:17ab64542280197a5368247deaefadc3e3bbe15714ab666c2455a06824e86efd
+              image: ghcr.io/home-operations/kopia:0.23.1@sha256:27da0a33b44e1b902150a6c963514237217464bb13118a95bb056667be93cda5
               command: ["/bin/sh", "-c"]
               args:
                 - |
