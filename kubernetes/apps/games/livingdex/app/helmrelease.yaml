@@ -54,7 +54,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 67321ffd8826763d9544e7220318fb33324ae4ae
+              tag: d5f0aac459d5501c854c648249e931a91b3c9998
             env:
               PORT: "8080"
               SPRITE_DIR: /sprites # enables the offline sprite mirror
@@ -159,12 +159,40 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 67321ffd8826763d9544e7220318fb33324ae4ae
+              tag: d5f0aac459d5501c854c648249e931a91b3c9998
             command: ["node", "dist/seed/run.js"]
             env:
               SEED_TIER: full
               SEED_CACHE_DIR: /cache
               SEED_CONCURRENCY: "8"
+            envFrom: *envFrom
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+
+      # ---- PokéAPI mirror (daily upstream-CSV sync into the `pokeapi` schema) --
+      mirror:
+        type: cronjob
+        cronjob:
+          schedule: "0 2 * * *" # daily 02:00 — no-ops unless the upstream CSVs changed
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 1
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/livingdex-api
+              tag: d5f0aac459d5501c854c648249e931a91b3c9998
+            command: ["node", "dist/mirror/run.js"]
+            env:
+              MIRROR_SCHEMA: pokeapi
             envFrom: *envFrom
             resources:
               requests:
@@ -199,6 +227,9 @@ spec:
             app:
               - path: /tmp
           seed:
+            app:
+              - path: /tmp
+          mirror:
             app:
               - path: /tmp
       cache:
