@@ -23,8 +23,15 @@ spec:
       fsGroup: ${VOLSYNC_GID:=568}
     parallelism: 2
     repository: ${APP}-volsync-secret
+    # Every key must be set explicitly. Kopia inherits its own global defaults
+    # (monthly 24, yearly 3, weekly 4, latest 10) for any key omitted here, so a
+    # partial block silently retains ~3 years rather than the week it appears to.
     retain:
       hourly: 24
       daily: 7
+      weekly: 4
+      monthly: 3
+      yearly: 0
+      latest: 4
     storageClassName: ${VOLSYNC_STORAGECLASS:=ceph-block}
     volumeSnapshotClassName: ${VOLSYNC_SNAPSHOTCLASS:=csi-ceph-block}

@@ -23,7 +23,17 @@ spec:
       fsGroup: ${VOLSYNC_GID:=568}
     parallelism: 2
     repository: ${APP}-volsync-b2-secret
+    # Every key must be set explicitly. Kopia inherits its own global defaults for
+    # any key omitted here, so `daily: 14` alone silently retained ~3 years.
+    # hourly is 0 deliberately: this source syncs once a day, so each snapshot
+    # lands in its own hourly bucket and the inherited hourly:48 was holding ~48
+    # daily snapshots on top of everything below.
     retain:
+      hourly: 0
       daily: 14
+      weekly: 4
+      monthly: 3
+      yearly: 0
+      latest: 3
     storageClassName: ${VOLSYNC_STORAGECLASS:=ceph-block}
     volumeSnapshotClassName: ${VOLSYNC_SNAPSHOTCLASS:=csi-ceph-block}

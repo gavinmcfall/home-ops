@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/volsync.backube/kopiamaintenance_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: KopiaMaintenance
+metadata:
+  name: "${APP}-b2"
+spec:
+  # Kopia permits only the single designated maintenance owner to run maintenance.
+  # Every B2 repo had its owner stamped as the ephemeral mover pod that first
+  # connected (e.g. nobody@volsync-src-plex-b2-nrk52) -- a pod that no longer
+  # exists, so maintenance could never run and had never run once. This controller
+  # claims ownership under the stable identity maintenance@volsync, then runs quick
+  # (index compaction) and full (snapshot GC) maintenance.
+  #
+  # The NFS repo does not need one of these: it is a single shared repo already
+  # covered by the kopia-maintenance CronJob in storage, whose NFS mount is injected
+  # by the volsync-mover-nfs MutatingAdmissionPolicy -- that policy matches jobs
+  # named volsync-* with label created-by, and would NOT match this controller's
+  # kopia-maint-* / managed-by jobs. S3 needs no mount, so this only applies here.
+  repository:
+    repository: "${APP}-volsync-b2-secret"
+  trigger:
+    # Backups run at ${VOLSYNC_B2_MINUTE} past midnight; maintain a few hours later
+    # so the two do not contend for the repository lock.
+    schedule: "${VOLSYNC_B2_MINUTE:=0} 4 * * *"
+  cacheCapacity: ${VOLSYNC_CACHE_CAPACITY:=8Gi}
+  cacheStorageClassName: ${VOLSYNC_CACHE_SNAPSHOTCLASS:=openebs-hostpath}
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  podSecurityContext:
+    runAsUser: ${VOLSYNC_UID:=568}
+    runAsGroup: ${VOLSYNC_GID:=568}
+    fsGroup: ${VOLSYNC_GID:=568}
+    runAsNonRoot: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 256Mi
+    limits:
+      memory: 2Gi
