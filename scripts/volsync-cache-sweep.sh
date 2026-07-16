@@ -52,6 +52,15 @@ while read -r ns name; do
         continue
     fi
 
+    # Never delete on a missing or malformed target size. An empty $want means the
+    # API call failed or the source is not on kopia -- either way it would compare
+    # unequal to $have and delete a cache we have no instruction to touch.
+    if ! [[ "$want" =~ ^[0-9]+(Mi|Gi|Ti)$ ]]; then
+        echo -e "  ${YELLOW}!${NC} $ns/$name: could not read a valid cacheCapacity (got '${want}') — skipping"
+        skipped=$((skipped + 1))
+        continue
+    fi
+
     if [[ "$want" == "$have" ]]; then
         skipped=$((skipped + 1))
         continue
