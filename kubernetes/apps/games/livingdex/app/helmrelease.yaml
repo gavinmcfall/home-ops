@@ -54,7 +54,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 5593fb91bf5b3f73bbb73a864f710ecb2bd4dfee
+              tag: 07616417a64f756b0a4cb2a82fce025e2beef80e
             env:
               PORT: "8080"
               SPRITE_DIR: /sprites # enables the offline sprite mirror
@@ -116,7 +116,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-web
-              tag: 5593fb91bf5b3f73bbb73a864f710ecb2bd4dfee
+              tag: 07616417a64f756b0a4cb2a82fce025e2beef80e
             env:
               API_UPSTREAM: livingdex-api.games.svc.cluster.local:8080
             probes:
@@ -159,7 +159,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 5593fb91bf5b3f73bbb73a864f710ecb2bd4dfee
+              tag: 07616417a64f756b0a4cb2a82fce025e2beef80e
             command: ["node", "dist/seed/run.js"]
             env:
               SEED_TIER: full
@@ -189,7 +189,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 5593fb91bf5b3f73bbb73a864f710ecb2bd4dfee
+              tag: 07616417a64f756b0a4cb2a82fce025e2beef80e
             command: ["node", "dist/mirror/run.js"]
             env:
               MIRROR_SCHEMA: pokeapi
