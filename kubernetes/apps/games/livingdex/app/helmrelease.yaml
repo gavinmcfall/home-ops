@@ -163,10 +163,6 @@ spec:
             command: ["node", "dist/seed/run.js"]
             env:
               SEED_TIER: full
-              # One-shot: prune the 15 fixed-gender phantom slots already seeded
-              # (cap Pikachu ♀, cosplay ♂, Ash-Greninja ♀). Safe to revert to off
-              # after the next successful seed run.
-              SEED_PRUNE: "1"
               SEED_CACHE_DIR: /cache
               SEED_CONCURRENCY: "8"
             envFrom: *envFrom
