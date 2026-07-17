@@ -54,7 +54,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 9928173c6c5ced9486255cfaaba2c763ad3a4481
+              tag: e1f4b8d58b5e1590a0541f7ec83a98451601ea90
             env:
               PORT: "8080"
               SPRITE_DIR: /sprites # enables the offline sprite mirror
@@ -116,7 +116,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-web
-              tag: 9928173c6c5ced9486255cfaaba2c763ad3a4481
+              tag: e1f4b8d58b5e1590a0541f7ec83a98451601ea90
             env:
               API_UPSTREAM: livingdex-api.games.svc.cluster.local:8080
             probes:
@@ -159,10 +159,14 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 9928173c6c5ced9486255cfaaba2c763ad3a4481
+              tag: e1f4b8d58b5e1590a0541f7ec83a98451601ea90
             command: ["node", "dist/seed/run.js"]
             env:
               SEED_TIER: full
+              # One-shot: prune the 15 fixed-gender phantom slots already seeded
+              # (cap Pikachu ♀, cosplay ♂, Ash-Greninja ♀). Safe to revert to off
+              # after the next successful seed run.
+              SEED_PRUNE: "1"
               SEED_CACHE_DIR: /cache
               SEED_CONCURRENCY: "8"
             envFrom: *envFrom
@@ -189,7 +193,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/livingdex-api
-              tag: 9928173c6c5ced9486255cfaaba2c763ad3a4481
+              tag: e1f4b8d58b5e1590a0541f7ec83a98451601ea90
             command: ["node", "dist/mirror/run.js"]
             env:
               MIRROR_SCHEMA: pokeapi
