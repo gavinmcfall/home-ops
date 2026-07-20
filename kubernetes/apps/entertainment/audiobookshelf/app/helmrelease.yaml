@@ -68,9 +68,9 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                memory: 128Mi
+                memory: 256Mi
               limits:
-                memory: 384Mi
+                memory: 1Gi
           abs-tract:
             image:
               repository: arranhs/abs-tract
