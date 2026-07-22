@@ -27,7 +27,7 @@ spec:
             seccompProfile: {type: RuntimeDefault}
           containers:
             - name: kubectl
-              image: registry.k8s.io/kubectl:v1.33.1
+              image: registry.k8s.io/kubectl:v1.36.3
               # Exec into the running dev pod and re-capture managed dotfiles.
               # `runuser -l gavin` gives a login env (PATH, op token); chezmoi's
               # autoCommit+autoPush then push any drift. Templates (.secrets) are
