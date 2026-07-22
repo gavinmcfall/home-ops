@@ -33,7 +33,7 @@ spec:
             seccompProfile: {type: RuntimeDefault}
           containers:
             - name: kubectl
-              image: registry.k8s.io/kubectl:v1.33.1
+              image: registry.k8s.io/kubectl:v1.36.3
               args:
                 - exec
                 - deployment/development-container
@@ -80,7 +80,7 @@ spec:
             seccompProfile: {type: RuntimeDefault}
           containers:
             - name: kubectl
-              image: registry.k8s.io/kubectl:v1.33.1
+              image: registry.k8s.io/kubectl:v1.36.3
               args:
                 - exec
                 - deployment/development-container
@@ -126,7 +126,7 @@ spec:
             seccompProfile: {type: RuntimeDefault}
           containers:
             - name: kubectl
-              image: registry.k8s.io/kubectl:v1.33.1
+              image: registry.k8s.io/kubectl:v1.36.3
               args:
                 - exec
                 - deployment/development-container
@@ -174,7 +174,7 @@ spec:
             seccompProfile: {type: RuntimeDefault}
           containers:
             - name: kubectl
-              image: registry.k8s.io/kubectl:v1.33.1
+              image: registry.k8s.io/kubectl:v1.36.3
               args:
                 - exec
                 - deployment/development-container
