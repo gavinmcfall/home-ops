@@ -101,7 +101,7 @@ spec:
           website:
             image:
               repository: docker.io/glax/tranga-website
-              tag: latest@sha256:68c1f4ca19b90bda9ad533036d71c94c1f31567e34b93eae5a87bc3c3fc13616
+              tag: latest@sha256:e67f26a5c10d54fa8233cca57a90917ec0c78e4dfccde8d88486322b1b2c0ca8
             env:
               TZ: ${TIMEZONE}
               # nginx envsubst fills the proxy_pass target from this.
