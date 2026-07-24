@@ -34,7 +34,7 @@ spec:
           app:
             image:
               repository: ghcr.io/slskd/slskd
-              tag: 0.24.4@sha256:4031fc99b824ed2eec3bdbd92914fe6071539f3f71f0742052276afc2c69353d
+              tag: 0.26.0@sha256:ecd4026d4f8fb504e2cc55323efa2c1f5b56d20d3686b018249cc36b48ea17a6
             env:
               TZ: ${TIMEZONE}
               # slskd is a .NET single-file app; with a read-only rootfs it must extract its
