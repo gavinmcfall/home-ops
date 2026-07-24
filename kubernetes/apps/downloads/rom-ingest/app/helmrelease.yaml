@@ -82,7 +82,7 @@ spec:
               # extraction + hashing) silently no-op on musl, so the gate would
               # quarantine everything. Verified against real ROMs on bookworm.
               repository: docker.io/library/node
-              tag: 22-bookworm-slim@sha256:813a7480f28fdadac1f7f5c824bcdad435b5bc1322a5968bbbdef8d058f9dff4
+              tag: 24-bookworm-slim@sha256:6f7b03f7c2c8e2e784dcf9295400527b9b1270fd37b7e9a7285cf83b6951452d
             command: ["/bin/sh", "/scripts/ingest.sh"]
             env:
               TZ: *timeZone
