@@ -25,6 +25,7 @@ spec:
   values:
     planeVersion: v1.0.0
     ingress:
+      enabled: false
       appHost: plane.${SECRET_DOMAIN}
 
     redis:
