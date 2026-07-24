@@ -41,7 +41,7 @@ spec:
           app:
             image:
               repository: kometateam/kometa
-              tag: v2.3.1@sha256:683c04827ef3fecf1cc5cb178f75f91f968aef6c6d89d34bc9c70966fd1d7259
+              tag: v2.4.5@sha256:a376a1818196cde159b5a4d5a6ad55411415f7b5bc38d8a27e8c718bae7f0ddd
             command:
               - /bin/sh
               - -c
