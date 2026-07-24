@@ -60,7 +60,7 @@ spec:
           app:
             image:
               repository: docker.io/glax/tranga-api
-              tag: latest@sha256:dd7d8fc08ee3455c5e02feea35d70ce1bf2b58b671d72e1cbd861933d91219c7
+              tag: latest@sha256:ec3e8b3ed9da770d40aa07f8f32ada614c2e42498d9cc5e03780c6d42423311c
             env:
               TZ: ${TIMEZONE}
               # Tranga options (all read via Environment.GetEnvironmentVariable
