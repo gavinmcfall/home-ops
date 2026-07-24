@@ -38,7 +38,7 @@ spec:
           git:
             image:
               repository: docker.io/alpine/git
-              tag: latest@sha256:e043be20669db13cbcfb6190192babee4cf2dca98709bb0c2d08ca2d35a0a06a
+              tag: latest@sha256:77418e6e7c7f434c4a98eaff04ef16840cf03649c881c03948e3e213923e3136
             command: ["/bin/sh", "/scripts/dat-refresh.sh"]
             env:
               TZ: *timeZone
