@@ -15,3 +15,7 @@ configMapGenerator:
       - subcleaner.sh=./resources/subcleaner.sh
 generatorOptions:
   disableNameSuffixHash: true
+  annotations:
+    # Shell/config-syntax ${VARS} inside these files are NOT Flux postBuild
+    # variables — exempt the generated ConfigMap from strict substitution.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
