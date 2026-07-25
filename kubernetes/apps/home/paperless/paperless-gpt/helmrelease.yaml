@@ -40,6 +40,10 @@ spec:
               tag: v0.25.1@sha256:c0ce6186028911101a2cfe68353f14a9dbb2653596f3f1cff94de4b6db3114ff
             env:
               #App
+              # v0.26.0 went rootless (default 10001:10001) and chowns mounted
+              # volumes on first boot — pin to the cluster-standard IDs instead.
+              PUID: "568"
+              PGID: "568"
               PAPERLESS_BASE_URL: "http://paperless.home.svc.cluster.local:8000" #needs quoting or YAML munges the port
               PAPERLESS_PUBLIC_URL: https://paperless.${SECRET_DOMAIN}
               LOG_LEVEL: "debug"
