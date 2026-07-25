@@ -52,6 +52,13 @@ spec:
               - --disable-authz=health
             env:
               AWS_ALLOW_HTTP: "true"
+              # Without this the server requests a TRIAL license, which
+              # expired 2026-07 (license server 402s, pod crashloops).
+              # `home` = free at-home tier: no expiry, 2-CPU limit,
+              # activates via verification email to the wired
+              # INFLUXDB3_ENTERPRISE_LICENSE_EMAIL, then persists the
+              # license into object storage.
+              INFLUXDB3_ENTERPRISE_LICENSE_TYPE: home
             envFrom:
               # OBC-generated creds: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
               - secretRef:
