@@ -50,6 +50,9 @@ spec:
                 drop:
                   - ALL
     defaultPodOptions:
+      # app-template v5 defaults automountServiceAccountToken to false;
+      # kait watches the cluster via its ServiceAccount and needs the token.
+      automountServiceAccountToken: true
       securityContext:
         runAsUser: 65534
         runAsGroup: 65534
