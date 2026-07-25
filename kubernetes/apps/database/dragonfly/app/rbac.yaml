@@ -28,6 +28,11 @@ rules:
   - apiGroups: ["networking.k8s.io"]
     resources: ["networkpolicies"]
     verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  # Operator v1.6+ runs a cluster-scoped ConfigMap informer; without this
+  # the manager's cache never syncs and it crashloops on startup.
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
   - apiGroups: ["policy"]
     resources: ["poddisruptionbudgets"]
     verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
