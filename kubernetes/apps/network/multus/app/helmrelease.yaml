@@ -6,6 +6,11 @@ metadata:
   name: multus
 spec:
   interval: 30m
+  # The DS rolls serially (maxUnavailable 1) and the republished 7.0.0 chart
+  # changes the ServiceAccount name, so a full roll doesn't fit helm's 5m
+  # default — timeouts mid-roll left pods and the ClusterRoleBinding on
+  # different SAs (RBAC desync flap, 2026-07-25).
+  timeout: 15m
   chart:
     spec:
       chart: multus
