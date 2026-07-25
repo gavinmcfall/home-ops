@@ -14,6 +14,11 @@ cluster:
   controllerManager:
     extraArgs:
       bind-address: 0.0.0.0
+      # Default is 12500 — a homelab never reaches it, so Deployment pods
+      # left in Succeeded by node power events linger forever and wedge
+      # later helm upgrades (2026-05-25 event left 72 such pods; see
+      # concept StaleSucceededPodsWedgeHelmUpgrades). Sweep them promptly.
+      terminated-pod-gc-threshold: "50"
     resources:
       requests:
         cpu: 100m
