@@ -114,13 +114,12 @@ spec:
               # ML cache folder paths
               MACHINE_LEARNING_CACHE_FOLDER: "/cache"
               TRANSFORMERS_CACHE: "/cache"
-              # Preload models on startup for faster first requests.
-              # v3 split the preload vars into per-task variants — the old
-              # unsplit names fail pydantic parsing and crash the pod.
-              # Also aligned CLIP preload with the model search actually
-              # uses (was warming ViT-B-32__openai for nothing).
-              MACHINE_LEARNING_PRELOAD__CLIP__TEXTUAL: "ViT-SO400M-16-SigLIP2-384__webli"
-              MACHINE_LEARNING_PRELOAD__CLIP__VISUAL: "ViT-SO400M-16-SigLIP2-384__webli"
+              # Preload face models on startup (v3 split the preload vars
+              # into per-task variants; the old unsplit names crash on
+              # pydantic parsing). No CLIP preload: the configured SigLIP2
+              # SO400M model OOMs the 3Gi limit if both variants are warmed
+              # (v2 "preloaded" an unused ViT-B-32, so CLIP has always
+              # effectively loaded on demand here).
               MACHINE_LEARNING_PRELOAD__FACIAL_RECOGNITION__DETECTION: "buffalo_l"
               MACHINE_LEARNING_PRELOAD__FACIAL_RECOGNITION__RECOGNITION: "buffalo_l"
               IMMICH_MEDIA_LOCATION: *mediaLocation
