@@ -28,6 +28,11 @@ spec:
       strategy: rollback
       retries: 3
   values:
+    # Chart 7.0.0 was republished on app-template/common v5, which defaults
+    # automountServiceAccountToken to false — the thick daemon then has no
+    # API token and exits instantly with no log output (2026-07-25 flap).
+    defaultPodOptions:
+      automountServiceAccountToken: true
     controllers:
       # The chart ships `test` + `uninstall` hook controllers. They
       # break `flux-local test` because with 2 ServiceAccounts in the
