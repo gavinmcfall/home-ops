@@ -15,6 +15,9 @@
         // # renovate: datasource=docker depName=ghcr.io/foo/bar
         // FOOBAR_VERSION=v1.0.0
         "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n.+(:\\s|=)(&\\S+\\s)?(?<currentValue>\\S+)",
+        // # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
+        // - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/experimental-install.yaml
+        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n\\s*- https://github\\.com/[^/]+/[^/]+/releases/download/(?<currentValue>[^/]+)/",
       ],
       datasourceTemplate: "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
     },
