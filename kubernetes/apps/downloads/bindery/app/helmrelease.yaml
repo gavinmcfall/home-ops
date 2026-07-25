@@ -35,7 +35,7 @@ spec:
             # imports to a TEST dir so the real ABS folders are untouched.
             image:
               repository: ghcr.io/vavallee/bindery
-              tag: v1.27.0@sha256:dc876fe82278654024f77a4f55cb292ee566146ad1df7bb452072ed8c723684c
+              tag: v1.28.0@sha256:a49caee1437c19d23cfb05e5481371adc35cc998035da1292c7ddfd8f69554bb
             env:
               TZ: ${TIMEZONE}
               BINDERY_PORT: &port "8787"
