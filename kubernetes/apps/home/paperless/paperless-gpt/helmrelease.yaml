@@ -89,6 +89,8 @@ spec:
         type: secret
         name: paperless-gpt-secret
         globalMounts:
-          - path: /app/gdocai-credentials.json
+          # Outside /app: the v0.26+ rootless entrypoint chowns /app recursively
+          # and exits fatally on this read-only secret mount if placed there.
+          - path: /secrets/gdocai-credentials.json
             subPath: gdocai-credentials.json
             readOnly: true
