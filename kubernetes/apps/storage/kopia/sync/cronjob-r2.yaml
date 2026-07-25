@@ -3,6 +3,10 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
+  annotations:
+    # ${VARS} in this job's shell script are runtime env vars, not Flux
+    # postBuild variables - exempt from strict substitution.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
   name: kopia-sync-r2
 spec:
   schedule: "0 3 * * *"

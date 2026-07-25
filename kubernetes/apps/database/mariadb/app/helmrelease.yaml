@@ -4,6 +4,10 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app mariadb
+  annotations:
+    # ${*_MARIADB_PASSWORD} tokens in the initdb script are runtime shell
+    # vars, not Flux postBuild variables - exempt from strict substitution.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
 spec:
   interval: 30m
   chartRef:

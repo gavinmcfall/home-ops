@@ -143,15 +143,3 @@ spec:
             target:
               kind: Deployment
               name: kustomize-controller
-          - # kustomize-controller 1.9 (Flux 2.9) enables StrictPostBuildSubstitutions
-            # by default, which fails builds on ${VARS} that are shell syntax inside
-            # scripts/configmaps (bazarr subcleaner, kopia cronjobs, mariadb initdb,
-            # NUT upsd.users) rather than Flux substitution vars. Keep legacy
-            # leave-unset-vars-as-is behavior.
-            patch: |-
-              - op: add
-                path: /spec/template/spec/containers/0/args/-
-                value: --feature-gates=StrictPostBuildSubstitutions=false
-            target:
-              kind: Deployment
-              name: kustomize-controller
