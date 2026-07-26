@@ -29,10 +29,11 @@ spec:
           reloader.stakater.com/auto: "true"
         containers:
           app:
-            # SPIKE: evaluating Bindery (clean Readarr replacement) alongside the
-            # parked bookshelf. Single Go binary + embedded SQLite, no external DB.
-            # Reads the existing Calibre library (configured in the web UI) and
-            # imports to a TEST dir so the real ABS folders are untouched.
+            # Bindery (clean Readarr replacement) alongside the parked bookshelf.
+            # Single Go binary + embedded SQLite, no external DB. Library/audiobook
+            # dirs point at the real colocated genre-tree library so ABS-import can
+            # mark on-disk books as owned; imports are metadata-first and never move
+            # existing files (reorganize is an explicit, opt-in action only).
             image:
               repository: ghcr.io/vavallee/bindery
               tag: v1.28.0@sha256:a49caee1437c19d23cfb05e5481371adc35cc998035da1292c7ddfd8f69554bb
@@ -41,9 +42,11 @@ spec:
               BINDERY_PORT: &port "8787"
               BINDERY_DATA_DIR: /config
               BINDERY_DB_PATH: /config/bindery.db
-              # import targets point at a throwaway test tree (not the real library)
-              BINDERY_LIBRARY_DIR: /media/Library/Books/.calibre/_bindery-test/library
-              BINDERY_AUDIOBOOK_DIR: /media/Library/Books/.calibre/_bindery-test/audiobooks
+              # library + audiobook dirs = the real colocated genre-tree library so
+              # ABS-import marks owned books; download dir stays the spike sandbox
+              # until the grab workflow (new ebooks route through CWA) is designed.
+              BINDERY_LIBRARY_DIR: /media/Library/Books/Books
+              BINDERY_AUDIOBOOK_DIR: /media/Library/Books/Books
               BINDERY_DOWNLOAD_DIR: /media/Library/Books/.calibre/_bindery-test/downloads
               BINDERY_TELEMETRY_DISABLED: "true"
             probes:
