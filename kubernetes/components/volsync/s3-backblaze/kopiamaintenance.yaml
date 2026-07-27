@@ -25,7 +25,10 @@ spec:
     schedule: "${VOLSYNC_B2_MINUTE:=0} 4 * * *"
   cacheCapacity: ${VOLSYNC_CACHE_CAPACITY:=8Gi}
   cacheStorageClassName: ${VOLSYNC_CACHE_SNAPSHOTCLASS:=openebs-hostpath}
-  successfulJobsHistoryLimit: 1
+  # 0 = successful maintenance jobs (and their Completed pods) self-delete;
+  # ~51 of these across the cluster otherwise leave a daily pod graveyard.
+  # Failures stay visible below for debugging.
+  successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 2
   podSecurityContext:
     runAsUser: ${VOLSYNC_UID:=568}
