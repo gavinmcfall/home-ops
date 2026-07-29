@@ -27,7 +27,7 @@ jobs:
 
       - name: Setup Homebrew
         id: setup-homebrew
-        uses: Homebrew/actions/setup-homebrew@d76747245729d7b0abd2fe716992b61c7681cd85 # master
+        uses: Homebrew/actions/setup-homebrew@9651e3cfa42dae9ae90ca79eaa6d36dcd8569168 # master
 
       - name: Setup Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
