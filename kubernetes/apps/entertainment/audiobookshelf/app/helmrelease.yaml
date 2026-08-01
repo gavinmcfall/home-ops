@@ -110,6 +110,27 @@ spec:
             namespace: network
             sectionName: https
         rules:
+          # ABS >=2.31 serves the web client under /audiobookshelf and its OIDC
+          # callback validation rejects callbacks outside that base path, so a
+          # login page loaded at the bare /login path 400s on the SSO button.
+          # Send browsers to the canonical prefixed login page. GET-only so the
+          # mobile app's POST /login (local auth API) is untouched.
+          - matches:
+              - path:
+                  type: Exact
+                  value: /login
+                method: GET
+              - path:
+                  type: Exact
+                  value: /login/
+                method: GET
+            filters:
+              - type: RequestRedirect
+                requestRedirect:
+                  path:
+                    type: ReplaceFullPath
+                    replaceFullPath: /audiobookshelf/login/
+                  statusCode: 302
           - backendRefs:
               - identifier: app
                 port: *port
