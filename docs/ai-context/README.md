@@ -48,6 +48,7 @@ This directory contains the single source of truth for AI assistant context acro
 | [TOOLS.md](TOOLS.md) | MCP servers, CLI commands, discovery patterns |
 | [CONVENTIONS.md](CONVENTIONS.md) | Coding standards, commit guidelines, project structure |
 | [PERSONAS.md](PERSONAS.md) | User access personas for internal and external application access |
+| [nerdz-reading-stack.md](nerdz-reading-stack.md) | Family reading/audiobook stack: Bindery + qBittorrent + CWA/Calibre + Audiobookshelf, genre-tree contract, metadata layers, seed-safety rules |
 
 ---
 
