@@ -107,7 +107,7 @@ spec:
                 cpu: 50m
                 memory: 256Mi
               limits:
-                memory: 1Gi
+                memory: 3Gi
           # Headless Calibre Content Server (the API Readarr integrates with).
           # Same image (calibre-server is at /app/calibre/calibre-server), same
           # library volume. Runs as 568 (the NFS file owner) so writes stay
