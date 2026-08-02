@@ -3,11 +3,26 @@
 set -euo pipefail
 
 # Codec tagger for Sonarr and Radarr instances
-# Tags series/movies based on the video codecs found in their files
+# Tags series/movies based on the video codecs found in their files, and flags
+# Dolby Vision Profile 5 files which browser clients cannot render correctly.
+
+# Tag applied to anything carrying a Dolby Vision Profile 5 video stream.
+# P5 has no HDR10 base layer, so any client that tone-maps it (Plex Web /
+# Chrome) renders green/purple. Radarr's "DV (w/o HDR fallback)" custom format
+# only fires on WEB-DL/WEBRIP sources and matches on release title, so it misses
+# P5 files that were parsed as Bluray. mediainfo catches them regardless.
+DV_P5_TAG="dv-profile5"
 
 # Helper function to decode base64 and process JSON using jq
 _jq() {
     echo "$1" | base64 --decode | jq --raw-output "$2"
+}
+
+# True when a mediainfo videoDynamicRangeType value indicates Profile 5.
+# Radarr/Sonarr report bare "DV" only when there is no HDR10 base layer;
+# Profile 7/8 report "DV HDR10" or "DV HDR10Plus".
+is_dv_profile5() {
+    [[ "$1" == "DV" ]]
 }
 
 # Map raw codec to normalized tag
@@ -72,10 +87,20 @@ process_sonarr() {
             continue
         fi
 
+        # Fetch episode files once; codec and dynamic range are both derived from it
+        local episode_files
+        episode_files=$("$${curl_cmd[@]}" "$${url}/api/v3/episodefile?seriesId=$${series_id}")
+
         # Get unique codecs for the series
         local codecs
-        codecs=$("$${curl_cmd[@]}" "$${url}/api/v3/episodefile?seriesId=$${series_id}" | jq --raw-output '
+        codecs=$(echo "$${episode_files}" | jq --raw-output '
             [.[].mediaInfo.videoCodec // "other"] | unique | .[]
+        ')
+
+        # A series is flagged if ANY episode file is Profile 5
+        local has_dv_p5
+        has_dv_p5=$(echo "$${episode_files}" | jq --raw-output '
+            any(.[]; (.mediaInfo.videoDynamicRangeType // "") == "DV")
         ')
 
         # Normalize codecs to tags
@@ -132,6 +157,26 @@ process_sonarr() {
             fi
         done
 
+        # Dolby Vision Profile 5 tag: add when present, drop once it no longer applies
+        local dv_p5_tag_id
+        dv_p5_tag_id=$(echo "$${existing_tags}" | jq --raw-output ".[] | select(.label == \"$${DV_P5_TAG}\") | .id")
+
+        if [[ "$${has_dv_p5}" == "true" ]]; then
+            if [[ -z "$${dv_p5_tag_id}" ]]; then
+                local new_dv_tag
+                new_dv_tag=$("$${curl_cmd[@]}" -X POST -H "Content-Type: application/json" -d "{\"label\": \"$${DV_P5_TAG}\"}" "$${url}/api/v3/tag")
+                dv_p5_tag_id=$(echo "$${new_dv_tag}" | jq --raw-output '.id')
+                existing_tags=$(echo "$${existing_tags}" | jq ". += [{\"id\": $${dv_p5_tag_id}, \"label\": \"$${DV_P5_TAG}\"}]")
+            fi
+            if ! echo "$${series_tags}" | jq --exit-status ". | index($${dv_p5_tag_id})" &> /dev/null; then
+                tags_to_add+=("$dv_p5_tag_id")
+            fi
+        elif [[ -n "$${dv_p5_tag_id}" ]]; then
+            if echo "$${series_tags}" | jq --exit-status ". | index($${dv_p5_tag_id})" &> /dev/null; then
+                tags_to_remove+=("$dv_p5_tag_id")
+            fi
+        fi
+
         # Apply changes if needed
         if [[ $${#tags_to_add[@]} -gt 0 || $${#tags_to_remove[@]} -gt 0 ]]; then
             local updated_series_data="$orig_series_data"
@@ -148,7 +193,11 @@ process_sonarr() {
                 ')
             fi
 
-            echo "[$${series_count}/$${total_series}] Updating $${series_title} (Tags: [$${normalized_tags[*]}])"
+            local dv_note=""
+            if [[ "$${has_dv_p5}" == "true" ]]; then
+                dv_note=" +$${DV_P5_TAG}"
+            fi
+            echo "[$${series_count}/$${total_series}] Updating $${series_title} (Tags: [$${normalized_tags[*]}]$${dv_note})"
             "$${curl_cmd[@]}" --request PUT --header "Content-Type: application/json" --data "$${updated_series_data}" "$${url}/api/v3/series" &> /dev/null
         fi
 
@@ -196,6 +245,10 @@ process_radarr() {
         local normalized_tag
         normalized_tag=$(normalize_codec "$codec")
 
+        # Dolby Vision profile of the movie file
+        local dynamic_range
+        dynamic_range=$(echo "$${movie_file}" | jq --raw-output '.[0].mediaInfo.videoDynamicRangeType // ""')
+
         # Get current movie data
         local orig_movie_data
         orig_movie_data=$("$${curl_cmd[@]}" "$${url}/api/v3/movie/$${movie_id}")
@@ -231,6 +284,27 @@ process_radarr() {
             fi
         done
 
+        # Dolby Vision Profile 5 tag: add when present, drop once it no longer applies
+        # (e.g. the file was upgraded to a Profile 7/8 or HDR10 release)
+        local dv_p5_tag_id
+        dv_p5_tag_id=$(echo "$${existing_tags}" | jq --raw-output ".[] | select(.label == \"$${DV_P5_TAG}\") | .id")
+
+        if is_dv_profile5 "$${dynamic_range}"; then
+            if [[ -z "$${dv_p5_tag_id}" ]]; then
+                local new_dv_tag
+                new_dv_tag=$("$${curl_cmd[@]}" -X POST -H "Content-Type: application/json" -d "{\"label\": \"$${DV_P5_TAG}\"}" "$${url}/api/v3/tag")
+                dv_p5_tag_id=$(echo "$${new_dv_tag}" | jq --raw-output '.id')
+                existing_tags=$(echo "$${existing_tags}" | jq ". += [{\"id\": $${dv_p5_tag_id}, \"label\": \"$${DV_P5_TAG}\"}]")
+            fi
+            if ! echo "$${movie_tags}" | jq --exit-status ". | index($${dv_p5_tag_id})" &> /dev/null; then
+                tags_to_add+=("$dv_p5_tag_id")
+            fi
+        elif [[ -n "$${dv_p5_tag_id}" ]]; then
+            if echo "$${movie_tags}" | jq --exit-status ". | index($${dv_p5_tag_id})" &> /dev/null; then
+                tags_to_remove+=("$dv_p5_tag_id")
+            fi
+        fi
+
         # Apply changes if needed
         if [[ $${#tags_to_add[@]} -gt 0 || $${#tags_to_remove[@]} -gt 0 ]]; then
             local updated_movie_data="$orig_movie_data"
@@ -247,7 +321,11 @@ process_radarr() {
                 ')
             fi
 
-            echo "[$${movie_count}/$${total_movies}] Updating $${movie_title} (Tag: $${normalized_tag})"
+            local dv_note=""
+            if is_dv_profile5 "$${dynamic_range}"; then
+                dv_note=" +$${DV_P5_TAG}"
+            fi
+            echo "[$${movie_count}/$${total_movies}] Updating $${movie_title} (Tag: $${normalized_tag}$${dv_note})"
             "$${curl_cmd[@]}" --request PUT --header "Content-Type: application/json" --data "$${updated_movie_data}" "$${url}/api/v3/movie/$${movie_id}" &> /dev/null
         fi
 
