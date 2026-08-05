@@ -35,7 +35,7 @@ spec:
           app:
             image:
               repository: docker.io/library/influxdb
-              tag: 3-enterprise@sha256:9386421d69b7c315116217242c34f54898b1638c6b524f59137ab4e3a8770c34
+              tag: 3-enterprise@sha256:89b43bbba5973ff22723c72f42195d8523cbd7a00f8509381f01c5832d01c712
             args:
               - serve
               - --node-id=influxdb3-node0
