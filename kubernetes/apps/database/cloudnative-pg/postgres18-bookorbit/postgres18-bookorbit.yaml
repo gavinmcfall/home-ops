@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres18-bookorbit
+  namespace: database
+spec:
+  # TRIAL POSTURE: single instance, no pgBackRest. BookOrbit is being evaluated
+  # as the reading hub; its DB holds re-derivable scan metadata plus early user
+  # state. Before promoting to production: bump instances to 3 and wire the
+  # pgbackrest plugin + stanza/pluginconfig/scheduledbackups (mirror
+  # postgres18-immich).
+  instances: 1
+  # BookOrbit requires the uuid-ossp, pg_trgm, and vector (pgvector) extensions.
+  # The vectorchord image ships vector 0.8.1 + contrib (verified against the
+  # running postgres18-immich cluster); same pinned image as postgres18-immich.
+  # renovate: datasource=docker depName=ghcr.io/tensorchord/cloudnative-vectorchord versioning=loose enabled=false
+  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:18.0-0.5.3@sha256:267f6cbb32af6e109e138a143c7e9dd5d44d68433ec2303f0c30e745c788d1a9
+  primaryUpdateStrategy: unsupervised
+
+  storage:
+    size: 10Gi
+    storageClass: openebs-hostpath
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: cloudnative-pg-secret
+
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: 256MB
+
+  resources:
+    requests:
+      cpu: 100m
+    limits:
+      memory: 2Gi
+
+  monitoring:
+    enablePodMonitor: true
+
+  bootstrap:
+    initdb:
+      database: bookorbit
+      owner: bookorbit
+      postInitApplicationSQL:
+        - CREATE EXTENSION IF NOT EXISTS "uuid-ossp" CASCADE
+        - CREATE EXTENSION IF NOT EXISTS pg_trgm CASCADE
+        - CREATE EXTENSION IF NOT EXISTS vector CASCADE

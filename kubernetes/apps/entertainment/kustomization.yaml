@@ -10,6 +10,7 @@ components:
 resources:
   # Applications
   - ./audiobookshelf/ks.yaml
+  - ./bookorbit/ks.yaml
   - ./immich/ks.yaml
   - ./kavita/ks.yaml
   - ./komf/ks.yaml
