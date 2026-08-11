@@ -29,7 +29,7 @@ spec:
           reloader.stakater.com/auto: "true"
         containers:
           app:
-            # Bindery (clean Readarr replacement) alongside the parked bookshelf.
+            # Bindery (clean Readarr replacement; bookshelf + rreading-glasses retired).
             # Single Go binary + embedded SQLite, no external DB. Library/audiobook
             # dirs point at the real colocated genre-tree library so ABS-import can
             # mark on-disk books as owned; imports are metadata-first and never move
