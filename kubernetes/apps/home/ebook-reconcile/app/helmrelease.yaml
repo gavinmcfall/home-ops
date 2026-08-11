@@ -27,6 +27,51 @@ spec:
       namespace: rook-ceph
   values:
     controllers:
+      # Nightly incremental bake: embed Calibre DB metadata into the library
+      # files (calibredb embed_metadata) for books modified in the last 2 days.
+      # Mounts ONLY the Calibre library (advancedMounts) — structurally cannot
+      # touch the genre tree. Pairs with ebook-reconcile: embed replaces the
+      # file inode, reconcile re-links the tree hardlink on its next run.
+      embed-nightly:
+        type: cronjob
+        cronjob:
+          suspend: false
+          schedule: "30 3 * * *"
+          timeZone: ${TIMEZONE}
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 3
+          backoffLimit: 1
+        pod:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
+            seccompProfile: { type: RuntimeDefault }
+        containers:
+          app:
+            image:
+              repository: ghcr.io/crocodilestick/calibre-web-automated
+              tag: v4.0.6@sha256:c31a738b6d5ec6982c050063dd3f063b6943eb1051fc81144789f840d9093a8d
+            command: ["/bin/bash", "/scripts/embed_nightly.sh"]
+            env:
+              TZ: ${TIMEZONE}
+              HOME: /tmp
+              CALIBRE_CONFIG_DIRECTORY: /tmp/calibre
+              CALIBREDB: /app/calibre/calibredb
+              LIB: /calibre-library
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 25m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
       ebook-reconcile:
         type: cronjob
         cronjob:
@@ -81,18 +126,28 @@ spec:
         globalMounts:
           - path: /scripts
       # Single NFS mount so LIB (library) and DEST (Books) share one device → hardlinks work.
+      # advancedMounts: reconcile needs the whole export (library + tree);
+      # embed-nightly gets ONLY the Calibre library subpath — tree unreachable.
       media:
         type: nfs
         server: citadel.internal
         path: /mnt/storage0/media
-        globalMounts:
-          - path: /media
+        advancedMounts:
+          ebook-reconcile:
+            app:
+              - path: /media
+          embed-nightly:
+            app:
+              - path: /calibre-library
+                subPath: Library/Books/.calibre/library
       state:
         accessMode: ReadWriteOnce
         size: 128Mi
         storageClass: ceph-block
-        globalMounts:
-          - path: /state
+        advancedMounts:
+          ebook-reconcile:
+            app:
+              - path: /state
       tmp:
         type: emptyDir
         globalMounts:
