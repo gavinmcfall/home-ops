@@ -49,7 +49,9 @@ spec:
               TZ: ${TIMEZONE}
               NODE_ENV: production
               PORT: &port 3000
-              APP_URL: https://bookorbit.${SECRET_DOMAIN}
+              # Family-facing hostname (deliberately not the app name); APP_URL
+              # drives OIDC callback, Kobo endpoints, and email links.
+              APP_URL: https://read.${SECRET_DOMAIN}
               # Run as the cluster-standard app UID; ownership is managed by the
               # NFS exports and fsGroup, not by the container entrypoint.
               PUID: "568"
@@ -108,7 +110,7 @@ spec:
         annotations:
           internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - read.${SECRET_DOMAIN}
         parentRefs:
           - name: internal
             namespace: network
