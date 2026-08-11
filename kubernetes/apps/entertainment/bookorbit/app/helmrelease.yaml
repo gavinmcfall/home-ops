@@ -1,0 +1,139 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app bookorbit
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controllers:
+      bookorbit:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 18.4.0@sha256:ebd9d30add17acdf935d73eb004758c7dfd9388aaa605fda70ad74378ab92aec
+            envFrom:
+              - secretRef:
+                  name: bookorbit-secret
+        containers:
+          app:
+            # BookOrbit TRIAL as the family reading hub: library + web readers,
+            # OPDS server, KOSync endpoints, KOReader/Kobo sync, annotations hub,
+            # Hardcover/StoryGraph sync. The library is mounted READ-ONLY while
+            # the CWA-vs-BookOrbit metadata-in-file question is decided — its
+            # scanner works, but nothing can bake metadata into the files yet.
+            image:
+              repository: ghcr.io/bookorbit/bookorbit
+              tag: 2.5.0@sha256:e131834be597819000e44d580cbe16c168895a6334315ba4101963c028c29b0e
+            env:
+              TZ: ${TIMEZONE}
+              NODE_ENV: production
+              PORT: &port 3000
+              APP_URL: https://bookorbit.${SECRET_DOMAIN}
+              # Run as the cluster-standard app UID; ownership is managed by the
+              # NFS exports and fsGroup, not by the container entrypoint.
+              PUID: "568"
+              PGID: "568"
+              BOOKORBIT_FIX_PERMISSIONS: "false"
+              # Scope the in-app library folder picker to the mounted library
+              LIBRARY_BROWSE_ROOT: /books
+              # pocket-id's issuer resolves to the internal gateway LB (private
+              # IP) from inside the cluster; without this the OIDC discovery
+              # SSRF guard refuses it.
+              OIDC_ALLOW_LOCAL_ISSUERS: "true"
+              NODE_MAX_OLD_SPACE_SIZE: "3072"
+            envFrom:
+              - secretRef:
+                  name: bookorbit-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v1/health
+                    port: *port
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 4Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups: [10000]
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: bookorbit
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /data
+      # Same single NFS export as audiobookshelf/CWA, sub-pathed to the family
+      # genre-tree library. READ-ONLY for the trial: BookOrbit's file-write
+      # pipeline (metadata baking, renames) stays inert until the
+      # CWA-vs-BookOrbit metadata-management decision is made.
+      books:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /books
+            subPath: Library/Books
+            readOnly: true
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
