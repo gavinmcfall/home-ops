@@ -7,7 +7,7 @@ categories: ["Gestalt[90%]", "Reference[10%]"]
 
 # Nerdz Reading Stack
 
-The family ebook + audiobook platform: four services around one NFS folder tree. **Bindery** acquires, **qBittorrent** downloads and seeds forever, **CWA/Calibre** is the metadata workbench, **Audiobookshelf (ABS)** serves readers/listeners (13+ per-genre libraries, multi-user incl. children with restricted library access). The disk tree — not any app database — is the integration contract: every service reads or writes `Books/{Genre}/{Author}/{Series}/{NN - Title}/` and they compose only because they all respect that shape.
+The family ebook + audiobook platform: five services around one NFS folder tree. **Bindery** acquires, **qBittorrent** downloads and seeds forever, **CWA/Calibre** is the metadata workbench, **Audiobookshelf (ABS)** serves readers/listeners (13+ per-genre libraries, multi-user incl. children with restricted library access), and **BookOrbit** (trial) is the reading hub — web reader, KOSync/KOReader/Kobo sync, per-user annotations hub, Hardcover/StoryGraph sync. The disk tree — not any app database — is the integration contract: every service reads or writes `Books/{Genre}/{Author}/{Series}/{NN - Title}/` and they compose only because they all respect that shape.
 
 **Working docs, scripts, decision history**: `G:\code\Projects\nerdz-reading` (see `docs/download-workflow-design.md`, `docs/abs-bindery-room-migration.md`). This file is the cluster-side gestalt; that repo holds the depth.
 
@@ -21,6 +21,8 @@ The family ebook + audiobook platform: four services around one NFS folder tree.
 | tqm | Torrent cleanup CronJob — flat 30-day-minimum seed rule for ALL trackers | downloads | [tqm](../../kubernetes/apps/downloads/tqm/) |
 | CWA (calibre-web-automated) | Calibre library of record + ingest watcher + metadata-baking tool. Sees ONLY `.calibre/ingest` + `.calibre/library`, never the genre tree | home | [calibre-web-automated](../../kubernetes/apps/home/calibre-web-automated/) |
 | Audiobookshelf | Reader/listener serving layer; one library per genre folder; kids' accounts restricted to fixed library lists | entertainment | [audiobookshelf](../../kubernetes/apps/entertainment/audiobookshelf/) |
+| BookOrbit (trial) | Reading hub: web reader, OPDS server, KOSync endpoints, KOReader/Kobo native sync, annotations hub, per-user Hardcover/StoryGraph sync. **Genre tree mounted READ-ONLY, no exceptions** (its per-book Write & Rename bypasses library toggles by design — bookorbit#852) | entertainment | [bookorbit](../../kubernetes/apps/entertainment/bookorbit/) + CNPG `postgres18-bookorbit` |
+| ebook-reconcile (embed-nightly + reconcile) | CronJobs on the CWA image: `embed-nightly` bakes DB metadata into Calibre's files (03:30, last-2-days window, mounts ONLY `.calibre/library`); `reconcile` (suspended pending validation) hardlinks `→abs`-tagged Calibre epubs into the genre tree | home | [ebook-reconcile](../../kubernetes/apps/home/ebook-reconcile/) |
 
 ```mermaid
 graph LR
@@ -29,7 +31,9 @@ graph LR
     Q -- "hardlink/copy, NEVER move" --> T["Genre tree Books/{Genre}/..."]
     B -- "ebook copy via cwa.ingest_path" --> C["CWA ingest -> Calibre bakes"]
     T --> A["ABS libraries (one per genre)"]
-    C -. "bake-sync: baked epub over tree copy" .-> T
+    T -- "read-only mount" --> O["BookOrbit (trial): reader + sync + annotations"]
+    E["embed-nightly CronJob"] -- "calibredb embed_metadata" --> C
+    C -. "bake-sync: baked epub over tree copy (manual) / reconcile hardlink (suspended)" .-> T
 
 %% MEANING: acquisition flows left-to-right into the disk tree; ABS only ever reads the tree.
 %% KEY INSIGHT: the seeding copy in /complete and the library copy are separate concerns joined by hardlinks.
@@ -51,6 +55,8 @@ Fixing a cover in ABS edits only the sidecar — opening the epub still shows th
 - Sidecar schema: `{title,subtitle,authors[],narrators[],series["Name #seq"],genres[],tags[],publishedYear,publisher,description,isbn,asin,language,explicit,abridged}`
 - `genres` = the curated 12-genre set (drives folders + ABS dropdown); `tags` = richer scraped arrays (Hardcover)
 - Workflow is FIX-FIRST: correct metadata in calibre-web (Calibre bakes it into the file), then bake-sync the corrected epub over the genre-tree copy + regen sidecar + ABS rescan
+- **CWA's UI enforcement only bakes UI edits** — `calibredb set_metadata` (bulk sessions) bypasses it. The `embed-nightly` CronJob closes that gap: every DB edit reaches the file layer within a day. Full process: `nerdz-reading/docs/metadata-bake-process.md`
+- BookOrbit reads the embedded layer only (cannot parse ABS sidecars) — its display of un-baked books is stale by design; Hardcover metadata provider is the display-side mitigation
 
 ### Capsule: HardlinkEconomy
 

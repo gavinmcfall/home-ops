@@ -8,5 +8,6 @@ configMapGenerator:
   - name: ebook-reconcile-scripts
     files:
       - reconcile.py=./resources/reconcile.py
+      - embed_nightly.sh=./resources/embed_nightly.sh
 generatorOptions:
   disableNameSuffixHash: true
