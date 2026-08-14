@@ -11,7 +11,7 @@ Spec: `docs/superpowers/specs/2026-08-15-domain-docs-skill-design.md`.
 ## Inputs
 
 - `domains.yaml` (this directory) — the ONLY source of domain membership.
-- `kubernetes/apps/<ns>/<app>/` — the ONLY source of generated facts.
+- `kubernetes/apps/<ns>/<app>/` (+ `flux/` if needed) — the ONLY source of generated facts.
   Read per app: `ks.yaml` (Flux Kustomization: dependsOn, components),
   `app/helmrelease.yaml` (chart, image, env, route, persistence),
   `app/*.yaml` (externalsecret, pvc, httproute if split out).
@@ -28,7 +28,7 @@ that resolves to no domain → drift report. Never guess membership.
 
 - `<!-- generated:start section=NAME -->` … `<!-- generated:end -->`:
   owned by this skill. Fully overwritten every update. Never hand-edit.
-- `<!-- curated -->` blocks and anything outside markers: NEVER modified
+- `<!-- curated -->` … `<!-- /curated -->` blocks and anything outside markers: NEVER modified
   by update. Audit may flag stale references; only a human deletes.
 - `decisions.md`: append-only. Never regenerate, reorder, or rewrite
   existing entries.
