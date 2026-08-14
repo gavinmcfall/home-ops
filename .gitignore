@@ -35,6 +35,7 @@ wiki
 # Claude Code
 .claude/*
 !.claude/CLAUDE.md
+!.claude/skills/
 # MemPalace MCP artifacts
 entities.json
 mempalace.yaml
