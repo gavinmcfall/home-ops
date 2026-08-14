@@ -161,19 +161,7 @@ spec:
           http:
             port: *port
     route:
-      # Dual-homed: LAN clients (Boox KOReader sync, family devices) stay on the
-      # internal gateway; the external route serves off-LAN readers — same
-      # internet-facing posture audiobookshelf has held on books.${SECRET_DOMAIN}.
       app:
-        annotations:
-          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
-        hostnames:
-          - read.${SECRET_DOMAIN}
-        parentRefs:
-          - name: internal
-            namespace: network
-            sectionName: https
-      external:
         annotations:
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         hostnames:
