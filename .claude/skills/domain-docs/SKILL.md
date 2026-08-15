@@ -24,6 +24,19 @@ An app may appear in multiple domains; each mention links to the owning
 domain's context.md for depth. Any app under a registry-claimed namespace
 that resolves to no domain → drift report. Never guess membership.
 
+Membership is one member per leaf directory that contains its own `ks.yaml`
+under a claimed namespace path — a grouping directory (e.g. `exporters/`)
+is not itself a member, it enumerates its leaf children. `include`/`exclude`
+entries are taken literally as written and may carry intermediate path
+segments (e.g. `observability/exporters/blackbox-exporter`). The Apps table's
+Namespace column reports the leaf's `ks.yaml` `spec.targetNamespace` (where
+its resources actually land), which can differ from the claimed namespace the
+directory lives under — membership still follows the owning directory, not
+`targetNamespace`. The Apps table's DependsOn column is sourced from
+`ks.yaml` `spec.dependsOn` only (Kustomization-level, Flux ordering); a
+HelmRelease's own `spec.dependsOn` is a different, unrelated field and is
+never surfaced in that column.
+
 ## One-liner descriptions
 
 The overview.md Components "What it does" column must be deterministic —

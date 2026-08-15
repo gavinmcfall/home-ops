@@ -111,6 +111,7 @@ flowchart LR
 
 - auth: [bookorbit](../../../kubernetes/apps/entertainment/bookorbit) enables OIDC login against pocket-id (`OIDC_ALLOW_LOCAL_ISSUERS` lets pocket-id's internal-gateway issuer through the SSRF guard) per its HelmRelease env.
 - auth: [shelfmark](../../../kubernetes/apps/downloads/shelfmark) authenticates via pocket-id OIDC (`OIDC_DISCOVERY_URL` points at `id.${SECRET_DOMAIN}`) per its HelmRelease env.
+- downloads: [suwayomi](../../../kubernetes/apps/downloads/suwayomi) and [tranga](../../../kubernetes/apps/downloads/tranga) use [flaresolverr](../../../kubernetes/apps/downloads/flaresolverr) to solve Cloudflare/DDoS-Guard challenges (`server.flareSolverrUrl`/`FLARESOLVERR_URL` pointing at `flaresolverr.downloads.svc.cluster.local:8191`), per their HelmRelease.
 <!-- generated:end -->
 
 <!-- curated -->

@@ -98,7 +98,7 @@ flowchart LR
 
     %% MEANING: Core observability platform -- promtail ships logs to loki; kube-prometheus-stack (Prometheus+Alertmanager) is the metrics hub, scraping gatus/unpoller and queried by kromgo; grafana reads both loki and kube-prometheus-stack; Alertmanager fires webhooks to kait (Ceph Thunderbolt-network auto-failover) and ntfy-alertmanager (which also reads Alertmanager's API to silence, then forwards to ntfy)
     %% COLOR: Blue = logs, Green = metrics, Yellow = dashboard, Red = alerting/notification
-    %% GOTCHA: discord-message-scheduler, keda, notifiarr, otel-collector, prometheus-operator-crds, and redisinsight have no manifest-declared edge to any other app in this diagram -- notifiarr and otel-collector integrate with apps in OTHER domains (see Integration Points), keda/prometheus-operator-crds are pure Flux dependencies (see the Apps table's DependsOn column), and discord-message-scheduler/redisinsight are standalone. Hardware and app-specific exporters are split into two further diagrams below to stay under the 12-node limit across 32 apps in this domain.
+    %% GOTCHA: this is 1 of 3 observability dataflow diagrams (Core Platform, Hardware Exporters, App/Service Exporters) -- split because 32 apps in this domain can't fit one 12-node diagram. discord-message-scheduler, keda, notifiarr, otel-collector, prometheus-operator-crds, and redisinsight have no manifest-declared edge to any other app in this diagram -- notifiarr and otel-collector integrate with apps in OTHER domains (see Integration Points), keda/prometheus-operator-crds are pure Flux dependencies (see the Apps table's DependsOn column), and discord-message-scheduler/redisinsight are standalone. Hardware and app-specific exporters are split into two further diagrams below to stay under the 12-node limit across 32 apps in this domain.
     %% NAVIGATION: Left-to-right -- logs and metrics pipelines feed grafana; kube-prometheus-stack's Alertmanager fans out to the alerting group on the right
 ```
 
@@ -150,7 +150,7 @@ flowchart LR
 
     %% MEANING: Hardware/infra exporters feeding kube-prometheus-stack (repeated hub node from the Core Platform diagram) -- most probe hardware directly and get scraped; network-ups-tools' NUT protocol is polled by nut-exporter; truenas-capacity pushes gauges into graphite-exporter (a receiver, not a scraper) on a 5-minute CronJob
     %% COLOR: Blue = direct-probe exporters, Yellow = UPS power chain, Purple = push-based bridge, Green = the shared hub
-    %% GOTCHA: this is 1 of 3 observability dataflow diagrams (Core Platform, Hardware Exporters, App/Service Exporters) -- split because 32 apps in this domain can't fit one 12-node diagram. kube-prometheus-stack is the same node repeated across all three; jetkvm-power runs no in-cluster pod (a headless Service points at 3 JetKVM devices' native /metrics endpoints)
+    %% GOTCHA: this is 2 of 3 observability dataflow diagrams (Core Platform, Hardware Exporters, App/Service Exporters) -- split because 32 apps in this domain can't fit one 12-node diagram. kube-prometheus-stack is the same node repeated across all three; jetkvm-power runs no in-cluster pod (a headless Service points at 3 JetKVM devices' native /metrics endpoints)
     %% NAVIGATION: Left-to-right -- three source groups all ultimately feed kube-prometheus-stack, either by being scraped directly or (network-ups-tools, truenas-capacity) via an intermediate exporter
 ```
 
