@@ -96,6 +96,9 @@ domains:
     seeds:
       - docs/ai-context/NETWORKING.md
       - docs/Guides/Security/Pocket ID + Tailscale SSO/README.md
+    descriptions:
+      oauth2-proxy: Reverse-proxy auth gate that authenticates against pocket-id and forwards identity headers to an upstream; currently dormant pending the lighthouse cutover
+      pocket-id: Self-hosted OIDC identity provider — issues SSO logins consumed across the cluster
   observability:
     title: Observability
     namespaces: [observability]
