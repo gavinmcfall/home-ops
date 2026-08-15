@@ -61,6 +61,9 @@ domains:
       - entertainment/wizarr
     exclude: []
     seeds: [docs/Guides/plex-arr-monitoring-stack.md]
+    descriptions:
+      arr-codec-tagger: Weekly CronJob that tags Sonarr/Radarr libraries with codec metadata via the kait image
+      recyclarr: Daily CronJob that syncs TRaSH Guides quality profiles and custom formats into Sonarr/Radarr
   reading:
     title: Books, Audiobooks, Comics & Manga
     namespaces: []
