@@ -1,0 +1,85 @@
+# Domain membership registry — the only source of truth for docs/domains/.
+# Resolution: namespaces minus exclude plus include. Paths are <ns>/<app>.
+# Apps in a claimed namespace that resolve to no domain appear in `task audit` drift.
+domains:
+  downloads:
+    title: Downloads Infrastructure
+    namespaces: [downloads]
+    exclude:
+      # media-type-specific apps documented in their consuming domain:
+      - downloads/arr-codec-tagger   # media
+      - downloads/bazarr             # media
+      - downloads/bazarr-foreign     # media
+      - downloads/bazarr-uhd         # media
+      - downloads/bindery            # reading
+      - downloads/kapowarr           # reading
+      - downloads/lidarr             # music (no domain yet — intentional drift)
+      - downloads/lncrawl            # reading
+      - downloads/radarr             # media
+      - downloads/radarr-uhd         # media
+      - downloads/recyclarr          # media
+      - downloads/rom-ingest         # games (no domain yet — intentional drift)
+      - downloads/shelfmark          # reading
+      - downloads/sonarr             # media
+      - downloads/sonarr-foreign     # media
+      - downloads/sonarr-uhd         # media
+      - downloads/soularr            # music (no domain yet — intentional drift)
+      - downloads/suwayomi           # reading
+      - downloads/tranga             # reading
+    include: []
+    seeds: []
+  media:
+    title: Movies & TV
+    namespaces: []
+    include:
+      - downloads/arr-codec-tagger
+      - downloads/bazarr
+      - downloads/bazarr-foreign
+      - downloads/bazarr-uhd
+      - downloads/radarr
+      - downloads/radarr-uhd
+      - downloads/recyclarr
+      - downloads/sonarr
+      - downloads/sonarr-foreign
+      - downloads/sonarr-uhd
+      - entertainment/plex
+      - entertainment/seerr
+      - entertainment/tautulli
+      - entertainment/wizarr
+    exclude: []
+    seeds: [docs/Guides/plex-arr-monitoring-stack.md]
+  reading:
+    title: Books, Audiobooks, Comics & Manga
+    namespaces: []
+    include:
+      - downloads/bindery
+      - downloads/kapowarr
+      - downloads/lncrawl
+      - downloads/shelfmark
+      - downloads/suwayomi
+      - downloads/tranga
+      - entertainment/audiobookshelf
+      - entertainment/bookorbit
+      - entertainment/kavita
+      - entertainment/komf
+      - entertainment/mangarr
+      - home/calibre-web-automated
+      - home/ebook-reconcile
+    exclude: []
+    seeds: [docs/ai-context/nerdz-reading-stack.md]
+  auth:
+    title: Authentication & Identity
+    namespaces: [security]
+    include: []
+    exclude: []
+    seeds:
+      - docs/ai-context/NETWORKING.md
+      - docs/Guides/Security/Pocket ID + Tailscale SSO/README.md
+  observability:
+    title: Observability
+    namespaces: [observability]
+    include: []
+    exclude: []
+    seeds:
+      - docs/observability-audit-2026-05.md
+      - docs/infrastructure-roadmap/otel-telemetry-backbone.md
