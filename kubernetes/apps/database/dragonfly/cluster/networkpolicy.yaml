@@ -24,3 +24,26 @@ spec:
       ports:
         - port: 9999
           protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/networking.k8s.io/networkpolicy_v1.json
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dragonfly-allow-redis
+  namespace: database
+spec:
+  # The operator-owned NetworkPolicy only allows port 6379 from pods in the
+  # database namespace (`from: podSelector: {}` is namespace-scoped), which
+  # blocks every cross-namespace Redis consumer (pelican, immich, paperless,
+  # oauth2-proxy, ...). Same additive-policy approach as the metrics fix above.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: dragonfly
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector: {}
+      ports:
+        - port: 6379
+          protocol: TCP
