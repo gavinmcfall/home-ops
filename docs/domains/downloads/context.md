@@ -55,7 +55,6 @@ flowchart LR
         qui["qui"]
     end
 
-    autobrr --> qbittorrent
     cross_seed --> qbittorrent
     dashbrr --> prowlarr
     prowlarr --> cross_seed
@@ -72,10 +71,10 @@ flowchart LR
     class tqm,unpackerr operator
     class flaresolverr,metube,qui utility
 
-    %% MEANING: Downloads domain data flow -- indexers feed release automation, which pushes releases to torrent/usenet clients, whose completed downloads are read by post-processing operators
+    %% MEANING: Downloads domain data flow -- indexers feed release automation, which pushes releases to torrent clients, whose completed downloads are read by post-processing operators
     %% COLOR: Blue = indexing/automation, Green = download clients, Yellow = post-processing operators, Gray = standalone utilities
-    %% GOTCHA: flaresolverr, metube, and qui operate independently -- no inter-app data flow to them is declared in any manifest
-    %% NAVIGATION: Left-to-right -- indexing/automation feeds download clients, whose output is consumed by operators; utilities sit apart with no modeled edges
+    %% GOTCHA: autobrr, flaresolverr, metube, qui, sabnzbd, and slskd have no manifest-declared edge to any other in-domain app -- no config file in any of their manifests references another downloads app, so no data-flow line is drawn for them here
+    %% NAVIGATION: Left-to-right -- indexing/automation feeds qbittorrent, whose output is consumed by operators; sabnzbd/slskd are grouped with qbittorrent by role (download clients) but carry no drawn edges; utilities sit apart with no modeled edges
 ```
 <!-- generated:end -->
 

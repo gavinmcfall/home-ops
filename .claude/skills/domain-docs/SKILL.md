@@ -24,6 +24,22 @@ An app may appear in multiple domains; each mention links to the owning
 domain's context.md for depth. Any app under a registry-claimed namespace
 that resolves to no domain → drift report. Never guess membership.
 
+## One-liner descriptions
+
+The overview.md Components "What it does" column must be deterministic —
+resolve each app's one-liner via this precedence, stopping at the first hit:
+
+1. `domains.yaml` → `<domain>.descriptions.<app>`, if the registry entry
+   has a `descriptions:` map with this app as a key. Registry-authored text
+   always wins.
+2. The app's `gethomepage.dev/description` route annotation, used
+   **verbatim** — no editorial extensions, no appended clauses. A
+   commented-out annotation is not a source and does not count.
+3. Fixed fallback string: `No description — add one to domains.yaml or a
+   gethomepage annotation`.
+
+Never invent or extend a one-liner outside this precedence.
+
 ## Zone semantics
 
 - `<!-- generated:start section=NAME -->` … `<!-- generated:end -->`:

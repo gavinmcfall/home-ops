@@ -28,6 +28,19 @@ domains:
       - downloads/tranga             # reading
     include: []
     seeds: []
+    descriptions:
+      autobrr: IRC/RSS release automation — filters torrent/usenet announces and pushes matching releases to download clients
+      cross-seed: Cross-seeds releases across trackers by matching new torrents against the existing library
+      dashbrr: Unified dashboard aggregating status from Prowlarr, Radarr, Sonarr, Seerr, and Plex
+      flaresolverr: Proxy that solves Cloudflare/DDoS-Guard challenges on behalf of indexers
+      metube: Web UI front-end for yt-dlp video downloads
+      prowlarr: Torrent/NZB Indexer Management
+      qbittorrent: Torrent Client, routed through gluetun/ProtonVPN
+      qui: Web UI for managing multiple qBittorrent instances
+      sabnzbd: NZB Download Client
+      slskd: Soulseek Client, routed through gluetun/ProtonVPN
+      tqm: Scheduled qBittorrent queue manager — retags and removes torrents per tracker rules
+      unpackerr: Extracts completed archive downloads and notifies Sonarr/Radarr
   media:
     title: Movies & TV
     namespaces: []
