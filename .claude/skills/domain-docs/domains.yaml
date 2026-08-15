@@ -107,3 +107,31 @@ domains:
     seeds:
       - docs/observability-audit-2026-05.md
       - docs/infrastructure-roadmap/otel-telemetry-backbone.md
+    descriptions:
+      blackbox-exporter: Probes ICMP/TCP/HTTP endpoints (NAS, NFS port) for reachability
+      discord-message-scheduler: Discord bot for scheduling recurring messages
+      exportarr-radarr: Prometheus exporter for the radarr/radarr-uhd Radarr instances
+      exportarr-sonarr: Prometheus exporter for the sonarr/sonarr-uhd/sonarr-foreign Sonarr instances
+      graphite-exporter: Receives pushed Graphite-protocol gauges and re-exposes them as Prometheus metrics
+      intel-gpu-exporter: Prometheus exporter for Intel iGPU metrics on the stanton nodes
+      ipmi-exporter: Prometheus exporter that polls BMC/IPMI sensors over the network
+      jetkvm-power: Scrapes native Prometheus metrics from 3 JetKVM DC power-monitoring devices
+      kait: Webhook receiver that auto-fails the Ceph cluster network over to LAN when Thunderbolt connectivity is lost
+      keda: Kubernetes event-driven autoscaling controller
+      kromgo: Public-facing metrics API that queries Prometheus and re-exposes curated values
+      loki: Log aggregation backend for promtail-shipped cluster logs
+      mariadb-exporter: Prometheus exporter for the database-domain MariaDB instance
+      network-ups-tools: NUT server exposing UPS status over the network
+      ntfy: Self-hosted push notification server
+      ntfy-alertmanager: Bridges Alertmanager webhooks into ntfy push notifications
+      nut-exporter: Prometheus exporter that polls network-ups-tools for UPS metrics
+      otel-collector: OpenTelemetry Collector -- ingests OTLP telemetry and exports it to InfluxDB 3
+      plex-exporter: Prometheus exporter for Plex library/server metrics (TechnoTim's fork)
+      prometheus-operator-crds: Prometheus Operator CustomResourceDefinitions (Probe, ServiceMonitor, PrometheusRule, etc.)
+      promtail: Ships container logs to Loki
+      smartctl-exporter: Prometheus exporter for disk S.M.A.R.T. health, auto-scanning each node's drives
+      snmp-exporter: Prometheus exporter that polls UniFi network gear (UDM Pro, switches) over SNMP
+      speedtest-exporter: Runs periodic internet speed tests and exposes results as Prometheus metrics
+      tautulli-exporter: Prometheus exporter for Tautulli (Plex stream monitoring) metrics
+      truenas-capacity: CronJob that pushes TrueNAS storage capacity gauges into graphite-exporter
+      unpoller: Prometheus exporter for UniFi controller metrics
