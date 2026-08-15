@@ -83,6 +83,11 @@ domains:
       - home/ebook-reconcile
     exclude: []
     seeds: [docs/ai-context/nerdz-reading-stack.md]
+    descriptions:
+      bindery: Readarr replacement — book/audiobook manager backed by SQLite, imports metadata-first without moving files
+      bookorbit: Family reading hub — library + web readers, OPDS server, KOSync/Kobo sync, Hardcover/StoryGraph sync (trial)
+      calibre-web-automated: Web-based Calibre library manager with automated metadata/format conversion; also runs a headless Calibre Content Server
+      ebook-reconcile: Nightly CronJobs that embed Calibre metadata into library files and reconcile hardlinks into the AudiobookShelf tree
   auth:
     title: Authentication & Identity
     namespaces: [security]
