@@ -48,7 +48,19 @@ This directory contains the single source of truth for AI assistant context acro
 | [TOOLS.md](TOOLS.md) | MCP servers, CLI commands, discovery patterns |
 | [CONVENTIONS.md](CONVENTIONS.md) | Coding standards, commit guidelines, project structure |
 | [PERSONAS.md](PERSONAS.md) | User access personas for internal and external application access |
-| [nerdz-reading-stack.md](nerdz-reading-stack.md) | Family reading/audiobook stack: Bindery + qBittorrent + CWA/Calibre + Audiobookshelf, genre-tree contract, metadata layers, seed-safety rules |
+| [nerdz-reading-stack.md](nerdz-reading-stack.md) | Superseded — pointer to [Domain Docs: reading](../domains/reading/context.md); content now lives there |
+
+### Domain Docs
+
+Per-domain docs generated and kept current by the `domain-docs` skill (`.claude/skills/domain-docs/`) from `kubernetes/apps/` manifests — each set has an `overview.md` (human), `context.md` (LLM: apps/routes/storage/flows), and `decisions.md` (append-only whys). Run `update <domain>` after cluster changes affecting that domain, `audit` to check for drift.
+
+| Domain | Overview | Context | Decisions |
+|--------|----------|---------|-----------|
+| Downloads Infrastructure | [overview](../domains/downloads/overview.md) | [context](../domains/downloads/context.md) | [decisions](../domains/downloads/decisions.md) |
+| Movies & TV | [overview](../domains/media/overview.md) | [context](../domains/media/context.md) | [decisions](../domains/media/decisions.md) |
+| Books, Audiobooks, Comics & Manga | [overview](../domains/reading/overview.md) | [context](../domains/reading/context.md) | [decisions](../domains/reading/decisions.md) |
+| Authentication & Identity | [overview](../domains/auth/overview.md) | [context](../domains/auth/context.md) | [decisions](../domains/auth/decisions.md) |
+| Observability | [overview](../domains/observability/overview.md) | [context](../domains/observability/context.md) | [decisions](../domains/observability/decisions.md) |
 
 ---
 
