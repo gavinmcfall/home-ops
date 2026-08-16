@@ -21,7 +21,7 @@ Append-only. Never regenerated. New entries at the top. Format:
 <!-- seeded: review -->
 
 ## 2026-07-31 — CWA sees only its own ingest/library subpaths, never the shared genre tree
-**Why**: calibre-web-automated is the Calibre metadata workbench, not the serving layer — scoping its NFS mounts to `.calibre/ingest` and `.calibre/library` only means a CWA bug or bad bulk edit cannot directly corrupt the AudiobookShelf-serving genre tree. ebook-reconcile's nightly hardlink step is the sole, narrowly-scoped bridge back into the tree.
+**Why**: calibre-web-automated is the Calibre metadata workbench, not the serving layer — scoping its NFS mounts to `.calibre/ingest` and `.calibre/library` only means a CWA bug or bad bulk edit cannot directly corrupt the AudiobookShelf-serving genre tree. The manual bake-sync copy step is the current, narrowly-scoped bridge back into the tree; the `ebook-reconcile` hardlink CronJob (every 15 min) will take over once enabled — it ships suspended pending a controlled first run.
 **Alternatives rejected**: Mounting the full genre tree into CWA directly — rejected because it would let Calibre's file-rewriting behavior (new inode on every bake) reach the seeding/serving copies directly, breaking the hardlink economy.
 **Links**: docs/ai-context/nerdz-reading-stack.md; kubernetes/apps/home/calibre-web-automated/app/helmrelease.yaml; kubernetes/apps/home/ebook-reconcile/app/helmrelease.yaml
 <!-- seeded: review -->

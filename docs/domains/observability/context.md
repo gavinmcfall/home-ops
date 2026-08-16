@@ -189,7 +189,7 @@ flowchart LR
 
     %% MEANING: App/service-specific exporters feeding kube-prometheus-stack (repeated hub node) -- exportarr-radarr, exportarr-sonarr, plex-exporter, and tautulli-exporter each poll a media-domain app's API (see Integration Points for the cross-domain targets); mariadb-exporter polls the database-domain mariadb Service; speedtest-exporter is self-contained
     %% COLOR: Blue = exporters targeting the media domain, Purple = other service exporters, Green = the shared hub
-    %% GOTCHA: this is 3 of 3 observability dataflow diagrams. The edges into radarr/sonarr/plex/tautulli themselves are NOT drawn here (they're cross-domain, out of this diagram's scope) -- only the in-domain "scraped by kube-prometheus-stack" edge is shown; see Integration Points for exportarr-radarr/exportarr-sonarr/plex-exporter/tautulli-exporter's actual polling targets
+    %% GOTCHA: this is 3 of 3 observability dataflow diagrams. The edges into radarr/sonarr/plex/tautulli themselves are NOT drawn here (they're cross-domain, out of this diagram's scope) -- only the in-domain "scraped by kube-prometheus-stack" edge is shown; see context.md's Integration Points for exportarr-radarr/exportarr-sonarr/plex-exporter/tautulli-exporter's actual polling targets
     %% NAVIGATION: Left-to-right -- both exporter groups feed the same shared metrics hub
 ```
 <!-- generated:end -->
@@ -197,13 +197,15 @@ flowchart LR
 <!-- generated:start section=integration -->
 ## Integration Points
 
-- auth: [grafana](../../../kubernetes/apps/observability/grafana) authenticates against pocket-id via generic OAuth (`auth_url`/`token_url`/`api_url` pointing at `id.${SECRET_DOMAIN}`) per its HelmRelease.
-- downloads: [notifiarr](../../../kubernetes/apps/observability/notifiarr) monitors [qbittorrent](../../../kubernetes/apps/downloads/qbittorrent), [sabnzbd](../../../kubernetes/apps/downloads/sabnzbd), and [prowlarr](../../../kubernetes/apps/downloads/prowlarr) via API keys pulled into its ExternalSecret.
-- media: [exportarr-radarr](../../../kubernetes/apps/observability/exporters/exportarr-radarr) polls [radarr](../../../kubernetes/apps/downloads/radarr) and [radarr-uhd](../../../kubernetes/apps/downloads/radarr-uhd) via their `URL`/`APIKEY` env.
-- media: [exportarr-sonarr](../../../kubernetes/apps/observability/exporters/exportarr-sonarr) polls [sonarr](../../../kubernetes/apps/downloads/sonarr), [sonarr-uhd](../../../kubernetes/apps/downloads/sonarr-uhd), and [sonarr-foreign](../../../kubernetes/apps/downloads/sonarr-foreign) via their `URL`/`APIKEY` env.
-- media: [notifiarr](../../../kubernetes/apps/observability/notifiarr) monitors [plex](../../../kubernetes/apps/entertainment/plex), [tautulli](../../../kubernetes/apps/entertainment/tautulli), [sonarr](../../../kubernetes/apps/downloads/sonarr), [sonarr-uhd](../../../kubernetes/apps/downloads/sonarr-uhd), [sonarr-foreign](../../../kubernetes/apps/downloads/sonarr-foreign), [radarr](../../../kubernetes/apps/downloads/radarr), and [radarr-uhd](../../../kubernetes/apps/downloads/radarr-uhd) via API keys pulled into its ExternalSecret.
-- media: [plex-exporter](../../../kubernetes/apps/observability/exporters/plex-exporter) polls [plex](../../../kubernetes/apps/entertainment/plex) via `PLEX_SERVER` env.
-- media: [tautulli-exporter](../../../kubernetes/apps/observability/exporters/tautulli-exporter) polls [tautulli](../../../kubernetes/apps/entertainment/tautulli) via `TAUTULLI_URI` env.
+- auth (outbound): [grafana](../../../kubernetes/apps/observability/grafana) authenticates against pocket-id via generic OAuth (`auth_url`/`token_url`/`api_url` pointing at `id.${SECRET_DOMAIN}`) per its HelmRelease.
+- downloads (inbound): [autobrr](../../../kubernetes/apps/downloads/autobrr) ships an `autobrr-loki-rules` ConfigMap labeled `loki_rule: "true"` containing LogQL alerting rules, per its Kustomization `configMapGenerator` (see [downloads domain](../downloads/context.md)).
+- downloads (outbound): [notifiarr](../../../kubernetes/apps/observability/notifiarr) monitors [qbittorrent](../../../kubernetes/apps/downloads/qbittorrent), [sabnzbd](../../../kubernetes/apps/downloads/sabnzbd), and [prowlarr](../../../kubernetes/apps/downloads/prowlarr) via API keys pulled into its ExternalSecret.
+- media (inbound): [plex](../../../kubernetes/apps/entertainment/plex) ships a `plex-loki-rules` ConfigMap labeled `loki_rule: "true"` containing LogQL alerting rules, per its Kustomization `configMapGenerator` (see [media domain](../media/context.md)).
+- media (outbound): [exportarr-radarr](../../../kubernetes/apps/observability/exporters/exportarr-radarr) polls [radarr](../../../kubernetes/apps/downloads/radarr) and [radarr-uhd](../../../kubernetes/apps/downloads/radarr-uhd) via their `URL`/`APIKEY` env.
+- media (outbound): [exportarr-sonarr](../../../kubernetes/apps/observability/exporters/exportarr-sonarr) polls [sonarr](../../../kubernetes/apps/downloads/sonarr), [sonarr-uhd](../../../kubernetes/apps/downloads/sonarr-uhd), and [sonarr-foreign](../../../kubernetes/apps/downloads/sonarr-foreign) via their `URL`/`APIKEY` env.
+- media (outbound): [notifiarr](../../../kubernetes/apps/observability/notifiarr) monitors [plex](../../../kubernetes/apps/entertainment/plex), [tautulli](../../../kubernetes/apps/entertainment/tautulli), [sonarr](../../../kubernetes/apps/downloads/sonarr), [sonarr-uhd](../../../kubernetes/apps/downloads/sonarr-uhd), [sonarr-foreign](../../../kubernetes/apps/downloads/sonarr-foreign), [radarr](../../../kubernetes/apps/downloads/radarr), and [radarr-uhd](../../../kubernetes/apps/downloads/radarr-uhd) via API keys pulled into its ExternalSecret.
+- media (outbound): [plex-exporter](../../../kubernetes/apps/observability/exporters/plex-exporter) polls [plex](../../../kubernetes/apps/entertainment/plex) via `PLEX_SERVER` env.
+- media (outbound): [tautulli-exporter](../../../kubernetes/apps/observability/exporters/tautulli-exporter) polls [tautulli](../../../kubernetes/apps/entertainment/tautulli) via `TAUTULLI_URI` env.
 <!-- generated:end -->
 
 <!-- curated -->

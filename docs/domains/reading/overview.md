@@ -112,6 +112,8 @@ flowchart LR
 ## Operating Notes
 
 The books/audio side of this domain is one NFS folder tree (`Books/{Genre}/{Author}/{Series}/{NN - Title}/`), not app databases — every service composes because it respects that shape. AudiobookShelf's kids' accounts are age-gated by which genre folders/libraries they're granted, not a separate permission system. See the Genre-Tree Contract and Two-Layer Metadata capsules in [context.md](context.md) before changing any book-pipeline manifest.
+
+Deep design/runbook material (`metadata-bake-process.md`, `download-workflow-design.md`, `abs-bindery-room-migration.md`, incident history) lives in the external repo `G:\code\Projects\nerdz-reading`.
 <!-- seeded: review -->
 
 <!-- Human-authored: family workflows, runbook pointers, quirks. Skill never edits below. -->

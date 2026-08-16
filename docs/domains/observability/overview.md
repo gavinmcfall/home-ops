@@ -191,7 +191,7 @@ flowchart LR
 
     %% MEANING: App/service-specific exporters feeding kube-prometheus-stack (repeated hub node) -- exportarr-radarr, exportarr-sonarr, plex-exporter, and tautulli-exporter each poll a media-domain app's API (see Integration Points for the cross-domain targets); mariadb-exporter polls the database-domain mariadb Service; speedtest-exporter is self-contained
     %% COLOR: Blue = exporters targeting the media domain, Purple = other service exporters, Green = the shared hub
-    %% GOTCHA: this is 3 of 3 observability dataflow diagrams. The edges into radarr/sonarr/plex/tautulli themselves are NOT drawn here (they're cross-domain, out of this diagram's scope) -- only the in-domain "scraped by kube-prometheus-stack" edge is shown; see Integration Points for exportarr-radarr/exportarr-sonarr/plex-exporter/tautulli-exporter's actual polling targets
+    %% GOTCHA: this is 3 of 3 observability dataflow diagrams. The edges into radarr/sonarr/plex/tautulli themselves are NOT drawn here (they're cross-domain, out of this diagram's scope) -- only the in-domain "scraped by kube-prometheus-stack" edge is shown; see context.md's Integration Points for exportarr-radarr/exportarr-sonarr/plex-exporter/tautulli-exporter's actual polling targets
     %% NAVIGATION: Left-to-right -- both exporter groups feed the same shared metrics hub
 ```
 <!-- generated:end -->

@@ -53,6 +53,29 @@ resolve each app's one-liner via this precedence, stopping at the first hit:
 
 Never invent or extend a one-liner outside this precedence.
 
+## Integration Points direction
+
+Direction is normative, not descriptive, so a fresh extraction is
+deterministic regardless of which domain runs first. Every cross-domain
+reference is extracted once, from the single manifest that carries it, and
+rendered as two bullets:
+
+- **Outbound** — filed in the domain whose app's own manifest holds the
+  reference (env var, ExternalSecret template, `gethomepage.dev` annotation,
+  `configMapGenerator` label, etc.) pointing at another domain's app.
+  Label the bullet `<target-domain> (outbound): ...`.
+- **Inbound** — filed in the target domain, mirroring the same fact so a
+  reader of either domain's page sees the full picture. Label the bullet
+  `<source-domain> (inbound): ...` and append `(see [<source> domain](../<source>/context.md))`.
+
+Both bullets describe the same manifest — the one that carries the
+reference — never a second, independently-derived source; the inbound
+bullet restates the outbound bullet's fact, it does not re-derive it.
+A `loki_rule: "true"` `configMapGenerator` label (a Loki alerting-rule
+ConfigMap) counts as manifest evidence like any other cross-domain wiring —
+model it uniformly wherever it appears, even if no in-repo consumer can be
+confirmed for the label yet.
+
 ## Zone semantics
 
 - `<!-- generated:start section=NAME -->` … `<!-- generated:end -->`:

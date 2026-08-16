@@ -67,9 +67,10 @@ flowchart TB
 <!-- generated:start section=integration -->
 ## Integration Points
 
-- downloads: [dashbrr](../../../kubernetes/apps/downloads/dashbrr) and [qui](../../../kubernetes/apps/downloads/qui) authenticate against pocket-id (`OIDC_ISSUER`/`QUI__OIDC_ISSUER` env pointing at `id.${SECRET_DOMAIN}`) per their ExternalSecret templates.
-- observability: [grafana](../../../kubernetes/apps/observability/grafana) authenticates against pocket-id via generic OAuth (`auth_url`/`token_url`/`api_url` pointing at `id.${SECRET_DOMAIN}`) per its HelmRelease.
-- reading: [bookorbit](../../../kubernetes/apps/entertainment/bookorbit) and [shelfmark](../../../kubernetes/apps/downloads/shelfmark) authenticate against pocket-id OIDC per their HelmRelease env (see [reading domain](../reading/context.md)).
+- downloads (inbound): [dashbrr](../../../kubernetes/apps/downloads/dashbrr) and [qui](../../../kubernetes/apps/downloads/qui) authenticate against pocket-id (`OIDC_ISSUER`/`QUI__OIDC_ISSUER` env pointing at `id.${SECRET_DOMAIN}`) per their ExternalSecret templates (see [downloads domain](../downloads/context.md)).
+- observability (inbound): [grafana](../../../kubernetes/apps/observability/grafana) authenticates against pocket-id via generic OAuth (`auth_url`/`token_url`/`api_url` pointing at `id.${SECRET_DOMAIN}`) per its HelmRelease (see [observability domain](../observability/context.md)).
+- reading (inbound): [bookorbit](../../../kubernetes/apps/entertainment/bookorbit) enables OIDC login against pocket-id (`OIDC_ALLOW_LOCAL_ISSUERS` lets pocket-id's internal-gateway issuer through the SSRF guard) per its HelmRelease env (see [reading domain](../reading/context.md)).
+- reading (inbound): [shelfmark](../../../kubernetes/apps/downloads/shelfmark) authenticates via pocket-id OIDC (`OIDC_DISCOVERY_URL` points at `id.${SECRET_DOMAIN}`) per its HelmRelease env (see [reading domain](../reading/context.md)).
 <!-- generated:end -->
 
 <!-- curated -->
