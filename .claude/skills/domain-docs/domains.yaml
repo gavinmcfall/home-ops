@@ -1,0 +1,137 @@
+# Domain membership registry — the only source of truth for docs/domains/.
+# Resolution: namespaces minus exclude plus include. Paths are <ns>/<app>.
+# Apps in a claimed namespace that resolve to no domain appear in `task audit` drift.
+domains:
+  downloads:
+    title: Downloads Infrastructure
+    namespaces: [downloads]
+    exclude:
+      # media-type-specific apps documented in their consuming domain:
+      - downloads/arr-codec-tagger   # media
+      - downloads/bazarr             # media
+      - downloads/bazarr-foreign     # media
+      - downloads/bazarr-uhd         # media
+      - downloads/bindery            # reading
+      - downloads/kapowarr           # reading
+      - downloads/lidarr             # music (no domain yet — intentional drift)
+      - downloads/lncrawl            # reading
+      - downloads/radarr             # media
+      - downloads/radarr-uhd         # media
+      - downloads/recyclarr          # media
+      - downloads/rom-ingest         # games (no domain yet — intentional drift)
+      - downloads/shelfmark          # reading
+      - downloads/sonarr             # media
+      - downloads/sonarr-foreign     # media
+      - downloads/sonarr-uhd         # media
+      - downloads/soularr            # music (no domain yet — intentional drift)
+      - downloads/suwayomi           # reading
+      - downloads/tranga             # reading
+    include: []
+    seeds: []
+    descriptions:
+      autobrr: IRC/RSS release automation — filters torrent/usenet announces and pushes matching releases to download clients
+      cross-seed: Cross-seeds releases across trackers by matching new torrents against the existing library
+      dashbrr: Unified dashboard aggregating status from Prowlarr, Radarr, Sonarr, Seerr, and Plex
+      flaresolverr: Proxy that solves Cloudflare/DDoS-Guard challenges on behalf of indexers
+      metube: Web UI front-end for yt-dlp video downloads
+      prowlarr: Torrent/NZB Indexer Management
+      qbittorrent: Torrent Client, routed through gluetun/ProtonVPN
+      qui: Web UI for managing multiple qBittorrent instances
+      sabnzbd: NZB Download Client
+      slskd: Soulseek Client, routed through gluetun/ProtonVPN
+      tqm: Scheduled qBittorrent queue manager — retags and removes torrents per tracker rules
+      unpackerr: Extracts completed archive downloads and notifies Sonarr/Radarr
+  media:
+    title: Movies & TV
+    namespaces: []
+    include:
+      - downloads/arr-codec-tagger
+      - downloads/bazarr
+      - downloads/bazarr-foreign
+      - downloads/bazarr-uhd
+      - downloads/radarr
+      - downloads/radarr-uhd
+      - downloads/recyclarr
+      - downloads/sonarr
+      - downloads/sonarr-foreign
+      - downloads/sonarr-uhd
+      - entertainment/plex
+      - entertainment/seerr
+      - entertainment/tautulli
+      - entertainment/wizarr
+    exclude: []
+    seeds: [docs/Guides/plex-arr-monitoring-stack.md]
+    descriptions:
+      arr-codec-tagger: Weekly CronJob that tags Sonarr/Radarr libraries with codec metadata via the kait image
+      recyclarr: Daily CronJob that syncs TRaSH Guides quality profiles and custom formats into Sonarr/Radarr
+  reading:
+    title: Books, Audiobooks, Comics & Manga
+    namespaces: []
+    include:
+      - downloads/bindery
+      - downloads/kapowarr
+      - downloads/lncrawl
+      - downloads/shelfmark
+      - downloads/suwayomi
+      - downloads/tranga
+      - entertainment/audiobookshelf
+      - entertainment/bookorbit
+      - entertainment/kavita
+      - entertainment/komf
+      - entertainment/mangarr
+      - home/calibre-web-automated
+      - home/ebook-reconcile
+    exclude: []
+    seeds: [docs/ai-context/nerdz-reading-stack.md]
+    descriptions:
+      bindery: Readarr replacement — book/audiobook manager backed by SQLite, imports metadata-first without moving files
+      bookorbit: Family reading hub — library + web readers, OPDS server, KOSync/Kobo sync, Hardcover/StoryGraph sync (trial)
+      calibre-web-automated: Web-based Calibre library manager with automated metadata/format conversion; also runs a headless Calibre Content Server
+      ebook-reconcile: Nightly CronJobs that embed Calibre metadata into library files and reconcile hardlinks into the AudiobookShelf tree
+  auth:
+    title: Authentication & Identity
+    namespaces: [security]
+    include: []
+    exclude: []
+    seeds:
+      - docs/ai-context/NETWORKING.md
+      - docs/Guides/Security/Pocket ID + Tailscale SSO/README.md
+    descriptions:
+      oauth2-proxy: Reverse-proxy auth gate that authenticates against pocket-id and forwards identity headers to an upstream; currently dormant pending the lighthouse cutover
+      pocket-id: Self-hosted OIDC identity provider — issues SSO logins consumed across the cluster
+  observability:
+    title: Observability
+    namespaces: [observability]
+    include: []
+    exclude: []
+    seeds:
+      - docs/observability-audit-2026-05.md
+      - docs/infrastructure-roadmap/otel-telemetry-backbone.md
+    descriptions:
+      blackbox-exporter: Probes ICMP/TCP/HTTP endpoints (NAS, NFS port) for reachability
+      discord-message-scheduler: Discord bot for scheduling recurring messages
+      exportarr-radarr: Prometheus exporter for the radarr/radarr-uhd Radarr instances
+      exportarr-sonarr: Prometheus exporter for the sonarr/sonarr-uhd/sonarr-foreign Sonarr instances
+      graphite-exporter: Receives pushed Graphite-protocol gauges and re-exposes them as Prometheus metrics
+      intel-gpu-exporter: Prometheus exporter for Intel iGPU metrics on the stanton nodes
+      ipmi-exporter: Prometheus exporter that polls BMC/IPMI sensors over the network
+      jetkvm-power: Scrapes native Prometheus metrics from 3 JetKVM DC power-monitoring devices
+      kait: Webhook receiver that auto-fails the Ceph cluster network over to LAN when Thunderbolt connectivity is lost
+      keda: Kubernetes event-driven autoscaling controller
+      kromgo: Public-facing metrics API that queries Prometheus and re-exposes curated values
+      loki: Log aggregation backend for promtail-shipped cluster logs
+      mariadb-exporter: Prometheus exporter for the database-domain MariaDB instance
+      network-ups-tools: NUT server exposing UPS status over the network
+      ntfy: Self-hosted push notification server
+      ntfy-alertmanager: Bridges Alertmanager webhooks into ntfy push notifications
+      nut-exporter: Prometheus exporter that polls network-ups-tools for UPS metrics
+      otel-collector: OpenTelemetry Collector -- ingests OTLP telemetry and exports it to InfluxDB 3
+      plex-exporter: Prometheus exporter for Plex library/server metrics (TechnoTim's fork)
+      prometheus-operator-crds: Prometheus Operator CustomResourceDefinitions (Probe, ServiceMonitor, PrometheusRule, etc.)
+      promtail: Ships container logs to Loki
+      smartctl-exporter: Prometheus exporter for disk S.M.A.R.T. health, auto-scanning each node's drives
+      snmp-exporter: Prometheus exporter that polls UniFi network gear (UDM Pro, switches) over SNMP
+      speedtest-exporter: Runs periodic internet speed tests and exposes results as Prometheus metrics
+      tautulli-exporter: Prometheus exporter for Tautulli (Plex stream monitoring) metrics
+      truenas-capacity: CronJob that pushes TrueNAS storage capacity gauges into graphite-exporter
+      unpoller: Prometheus exporter for UniFi controller metrics
