@@ -35,7 +35,15 @@ spec:
       embed-nightly:
         type: cronjob
         cronjob:
-          suspend: false
+          # SUSPENDED 2026-08-17: the "embed replaces the file inode" assumption
+          # above is FALSE for epub — calibredb embed_metadata writes IN PLACE,
+          # straight through the tree<->calibre hardlink (367 pairs), silently
+          # rewriting genre-tree files. bookorbit does not rehash on mtime change
+          # (upstream PR #932), so KOReader device matching breaks (Bride of Ash
+          # and Dust incident, nerdz-reading journal 2026-08-17). Unsuspend only
+          # after the hardlink-vs-identity design decision (break links, or add
+          # post-embed hash refresh) — see nerdz-reading session journal.
+          suspend: true
           schedule: "30 3 * * *"
           timeZone: ${TIMEZONE}
           concurrencyPolicy: Forbid
