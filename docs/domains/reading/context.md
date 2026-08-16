@@ -120,6 +120,8 @@ flowchart LR
 ### Genre-Tree Contract
 
 The disk tree, not any app database, is the integration contract for the books/audio side of this domain: every service reads or writes `Books/{Genre}/{Author}/{Series}/{NN - Title}/` on the shared NFS export (`citadel.internal:/mnt/storage0/media`), and they compose only because they all respect that shape. Folders encode only single-valued facts; anything multi-valued (extra genres, multi-series, tags) lives in metadata, never in the path. AudiobookShelf runs one library per top-level genre folder, which is also how kids' restricted accounts are age-gated (a genre folder is invisible to a kid account unless explicitly granted). calibre-web-automated cannot see the genre tree at all — it's scoped to `.calibre/ingest` + `.calibre/library` only — so ebook-reconcile's nightly hardlink step is the sole bridge from Calibre-fixed files back into the tree.
+
+Audiobook layout is state-dependent: dual-format books put the ebook at the title-folder root with the audio nested in an `Audiobook/` subfolder (one AudiobookShelf item, Read+Listen); audio-only books put the audio at the title root instead (a sidecar alone does not anchor an AudiobookShelf item); dramatized adaptations get their own sibling folder, `NN - Title (Dramatized Adaptation)/`. When the ebook later arrives for a previously audio-only book, the audio gets nested into `Audiobook/` at that point. Bindery's naming templates are cached at pod boot, so a template change needs a Bindery pod restart before it takes effect.
 <!-- seeded: review -->
 
 ### Two-Layer Metadata
@@ -130,6 +132,18 @@ A book's metadata lives in two independent layers: the catalog sidecar (`metadat
 ### Seed-Safety Rules
 
 Library placement must hardlink or copy, never move: any tool that rewrites a file mints a new inode and silently divorces the library copy from the seeding copy held open by qBittorrent in the downloads domain (a moved or deleted `/complete` file kills the seed on the private tracker). ebook-reconcile's `embed-nightly` CronJob is scoped with `advancedMounts` to touch ONLY the Calibre library subpath — it structurally cannot reach the genre tree, so a bug there cannot corrupt AudiobookShelf's library. The `ebook-reconcile` (hardlink) CronJob itself ships **suspended** (`suspend: true`) pending a controlled first run before it's allowed to touch the shared tree.
+
+A book therefore exists as 2-3 copies at once (the qBittorrent seed, the Calibre-baked copy, the genre-tree copy) for ebooks, or as a single hardlinked file for audiobooks. [tqm](../../../kubernetes/apps/downloads/tqm) enforces a flat 30-day-minimum seed rule across all trackers before anything is automatically removed. MAM 429 cooldowns compound: retrying a disabled indexer extends the ban roughly 24h per attempt, so wait out the stated expiry and then probe with exactly one search.
+<!-- seeded: review -->
+
+### M4b Conversion Workflow
+
+Converting mp3 audiobooks to m4b runs through AudiobookShelf's built-in encoder (`POST /api/tools/item/{id}/encode-m4b`), driven by a sequential, resumable script that submits one encode at a time and polls the task queue rather than firing all books at once. Success must be verified on disk, never from the API — the item record lags right after an encode completes, so the real check is exactly 1 `.m4b` and 0 `.mp3`/`.m4a` files left in the folder. AudiobookShelf stashes the pre-encode originals under `/config/metadata/cache/items/{id}` as a safety net; that cache has to be purged per book once the encode is verified, or a batch run fills the config PVC. Encodes and library scans must stay sequential — running them in parallel OOMKills the AudiobookShelf container. The encoder's output lands at the title-folder root regardless of layout, so dual-format books need the resulting m4b manually filed into `Audiobook/` afterward, followed by a rescan.
+<!-- seeded: review -->
+
+### Grab Safety Gates
+
+Grabbing is manual and user-triggered; every piece of automation that can fetch or delete is fenced off by an explicit gate. Bindery's `autoGrab.enabled=false` setting keeps roughly 2,000 monitored+wanted books from mass-grabbing the instant a download client is enabled — but the kill-switch is read only once, when Bindery's 12-hour wanted-sweep starts, so after changing it the Bindery pod needs a restart before enabling any client, or an in-flight sweep will still grab. Authors and series are added unmonitored by default; grabs go through the Wanted page in the UI or `POST /api/v1/wanted/bulk {ids,action:'search'}` (paced and bounded). The English-only filter lives on the Prowlarr MAM indexers (`searchLanguages=[1]`) — without it, loose title matches grab foreign editions. Dual-format grabs carry two known upstream Bindery gotchas: an audiobook import landing on an existing ebook folder collides into `Title (2)/` and needs manual consolidation, and the last import wins on `mediaType`, which is restored with `PUT /api/v1/book/{id} {"mediaType":"both"}`.
 <!-- seeded: review -->
 
 <!-- Add capsules per docs/ai-context/writing-capsules.md. Skill never edits below. -->
