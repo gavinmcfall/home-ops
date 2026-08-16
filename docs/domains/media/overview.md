@@ -35,19 +35,17 @@ The Movies & TV domain runs 14 apps across the downloads and entertainment names
 
 ```mermaid
 flowchart TB
-    subgraph Sources["Automation & Downloads Handoff"]
-        arr_codec_tagger["arr-codec-tagger"]
-        recyclarr["recyclarr"]
-        downloads_boundary["Downloads Domain"]
-    end
+    arr_codec_tagger["arr-codec-tagger"]
+    recyclarr["recyclarr"]
+    downloads_boundary["Downloads Domain"]
 
-    subgraph Arrs["Arr Instances"]
-        radarr["radarr"]
-        radarr_uhd["radarr-uhd"]
-        sonarr["sonarr"]
-        sonarr_foreign["sonarr-foreign"]
-        sonarr_uhd["sonarr-uhd"]
-    end
+    fanout(("all 5"))
+
+    radarr["radarr"]
+    radarr_uhd["radarr-uhd"]
+    sonarr["sonarr"]
+    sonarr_foreign["sonarr-foreign"]
+    sonarr_uhd["sonarr-uhd"]
 
     subgraph FrontEnd["Front End"]
         plex["plex"]
@@ -56,9 +54,10 @@ flowchart TB
         wizarr["wizarr"]
     end
 
-    arr_codec_tagger --> radarr & radarr_uhd & sonarr & sonarr_foreign & sonarr_uhd
-    recyclarr --> radarr & radarr_uhd & sonarr & sonarr_foreign & sonarr_uhd
-    downloads_boundary --> radarr & radarr_uhd & sonarr & sonarr_foreign & sonarr_uhd
+    arr_codec_tagger --> fanout
+    recyclarr --> fanout
+    downloads_boundary --> fanout
+    fanout --> radarr & radarr_uhd & sonarr & sonarr_foreign & sonarr_uhd
 
     click downloads_boundary href "../downloads/context.md" "Downloads domain"
 
@@ -66,16 +65,18 @@ flowchart TB
     classDef arr fill:#90EE90,stroke:#2E7D32,color:#000
     classDef boundary fill:#FFE082,stroke:#F57C00,color:#000
     classDef frontend fill:#E0E0E0,stroke:#616161,color:#000
+    classDef junction fill:#ECEFF1,stroke:#607D8B,color:#000
 
     class arr_codec_tagger,recyclarr automation
     class radarr,radarr_uhd,sonarr,sonarr_foreign,sonarr_uhd arr
     class downloads_boundary boundary
     class plex,seerr,tautulli,wizarr frontend
+    class fanout junction
 
     %% MEANING: Media domain request/automation flow -- arr-codec-tagger and recyclarr push per-instance updates into the 5 arr instances; the downloads domain (cross-seed injection, unpackerr extraction notify -- see downloads/context.md) also feeds the same 5 arr instances
-    %% COLOR: Blue = automation, Green = arr instances, Orange = downloads-domain boundary (external link), Gray = front-end apps
-    %% GOTCHA: plex, seerr, tautulli, and wizarr have no manifest-declared edge to any other in-domain app -- arr/Plex integration for these four is configured via each app's runtime UI (Seerr's Radarr/Sonarr server settings, Tautulli's Plex server, Wizarr's Plex/Seerr integration), not exposed in any manifest, so no edge is drawn. bazarr, bazarr-foreign, and bazarr-uhd are omitted from this diagram (see the Subtitle Instances diagram below) to stay under the 12-node limit with 14 apps in the domain.
-    %% NAVIGATION: Top-to-bottom -- automation and the downloads-domain boundary both feed the arr instances; front-end apps sit apart with no manifest-modeled edges into the arr layer
+    %% COLOR: Blue = automation, Green = arr instances, Orange = downloads-domain boundary (external link), Gray = front-end apps, small gray circle = fan-out junction (not an app)
+    %% GOTCHA: the "all 5" circle is a fan-out junction, not an app -- each of the three sources above it feeds ALL five arr instances, so the 15 pairwise edges are collapsed through it for readability. plex, seerr, tautulli, and wizarr have no manifest-declared edge to any other in-domain app -- arr/Plex integration for these four is configured via each app's runtime UI (Seerr's Radarr/Sonarr server settings, Tautulli's Plex server, Wizarr's Plex/Seerr integration), not exposed in any manifest, so no edge is drawn. bazarr, bazarr-foreign, and bazarr-uhd are omitted from this diagram (see the Subtitle Instances diagram below) to stay under the 12-app-node limit with 14 apps in the domain.
+    %% NAVIGATION: Top-to-bottom -- three sources converge on the fan-out junction, which feeds the arr row (unboxed so no edge can cross a group title); front-end apps sit apart with no manifest-modeled edges into the arr layer
 ```
 
 ### Subtitle Instances

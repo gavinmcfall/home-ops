@@ -124,10 +124,26 @@ fresh extraction (stale docs).
 2. `npx -y @mermaid-js/mermaid-cli -i <file>.mmd -o <file>.png -b white`
 3. Read the PNG. VISUALLY verify (image eyes, not code eyes):
    - no removable edge crossings; no label overlap; no orphan nodes;
-   - orientation fits (LR pipelines, TB hierarchies); ≤12 nodes.
-4. Fail → adjust source (direction, subgraphs, ordering) → re-render.
-   Max 3 iterations, then simplify the diagram.
-5. Style per `docs/ai-context/mermaid-diagram-guide.md`.
+   - orientation fits (LR pipelines, TB hierarchies); ≤12 app nodes
+     (junction/data nodes don't count);
+   - NO edge passes through or near a subgraph title. Titles render
+     top-center, so any edge entering a subgraph from outside-above
+     crosses them. Layout shifts between mermaid versions/renderers —
+     a near-miss in mmdc is a collision in VS Code. Treat "close to
+     the title" as a fail, not a pass.
+4. Fail → restructure, in this order:
+   - Nodes that receive edges from outside the box: unbox them — carry
+     the grouping in classDef colors or `<br>` node-label suffixes
+     instead of a titled subgraph.
+   - N sources each feeding the same M targets: collapse the N×M edges
+     through one small junction node (e.g. `fanout(("all M"))`, styled
+     neutral, flagged as not-an-app in the GOTCHA comment).
+   - Then direction/ordering tweaks. Max 3 iterations, then simplify.
+5. Real-but-not-manifest-declared steps (manual workflows, suspended
+   CronJobs) may appear as DASHED edges only, and the GOTCHA comment
+   must name the provenance (the source doc or the manifest field that
+   proves the dormancy). Solid edges stay manifest-evidenced.
+6. Style per `docs/ai-context/mermaid-diagram-guide.md`.
 
 ## Cleanup (MANDATORY last step of create/update)
 

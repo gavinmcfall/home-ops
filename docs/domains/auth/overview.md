@@ -24,21 +24,11 @@ The Authentication & Identity domain runs 2 apps across the security namespace.
 ```mermaid
 flowchart TB
     client["Client"]
-
-    subgraph Gateway["Envoy Gateway"]
-        envoy_securitypolicy["SecurityPolicy (per-route)"]
-    end
-
+    envoy_securitypolicy["Envoy Gateway<br>SecurityPolicy (per-route)"]
     pocket_id["pocket-id"]
-
-    subgraph GatewayPattern["Gateway-Intercept Pattern"]
-        bentopdf["bentopdf (home, example)"]
-    end
-
-    subgraph ProxyPattern["Reverse-Proxy Pattern (dormant)"]
-        oauth2_proxy["oauth2-proxy"]
-        lighthouse["lighthouse (cortex, example)"]
-    end
+    bentopdf["bentopdf (home, example)<br>gateway-intercept pattern"]
+    oauth2_proxy["oauth2-proxy<br>reverse-proxy pattern (dormant)"]
+    lighthouse["lighthouse (cortex, example)"]
 
     client --> envoy_securitypolicy
     envoy_securitypolicy -->|redirects for auth| pocket_id
@@ -62,7 +52,7 @@ flowchart TB
     %% MEANING: Two OIDC integration patterns against pocket-id -- (1) Envoy Gateway SecurityPolicy intercepts a route and redirects to pocket-id before forwarding to a backend with no native auth (bentopdf is NETWORKING.md's verified example); (2) oauth2-proxy is a reverse-proxy that itself authenticates against pocket-id as an OIDC client and forwards identity headers to an upstream (lighthouse), currently dormant -- no HTTPRoute points at it yet
     %% COLOR: Gray = client, Blue = gateway, Green = auth domain apps, Yellow = example backends in other domains (not auth-domain members)
     %% GOTCHA: bentopdf and lighthouse are NOT auth-domain apps -- they're included only as NETWORKING.md's documented example and oauth2-proxy's configured (but currently unrouted) upstream, to show what each pattern connects to. The dotted client->oauth2-proxy edge marks that no live HTTPRoute forwards traffic there yet (OAUTH2_PROXY_UPSTREAMS is pre-set for a future cutover).
-    %% NAVIGATION: Top-to-bottom -- one pocket-id serves both patterns; the gateway-intercept pattern (left) is live for apps like bentopdf, the reverse-proxy pattern (right) is configured but dormant
+    %% NAVIGATION: Top-to-bottom -- one pocket-id serves both patterns; pattern names ride in the node labels (no subgraph boxes, so no edge can cross a group title). The SecurityPolicy round-trip is the live gateway-intercept path; the oauth2-proxy chain is configured but dormant
 ```
 <!-- generated:end -->
 

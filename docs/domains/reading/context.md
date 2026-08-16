@@ -34,38 +34,41 @@ categories: ["Reference[100%]", "DomainContext[95%]"]
 
 ```mermaid
 flowchart LR
-    subgraph Acquisition["Acquisition"]
-        lncrawl["lncrawl"]
-        shelfmark["shelfmark"]
-    end
+    lncrawl["lncrawl"]
+    shelfmark["shelfmark"]
+    inbox["_inbox<br>manual queue"]
+    calibre_web_automated["calibre-web-automated<br>metadata workbench"]
+    ebook_reconcile["ebook-reconcile<br>bake + sync CronJobs"]
+    bindery["bindery<br>acquire + track ownership"]
+    genre_tree[("NFS genre tree<br>Books/{Genre}/{Author}/{Series}/{NN - Title}/")]
+    audiobookshelf["audiobookshelf<br>serves audio"]
+    bookorbit["bookorbit<br>ebook reading hub"]
 
-    subgraph Pipeline["Library Pipeline"]
-        calibre_web_automated["calibre-web-automated"]
-        ebook_reconcile["ebook-reconcile"]
-    end
-
-    subgraph Readers["Readers & Managers"]
-        audiobookshelf["audiobookshelf"]
-        bindery["bindery"]
-        bookorbit["bookorbit"]
-    end
-
-    ebook_reconcile --> calibre_web_automated
-    ebook_reconcile --> audiobookshelf
-    ebook_reconcile --> bindery
+    lncrawl --> inbox
+    shelfmark --> inbox
+    inbox -.->|"manual: desktop Calibre"| calibre_web_automated
+    ebook_reconcile -->|"embed-nightly re-bake"| calibre_web_automated
+    calibre_web_automated -.->|"bake-sync: manual today; hardlink CronJob suspended"| genre_tree
+    bindery -->|"files by {Genre}"| genre_tree
+    genre_tree -->|"library scan"| audiobookshelf
+    genre_tree -->|"read-only mount"| bookorbit
 
     classDef acquisition fill:#81D4FA,stroke:#0277BD,color:#000
     classDef pipeline fill:#FFE082,stroke:#F57C00,color:#000
     classDef reader fill:#90EE90,stroke:#2E7D32,color:#000
+    classDef tree fill:#E1BEE7,stroke:#7B1FA2,color:#000
+    classDef queue fill:#ECEFF1,stroke:#607D8B,color:#000
 
-    class lncrawl,shelfmark acquisition
+    class lncrawl,shelfmark,bindery acquisition
     class calibre_web_automated,ebook_reconcile pipeline
-    class audiobookshelf,bindery,bookorbit reader
+    class audiobookshelf,bookorbit reader
+    class genre_tree tree
+    class inbox queue
 
-    %% MEANING: Reading domain books/audio flow -- ebook-reconcile reads calibre-web-automated's Calibre library and writes reconciled files into the shared genre-tree path that both audiobookshelf and bindery treat as their library root
-    %% COLOR: Blue = acquisition, Orange = library pipeline, Green = readers/managers
-    %% GOTCHA: shelfmark and lncrawl write completed downloads to /media/Library/Books/_inbox, a manually-processed inbox with no manifest-declared consumer in this domain (Gavin processes it via a local desktop Calibre workflow), so no edge is drawn from either. bookorbit has no manifest-declared edge to any other in-domain app -- its library mount is read-only pending the CWA-vs-BookOrbit metadata decision (see decisions.md).
-    %% NAVIGATION: Left-to-right -- ebook-reconcile is the hub, pulling from the library pipeline and feeding both reader apps
+    %% MEANING: The NFS genre tree, not any app database, is the integration contract for books/audio (per the nerdz-reading repo's docs/README.md orientation): bindery acquires and files by {Genre}; calibre-web-automated is the metadata source of truth (a workbench scoped to .calibre/ingest + .calibre/library -- it cannot see the genre tree at all); audiobookshelf serves audio by scanning the tree; bookorbit is the ebook reading hub on a read-only mount
+    %% COLOR: Blue = acquisition, Orange = Calibre metadata pipeline, Green = readers, Purple cylinder = the genre tree (shared NFS export, not an app), Gray = manual inbox
+    %% GOTCHA: dashed edges are real-but-not-manifest-declared steps -- _inbox -> CWA is Gavin's desktop-Calibre workflow, and CWA -> tree is the manual bake-sync copy that the ebook-reconcile hardlink CronJob (ships suspend: true, */15 schedule once enabled) will replace after a controlled first run. Library placement must hardlink or copy, never move: qBittorrent (downloads domain) holds seeding copies open (see the Seed-Safety capsule below).
+    %% NAVIGATION: Left-to-right -- acquisition feeds the manual inbox, the Calibre workbench bakes metadata, everything converges on the genre tree, and the two readers consume it. No subgraph boxes, so no edge can cross a group title.
 ```
 
 ### Comics & Manga
