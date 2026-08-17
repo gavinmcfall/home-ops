@@ -1,0 +1,53 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: smtp-relay-rules
+spec:
+  groups:
+    - name: smtp-relay.rules
+      rules:
+        - alert: SmtpRelayAbsent
+          annotations:
+            summary: smtp-relay has disappeared from Prometheus target discovery.
+          expr: |
+            absent(up{job="smtp-relay"})
+          for: 15m
+          labels:
+            severity: critical
+
+        # maddy 0.9.5 publishes only three metrics and none of them count
+        # delivery failures, so queue depth is the only delivery signal
+        # available. It is also the better one: it fires regardless of cause
+        # (bad credentials, rejected sender, upstream unreachable).
+        #
+        # This is the gap that let a TOTAL 23-day outage pass unnoticed —
+        # 0 of 94 messages delivered while every dashboard looked healthy,
+        # because the relay accepted mail happily and only failed on the
+        # upstream hop to Migadu.
+        #
+        # A healthy relay drains in seconds. 30m tolerates one failed
+        # delivery sitting through maddy's ~15m first retry backoff without
+        # paging; anything past that is a real fault.
+        - alert: SmtpRelayQueueBacklog
+          annotations:
+            summary: >-
+              smtp-relay has {{ $value }} message(s) stuck in the
+              {{ $labels.module }} queue — upstream delivery is failing.
+          expr: |
+            maddy_queue_length > 0
+          for: 30m
+          labels:
+            severity: warning
+
+        - alert: SmtpRelayQueueStuck
+          annotations:
+            summary: >-
+              smtp-relay queue has been backed up for over two hours
+              ({{ $value }} message(s) in {{ $labels.module }}).
+          expr: |
+            maddy_queue_length > 0
+          for: 2h
+          labels:
+            severity: critical
