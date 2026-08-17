@@ -282,6 +282,13 @@ Name the model actually used — the trailer is a record of how the commit was
 built, so a stale or guessed model id makes that record wrong. Add a human
 `Co-Authored-By:` trailer as well when someone genuinely co-authored the change.
 
+A `commit-msg` hook in [`.githooks/`](.githooks/) checks this. It does **not**
+require attribution — a hook cannot tell whether an agent was involved, so
+demanding the trailers would block hand-written work. It validates attribution
+*when present*: both trailers together, a parenthesised model id, and the exact
+URL. The hook is version-controlled and wired via `core.hooksPath`, so a fresh
+clone needs `git config core.hooksPath .githooks` once.
+
 Earlier guidance told agents to strip every trace of AI involvement. That is
 **retired** — do not remove these trailers, and do not treat naming the
 assistant as something to avoid. The point is transparency about process, not
