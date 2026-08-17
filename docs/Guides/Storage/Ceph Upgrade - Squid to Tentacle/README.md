@@ -161,12 +161,7 @@ spec:
 git add kubernetes/apps/rook-ceph/
 git commit -m "feat(rook-ceph): upgrade Rook operator to v1.19.x
 
-Required for Ceph Tentacle support.
-
-Pair-programmed with Claude Code - https://claude.com/claude-code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-Co-Authored-By: Gavin <gavin@nerdz.cloud>"
+Required for Ceph Tentacle support."
 
 git push
 ```
@@ -236,12 +231,7 @@ git commit -m "feat(rook-ceph): upgrade Ceph from Squid v19.2.3 to Tentacle v20.
 Breaking changes reviewed:
 - restful/zabbix modules removed (not used)
 - IAM tenant deprecation (not using tenant IAM)
-- EC default changed (existing pools unaffected)
-
-Pair-programmed with Claude Code - https://claude.com/claude-code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-Co-Authored-By: Gavin <gavin@nerdz.cloud>"
+- EC default changed (existing pools unaffected)"
 
 git push
 ```

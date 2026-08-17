@@ -226,12 +226,7 @@ persistence:
 ```bash
 cd ~/home-ops
 git add kubernetes/apps/myns/myapp/
-git commit -m "feat(myapp): add volsync backup component
-
-Pair-programmed with Claude Code - https://claude.com/claude-code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-Co-Authored-By: Gavin <gavin@nerdz.cloud>"
+git commit -m "feat(myapp): add volsync backup component"
 git push
 ```
 

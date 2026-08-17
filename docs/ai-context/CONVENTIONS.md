@@ -160,6 +160,13 @@ chore(deps): update app-template to 4.4.0
 docs(readme): add troubleshooting section
 ```
 
+**No AI attribution.** A `commit-msg` hook rejects any message containing
+"claude" or "anthropic" (case-insensitive), so `Co-Authored-By: Claude ...`
+and `Pair-programmed with ...` closings are blocked. The hook is bound to
+`core.hooksPath` and does not resolve on every machine — treat this as policy,
+not something enforcement will reliably catch. Never bypass with `--no-verify`;
+rewrite the message instead.
+
 ### Branch Strategy
 
 - `main` is the deployment branch

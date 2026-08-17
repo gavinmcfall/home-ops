@@ -267,14 +267,21 @@ This ensures:
 - Clear version tracking (tag shows semantic version)
 - No surprise updates from mutable tags like `latest`
 
-### Commit Message Closing
+### Commit Messages
 
-When writing commits to git, use the following for the closing comments:
+Conventional commits: `type(scope): description`.
+
+**Never add AI attribution trailers.** A `commit-msg` hook rejects any message
+containing "claude" or "anthropic" (case-insensitive), so closings such as
+`Pair-programmed with Claude Code ...` or `Co-Authored-By: Claude ...` are
+blocked outright. Treat this as policy rather than something the hook enforces:
+it is bound to `core.hooksPath`, which does not resolve on every machine, so the
+rule still applies where the hook is silently inactive.
+
+Do not work around it with `--no-verify` — rewrite the message without the
+trailer. A human co-author trailer is fine:
 
 ```
-Pair-programmed with Claude Code - https://claude.com/claude-code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 Co-Authored-By: Gavin <gavin@nerdz.cloud>
 ```
 
