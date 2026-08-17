@@ -163,10 +163,8 @@ git commit -m "feat(rook-ceph): upgrade Rook operator to v1.19.x
 
 Required for Ceph Tentacle support.
 
-Pair-programmed with Claude Code - https://claude.com/claude-code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-Co-Authored-By: Gavin <gavin@nerdz.cloud>"
+Assisted-by: Claude Code (claude-opus-5)
+Agentically-Engineered: https://nerdz.cloud/agentic-engineering"
 
 git push
 ```
@@ -238,10 +236,8 @@ Breaking changes reviewed:
 - IAM tenant deprecation (not using tenant IAM)
 - EC default changed (existing pools unaffected)
 
-Pair-programmed with Claude Code - https://claude.com/claude-code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-Co-Authored-By: Gavin <gavin@nerdz.cloud>"
+Assisted-by: Claude Code (claude-opus-5)
+Agentically-Engineered: https://nerdz.cloud/agentic-engineering"
 
 git push
 ```

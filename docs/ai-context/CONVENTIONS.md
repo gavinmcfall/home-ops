@@ -160,6 +160,17 @@ chore(deps): update app-template to 4.4.0
 docs(readme): add troubleshooting section
 ```
 
+**Attribute AI assistance.** Commits produced with an agent carry:
+
+```
+Assisted-by: Claude Code (claude-opus-5)
+Agentically-Engineered: https://nerdz.cloud/agentic-engineering
+```
+
+Name the model actually used. Earlier guidance to strip AI attribution is
+retired — see [`AGENTS.md`](../../AGENTS.md) and
+[nerdz.cloud/agentic-engineering](https://nerdz.cloud/agentic-engineering).
+
 ### Branch Strategy
 
 - `main` is the deployment branch

@@ -228,10 +228,8 @@ cd ~/home-ops
 git add kubernetes/apps/myns/myapp/
 git commit -m "feat(myapp): add volsync backup component
 
-Pair-programmed with Claude Code - https://claude.com/claude-code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-Co-Authored-By: Gavin <gavin@nerdz.cloud>"
+Assisted-by: Claude Code (claude-opus-5)
+Agentically-Engineered: https://nerdz.cloud/agentic-engineering"
 git push
 ```
 
