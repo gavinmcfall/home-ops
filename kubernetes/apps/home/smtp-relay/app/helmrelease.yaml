@@ -25,7 +25,11 @@ spec:
   values:
     controllers:
       smtp-relay:
-        strategy: RollingUpdate
+        # Recreate, not RollingUpdate: the queue PVC is RWO, so a rolling
+        # update would deadlock with the new pod waiting on a volume the
+        # outgoing pod still holds. SMTP senders retry, so the brief gap
+        # during a roll is harmless.
+        strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -59,6 +63,11 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
         runAsGroup: 65534
+        # fsGroup is required now that the queue lives on a ceph-block (ext4)
+        # PVC: the volume comes up root-owned and maddy runs as nobody, so
+        # without this the queue directory is unwritable at startup.
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
         seccompProfile: { type: RuntimeDefault }
       topologySpreadConstraints:
         - maxSkew: 1
@@ -98,6 +107,18 @@ spec:
           - path: /data/maddy.conf
             subPath: maddy.conf
             readOnly: true
+      # Outbound queue. Persistent on purpose: maddy's state_dir holds
+      # undelivered mail, and on the previous emptyDir every pod restart or
+      # reschedule silently discarded it (~188 queued messages lost on
+      # 2026-08-18 when reloader restarted the pod after a credential fix).
+      queue:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
+        globalMounts:
+          - path: /queue
+      # runtime_dir only — sockets and pidfiles, deliberately ephemeral.
       cache:
         type: emptyDir
         globalMounts:
