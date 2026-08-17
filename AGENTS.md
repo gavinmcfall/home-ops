@@ -267,15 +267,25 @@ This ensures:
 - Clear version tracking (tag shows semantic version)
 - No surprise updates from mutable tags like `latest`
 
-### Commit Message Closing
+### Commit Messages
 
-When writing commits to git, use the following for the closing comments:
+Conventional commits: `type(scope): description`.
+
+**Attribute AI assistance.** Anything built with an agent closes with:
 
 ```
-Pair-programmed with Claude Code - https://claude.com/claude-code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-Co-Authored-By: Gavin <gavin@nerdz.cloud>
+Assisted-by: Claude Code (claude-opus-5)
+Agentically-Engineered: https://nerdz.cloud/agentic-engineering
 ```
+
+Name the model actually used — the trailer is a record of how the commit was
+built, so a stale or guessed model id makes that record wrong. Add a human
+`Co-Authored-By:` trailer as well when someone genuinely co-authored the change.
+
+Earlier guidance told agents to strip every trace of AI involvement. That is
+**retired** — do not remove these trailers, and do not treat naming the
+assistant as something to avoid. The point is transparency about process, not
+decoration: see
+[nerdz.cloud/agentic-engineering](https://nerdz.cloud/agentic-engineering).
 
 For complete details, see the documentation in [`docs/ai-context/`](docs/ai-context/).

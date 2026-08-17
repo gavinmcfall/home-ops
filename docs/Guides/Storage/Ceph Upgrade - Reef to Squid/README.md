@@ -173,10 +173,8 @@ git commit -m "feat(rook-ceph): upgrade Ceph from Reef v18.2.7 to Squid v19.2.3
 
 Breaking changes reviewed - no impact on current configuration.
 
-Pair-programmed with Claude Code - https://claude.com/claude-code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-Co-Authored-By: Gavin <gavin@nerdz.cloud>"
+Assisted-by: Claude Code (claude-opus-5)
+Agentically-Engineered: https://nerdz.cloud/agentic-engineering"
 
 git push
 ```
