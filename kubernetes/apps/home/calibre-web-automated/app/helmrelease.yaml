@@ -83,6 +83,14 @@ spec:
               # Let s6-overlay work under a read-only-ish, non-privileged k8s sandbox
               S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
               S6_READ_ONLY_ROOT: "1"
+              # Calibre otherwise resolves its config dir from HOME (=/root here),
+              # which is ephemeral — so tweaks.json is lost on every restart. The
+              # tweak that matters is author_sort_copy_method=copy: without it
+              # Calibre generates author_sort as "Lastname, Firstname" for every
+              # NEW author, which is not the sort order we want. Deliberately a
+              # separate dir from the calibre-server container's config, so the
+              # two containers do not race on the same global.py.json.
+              CALIBRE_CONFIG_DIRECTORY: /config/calibre-app
             probes:
               liveness: &probes
                 enabled: true
