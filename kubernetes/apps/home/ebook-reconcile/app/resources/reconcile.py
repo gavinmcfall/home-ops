@@ -130,13 +130,33 @@ def _match_child(parent_abs, title, want_dir=True):
     return None
 
 
+def _author_dir(genre_abs, authors):
+    """The author folder to use -- an EXISTING one always wins over a generated one.
+
+    The tree files a collaboration under its PRIMARY author, not the joined
+    string: 'Fantasy/Raymond E. Feist/Riftwar Cycle/(2) The Empire Trilogy' for
+    Feist & Wurts, with no 'Janny Wurts' folder anywhere; likewise Eddings,
+    Nagoski, Armentrout. But exactly one joined folder exists ('Caroline Peckham
+    & Susanne Valenti'), so neither form can be assumed -- generating either one
+    unconditionally mints a duplicate for the books that use the other. Probe for
+    what is really there, and fall back to the dominant convention (primary) only
+    for a book that has no folder yet.
+    """
+    full = sanitize(authors or "")
+    primary = sanitize((authors or "").split(" & ")[0])
+    for cand in (full, primary):
+        if cand and os.path.isdir(os.path.join(genre_abs, cand)):
+            return cand
+    return primary
+
+
 def rel_path(b):
     """Prefer the folder/file this book ALREADY occupies; only invent a path
     when it genuinely has none. Generating a path unconditionally is what
     scattered 16 duplicate folders -- a book whose generated name disagreed with
     its real one was silently treated as new rather than as an error."""
     genre = sanitize(b.get(GENRE_FIELD) or "")
-    author = sanitize(b.get("authors") or "")
+    author = _author_dir(os.path.join(DEST, genre), b.get("authors"))
     title = sanitize(b.get("title") or "")
     series = (b.get("series") or "").strip()
     if not (genre and author and title):
