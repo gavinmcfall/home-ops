@@ -29,21 +29,25 @@ spec:
     controllers:
       # Nightly incremental bake: embed Calibre DB metadata into the library
       # files (calibredb embed_metadata) for books modified in the last 2 days.
-      # Mounts ONLY the Calibre library (advancedMounts) — structurally cannot
-      # touch the genre tree. Pairs with ebook-reconcile: embed replaces the
-      # file inode, reconcile re-links the tree hardlink on its next run.
+      # Mounts ONLY the Calibre library (advancedMounts). That mount is now
+      # REAL isolation — see the note below.
       embed-nightly:
         type: cronjob
         cronjob:
-          # SUSPENDED 2026-08-17: the "embed replaces the file inode" assumption
-          # above is FALSE for epub — calibredb embed_metadata writes IN PLACE,
-          # straight through the tree<->calibre hardlink (367 pairs), silently
-          # rewriting genre-tree files. bookorbit does not rehash on mtime change
-          # (upstream PR #932), so KOReader device matching breaks (Bride of Ash
-          # and Dust incident, nerdz-reading journal 2026-08-17). Unsuspend only
-          # after the hardlink-vs-identity design decision (break links, or add
-          # post-embed hash refresh) — see nerdz-reading session journal.
-          suspend: true
+          # Suspended 2026-08-17 because mount isolation did not survive
+          # hardlinks: calibredb embed_metadata writes IN PLACE, straight through
+          # the tree<->calibre hardlink (368 pairs), silently rewriting genre-tree
+          # files. Worse, a tree file can itself be hardlinked to a SEEDING
+          # torrent (Bindery organises grabs by hardlink, never move), so a bake
+          # could rewrite bytes qBittorrent is serving — hit-and-run.
+          #
+          # UNSUSPENDED 2026-08-18: the design decision was taken — break the
+          # links. All 368 Calibre<->tree hardlinks were replaced with Calibre-
+          # owned copies (verified: 0 files at nlink>=3 anywhere), reconcile.py
+          # now COPIES instead of linking, and bulk_import.py's hardlink dedup
+          # was removed. The tree file's only hardlink partner is now the torrent,
+          # so this job genuinely cannot reach the genre tree.
+          suspend: false
           schedule: "30 3 * * *"
           timeZone: ${TIMEZONE}
           concurrencyPolicy: Forbid
