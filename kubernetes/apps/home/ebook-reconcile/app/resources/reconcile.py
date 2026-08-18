@@ -1,17 +1,26 @@
 #!/usr/bin/env python3
 """Reconcile curated ebooks from a Calibre library into the AudiobookShelf
-folder structure via HARDLINKS — idempotent.
+folder structure by COPYING — idempotent.
 
 For every book tagged `→abs` (the review gate), compute its ABS path
-(`<Genre>/<Author>/<Series>/<NN - Title>/<Title>.epub`) and hardlink Calibre's
-epub there. Same dataset → nlink=2, one physical copy, zero extra bytes, and
-Calibre retains the book.
+(`<Genre>/<Author>/<Series>/<NN - Title>/<Title>.epub`) and place Calibre's epub
+there.
 
-- New book          -> link
-- File replaced     -> inode mismatch -> re-link  (re-convert/re-embed in Calibre)
-- In-place edit     -> same inode -> ABS already current, no action
-- Metadata path move-> state says old path -> remove old hardlink, link new
+⚠️ THIS USED TO HARDLINK, AND THAT WAS UNSAFE. A hardlink shares one inode
+between Calibre and the tree, and the tree file may itself be hardlinked to a
+SEEDING torrent (Bindery organises grabs by hardlink, never move). Once both
+links exist, `calibredb embed_metadata` rewrites the bytes qBittorrent is
+seeding — hit-and-run. It also silently defeated the nightly bake's claimed
+isolation (that job mounts only .calibre/library, but the shared inode reaches
+through). Copying costs one duplicate ebook (~3 MB), which
+media-library-design.md §2 already accepted as the price of the Calibre-first
+design. See _place().
+
+- New book          -> COPY (see _place: temp + os.replace, bumps folder mtime)
+- Calibre file changed -> size/mtime differ -> re-copy
 - Unchanged         -> skip
+- Metadata path move-> state says old path -> remove old file, place at new
+- Pre-existing file we did not place -> CONFLICT, left alone (ALLOW_REPLACE=1 overrides)
 
 Reads metadata via `calibredb` (handles locking + custom columns + format
 paths). Keeps its own state file (book id -> last dst) so it never writes to
@@ -22,6 +31,7 @@ Env: LIB, DEST, STATE (default /state/abs_paths.json), TAG (default →abs).
 import json
 import os
 import re
+import shutil
 import subprocess
 
 LIB = os.environ["LIB"]
@@ -147,6 +157,35 @@ def epub_of(b):
     return None
 
 
+def _place(src, dst):
+    """Copy Calibre's epub into the tree — never hardlink.
+
+    A hardlink here shares one inode between Calibre and the tree, and the tree
+    file may itself be hardlinked to a SEEDING torrent (Bindery organises grabs
+    by hardlink, never move). `calibredb embed_metadata` would then rewrite the
+    bytes qBittorrent is seeding -> hit-and-run. Copying restores the isolation
+    docs/metadata-bake-process.md always claimed, at the cost of one duplicate
+    ebook (~3 MB each), which media-library-design.md §2 already accepted.
+
+    temp + os.replace, not a plain copy: the replace is atomic AND bumps the
+    folder mtime, which bookorbit's incremental scanner prunes on — an in-place
+    cp leaves the folder mtime untouched and the rescan reports "no changes".
+    """
+    tmp = dst + ".reconcile.tmp"
+    shutil.copy2(src, tmp)
+    os.replace(tmp, dst)
+
+
+def _same_content(src, dst):
+    """Inode equality no longer means anything now that we copy, so compare the
+    bytes' fingerprint instead: size first (cheap), then mtime."""
+    try:
+        a, b = os.stat(src), os.stat(dst)
+    except OSError:
+        return False
+    return a.st_size == b.st_size and int(a.st_mtime) == int(b.st_mtime)
+
+
 def main():
     books = json.loads(calibredb(
         "list", "--search", f'tag:"{TAG}"', "--fields", FIELDS, "--for-machine") or "[]")
@@ -176,12 +215,12 @@ def main():
         if not os.path.lexists(dst):
             colocated = os.path.isdir(os.path.dirname(dst))
             tag = 'colocated' if colocated else 'NEW FOLDER'
-            print(f"LINK   id={bid} -> {rp}  [{tag}]")
+            print(f"COPY   id={bid} -> {rp}  [{tag}]")
             if not DRY:
                 os.makedirs(os.path.dirname(dst), exist_ok=True)
-                os.link(src, dst)
+                _place(src, dst)
             linked += 1
-        elif os.stat(dst).st_ino != os.stat(src).st_ino:
+        elif not _same_content(src, dst):
             dsz, ssz = os.stat(dst).st_size, os.stat(src).st_size
             # Two very different situations, previously indistinguishable because
             # generated paths never landed on a curated file:
@@ -195,8 +234,7 @@ def main():
                       f"tree={dsz:,}B calibre={ssz:,}B"
                       f"{'  (DRY RUN - not written)' if DRY else ''}")
                 if not DRY:
-                    os.remove(dst)
-                    os.link(src, dst)
+                    _place(src, dst)          # copy, never hardlink
                 relinked += 1
             else:
                 print(f"CONFLICT id={bid} -> {rp}  tree={dsz:,}B calibre={ssz:,}B"
