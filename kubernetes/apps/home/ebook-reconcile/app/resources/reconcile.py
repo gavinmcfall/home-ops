@@ -130,6 +130,20 @@ def _match_child(parent_abs, title, want_dir=True):
     return None
 
 
+def _partnership_dir_exists(name):
+    """Has this exact author pairing been given its own folder in any genre room?
+
+    Distinguishes a standing writing duo (their own series, their own folder)
+    from a one-off collaboration filed under the lead author. Rooms are the
+    top level of DEST, so this is a couple of dozen cheap isdir() checks.
+    """
+    try:
+        rooms = os.listdir(DEST)
+    except OSError:
+        return False
+    return any(os.path.isdir(os.path.join(DEST, r, name)) for r in rooms)
+
+
 def _author_dir(genre_abs, authors):
     """The author folder to use -- an EXISTING one always wins over a generated one.
 
@@ -147,6 +161,18 @@ def _author_dir(genre_abs, authors):
     for cand in (full, primary):
         if cand and os.path.isdir(os.path.join(genre_abs, cand)):
             return cand
+    # No folder yet, so the form has to be chosen. The two cases are genuinely
+    # different and the tree already encodes which is which:
+    #   incidental collaboration -- Janny Wurts co-wrote three books inside
+    #     Feist's Riftwar Cycle. Those belong under the primary author, beside
+    #     the rest of the series.
+    #   standing partnership -- Caroline Peckham & Susanne Valenti write their
+    #     series together AND publish solo. The pair is its own author identity
+    #     and has earned its own folder.
+    # If this exact pairing already holds a folder in ANY room, it is a
+    # partnership; otherwise fall back to the primary author.
+    if full and full != primary and _partnership_dir_exists(full):
+        return full
     return primary
 
 
