@@ -49,13 +49,16 @@ spec:
               ENABLE_SCHEDULED_RESCAN: "true"
               SCHEDULED_RESCAN_CRON: "0 3 * * *"
               ENABLE_SCHEDULED_UPDATE_SWITCH_TITLEDB: "false"
-              ENABLE_SCHEDULED_UPDATE_MAME_XML: "false"
               ENABLE_RESCAN_ON_FILESYSTEM_CHANGE: "true"
               ENABLE_SCHEDULED_RETROACHIEVEMENTS_PROGRESS_SYNC: "true"
               ENABLE_SCHEDULED_CONVERT_IMAGES_TO_WEBP: "true"
+              ENABLE_SCHEDULED_CLEANUP_ORPHANED_RESOURCES: "true"
+              SCHEDULED_CLEANUP_ORPHANED_RESOURCES_CRON: "0 5 * * *"
               RESCAN_ON_FILESYSTEM_CHANGE_DELAY: 5
               LOGLEVEL: DEBUG
               SCAN_WORKERS: 2
+              WEB_SERVER_CONCURRENCY: 3
+              ROMM_SESSION_SECURE_COOKIE: "true"
               DISABLE_USERPASS_LOGIN: false
               HASHEOUS_API_ENABLED: true
               PLAYMATCH_API_ENABLED: true
@@ -66,7 +69,7 @@ spec:
             resources:
               requests:
                 cpu: 10m
-                memory: 1Gi
+                memory: 2Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
