@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Validates AI-attribution trailers. See AGENTS.md -> Commit Messages.
+#
+# This does NOT require attribution: a hook cannot know whether an agent was
+# involved, so demanding the trailers would block hand-written work. It only
+# checks that attribution, WHEN PRESENT, is complete and well formed — the
+# realistic failure mode now that agents add these routinely.
+set -euo pipefail
+
+MSG_FILE="$1"
+URL="https://nerdz.cloud/agentic-engineering"
+
+# Drop comment lines and the scissors section git adds for verbose commits.
+BODY="$(sed -e '/^# ------------------------ >8 /,$d' -e '/^#/d' "$MSG_FILE")"
+
+has_assisted=0
+has_engineered=0
+grep -qE '^Assisted-by:'            <<<"$BODY" && has_assisted=1
+grep -qE '^Agentically-Engineered:' <<<"$BODY" && has_engineered=1
+
+# No attribution at all: nothing to validate.
+if (( has_assisted == 0 && has_engineered == 0 )); then
+  exit 0
+fi
+
+fail() {
+  echo "commit-msg: $*" >&2
+  echo >&2
+  echo "Expected both trailers, e.g.:" >&2
+  echo "  Assisted-by: Claude Code (claude-opus-5)" >&2
+  echo "  Agentically-Engineered: $URL" >&2
+  exit 1
+}
+
+(( has_assisted    == 1 )) || fail "'Agentically-Engineered:' present without 'Assisted-by:'"
+(( has_engineered  == 1 )) || fail "'Assisted-by:' present without 'Agentically-Engineered:'"
+
+grep -qE '^Assisted-by: [A-Za-z0-9][A-Za-z0-9 ._-]* \([a-z0-9][a-z0-9._-]*\)[[:space:]]*$' <<<"$BODY" \
+  || fail "'Assisted-by:' must name the tool and the model actually used, as: Tool Name (model-id)"
+
+grep -qFx "Agentically-Engineered: $URL" <<<"$BODY" \
+  || fail "'Agentically-Engineered:' must be exactly: $URL"
+
+exit 0
