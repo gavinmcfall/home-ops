@@ -210,6 +210,16 @@ spec:
             subPath: Library/Books/.calibre/ingest
           - path: /calibre-library
             subPath: Library/Books/.calibre/library
+          # Bulk-import staging, READ-ONLY and deliberately OUTSIDE the ingest
+          # tree. CWA's ingest watcher consumes anything under /cwa-book-ingest
+          # -- including dot-directories -- and DELETES the source after import.
+          # Staging there meant the watcher and a manual `calibredb add` both
+          # processed the same files: 50 source books produced 82 Calibre rows.
+          # A separate mount lets us add books deliberately, set #genre before
+          # anything is placed, and keep the source files intact.
+          - path: /import-staging
+            subPath: Library/Books/.import-staging
+            readOnly: true
       tmpfs:
         type: emptyDir
         globalMounts:
