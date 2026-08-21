@@ -54,9 +54,21 @@ spec:
                 BO=http://bookorbit.entertainment.svc.cluster.local:3000
                 TOKEN=$(curl -sf -X POST "$BO/api/v1/auth/login" -H 'content-type: application/json' -d "{\"username\":\"$BOOKORBIT_ADMIN_USER\",\"password\":\"$BOOKORBIT_ADMIN_PASSWORD\"}" | sed -n 's/.*"accessToken":"\([^"]*\)".*/\1/p')
                 if [ -z "$TOKEN" ]; then echo "scan-nightly: login failed" >&2; exit 1; fi
-                CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BO/api/v1/scanner/libraries/1/scan" -H "Authorization: Bearer $TOKEN")
-                echo "scan-nightly: scan trigger returned HTTP $CODE"
-                case "$CODE" in 202) exit 0;; 409) echo "scan-nightly: scan already running - fine"; exit 0;; *) exit 1;; esac
+                # Discover library IDs rather than hardcoding one. The previous
+                # "libraries/1/scan" returned 404 every night: BookOrbit library
+                # IDs start at 2, so library 1 has never existed.
+                IDS=$(curl -sf "$BO/api/v1/libraries" -H "Authorization: Bearer $TOKEN" | tr ',' '\n' | sed -n 's/.*"id":\([0-9][0-9]*\).*/\1/p' | sort -n | uniq)
+                if [ -z "$IDS" ]; then echo "scan-nightly: no libraries returned" >&2; exit 1; fi
+                rc=0
+                for id in $IDS; do
+                  CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BO/api/v1/scanner/libraries/$id/scan" -H "Authorization: Bearer $TOKEN")
+                  case "$CODE" in
+                    202) echo "scan-nightly: library $id queued";;
+                    409) echo "scan-nightly: library $id already scanning - fine";;
+                    *)   echo "scan-nightly: library $id returned HTTP $CODE" >&2; rc=1;;
+                  esac
+                done
+                exit $rc
             env:
               TZ: ${TIMEZONE}
               BOOKORBIT_ADMIN_USER:
