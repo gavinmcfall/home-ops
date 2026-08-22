@@ -28,6 +28,7 @@ Calibre's metadata.db.
 
 Env: LIB, DEST, STATE (default /state/abs_paths.json), TAG (default →abs).
 """
+import hashlib
 import json
 import os
 import re
@@ -224,12 +225,32 @@ def _place(src, dst):
 
 def _same_content(src, dst):
     """Inode equality no longer means anything now that we copy, so compare the
-    bytes' fingerprint instead: size first (cheap), then mtime."""
+    bytes' fingerprint instead: size first (cheap), then mtime, and only if those
+    disagree, the bytes themselves.
+
+    The hash step exists because mtime is not a content signal. The nightly embed
+    CronJob rewrites every Calibre-side file; when the metadata it bakes is already
+    present the bytes come out identical but the mtime moves. Trusting mtime alone
+    re-copied 37 byte-identical files after one night, which at full library size
+    means copying the whole tree nightly and bumping every folder's mtime, which in
+    turn makes ABS re-index books that never changed."""
     try:
         a, b = os.stat(src), os.stat(dst)
     except OSError:
         return False
-    return a.st_size == b.st_size and int(a.st_mtime) == int(b.st_mtime)
+    if a.st_size != b.st_size:
+        return False
+    if int(a.st_mtime) == int(b.st_mtime):
+        return True
+    return _digest(src) == _digest(dst)
+
+
+def _digest(p, chunk=1 << 20):
+    h = hashlib.md5()
+    with open(p, 'rb') as f:
+        for blk in iter(lambda: f.read(chunk), b''):
+            h.update(blk)
+    return h.hexdigest()
 
 
 def main():
