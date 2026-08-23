@@ -31,66 +31,6 @@ spec:
       # (tracked in nerdz-reading docs/upstream-tracker.md).
       # Script style: bare $VAR only, no dollar-brace tokens anywhere (Flux
       # post-build envsubst processes this manifest; braces fail the build).
-      scan-nightly:
-        type: cronjob
-        cronjob:
-          suspend: false
-          schedule: "0 4 * * *"
-          timeZone: ${TIMEZONE}
-          concurrencyPolicy: Forbid
-          successfulJobsHistory: 1
-          failedJobsHistory: 3
-          backoffLimit: 1
-        containers:
-          app:
-            image:
-              repository: docker.io/curlimages/curl
-              tag: 8.21.0@sha256:7c12af72ceb38b7432ab85e1a265cff6ae58e06f95539d539b654f2cfa64bb13
-            command:
-              - /bin/sh
-              - -c
-              - |
-                set -e
-                BO=http://bookorbit.entertainment.svc.cluster.local:3000
-                TOKEN=$(curl -sf -X POST "$BO/api/v1/auth/login" -H 'content-type: application/json' -d "{\"username\":\"$BOOKORBIT_ADMIN_USER\",\"password\":\"$BOOKORBIT_ADMIN_PASSWORD\"}" | sed -n 's/.*"accessToken":"\([^"]*\)".*/\1/p')
-                if [ -z "$TOKEN" ]; then echo "scan-nightly: login failed" >&2; exit 1; fi
-                # Discover library IDs rather than hardcoding one. The previous
-                # "libraries/1/scan" returned 404 every night: BookOrbit library
-                # IDs start at 2, so library 1 has never existed.
-                IDS=$(curl -sf "$BO/api/v1/libraries" -H "Authorization: Bearer $TOKEN" | tr ',' '\n' | sed -n 's/.*"id":\([0-9][0-9]*\).*/\1/p' | sort -n | uniq)
-                if [ -z "$IDS" ]; then echo "scan-nightly: no libraries returned" >&2; exit 1; fi
-                rc=0
-                for id in $IDS; do
-                  CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BO/api/v1/scanner/libraries/$id/scan" -H "Authorization: Bearer $TOKEN")
-                  case "$CODE" in
-                    202) echo "scan-nightly: library $id queued";;
-                    409) echo "scan-nightly: library $id already scanning - fine";;
-                    *)   echo "scan-nightly: library $id returned HTTP $CODE" >&2; rc=1;;
-                  esac
-                done
-                exit $rc
-            env:
-              TZ: ${TIMEZONE}
-              BOOKORBIT_ADMIN_USER:
-                valueFrom:
-                  secretKeyRef:
-                    name: bookorbit-secret
-                    key: BOOKORBIT_ADMIN_USER
-              BOOKORBIT_ADMIN_PASSWORD:
-                valueFrom:
-                  secretKeyRef:
-                    name: bookorbit-secret
-                    key: BOOKORBIT_ADMIN_PASSWORD
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
-            resources:
-              requests:
-                cpu: 10m
-                memory: 32Mi
-              limits:
-                memory: 64Mi
       bookorbit:
         annotations:
           reloader.stakater.com/auto: "true"
@@ -183,9 +123,8 @@ spec:
             namespace: network
             sectionName: https
     persistence:
-      # advancedMounts (not global): the scan-nightly CronJob pod must get NO
-      # mounts — the data PVC is RWO (multi-attach risk) and the tree is not
-      # its business; it only speaks HTTP to the service.
+      # advancedMounts (not global), kept from the scan-nightly CronJob era so a
+      # future sidecar/job pod never inherits the RWO data PVC by default.
       data:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
