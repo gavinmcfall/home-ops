@@ -119,7 +119,10 @@ spec:
               LIB: /media/Library/Books/.calibre/library       # staging Calibre library (CWA workbench)
               DEST: /media/Library/Books/Books                 # AudiobookShelf books root
               STATE: /state/abs_paths.json
-              TAG: "→abs"
+              # Selector for "belongs in the tree". A custom column, not a tag: `tags`
+              # is embedded into the epub's dc:subject and BookOrbit reads that as a
+              # genre, so a tag marker leaks into the UI as a browsable genre.
+              SELECT: "#tosync:true"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

@@ -2,7 +2,7 @@
 """Reconcile curated ebooks from a Calibre library into the AudiobookShelf
 folder structure by COPYING — idempotent.
 
-For every book tagged `→abs` (the review gate), compute its ABS path
+For every book flagged `#tosync` (the review gate), compute its ABS path
 (`<Genre>/<Author>/<Series>/<NN - Title>/<Title>.epub`) and place Calibre's epub
 there.
 
@@ -26,7 +26,8 @@ Reads metadata via `calibredb` (handles locking + custom columns + format
 paths). Keeps its own state file (book id -> last dst) so it never writes to
 Calibre's metadata.db.
 
-Env: LIB, DEST, STATE (default /state/abs_paths.json), TAG (default →abs).
+Env: LIB, DEST, STATE (default /state/abs_paths.json), SELECT (default
+`#tosync:true`).
 """
 import hashlib
 import json
@@ -38,7 +39,15 @@ import subprocess
 LIB = os.environ["LIB"]
 DEST = os.environ["DEST"]
 STATE = os.environ.get("STATE", "/state/abs_paths.json")
-TAG = os.environ.get("TAG", "→abs")
+# Which books belong in the tree. This was a Calibre TAG until 2026-09-03, and
+# that was quietly harmful: `tags` is what `calibredb embed_metadata` writes into
+# the epub's <dc:subject>, and BookOrbit reads <dc:subject> as a GENRE. So the
+# marker showed up as a browsable genre on ~2,800 books, and because it was the
+# ONLY subject we embedded, the real room never reached BookOrbit at all.
+# A custom column is not written into the file, so the marker stays internal and
+# `tags` is freed to carry the room and the discovery vocabulary.
+# Roll back with SELECT='tag:"→abs"'.
+SELECT = os.environ.get("SELECT", "#tosync:true")
 GENRE_FIELD = os.environ.get("GENRE_FIELD", "*genre")
 # In the CWA image `/usr/bin/calibredb` is a symlink created by s6 at runtime; a
 # command-override container (no s6 init) won't have it, so point at the real binary.
@@ -255,7 +264,7 @@ def _digest(p, chunk=1 << 20):
 
 def main():
     books = json.loads(calibredb(
-        "list", "--search", f'tag:"{TAG}"', "--fields", FIELDS, "--for-machine") or "[]")
+        "list", "--search", SELECT, "--fields", FIELDS, "--for-machine") or "[]")
     state = load_state()
     linked = relinked = moved = skipped = ok = conflicts = 0
 
@@ -316,7 +325,7 @@ def main():
 
     if not DRY:
         save_state(state)
-    print(f"\ndone{' (DRY RUN — nothing written)' if DRY else ''}: {len(books)} {TAG} book(s) | "
+    print(f"\ndone{' (DRY RUN — nothing written)' if DRY else ''}: {len(books)} selected book(s) | "
           f"linked={linked} relinked={relinked} moved={moved} ok={ok} "
           f"skipped={skipped} conflicts={conflicts}")
 
