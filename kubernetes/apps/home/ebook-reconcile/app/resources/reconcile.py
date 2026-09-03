@@ -27,7 +27,7 @@ paths). Keeps its own state file (book id -> last dst) so it never writes to
 Calibre's metadata.db.
 
 Env: LIB, DEST, STATE (default /state/abs_paths.json), SELECT (default
-`#tosync:true`).
+`#tosync:yes`).
 """
 import hashlib
 import json
@@ -47,7 +47,12 @@ STATE = os.environ.get("STATE", "/state/abs_paths.json")
 # A custom column is not written into the file, so the marker stays internal and
 # `tags` is freed to carry the room and the discovery vocabulary.
 # Roll back with SELECT='tag:"→abs"'.
-SELECT = os.environ.get("SELECT", "#tosync:true")
+# `:yes`, NOT `:true`. For a Calibre BOOL custom column, `#tosync:true` matches
+# "has any value" -- it selects books explicitly set to False as well as True.
+# Measured 2026-09-04: with 97 books set False, `#tosync:true` returned 3608 and
+# `#tosync:yes` returned 3511, the difference being exactly those 97. Selecting
+# them would have created 97 duplicate folders for books already on the shelf.
+SELECT = os.environ.get("SELECT", "#tosync:yes")
 GENRE_FIELD = os.environ.get("GENRE_FIELD", "*genre")
 # In the CWA image `/usr/bin/calibredb` is a symlink created by s6 at runtime; a
 # command-override container (no s6 init) won't have it, so point at the real binary.
