@@ -5,7 +5,7 @@ resources:
   # Must stay >= the Gateway API version envoy-gateway bundles — its v1.5+
   # safe-upgrades ValidatingAdmissionPolicy denies older CRD applies.
   # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
-  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.1/experimental-install.yaml
+  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.2/experimental-install.yaml
 patches:
   # k8s-gateway v0.4.0 requires v1alpha2.GRPCRoute which was removed in Gateway API v1.1.0+
   # Use JSON patch to ADD v1alpha2 version without replacing existing v1
