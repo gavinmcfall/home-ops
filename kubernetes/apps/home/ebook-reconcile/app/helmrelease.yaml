@@ -122,7 +122,9 @@ spec:
               # Selector for "belongs in the tree". A custom column, not a tag: `tags`
               # is embedded into the epub's dc:subject and BookOrbit reads that as a
               # genre, so a tag marker leaks into the UI as a browsable genre.
-              SELECT: "#tosync:true"
+              # `:yes` not `:true` -- for a bool custom column Calibre reads
+              # `:true` as "has any value", so it also selects books set to False.
+              SELECT: "#tosync:yes"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
