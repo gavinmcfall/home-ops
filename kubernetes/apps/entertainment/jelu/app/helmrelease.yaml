@@ -67,7 +67,11 @@ spec:
               # Jelu matches OIDC logins to existing users BY EMAIL, so the
               # admin is created once via the first-run wizard (with the
               # pocket-id email), then signs in with pocket-id. Account
-              # auto-creation stays off: single-user tool.
+              # auto-creation stays at its default (off): single-user tool.
+              # Do NOT set any JELU_AUTH_* key on its own — binding one key
+              # under jelu.auth makes Spring construct Auth() and its ldap/proxy
+              # sub-objects have no defaults, so the pod crash-loops with
+              # "Parameter specified as non-null is null ... parameter ldap".
               SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_POCKETID_PROVIDER: pocketid
               SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_POCKETID_CLIENT_NAME: pocket-id
               SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_POCKETID_SCOPE: openid,profile,email
@@ -75,7 +79,6 @@ spec:
               SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_POCKETID_REDIRECT_URI: "{baseUrl}/login/oauth2/code/{registrationId}"
               SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_POCKETID_ISSUER_URI: https://id.${SECRET_DOMAIN}
               SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_POCKETID_USER_NAME_ATTRIBUTE: preferred_username
-              JELU_AUTH_OAUTH2_ACCOUNT_CREATION: "false"
             envFrom:
               - secretRef:
                   name: jelu-secret
