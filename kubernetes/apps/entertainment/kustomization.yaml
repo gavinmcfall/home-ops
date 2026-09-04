@@ -12,6 +12,7 @@ resources:
   - ./audiobookshelf/ks.yaml
   - ./bookorbit/ks.yaml
   - ./immich/ks.yaml
+  - ./jelu/ks.yaml
   - ./kavita/ks.yaml
   - ./komf/ks.yaml
   - ./maloja/ks.yaml
