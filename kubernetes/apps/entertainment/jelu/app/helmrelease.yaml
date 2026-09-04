@@ -61,6 +61,14 @@ spec:
               JELU_METADATAPROVIDERS_0_ISENABLED: "true"
               JELU_METADATAPROVIDERS_0_ORDER: "-10"
               JELU_METADATAPROVIDERS_0_CONFIG: en
+              # Lucene search index. Upstream default is "" = the working dir
+              # /app, which is the read-only root here (first boot died on
+              # /app/write.lock). Keep it on the data volume. The min-gram
+              # line restates the default on purpose: jelu.lucene's
+              # indexAnalyzer has no constructor default, so binding
+              # data-directory alone would null it (same trap as jelu.auth).
+              JELU_LUCENE_DATA_DIRECTORY: /data/lucene
+              JELU_LUCENE_INDEX_ANALYZER_MIN_GRAM: "3"
               # --- SSO via pocket-id (OIDC) ---
               # Callback to register in pocket-id:
               #   https://jelu.${SECRET_DOMAIN}/login/oauth2/code/pocketid
