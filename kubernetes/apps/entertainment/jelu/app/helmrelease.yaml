@@ -61,6 +61,15 @@ spec:
               JELU_METADATAPROVIDERS_0_ISENABLED: "true"
               JELU_METADATAPROVIDERS_0_ORDER: "-10"
               JELU_METADATAPROVIDERS_0_CONFIG: en
+              # Google Books via Jelu's own plugin with an API key. Providers run
+              # highest order first, so this beats Calibre (order 1000). Added
+              # after the first import: Calibre's keyless Google lookups got
+              # HTTP 429 for the whole house IP ~150 books in, and every later
+              # book burned ~2 min failing. The key itself is
+              # JELU_METADATAPROVIDERS_1_APIKEY in jelu-secret.
+              JELU_METADATAPROVIDERS_1_NAME: google
+              JELU_METADATAPROVIDERS_1_ISENABLED: "true"
+              JELU_METADATAPROVIDERS_1_ORDER: "5000"
               # Lucene search index. Upstream default is "" = the working dir
               # /app, which is the read-only root here (first boot died on
               # /app/write.lock). Keep it on the data volume. The min-gram
