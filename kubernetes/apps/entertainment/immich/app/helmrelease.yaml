@@ -49,7 +49,7 @@ spec:
           main:
             image:
               repository: ghcr.io/immich-app/immich-server
-              tag: v3.0.3@sha256:c716dc20f957aafd89fa9d284a2ec63e25c9e2d8d8e87c6197d540a3dce237db
+              tag: v3.2.0@sha256:ae13784ffcfcce8f4178113eb6661602a1fd1912f3d539880b8ac0dd95fc8ac2
             env:
               TZ: ${TIMEZONE}
               # Config file (from secret, templated by ESO with secrets from 1Password)
@@ -106,7 +106,7 @@ spec:
             image:
               repository: ghcr.io/immich-app/immich-machine-learning
               # Using CPU version - OpenVINO has compatibility issues with some iGPUs
-              tag: v3.0.3@sha256:d76fe88b69282c09a97eac4f82dafa82cfd77bce274bc742591cde974f87dacb
+              tag: v3.2.0@sha256:f8b2869891c861a58dde969d86e7ea8a186e6059a55886632ee3249e51fb574a
             env:
               REDIS_HOSTNAME: *redisHostname
               REDIS_DBINDEX: "1"
