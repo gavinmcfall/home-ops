@@ -26,6 +26,27 @@ This centralized approach provides:
 2. **[docs/ai-context/ARCHITECTURE.md](docs/ai-context/ARCHITECTURE.md)** - System architecture
 3. **[docs/ai-context/CONVENTIONS.md](docs/ai-context/CONVENTIONS.md)** - Coding standards
 
+## 📕 Ebooks & audiobooks live in another repo
+
+**This repo holds only the cluster manifests** for the reading stack (Bindery,
+CWA/Calibre, Audiobookshelf, BookOrbit, Kavita, and friends). Everything else for
+that domain — the pipeline, acquisition, metadata, the genre tree, imports,
+tooling, decisions and session journal — lives in the **`nerdz-reading`** repo.
+
+Before doing reading-stack work beyond a manifest change, read there:
+
+- `docs/README.md` — the index: which docs are canonical and which are superseded
+- `docs/ebook-curation-pipeline.md` — **the** pipeline (§10 field-proven
+  corrections, §11 Bindery, §12 genre taxonomy)
+- `.repoql/concepts/` — the invariants as capsules
+
+Cluster-side map for this domain: [`docs/domains/reading/`](docs/domains/reading/).
+⚠️ Several older docs in the other repo describe an architecture that no longer
+exists (Readarr, Calibre-Web-as-reader, "genre is tags not folders" — all
+reversed). They are bannered; the index is the fast way to tell. **Do not
+re-derive this domain's rules** — they are written down, and re-deriving has
+repeatedly resurrected retired problems.
+
 ## ⚠️ Critical Invariants
 
 ### Capsule: GitOpsReconciliation
