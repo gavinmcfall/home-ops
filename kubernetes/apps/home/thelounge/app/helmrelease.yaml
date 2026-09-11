@@ -85,3 +85,11 @@ spec:
     persistence:
       config:
         existingClaim: *app
+      # node:sqlite needs a writable temp dir to build indexes and VACUUM.
+      # With readOnlyRootFilesystem and no /tmp, the 4.5.2 schema migration
+      # failed with SQLITE_IOERR_GETTEMPPATH and message storage silently
+      # switched itself off.
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
