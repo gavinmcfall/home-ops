@@ -26,6 +26,6 @@ spec:
   postBuild:
     substitute:
       APP: *app
-      VOLSYNC_CAPACITY: 1Gi
+      VOLSYNC_CAPACITY: 5Gi
       VOLSYNC_MINUTE: "44"
       VOLSYNC_B2_MINUTE: "21"
