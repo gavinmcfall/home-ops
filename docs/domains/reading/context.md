@@ -7,6 +7,23 @@ categories: ["Reference[100%]", "DomainContext[95%]"]
 
 # Books, Audiobooks, Comics & Manga — Context
 
+> **Depth lives in the `nerdz-reading` repo.**
+> This file is the cluster-side map: apps, routes, storage, flows. The pipeline
+> semantics — how a book actually gets from acquisition to shelf, and the rules
+> that keep it from going wrong — are documented there:
+>
+> - `docs/README.md` — index; what is canonical vs superseded
+> - `docs/ebook-curation-pipeline.md` — **THE pipeline.** §10 field-proven
+>   corrections, §11 Bindery, §12 genre taxonomy. Required before any bulk import.
+> - `docs/download-workflow-design.md` — acquisition + seed safety
+> - `docs/metadata-bake-process.md` — the bake and per-book bake-sync
+> - `.repoql/concepts/` — the invariants, as auto-surfacing capsules
+>
+> Load-bearing facts that are easy to get wrong: the **genre tree on disk is the
+> integration contract** (`Books/{Genre}/{Author}/{Series}/{NN - Title}/`);
+> **ABS parses embedded ebook metadata only at first index**; and Bindery's
+> **autoGrab kill-switch does not stop an already-running sweep**.
+
 <!-- generated:start section=apps -->
 ## Apps
 
