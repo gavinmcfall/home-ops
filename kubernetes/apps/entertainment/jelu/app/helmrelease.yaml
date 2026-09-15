@@ -41,7 +41,7 @@ spec:
             # docs/odad-physical-books/design/interim-jelu.md
             image:
               repository: docker.io/wabayang/jelu
-              tag: 0.86.0@sha256:252e57ddc25590be09d35de0cccb319e852a36b0ed3d098e4ef08a2ff0dc7320
+              tag: 0.87.2@sha256:ed8e72eaf4dba191ff6624a4d4e2ef970a8b1e724e1fb78652783f50a374baf8
             env:
               TZ: ${TIMEZONE}
               # All state under one backed-up volume (the image defaults are
