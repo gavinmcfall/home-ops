@@ -3,7 +3,7 @@
 Deploy the Pelican Panel using the bjw-s app-template Helm chart with GitOps.
 
 > [!NOTE]
-> Pelican is the community-driven successor to Pterodactyl. The official image is `ghcr.io/pelican-dev/panel`.
+> Pelican is the community-driven successor to Pterodactyl. The official image is `ghcr.io/pelican/panel`.
 
 ---
 
@@ -184,7 +184,7 @@ spec:
         initContainers:
           init-plugins:
             image:
-              repository: ghcr.io/pelican-dev/panel
+              repository: ghcr.io/pelican/panel
               tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
             command:
               - /bin/sh
@@ -202,7 +202,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/pelican-dev/panel
+              repository: ghcr.io/pelican/panel
               tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
             env:
               XDG_DATA_HOME: /pelican-data
@@ -266,7 +266,7 @@ spec:
 > - Should be `/var/www/html/plugins` → `/pelican-data/plugins`
 >
 > The workaround mounts the PVC directly to `/var/www/html/plugins` via subPath.
-> This issue is tracked in [pelican-dev/panel#2063](https://github.com/pelican-dev/panel/pull/2063).
+> This issue is tracked in [pelican/panel#2063](https://github.com/pelican/panel/pull/2063).
 
 ---
 
