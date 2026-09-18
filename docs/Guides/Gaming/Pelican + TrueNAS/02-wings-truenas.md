@@ -188,7 +188,7 @@ Create the Docker Compose file on TrueNAS:
 ```yaml
 services:
   wings:
-    image: ghcr.io/pelican-dev/wings:latest
+    image: ghcr.io/pelican/wings:latest
     restart: always
     network_mode: host
     tty: true

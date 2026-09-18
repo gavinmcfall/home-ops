@@ -99,7 +99,7 @@ Add these init containers before your main app container:
 initContainers:
   init-plugins:
     image:
-      repository: ghcr.io/pelican-dev/panel
+      repository: ghcr.io/pelican/panel
       tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
     command:
       - /bin/sh
@@ -116,7 +116,7 @@ initContainers:
       runAsGroup: 0
   copy-vendor:
     image:
-      repository: ghcr.io/pelican-dev/panel
+      repository: ghcr.io/pelican/panel
       tag: v1.0.0-beta30@sha256:aec08833e40b54e773cae68945d81f42561d176244032e33c152a92ebd0e0deb
     command:
       - /bin/sh
@@ -194,13 +194,13 @@ flux reconcile kustomization pelican --with-source
 
 ## Step 6: Install the PocketID Plugin
 
-1. Download the plugin from: https://github.com/pelican-dev/plugins/tree/main/pocketid
+1. Download the plugin from: https://github.com/pelican/plugins/tree/main/pocketid
 2. Go to **Pelican Admin Panel** → **Plugins**
 3. Upload the plugin files or clone directly:
 
 ```bash
 kubectl exec -n games deploy/pelican -- \
-  git clone https://github.com/pelican-dev/plugins.git /tmp/plugins
+  git clone https://github.com/pelican/plugins.git /tmp/plugins
 
 kubectl exec -n games deploy/pelican -- \
   cp -r /tmp/plugins/pocketid /var/www/html/plugins/
@@ -291,8 +291,8 @@ The following PRs were created to improve Pelican's container experience:
 
 | PR | Description | Status |
 |----|-------------|--------|
-| [pelican-dev/panel#2112](https://github.com/pelican-dev/panel/pull/2112) | Make `APP_TIMEZONE` env var work | Pending |
-| [pelican-dev/plugins#82](https://github.com/pelican-dev/plugins/pull/82) | PocketID container/Kubernetes docs | Pending |
-| [pelican-dev/panel#2063](https://github.com/pelican-dev/panel/pull/2063) | Fix plugins symlink in Dockerfile | Open |
+| [pelican/panel#2112](https://github.com/pelican/panel/pull/2112) | Make `APP_TIMEZONE` env var work | Pending |
+| [pelican/plugins#82](https://github.com/pelican/plugins/pull/82) | PocketID container/Kubernetes docs | Pending |
+| [pelican/panel#2063](https://github.com/pelican/panel/pull/2063) | Fix plugins symlink in Dockerfile | Open |
 
 Once PR #2063 is merged, the plugin mounting workaround can be simplified.
