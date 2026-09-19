@@ -78,6 +78,9 @@ spec:
               ABB_ENABLED: "true"
               ABB_HOSTNAME: audiobookbay.lu
               ABB_PAGE_LIMIT: "2"
+              # Multi-file audiobook torrents otherwise land as loose PartNN.mp3 files in the
+              # inbox; organize mode files them as {Author}/{Title}/ (template set in the UI).
+              FILE_ORGANIZATION_AUDIOBOOK: organize
             envFrom:
               # AA_DONATOR_KEY + OIDC_CLIENT_ID/SECRET from the ExternalSecret
               - secretRef:
