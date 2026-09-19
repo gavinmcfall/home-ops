@@ -51,9 +51,13 @@ spec:
                 ls -ld /media/Library/Books/_inbox
         containers:
           app:
+            # Fork of calibrain/shelfmark carrying feat/api-keys (personal API keys as
+            # Bearer tokens, so Claude can drive acquisition programmatically) until
+            # upstream merges it. Tags are cut from that branch; switch back to
+            # ghcr.io/calibrain/shelfmark once a release contains the feature.
             image:
-              repository: ghcr.io/calibrain/shelfmark
-              tag: v1.3.15@sha256:9602290324993c801b319d3166b202b96bd9039af2416f0916dae03a5bdca815
+              repository: ghcr.io/gavinmcfall/shelfmark
+              tag: v1.3.15-apikeys.1@sha256:a01e2ec6ccc55c48efab0762f5221494240d324e82c53ba1274b0b640d286321
             env:
               TZ: ${TIMEZONE}
               FLASK_PORT: "8084"
