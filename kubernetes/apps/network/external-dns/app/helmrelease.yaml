@@ -38,6 +38,9 @@ spec:
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
       - --gateway-namespace=network
+      # v0.22.0 switched the default prefix to external-dns.kubernetes.io/ with no
+      # fallback; pin the legacy prefix every route in this repo still uses.
+      - --annotation-prefix=external-dns.alpha.kubernetes.io/
       - --annotation-filter=external-dns.alpha.kubernetes.io/target
     policy: sync
     sources: ["crd", "gateway-httproute"]
