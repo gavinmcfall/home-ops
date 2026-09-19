@@ -72,6 +72,12 @@ spec:
               OIDC_DISCOVERY_URL: https://id.${SECRET_DOMAIN}/.well-known/openid-configuration
               # OIDC_AUTO_PROVISION defaults true -> first OIDC login auto-creates the user.
               # Local admin login stays enabled as a fallback (not disabled yet).
+              # --- AudiobookBay: the one audiobook source Shelfmark adds over Prowlarr ---
+              # Magnets go to qBittorrent under the "shelfmark" category (client set in the UI).
+              # audiobookbay.lu answers from the cluster; the .is mirror serves an expired cert.
+              ABB_ENABLED: "true"
+              ABB_HOSTNAME: audiobookbay.lu
+              ABB_PAGE_LIMIT: "2"
             envFrom:
               # AA_DONATOR_KEY + OIDC_CLIENT_ID/SECRET from the ExternalSecret
               - secretRef:
