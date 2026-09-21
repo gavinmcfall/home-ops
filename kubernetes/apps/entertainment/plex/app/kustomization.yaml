@@ -28,5 +28,8 @@ configMapGenerator:
     options:
       labels:
         loki_rule: "true"
+      annotations:
+        # Loki's rules sidecar files this under the single-tenant ("fake") rule directory.
+        k8s-sidecar-target-directory: /rules/fake
 generatorOptions:
   disableNameSuffixHash: true
