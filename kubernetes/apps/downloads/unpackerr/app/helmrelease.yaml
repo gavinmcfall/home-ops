@@ -45,6 +45,9 @@ spec:
               UN_SONARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr
               UN_SONARR_1_URL: http://sonarr-uhd.downloads.svc.cluster.local
               UN_SONARR_1_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr-uhd
+              # unpackerr 0.16 caps extracted size per instance (Sonarr 20GB, Radarr 75GB)
+              # and fails the item with no retry when hit; 0 disables the cap for UHD.
+              UN_SONARR_1_MAX_BYTES: "0"
               UN_SONARR_2_URL: http://sonarr-foreign.downloads.svc.cluster.local
               UN_SONARR_2_PATHS_0: /media/Downloads/qbittorrent/complete/sonarr-foreign
               # Radarr
@@ -52,6 +55,7 @@ spec:
               UN_RADARR_0_PATHS_0: /media/Downloads/qbittorrent/complete/radarr
               UN_RADARR_1_URL: http://radarr-uhd.downloads.svc.cluster.local
               UN_RADARR_1_PATHS_0: /media/Downloads/qbittorrent/complete/radarr-uhd
+              UN_RADARR_1_MAX_BYTES: "0"
             envFrom:
               - secretRef:
                   name: unpackerr-secret
