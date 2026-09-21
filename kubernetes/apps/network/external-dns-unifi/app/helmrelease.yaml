@@ -58,6 +58,9 @@ spec:
           timeoutSeconds: 5
     extraArgs:
       - --ignore-ingress-tls-spec
+      # v0.22.0 switched the default prefix to external-dns.kubernetes.io/ with no
+      # fallback; pin the legacy prefix every route in this repo still uses.
+      - --annotation-prefix=external-dns.alpha.kubernetes.io/
       - --annotation-filter=internal-dns.alpha.kubernetes.io/target
     policy: sync
     sources:
