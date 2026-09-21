@@ -30,8 +30,18 @@ spec:
       namespace: openebs-system
   values:
     deploymentMode: Monolithic
+    sidecar:
+      rules:
+        searchNamespace: ALL
     loki:
       auth_enabled: false
+      rulerConfig:
+        alertmanager_url: http://kube-prometheus-stack-alertmanager.observability.svc.cluster.local:9093
+        rule_path: /tmp/loki/rules-scratch
+        storage:
+          type: local
+          local:
+            directory: /rules
       analytics:
         reporting_enabled: false
       server:

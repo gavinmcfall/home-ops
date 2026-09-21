@@ -30,8 +30,23 @@ spec:
       namespace: openebs-system
   values:
     deploymentMode: Monolithic
+    sidecar:
+      rules:
+        # The loki_rule ConfigMaps live in the app namespaces (downloads, entertainment),
+        # not here; the chart default only watches the release namespace.
+        searchNamespace: ALL
     loki:
       auth_enabled: false
+      rulerConfig:
+        # Deliver rule alerts to the in-cluster Alertmanager.
+        alertmanager_url: http://kube-prometheus-stack-alertmanager.observability.svc.cluster.local:9093
+        # The sidecar drops rule files at /rules/<tenant>; read them from there and keep the
+        # ruler's scratch copies elsewhere (its default scratch path is also /rules).
+        rule_path: /tmp/loki/rules-scratch
+        storage:
+          type: local
+          local:
+            directory: /rules
       analytics:
         reporting_enabled: false
       server:
