@@ -10,10 +10,10 @@ spec:
   chart:
     spec:
       chart: loki
-      version: 6.55.0
+      version: 18.13.4
       sourceRef:
         kind: HelmRepository
-        name: grafana
+        name: grafana-community
         namespace: flux-system
   install:
     crds: Skip
@@ -29,7 +29,7 @@ spec:
     - name: openebs
       namespace: openebs-system
   values:
-    deploymentMode: SingleBinary
+    deploymentMode: Monolithic
     loki:
       auth_enabled: false
       analytics:
@@ -60,7 +60,7 @@ spec:
         storageClass: openebs-hostpath
         size: 50Gi
     gateway:
-      replicas: 0
+      enabled: false
     backend:
       replicas: 0
     read:
