@@ -14,8 +14,3 @@ overlays:
     plex_search:
       all:
         collection: TMDb Weekly Trending
-  Trakt Trending:
-    overlay: Trakt Trending
-    trakt_chart:                                                        # For some reason it said the collection "Trakt Trending Now (Unplayed)" is not found, so I put this
-      chart: trending
-      limit: 100

@@ -14,8 +14,3 @@ overlays:
     plex_search:
       all:
         collection: TMDb Weekly Trending
-  Trakt Trending:
-    overlay: Trakt Trending
-    plex_search:
-      all:
-        collection: Trakt Trending
