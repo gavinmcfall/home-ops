@@ -22,18 +22,6 @@ templates:
     collection_order: custom
     collection_mode: hide
     schedule: yearly(03/01)
-  Best Of - Rotten Tomatoes - Years:
-    sort_title: "!04_<<collection_name>>"
-    sync_mode: sync
-    collection_order: custom
-    collection_mode: hide
-    schedule: yearly(03/01)
-  Best Of - Rotten Tomatoes - Genres:
-    sort_title: "!05_<<collection_name>>"
-    sync_mode: sync
-    collection_order: custom
-    collection_mode: hide
-    schedule: yearly(03/01)
   Custom:
     sort_title: "!06_<<collection_name>>"
     sync_mode: sync
@@ -184,9 +172,6 @@ collections:
   Top 10 Pirated Movies:
     template: {name: Charts}
     mdblist_list: https://mdblist.com/lists/awesomeaustn/top-10-pirated-movies-of-the-week
-# Trakt Trending:                                                       # I'm using this instead: Movies - Trakt (Unplayed) by Magic815
-#   template: {name: Charts}
-#   trakt_trending: 30
 
 ############################
 #         BEST OF          #
@@ -214,39 +199,6 @@ collections:
   Best Visual Effects:
     template: {name: Oscars}
     imdb_list: https://www.imdb.com/list/ls560368042
-  Rotten Tomatoes - Best All Time:
-    template: {name: Best Of - Rotten Tomatoes - Years}
-    trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-top-100-movies-of-all-time
-# Rotten Tomatoes - Best of 2014:
-#   template: {name: Best Of - Rotten Tomatoes - Years}
-#   trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-best-of-2014
-# Rotten Tomatoes - Best of 2015:
-#   template: {name: Best Of - Rotten Tomatoes - Years}
-#   trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-best-of-2015
-# Rotten Tomatoes - Best of 2016:
-#   template: {name: Best Of - Rotten Tomatoes - Years}
-#   trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-best-of-2016
-# Rotten Tomatoes - Best of 2017:
-#   template: {name: Best Of - Rotten Tomatoes - Years}
-#   trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-best-of-2017
-# Rotten Tomatoes - Best of 2018:
-#   template: {name: Best Of - Rotten Tomatoes - Years}
-#   trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-best-of-2018
-# Rotten Tomatoes - Best of 2019:
-#   template: {name: Best Of - Rotten Tomatoes - Years}
-#   trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-best-of-2019
-# Rotten Tomatoes - Best of 2020:
-#   template: {name: Best Of - Rotten Tomatoes - Years}
-#   trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-best-of-2020
-  Rotten Tomatoes - Best Horror:
-    template: {name: Best Of - Rotten Tomatoes - Genres}
-    trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-best-horror-movies-of-all-time
-  Rotten Tomatoes - Best LGBT:
-    template: {name: Best Of - Rotten Tomatoes - Genres}
-    trakt_list: https://trakt.tv/users/saara-v-a/lists/rotten-tomatoes-150-best-lgbt-movies-of-all-time-copy
-  Rotten Tomatoes - Best Rom Com:
-    template: {name: Best Of - Rotten Tomatoes - Genres}
-    trakt_list: https://trakt.tv/users/lish408/lists/rotten-tomatoes-the-200-best-romantic-comedies-of-all-time
 
 ############################
 #          CUSTOM          #
@@ -330,10 +282,6 @@ collections:
     template: {name: Custom}
     mdblist_list: https://mdblist.com/lists/hdlists/mindfuck-movies
     summary: A Growing Collection of Mindfuck Movies!
-  Mindfuck by LISH:
-    template: {name: Custom}
-    trakt_list: https://trakt.tv/users/lish408/lists/mindfuck
-    summary: Complex plot. Big plot twist. Ending twist.
   Music:
     template: {name: Custom}
     imdb_list: https://www.imdb.com/list/ls021457968                    # List by ivandjordjevic-43807
@@ -616,22 +564,6 @@ collections:
       any:
         title:
           - "Marvel's Infinity Saga: The Sacred Timeline"               # Fan edit
-  Marvel Cinematic Universe (Chronological):
-    template: {name: Studios}
-    trakt_list: https://trakt.tv/users/jawann2002/lists/marvel-cinematic-universe-movies?sort=rank,asc
-    plex_search:
-      any:
-        title:
-          - "Marvel's Infinity Saga: The Sacred Timeline"               # Fan edit
-    file_poster: /config/assets/Marvel Cinematic Universe.png
-# Marvel Cinematic Universe (Chronological):                            # This includes the TV Shows also
-#   template: {name: Studios}
-#   trakt_list: https://trakt.tv/users/donxy/lists/marvel-cinematic-universe?sort=rank,asc
-#   plex_search:
-#     any:
-#       title:
-#         - "Marvel's Infinity Saga: The Sacred Timeline"               # Fan edit
-#   file_poster: /config/assets/Marvel Cinematic Universe.png
   Pixar:
     template: {name: Studios}
     imdb_list: https://www.imdb.com/list/ls084018331

@@ -181,9 +181,6 @@ collections:
   TMDb Weekly Trending:
     template: {name: Charts}
     tmdb_trending_weekly: 30
-  Trakt Trending:
-    template: {name: Charts}
-    trakt_trending: 30
 
 ############################
 #         BEST OF          #
@@ -294,7 +291,7 @@ collections:
     template: {name: Streaming Services}
     mdblist_list: https://mdblist.com/lists/awesomeaustn/apple-tv-sorted-by-score
     collection_order: custom
-    summary: Sorted by a combined score of IMDb, Trakt, TMDb, Letterboxed, Rotten Tomatoes, Audience, Metacritic, and RogerEbert.
+    summary: Sorted by a combined score of IMDb, TMDb, Letterboxed, Rotten Tomatoes, Audience, Metacritic, and RogerEbert.
   Disney+:
     template: {name: Streaming Services}
     tmdb_network: 2739
@@ -304,7 +301,7 @@ collections:
     template: {name: Streaming Services}
     mdblist_list: https://mdblist.com/lists/awesomeaustn/disney-sorted-by-score
     collection_order: custom
-    summary: Sorted by a combined score of IMDb, Trakt, TMDb, Letterboxed, Rotten Tomatoes, Audience, Metacritic, and RogerEbert.
+    summary: Sorted by a combined score of IMDb, TMDb, Letterboxed, Rotten Tomatoes, Audience, Metacritic, and RogerEbert.
   HBO Max:
     template: {name: Streaming Services}
     tmdb_network: 3186
@@ -326,7 +323,7 @@ collections:
     template: {name: Streaming Services}
     mdblist_list: https://mdblist.com/lists/awesomeaustn/netflix-sorted-by-score
     collection_order: custom
-    summary: Sorted by a combined score of IMDb, Trakt, TMDb, Letterboxed, Rotten Tomatoes, Audience, Metacritic, and RogerEbert.
+    summary: Sorted by a combined score of IMDb, TMDb, Letterboxed, Rotten Tomatoes, Audience, Metacritic, and RogerEbert.
   Paramount+:
     template: {name: Streaming Services}
     tmdb_network: 4330
@@ -360,10 +357,6 @@ collections:
     tmdb_list: https://www.themoviedb.org/list/7071556
     tvdb_show:
       - 393201  # I Am Groot                                            # This is listed as movies on TMDb
-# Marvel Cinematic Universe (Chronological):                            # This includes the movies also
-#   template: {name: Studios}
-#   trakt_list: https://trakt.tv/users/donxy/lists/marvel-cinematic-universe?sort=rank,asc
-#   collection_order: custom
   Marvel Studios:
     template: {name: Studios}
     tmdb_company: 420
