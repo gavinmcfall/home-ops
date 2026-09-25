@@ -1,4 +1,4 @@
-cloudflare==5.7.0
+cloudflare==5.8.0
 email-validator==2.3.0
 makejinja==2.9.1
 netaddr==1.3.0
