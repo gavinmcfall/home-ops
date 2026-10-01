@@ -51,13 +51,9 @@ spec:
                 ls -ld /media/Library/Books/_inbox
         containers:
           app:
-            # Fork of calibrain/shelfmark carrying feat/api-keys (personal API keys as
-            # Bearer tokens, so Claude can drive acquisition programmatically) until
-            # upstream merges it. Tags are cut from that branch; switch back to
-            # ghcr.io/calibrain/shelfmark once a release contains the feature.
             image:
-              repository: ghcr.io/gavinmcfall/shelfmark
-              tag: v1.3.15-apikeys.1@sha256:a01e2ec6ccc55c48efab0762f5221494240d324e82c53ba1274b0b640d286321
+              repository: ghcr.io/calibrain/shelfmark
+              tag: v1.4.0@sha256:4ef757349c3c7a7d90ba95b1e2a46ce4dd460a4776efbcf2aa1b1c476e7d5de5
             env:
               TZ: ${TIMEZONE}
               FLASK_PORT: "8084"
@@ -82,7 +78,8 @@ spec:
               # inbox; organize mode files them as {Author}/{Title}/ (template set in the UI).
               FILE_ORGANIZATION_AUDIOBOOK: organize
             envFrom:
-              # AA_DONATOR_KEY + OIDC_CLIENT_ID/SECRET from the ExternalSecret
+              # AA_DONATOR_KEY + OIDC_CLIENT_ID/SECRET + SHELFMARK_API_KEY from the ExternalSecret.
+              # SHELFMARK_API_KEY (Bearer or X-Api-Key) acts as the first admin user, not an OIDC user.
               - secretRef:
                   name: shelfmark-secret
             probes:
