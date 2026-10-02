@@ -34,7 +34,7 @@ spec:
           app:
             image:
               repository: docker.io/library/influxdb
-              tag: 2.9.1@sha256:05d6fb735bc22449c401094d42846123a24e3325d3a6e092242a45bfd68fff21
+              tag: 2.9.1@sha256:db0bdab1e5ad5ee899c127b8c13d9c986a3ced78cd9200dd80a1064bf1533b6e
             env:
               DOCKER_INFLUXDB_INIT_MODE: setup
               DOCKER_INFLUXDB_INIT_ORG: vitals
