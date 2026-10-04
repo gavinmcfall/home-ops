@@ -68,7 +68,7 @@ spec:
           app:
             image:
               repository: ghcr.io/suwayomi/tachidesk
-              tag: v2.3.2361@sha256:c1888d3c331cdc139a49a5ec62260f02ca003739bc7f754114b8293a305bffd3
+              tag: v2.4.2378@sha256:25376e7c54f0a6d49d861f7fd57dd82e18799aec8928ff0b8fd680c98cd2ff2c
             env:
               TZ: ${TIMEZONE}
               # Suwayomi has no env-var config layer; JVM -D flags drive runtime overrides.
