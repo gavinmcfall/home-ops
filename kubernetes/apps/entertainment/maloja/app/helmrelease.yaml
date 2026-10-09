@@ -35,7 +35,7 @@ spec:
             image:
               # NOTE: digest lifted from a community mirror — verify against docker.io before prod.
               repository: docker.io/krateng/maloja
-              tag: 3.2.6@sha256:1ccc7f4f78256242ada110efffe255617c974714455199c59a1fb0696ab23734
+              tag: 3.2.7@sha256:8864145b0107f9edfdd6672b366deb84378f4b20ea48730206bc5a56e3f82460
             env:
               MALOJA_DATA_DIRECTORY: /data
             envFrom:
