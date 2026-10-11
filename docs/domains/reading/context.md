@@ -149,5 +149,17 @@ Converting mp3 audiobooks to m4b runs through AudiobookShelf's built-in encoder 
 Grabbing is manual and user-triggered; every piece of automation that can fetch or delete is fenced off by an explicit gate. Bindery's `autoGrab.enabled=false` setting keeps roughly 2,000 monitored+wanted books from mass-grabbing the instant a download client is enabled — but the kill-switch is read only once, when Bindery's 12-hour wanted-sweep starts, so after changing it the Bindery pod needs a restart before enabling any client, or an in-flight sweep will still grab. Authors and series are added unmonitored by default; grabs go through the Wanted page in the UI or `POST /api/v1/wanted/bulk {ids,action:'search'}` (paced and bounded). The English-only filter lives on the Prowlarr MAM indexers (`searchLanguages=[1]`) — without it, loose title matches grab foreign editions. Dual-format grabs carry two known upstream Bindery gotchas: an audiobook import landing on an existing ebook folder collides into `Title (2)/` and needs manual consolidation, and the last import wins on `mediaType`, which is restored with `PUT /api/v1/book/{id} {"mediaType":"both"}`.
 <!-- seeded: review -->
 
+### Access Model
+
+Who can read what is decided in BookOrbit and nowhere else. A person sees a book only if their BookOrbit account is granted the library (one library per genre room), which is how the kids' accounts are age-gated: Children's and Young Adult rooms only, granted by hand. What a person may *do* (download, send to Kindle, sync a Kobo, upload, edit metadata) comes from Pocket-ID group membership through BookOrbit's OIDC group mappings — `bookorbit_adults` and `bookorbit_kids` carry the same standard set, `book_orbit_librarians` adds upload and edit-metadata — and those mappings are re-applied on every login, so a permission ticked or unticked on a single user reverts the next time they sign in (bookorbit#1398). Change the group or the mapping, never the user. AudiobookShelf's grants are a frozen legacy snapshot and must not be reasoned from.
+
+### Series Completeness Badges
+
+BookOrbit marks a series "missing #N" whenever its stored expected book count exceeds the volumes owned, and the provider it fills that count from (Hardcover `books_count`) counts novellas, box sets and companions, so unedited badges overstate every long children's series (bookorbit#1384). The honest total is one a person states, written with `source = manual` by `tools/bookorbit_series_totals.py` in the nerdz-reading repo from a reviewed CSV; a provider refresh can still raise it until the upstream fix lands, so the tool's `plan` is re-run after metadata fetches to list drift.
+
+### Send To Kindle
+
+One shared SMTP relay owned by the admin sends every family member's books, from a single fixed address. Amazon accepts mail from any sender and then silently discards it unless that address is on the recipient's own approved-senders list, so a relay's "delivered" proves nothing about arrival: each Kindle owner adds the From address on their Amazon account first. BookOrbit resolves the provider only from the user's own preference, never from the shared provider's Default flag (bookorbit#1387), so each user also sets Preferences → default provider once.
+
 <!-- Add capsules per docs/ai-context/writing-capsules.md. Skill never edits below. -->
 <!-- /curated -->
