@@ -1,0 +1,63 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cloudnative-pg-superuser-rules
+spec:
+  groups:
+    - name: cloudnative-pg-superuser.rules
+      rules:
+        # Alert on the absence of a success rather than on a failed Job.
+        # `kube_job_status_failed` stays at 1 until the Job is garbage
+        # collected, so it keeps firing long after recovery;
+        # `last_successful_time` resolves the instant one run passes, and it
+        # also pages when the probe is suspended, deleted or never scheduled —
+        # a dead canary should be as loud as a failing one.
+        - alert: CnpgSuperuserProbeAbsent
+          annotations:
+            summary: >-
+              The CloudNativePG superuser auth probe has never reported a
+              success — superuser password drift is currently undetectable.
+          expr: |
+            absent(kube_cronjob_status_last_successful_time{namespace="database", cronjob="cnpg-superuser-probe"})
+          for: 1h
+          labels:
+            severity: critical
+
+        # 30m = three missed 10m cycles, and longer than the 15m ExternalSecret
+        # refresh that auto-repairs drift. A drift that self-heals never pages;
+        # this only fires once auto-repair has also failed.
+        - alert: CnpgSuperuserAuthFailing
+          annotations:
+            summary: >-
+              CloudNativePG superuser auth has not succeeded for over 30m — the
+              `postgres` password in the database no longer matches
+              cloudnative-pg-secret. Every app with an init-db container will
+              fail on its next pod restart.
+            description: >-
+              Force an ExternalSecret refresh to make CNPG re-run ALTER ROLE:
+              kubectl -n database annotate externalsecret cloudnative-pg
+              force-sync="$(date +%s)" --overwrite. Then confirm with the next
+              cnpg-superuser-probe job's logs. Do NOT rollout restart anything
+              until the probe passes — new pods hit the same auth failure.
+          expr: |
+            time() - max(kube_cronjob_status_last_successful_time{namespace="database", cronjob="cnpg-superuser-probe"}) > 1800
+          for: 5m
+          labels:
+            severity: critical
+
+        # Broad safety net, independent of the probe: 29 app manifests carry an
+        # `init-db` container that authenticates as the postgres superuser, and
+        # a crash-looping one is the symptom that made the 2026-10-18 incident
+        # visible only after six apps were already down.
+        - alert: PostgresInitDbCrashLooping
+          annotations:
+            summary: >-
+              {{ $labels.namespace }}/{{ $labels.pod }} init-db is in
+              CrashLoopBackOff — it cannot authenticate to Postgres.
+          expr: |
+            kube_pod_init_container_status_waiting_reason{container="init-db", reason="CrashLoopBackOff"} > 0
+          for: 10m
+          labels:
+            severity: critical
