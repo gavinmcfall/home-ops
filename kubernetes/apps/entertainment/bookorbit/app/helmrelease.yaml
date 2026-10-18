@@ -51,7 +51,7 @@ spec:
             # scanner works, but nothing can bake metadata into the files yet.
             image:
               repository: ghcr.io/bookorbit/bookorbit
-              tag: 3.2.0@sha256:1020eef9f004be972ac60e79dd5f416129f0d3d91491b803aa8fa656acb2b6a6
+              tag: 3.4.0@sha256:99539be044c94f10fa5fba616cb08e1b128deb4996c975d181a950818a8632e4
             env:
               TZ: ${TIMEZONE}
               NODE_ENV: production
