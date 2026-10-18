@@ -1,0 +1,100 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cnpg-superuser-probe
+spec:
+  # Nothing in CNPG reports whether the `postgres` password in the database
+  # still matches `cloudnative-pg-secret`. SetUserPassword runs through
+  # ExecWithSuppressedLogging, so applying it logs nothing and skipping it logs
+  # nothing; there is no event and no metric. The one field that looks like a
+  # receipt — `cluster.status.secretsResourceVersion.superuserSecretVersion` —
+  # is written by the operator simply *reading* the secret's current
+  # resourceVersion (internal/controller/cluster_status.go), so it reads
+  # "in sync" while the database is drifted. It did exactly that during the
+  # 2026-10-18 incident.
+  #
+  # So the only way to know is to authenticate. This does what every app's
+  # `init-db` container does, over TCP, with the secret's own credentials —
+  # turning a silent cluster-wide landmine into a page before any pod restarts
+  # and trips over it.
+  schedule: "*/10 * * * *"
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      ttlSecondsAfterFinished: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 26
+            runAsGroup: 26
+            fsGroup: 26
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: probe
+              # Same digest the clusters themselves run, so this pulls nothing
+              # new and Renovate tracks one image reference for both.
+              image: ghcr.io/cloudnative-pg/postgresql:18@sha256:7f374e054e46fdefd64b52904e32362949703a75c05302dca8ffa1eb78d41891
+              command: ["/bin/bash", "-c"]
+              args:
+                - |
+                  set -u
+                  rc=0
+                  for host in ${TARGETS}; do
+                    fqdn="${host}.${TARGET_NAMESPACE}.svc.cluster.local"
+                    if err=$(psql -h "${fqdn}" -d postgres -tAc 'SELECT 1' 2>&1 >/dev/null); then
+                      echo "ok      ${host}"
+                    else
+                      # psql never echoes the password, only the username.
+                      echo "FAILED  ${host}: ${err}"
+                      rc=1
+                    fi
+                  done
+                  exit "${rc}"
+              env:
+                - name: TARGET_NAMESPACE
+                  value: database
+                - name: TARGETS
+                  value: >-
+                    postgres18-cluster-rw
+                    postgres18-immich-rw
+                    postgres18-bookorbit-rw
+                - name: PGCONNECT_TIMEOUT
+                  value: "10"
+                - name: HOME
+                  value: /tmp
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      name: cloudnative-pg-secret
+                      key: username
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: cloudnative-pg-secret
+                      key: password
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 128Mi
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir: {}
