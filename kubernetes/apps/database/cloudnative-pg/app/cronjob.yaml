@@ -45,21 +45,25 @@ spec:
               # new and Renovate tracks one image reference for both.
               image: ghcr.io/cloudnative-pg/postgresql:18@sha256:7f374e054e46fdefd64b52904e32362949703a75c05302dca8ffa1eb78d41891
               command: ["/bin/bash", "-c"]
+              # NOTE: shell vars escaped as $${VAR} so Flux postBuild.substitute
+              # leaves them alone — the parent flux-system Kustomization patches
+              # substituteFrom onto every app Kustomization, and it runs in
+              # strict mode, so an unescaped ${VAR} fails the build outright.
               args:
                 - |
                   set -u
                   rc=0
-                  for host in ${TARGETS}; do
-                    fqdn="${host}.${TARGET_NAMESPACE}.svc.cluster.local"
-                    if err=$(psql -h "${fqdn}" -d postgres -tAc 'SELECT 1' 2>&1 >/dev/null); then
-                      echo "ok      ${host}"
+                  for host in $${TARGETS}; do
+                    fqdn="$${host}.$${TARGET_NAMESPACE}.svc.cluster.local"
+                    if err=$(psql -h "$${fqdn}" -d postgres -tAc 'SELECT 1' 2>&1 >/dev/null); then
+                      echo "ok      $${host}"
                     else
                       # psql never echoes the password, only the username.
-                      echo "FAILED  ${host}: ${err}"
+                      echo "FAILED  $${host}: $${err}"
                       rc=1
                     fi
                   done
-                  exit "${rc}"
+                  exit "$${rc}"
               env:
                 - name: TARGET_NAMESPACE
                   value: database
