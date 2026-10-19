@@ -1,6 +1,14 @@
 ---
 fullnameOverride: coredns
 k8sAppLabelOverride: kube-dns
+# This is the cluster's only DNS (kube-dns, 10.96.0.10). The chart defaults to a
+# single replica with rollingUpdate.maxUnavailable=1, which terminates the one
+# pod before its replacement is Ready — so every chart or image bump was a
+# cluster-wide DNS gap. Two replicas let one roll while the other serves.
+replicaCount: 2
+# Keeps a voluntary disruption (node drain, eviction) from taking both at once.
+podDisruptionBudget:
+  minAvailable: 1
 serviceAccount:
   create: true
 service:
