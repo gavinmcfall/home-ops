@@ -58,5 +58,21 @@
       matchPackageNames: ["ghcr.io/home-operations/qbittorrent"],
       allowedVersions: "<5.2.0",
     },
+    {
+      // spegel 0.8.0's spegel-registry Service sets
+      // spec.trafficDistribution: PreferSameNode, which is alpha in k8s 1.33
+      // behind PreferSameTrafficDistribution (beta 1.34, stable 1.35). This
+      // cluster runs v1.33.1, so the apiserver rejects it outright:
+      //   Unsupported value: "PreferSameNode": supported values: "PreferClose"
+      // Merged as #2825 on 2026-10-18 in a 63-PR flush, stalled the
+      // HelmRelease, reverted by #2828. Both dep names are listed: "spegel" is
+      // the runtime HelmRelease chart (helm datasource, via the spegel
+      // HelmRepository), "ghcr.io/spegel-org/helm-charts/spegel" is the
+      // bootstrap OCI chart in kubernetes/bootstrap/helmfile.yaml (#2824).
+      // Pinning only one lets Renovate re-raise the other.
+      description: ["Block spegel 0.8.0+ — needs Kubernetes >= 1.34 (2026-10-18). Remove this rule once the cluster is upgraded; see #2828."],
+      matchPackageNames: ["spegel", "ghcr.io/spegel-org/helm-charts/spegel"],
+      allowedVersions: "<0.8.0",
+    },
   ],
 }
