@@ -14,6 +14,21 @@ Append-only. Never regenerated. New entries at the top. Format:
 **Alternatives rejected**: Y (reason), Z (reason)
 **Links**: manifests / PRs / external docs
 
+## 2026-09-14 — BookOrbit permissions come from Pocket-ID groups, never from per-user edits
+**Why**: BookOrbit re-applies its OIDC group mappings on every login and deletes any mapped permission the user's groups do not grant, so a permission set by hand in Users → Edit reverted the next time the child signed in (three times in one day) and a user in no mapped group was stripped to zero. The mappings now mirror the groups: `bookorbit_adults` and `bookorbit_kids` carry the standard nine, `book_orbit_librarians` adds upload and edit-metadata; Serina and Herenya were accepted as dropping to the standard set.
+**Alternatives rejected**: Keep editing users by hand — reverts on login. A third group per exception — only where a real role exists (librarians).
+**Links**: bookorbit#1398; nerdz-reading concept `BookOrbitOidcLoginRewritesMappedPermissions`; nerdz-reading `data/_oidc_mapping_2026-09-14.sql`
+
+## 2026-09-13 — Series totals are set by hand over Hardcover's counts
+**Why**: Kieran's series view showed 45 "missing" series; 22 were audio-only positions, about 6 real gaps, and the rest Hardcover `books_count` counting novellas, box sets and companions (Harry Potter "18"). 34 reviewed totals were written with `source = manual` (`data/series-expected-counts.csv`), with a pg_dump and dated snapshots for rollback.
+**Alternatives rejected**: Wait for upstream — the badges mislead a child today. Disable the provider — loses the real gaps it does catch.
+**Links**: bookorbit#1384 (fork branch `fix/series-expected-count-primary-manual` ready, PR pending assignment); nerdz-reading `tools/bookorbit_series_totals.py`
+
+## 2026-09-04 — BookOrbit is the reading surface for everything; AudiobookShelf is frozen and retiring
+**Why**: Gavin: "audio will be moving to book orbit, i wont be making more changes to ABS." Ebook reading, progress and highlights already live in BookOrbit; audio follows. Until the audio migration starts, ABS is not rescanned, not re-granted and not reasoned about for access — its state drifts further from reality with every BookOrbit change.
+**Alternatives rejected**: Keep both current — every room move would have to be mirrored twice and ABS progress stranded on each move.
+**Links**: nerdz-reading concept `KidEbookAccessComesFromBookOrbitNotAbs`; nerdz-reading CLAUDE.md standing rules
+
 ## 2026-08-30 — Volume manga archives enter via a dedicated `manga-manual` root and mangarr's volume scheme, not by hand-placing files in the Kavita tree
 **Why**: Retail/volume `.cbz` (e.g. the 26 Dragon Ball Z colour volumes) had no path into Kavita: Suwayomi/Tranga only produce chapters, and mangarr's single rename scheme turned `Vol. 001` into `Ch.001`. mangarr#71 added a volume rename scheme (`{series}/{series} - Vol.{volume}.cbz`) and conflict detection (two files rendering to one destination, or an existing library file that is not a hardlink of the source, are reported instead of silently skipped — the Weeb Central "Dragon Ball" 1..194 / Z 1..325 run had lost 194 chapters this way). A third download root `/media/Downloads/manga-manual` (UI-managed setting, no manifest change) is the intake: drop a folder of volume files there and mangarr classifies, hardlinks and triggers the Kavita scan like any other source. Hand-placing files in `/media/Library/Books/Manga` would bypass classification, conflict detection and the scan trigger.
 **Alternatives rejected**: Reuse `/media/Downloads/manual` — holds unrelated non-manga material. Merge Suwayomi chapters into volumes — needless when volume releases exist; chapter sources stay chapter sources. Auto-split arc-prefixed chapter numbering ("Z 1") into a second series — heuristic; the honest fix is a different source, which mangarr now tells you.
