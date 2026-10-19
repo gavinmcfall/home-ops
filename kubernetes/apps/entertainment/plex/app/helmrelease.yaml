@@ -87,7 +87,11 @@ spec:
                 memory: 1500Mi
               limits:
                 gpu.intel.com/i915: 1
-                memory: 8Gi
+                # 8Gi was not enough for the nightly butler window (02:00-05:00
+                # local): chapter-thumbnail generation peaks at ~6.9GiB working
+                # set and OOMKilled Plex five times on 2026-10-20. Idle is ~98Mi,
+                # so the request stays low and this is purely a burst ceiling.
+                memory: 16Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
