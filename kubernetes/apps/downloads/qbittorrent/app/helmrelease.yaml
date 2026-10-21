@@ -243,8 +243,17 @@ spec:
           qbittorrent:
             port-forward:
               - path: /config
+      # seedboxapi persists its MAM session here as MAM.cookies. MAM rotates the
+      # mam_id when a session is created from it, so the seed in the
+      # ExternalSecret is stale after first use and this file becomes the only
+      # working credential. On emptyDir it died with the pod, and recovering
+      # meant minting a new mam_id by hand. Deployment strategy is Recreate, so
+      # RWO is safe.
       mam-config:
-        type: emptyDir
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: ceph-block
         advancedMounts:
           qbittorrent:
             seedboxapi:
