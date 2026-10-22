@@ -237,17 +237,27 @@ spec:
           qbittorrent:
             app:
               - path: /config
+            # seedboxapi keeps its MAM session at /config/MAM.cookies. MAM
+            # rotates the mam_id when a session is created from it, so the seed
+            # in the ExternalSecret is stale after first use and this file
+            # becomes the only working credential -- on an emptyDir it died
+            # with the pod and cost a hand-minted mam_id to recover.
+            #
+            # It rides the existing qbittorrent claim under a subPath rather
+            # than getting a volume of its own. A `type: persistentVolumeClaim`
+            # entry here renders a PVC named after the RELEASE, which collides
+            # with this claim; Helm then adopts it, fails to resize it, and
+            # cleanupOnFail deletes it. That is what took the config volume out
+            # on 2026-10-22. A subPath needs no new claim, so the collision is
+            # not possible.
+            seedboxapi:
+              - path: /config
+                subPath: mam
       empty-config:
         type: emptyDir
         advancedMounts:
           qbittorrent:
             port-forward:
-              - path: /config
-      mam-config:
-        type: emptyDir
-        advancedMounts:
-          qbittorrent:
-            seedboxapi:
               - path: /config
       media:
         type: nfs
