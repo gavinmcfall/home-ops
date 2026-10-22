@@ -29,3 +29,33 @@ spec:
           for: 1h
           labels:
             severity: critical
+        # The two alerts above watch BACKUPS (ReplicationSource). This one
+        # watches RESTORES, which had no coverage at all. ReplicationDestinations
+        # use `trigger.manual: restore-once`, and a manual trigger only fires
+        # when its value changes, so a restore point freezes at whenever the
+        # volume was seeded. Because the app PVCs carry a dataSourceRef to the
+        # RD, losing a PVC silently restores that vintage instead of last
+        # night's backup -- on 2026-10-22 qbittorrent came back on a
+        # 2025-12-06 snapshot (103 torrents instead of 1747) and started
+        # writing to it. Backups being green tells you nothing about this.
+        #
+        # Refresh a stale one by changing the trigger value, which re-restores
+        # from the current Kopia repo (patch the live object -- the RD carries
+        # ssa: IfNotPresent, so git will not update it):
+        #   kubectl patch replicationdestination <app>-dst -n <ns> --type=merge \
+        #     -p '{"spec":{"trigger":{"manual":"restore-'"$(date -u +%Y%m%d%H%M)"'"}}}'
+        #
+        # 90d is deliberately loose: at the time of writing 52 of 53 restore
+        # points were already over 30 days old, so a tighter bound would fire
+        # for nearly everything at once. Tighten it as they get refreshed.
+        - alert: VolSyncRestorePointStale
+          annotations:
+            summary: >-
+              {{ $labels.exported_namespace }}/{{ $labels.name }} restore point
+              is {{ $value | humanizeDuration }} old; losing its PVC would
+              restore data from that long ago, not from the latest backup.
+          expr: |
+            time() - volsync_rd_last_sync_timestamp_seconds > 60 * 60 * 24 * 90
+          for: 6h
+          labels:
+            severity: warning

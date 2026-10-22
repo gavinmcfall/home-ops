@@ -498,6 +498,33 @@ spec:
                       ready: [status, conditions, "[type=Ready]", status]
                       suspended: [spec, suspend]
                       source_name: [spec, sourceRef, name]
+              # VolSync restore points. ReplicationDestinations use
+              # `trigger.manual: restore-once`, and a manual trigger only fires
+              # when its VALUE changes -- so status.lastSyncTime freezes at
+              # whenever the volume was first seeded. The app PVCs carry a
+              # dataSourceRef to these, so a PVC that is lost and recreated
+              # silently restores whatever vintage this image is. Nothing
+              # exported that fact, which is why a stale restore went unnoticed
+              # until the data was inspected by hand (2026-10-22, qbittorrent).
+              # RFC3339 strings are parsed to a float unix timestamp by KSM.
+              - groupVersionKind:
+                  group: volsync.backube
+                  version: v1alpha1
+                  kind: ReplicationDestination
+                metricNamePrefix: volsync_rd
+                metrics:
+                  - name: "last_sync_timestamp_seconds"
+                    help: "Unix time of the last ReplicationDestination sync, i.e. how old this volume's restore point is."
+                    each:
+                      type: Gauge
+                      gauge:
+                        path: [status, lastSyncTime]
+                        # A freshly created RD has no lastSyncTime yet; without
+                        # this the whole collector errors instead of skipping it.
+                        nilIsZero: true
+                    labelsFromPath:
+                      name: [metadata, name]
+                      exported_namespace: [metadata, namespace]
       prometheus:
         monitor:
           enabled: true
