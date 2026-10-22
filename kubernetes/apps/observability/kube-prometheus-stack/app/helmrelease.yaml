@@ -251,6 +251,15 @@ spec:
               - imagepolicies
               - imageupdateautomations
             verbs: ["list", "watch"]
+          # Needed by the ReplicationDestination entry in customResourceState
+          # below. Without it KSM stays up but logs "cannot list resource
+          # replicationdestinations ... at the cluster scope" on a loop and the
+          # metric is never produced.
+          - apiGroups:
+              - volsync.backube
+            resources:
+              - replicationdestinations
+            verbs: ["list", "watch"]
       customResourceState:
         enabled: true
         config:
