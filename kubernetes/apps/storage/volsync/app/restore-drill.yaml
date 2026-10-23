@@ -1,0 +1,164 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: volsync-restore-drill
+  namespace: storage
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: volsync-restore-drill
+rules:
+  # Cluster-scoped: the ReplicationDestinations live in every app namespace.
+  # Patch is needed to bump trigger.manual; nothing else is touched.
+  - apiGroups: ["volsync.backube"]
+    resources: ["replicationdestinations"]
+    verbs: ["get", "list", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: volsync-restore-drill
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: volsync-restore-drill
+subjects:
+  - kind: ServiceAccount
+    name: volsync-restore-drill
+    namespace: storage
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0/cronjob-batch-v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: volsync-restore-drill
+  namespace: storage
+spec:
+  # A green ReplicationSource says the data went INTO the repo. It says nothing
+  # about whether it can come back OUT. On 2026-10-23 sabnzbd's backups turned
+  # out to be unrestorable -- one 248-character filename, plus the ~10-digit
+  # temp suffix Kopia appends on restore, exceeded the 255-byte limit, so every
+  # restore died at 70.8%. Backups had reported success hourly for ten months
+  # and its restore point was frozen on a 2025-12-22 snapshot. Nothing could
+  # have revealed that except actually performing a restore.
+  #
+  # VolSyncRestorePointStale catches a restore point that stops ADVANCING; it
+  # cannot catch one that advances but would not restore. This drill closes
+  # that gap by exercising the real path on a rotating subset.
+  #
+  # Safe to run against live apps: the RDs use copyMethod Snapshot with no
+  # destinationPVC, so VolSync provisions its own temp PVC and the app's live
+  # volume is never touched (verified on recyclarr, whose PV was unchanged
+  # across a drill). cleanupTempPVC and cleanupCachePVC are both true.
+  schedule: "0 11 * * *"
+  timeZone: Etc/UTC
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      # A failed drill should surface as KubeJobFailed (already shipped by
+      # kube-prometheus-stack) rather than retry quietly.
+      activeDeadlineSeconds: 2400
+      ttlSecondsAfterFinished: 86400
+      template:
+        spec:
+          restartPolicy: Never
+          serviceAccountName: volsync-restore-drill
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: drill
+              image: registry.k8s.io/kubectl:v1.37.1
+              command: ["/bin/sh", "-c"]
+              # NOTE: no braced shell expansions below. The parent flux-system
+              # Kustomization patches postBuild.substituteFrom onto every app
+              # Kustomization and envsubst runs in strict mode, so a literal
+              # ${...} fails the whole build -- and kubeconform cannot catch it,
+              # because it validates the kustomize output produced before
+              # postBuild runs. Unbraced $VAR and $(...) pass through untouched.
+              args:
+                - |
+                  set -u
+                  TS=$(date -u +%Y%m%d%H%M%S)
+                  rc=0
+
+                  # Drill whichever restore points are oldest. Sorting on
+                  # lastSyncTime makes the rotation self-balancing: it always
+                  # exercises whatever is most at risk, and no bookkeeping of
+                  # "whose turn is it" is needed.
+                  kubectl get replicationdestination -A \
+                    -o "jsonpath={range .items[*]}{.status.lastSyncTime}{' '}{.metadata.namespace}{' '}{.metadata.name}{'\n'}{end}" \
+                    | grep -v '^ ' | sort | head -n "$DRILL_COUNT" > /tmp/targets
+
+                  if [ ! -s /tmp/targets ]; then
+                    echo "no ReplicationDestinations found"
+                    exit 1
+                  fi
+
+                  while read -r when ns name; do
+                    echo "drill $ns/$name (restore point was $when)"
+                    if ! kubectl patch replicationdestination "$name" -n "$ns" \
+                        --type=merge -p "{\"spec\":{\"trigger\":{\"manual\":\"drill-$TS\"}}}" >/dev/null; then
+                      echo "FAILED  $ns/$name: could not trigger"
+                      rc=1
+                    fi
+                  done < /tmp/targets
+
+                  # Wait for each to land. A restore that never completes is
+                  # exactly the failure this exists to find, so a timeout is a
+                  # failure, not a shrug.
+                  deadline=$(( $(date +%s) + DRILL_WAIT_SECONDS ))
+                  while read -r when ns name; do
+                    while :; do
+                      got=$(kubectl get replicationdestination "$name" -n "$ns" \
+                              -o jsonpath='{.status.lastManualSync}' 2>/dev/null || true)
+                      if [ "$got" = "drill-$TS" ]; then
+                        img=$(kubectl get replicationdestination "$name" -n "$ns" \
+                                -o jsonpath='{.status.latestImage.name}' 2>/dev/null || true)
+                        echo "ok      $ns/$name -> $img"
+                        break
+                      fi
+                      if [ "$(date +%s)" -ge "$deadline" ]; then
+                        echo "FAILED  $ns/$name: restore did not complete within the deadline"
+                        rc=1
+                        break
+                      fi
+                      sleep 20
+                    done
+                  done < /tmp/targets
+
+                  exit "$rc"
+              env:
+                # 3 a night over 53 volumes gives every restore point a drill
+                # roughly every 18 days, comfortably inside the staleness alert.
+                - name: DRILL_COUNT
+                  value: "3"
+                # Generous: a 60Gi restore (plex) is the worst case. Raise this
+                # rather than lowering DRILL_COUNT if it ever times out on size.
+                - name: DRILL_WAIT_SECONDS
+                  value: "1800"
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 128Mi
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir: {}

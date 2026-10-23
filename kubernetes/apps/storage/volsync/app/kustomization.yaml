@@ -6,3 +6,4 @@ resources:
   - ./mutatingadmissionpolicy.yaml
   - ./ocirepository.yaml
   - ./prometheusrule.yaml
+  - ./restore-drill.yaml
