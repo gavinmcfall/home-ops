@@ -75,6 +75,63 @@ spec:
                 memory: 2Gi
               limits:
                 memory: 4Gi
+          # SABnzbd keeps a gzipped copy of every nzb it processes in
+          # nzb_backup_dir (= /config/history) and NEVER prunes it -- there is
+          # no retention setting for that directory in its config at all. It had
+          # grown to 4868 files / 557MB of this 1Gi volume (62% full).
+          #
+          # Worse, it made the backups unrestorable. One release name was 248
+          # characters, and Kopia appends a ~10-digit temp suffix on restore,
+          # pushing it past the 255-byte filename limit:
+          #   cannot create temp file: ... .nzb.gz3432274550: file name too long
+          # The ReplicationSource reported success the whole time while the
+          # restore died at 70.8%, so sabnzbd's restore point sat on a
+          # 2025-12-22 snapshot for ten months.
+          #
+          # A sidecar, not a CronJob, because the claim is ReadWriteOnce: a
+          # separate pod would contend for the mount and break whenever sabnzbd
+          # is rescheduled. Sharing the pod sidesteps that.
+          #
+          # NOTE: no braced shell expansions below. Flux patches
+          # postBuild.substituteFrom onto every app Kustomization and envsubst
+          # runs in strict mode, so a literal ${...} here fails the whole build
+          # -- and kubeconform cannot catch it, because it validates the
+          # kustomize output produced before postBuild runs.
+          prune-nzb-backup:
+            image:
+              repository: ghcr.io/home-operations/busybox
+              tag: 1.38.0@sha256:ff88728f0d5fe50a9984f6cc04d7d1185590b628f29ef4e6a3ec8cae7169e0c8
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -u
+                HIST=/config/history
+                while true; do
+                  if [ -d "$HIST" ]; then
+                    # Age prune bounds growth: 60d cleared 2224 of 4868 files
+                    # when this was added.
+                    find "$HIST" -type f -mtime +60 -delete 2>/dev/null || true
+                    # Length guard is the actual fix for the unrestorable
+                    # backup. 230 leaves room for Kopia's temp suffix in 255.
+                    find "$HIST" -type f 2>/dev/null | while IFS= read -r f; do
+                      n=$(printf %s "$f" | awk -F/ '{print length($NF)}')
+                      [ "$n" -gt 230 ] && rm -f -- "$f"
+                    done
+                    echo "[prune] $(date -u +%FT%TZ) remaining=$(find "$HIST" -type f 2>/dev/null | wc -l)"
+                  fi
+                  sleep 86400
+                done
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 16Mi
+              limits:
+                memory: 64Mi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
