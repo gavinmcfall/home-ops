@@ -45,9 +45,12 @@ spec:
         #   kubectl patch replicationdestination <app>-dst -n <ns> --type=merge \
         #     -p '{"spec":{"trigger":{"manual":"restore-'"$(date -u +%Y%m%d%H%M)"'"}}}'
         #
-        # 90d is deliberately loose: at the time of writing 52 of 53 restore
-        # points were already over 30 days old, so a tighter bound would fire
-        # for nearly everything at once. Tighten it as they get refreshed.
+        # Tightened 90d -> 30d now that all 53 restore points have been
+        # refreshed (they were up to 315 days old) and volsync-restore-drill
+        # exercises the three oldest every night, giving each one a turn roughly
+        # every 18 days. 30d therefore means a drill has actually stopped
+        # landing for that volume, which is worth knowing within weeks rather
+        # than within a quarter.
         - alert: VolSyncRestorePointStale
           annotations:
             summary: >-
@@ -55,7 +58,7 @@ spec:
               is {{ $value | humanizeDuration }} old; losing its PVC would
               restore data from that long ago, not from the latest backup.
           expr: |
-            time() - volsync_rd_last_sync_timestamp_seconds > 60 * 60 * 24 * 90
+            time() - volsync_rd_last_sync_timestamp_seconds > 60 * 60 * 24 * 30
           for: 6h
           labels:
             severity: warning
