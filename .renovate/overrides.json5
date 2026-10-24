@@ -13,5 +13,21 @@
       matchPackageNames: ["/factory\\.talos\\.dev/"],
       overridePackageName: "ghcr.io/siderolabs/installer",
     },
+    {
+      // v4.8.0 ships git 2.47.3, which enforces the safe.directory ownership
+      // check and refuses GITSYNC_ROOT outright:
+      //   fatal: detected dubious ownership in repository at '/add-ons'
+      // With maxFailures at 0 git-sync aborts and exits 1, crashlooping the
+      // subcleaner container in all three bazarr instances at once. Merged as
+      // #2906, reverted as #2918, then immediately re-raised as #2920 -- hence
+      // a bound here rather than another comment Renovate cannot read.
+      //
+      // Lifting this means first giving git-sync a safe.directory for
+      // /add-ons (GITSYNC_GIT_CONFIG), not just widening the range.
+      description: "Hold git-sync below v4.8.0 until /add-ons is a safe.directory",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["registry.k8s.io/git-sync/git-sync"],
+      allowedVersions: "<4.8.0",
+    },
   ],
 }
