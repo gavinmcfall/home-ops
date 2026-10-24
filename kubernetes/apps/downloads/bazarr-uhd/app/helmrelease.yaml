@@ -76,7 +76,15 @@ spec:
           subcleaner:
             image:
               repository: registry.k8s.io/git-sync/git-sync
-              tag: v4.8.0@sha256:a20644562fba94773e594885cb001aadb5a3172175f13ac1215e5b2033c9200e
+              # HELD at v4.7.1 -- do not take v4.8.0 (#2906, reverted). It ships
+              # git 2.47.3, which enforces the safe.directory ownership check and
+              # refuses GITSYNC_ROOT outright:
+              #   fatal: detected dubious ownership in repository at '/add-ons'
+              # git-sync then logs "too many failures, aborting" (maxFailures: 0)
+              # and exits 1, so the subcleaner container crashloops and takes all
+              # three bazarr instances with it. Fixing forward means giving
+              # git-sync a safe.directory for /add-ons, not just bumping the tag.
+              tag: v4.7.1@sha256:c5e1976da735bf0b53979f079a07475d77174c51863cd084e928ff6074480717
             env:
               GITSYNC_REPO: https://github.com/KBlixt/subcleaner
               GITSYNC_REF: master
