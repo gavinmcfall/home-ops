@@ -86,7 +86,7 @@ spec:
               # the cluster's 1.33, and unlike `apk add kubectl` on plain alpine
               # (the wings-cert-sync pattern) it needs neither root nor a
               # writable root, so the hardening below stays intact.
-              image: docker.io/alpine/k8s:1.33.1
+              image: docker.io/alpine/k8s:1.37.1
               command: ["/bin/sh", "-c"]
               # NOTE: no braced shell expansions below. The parent flux-system
               # Kustomization patches postBuild.substituteFrom onto every app
