@@ -31,10 +31,13 @@ spec:
           app:
             image:
               repository: ghcr.io/gtsteffaniak/filebrowser
-              tag: 1.5.8-stable@sha256:68455d4953bad8e984e1bc5d112ed1e9c918a0a04f104c13c9ece50790308894
+              tag: 2.0.2-stable@sha256:de2b4c4d18485ea202ab2cdada5bd25d8f0b8ed071712c8216a67194c31285ae
             env:
               TZ: ${TIMEZONE}
-              FILEBROWSER_DATABASE: /config/database.db
+              # FILEBROWSER_DATABASE (v1) is deliberately gone: in v2 its mere
+              # presence is a startup Fatal unless server.database.migrateFrom is
+              # the literal string "default". The migration path is declared
+              # explicitly in config.yaml instead -- see externalsecret.yaml.
               FILEBROWSER_CONFIG: /config/config.yaml
             probes:
               liveness: &probes
@@ -104,5 +107,15 @@ spec:
           - path: /folder
       tmp:
         type: emptyDir
+        # v1 held its file index in memory, which is what the 3Gi limit above is
+        # for. v2 persists it to SQLite at <cacheDir>/sql/index_<source>.db, and
+        # cacheDir is /tmp/cache -- so this emptyDir, previously pure scratch,
+        # now carries real data on node ephemeral storage. The media source is
+        # ~490k entries (440,459 files + 49,933 dirs), a few hundred MB of index;
+        # the remaining headroom is for previews and the download spool, which v2
+        # bounds at maxArchiveSize (default 20GB). The limit means a runaway cache
+        # costs one pod eviction rather than filling a node's disk (~800GB
+        # allocatable) and taking unrelated workloads down with it.
+        sizeLimit: 24Gi
         globalMounts:
           - path: /tmp
