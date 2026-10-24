@@ -77,7 +77,16 @@ spec:
             seccompProfile: {type: RuntimeDefault}
           containers:
             - name: drill
-              image: registry.k8s.io/kubectl:v1.37.1
+              # NOT registry.k8s.io/kubectl: that image is distroless with no
+              # shell, so `command: ["/bin/sh", ...]` dies before the container
+              # starts -- `exec: "/bin/sh": stat /bin/sh: no such file or
+              # directory`. The dotfiles-sync CronJob uses it fine because it
+              # passes args straight to the kubectl entrypoint; this one loops,
+              # so it needs a shell. alpine/k8s has both, its kubectl matches
+              # the cluster's 1.33, and unlike `apk add kubectl` on plain alpine
+              # (the wings-cert-sync pattern) it needs neither root nor a
+              # writable root, so the hardening below stays intact.
+              image: docker.io/alpine/k8s:1.33.1
               command: ["/bin/sh", "-c"]
               # NOTE: no braced shell expansions below. The parent flux-system
               # Kustomization patches postBuild.substituteFrom onto every app
@@ -146,6 +155,13 @@ spec:
                 # rather than lowering DRILL_COUNT if it ever times out on size.
                 - name: DRILL_WAIT_SECONDS
                   value: "1800"
+                # kubectl needs somewhere for its discovery cache; without
+                # these it tries $HOME under the read-only root and warns on
+                # every call.
+                - name: HOME
+                  value: /tmp
+                - name: KUBECACHEDIR
+                  value: /tmp/.kube/cache
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
