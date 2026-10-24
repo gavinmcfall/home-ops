@@ -55,7 +55,7 @@ spec:
           cni-installer:
             image:
               repository: ghcr.io/angelnu/cni-plugins
-              tag: 1.9.1@sha256:2c962ef7454c79b6e64d59a8645d3fd646dcb256fd52c481f52f268b34796a88
+              tag: 1.9.1@sha256:13e3bb25d6e4cb0f3a7b3f71788341ff97808804b2de7345b9f25c283aa92921
     cni:
       logLevel: error
       paths:
