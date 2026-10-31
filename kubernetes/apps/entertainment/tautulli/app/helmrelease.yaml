@@ -98,11 +98,11 @@ spec:
           gethomepage.dev/widget.type: tautulli
           gethomepage.dev/widget.url: http://tautulli.entertainment
           gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_TAUTULLI_TOKEN}}` }}"
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
-          - name: external
+          - name: internal
             namespace: network
             sectionName: https
     persistence:
