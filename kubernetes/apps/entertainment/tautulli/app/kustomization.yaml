@@ -6,6 +6,6 @@ resources:
   - ./helmrelease.yaml
   - ./pvc.yaml
 components:
-  - ../../../../components/gatus/external
+  - ../../../../components/gatus/guarded
   - ../../../../components/volsync-standard
   - ../../../../components/priority/priority-03
