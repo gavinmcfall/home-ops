@@ -39,7 +39,7 @@ spec:
           init-contact-energy:
             image:
               repository: docker.io/alpine/git
-              tag: v2.54.0@sha256:4fac439ee3b9204bec99c712b8a15942999632458f716ae8149fbb97cb760cd4
+              tag: v2.54.0@sha256:ac6c828f15d82775d204d3d75112e1d34af8945da80ccf922713c9891ba68e7a
             command:
               - /bin/sh
               - -c
