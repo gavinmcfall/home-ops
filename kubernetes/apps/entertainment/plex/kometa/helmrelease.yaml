@@ -90,3 +90,11 @@ spec:
       # No logs volume on purpose: /config/logs falls through to the config
       # PVC above, so each run's per-library log survives the pod exiting.
       # An emptyDir here destroys them, hiding what the nightly run changed.
+      # Kometa's cache is SQLite (/config/config.cache) and it builds
+      # tmdb_episode_data2_episode_id_language with CREATE UNIQUE INDEX. A
+      # sort that outgrows SQLite's page cache spills to the temp dir, and
+      # with readOnlyRootFilesystem and no /tmp that fails as errcode 6410.
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
