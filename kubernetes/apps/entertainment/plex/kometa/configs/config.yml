@@ -20,6 +20,11 @@ libraries:
       - repo: TV Shows - Overlays - Studios.yml
       - default: content_rating_nz
     operations:
+      # Items carrying this Plex label are skipped by every operation below.
+      # Use it when a hand-set value must survive the nightly run, e.g. a
+      # content rating where mdb_age_rating is wrong for this household.
+      ignore_labels:
+        - Kometa Ignore
       mass_genre_update: tmdb
       mass_content_rating_update:
         - mdb_age_rating
