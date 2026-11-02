@@ -29,8 +29,17 @@ spec:
     controllers:
       kometa:
         type: cronjob
-        annotations:
-          reloader.stakater.com/auto: "true"
+        # Deliberately NOT annotated with reloader.stakater.com/auto, unlike
+        # most apps here. On an annotated CronJob, Reloader triggers a Job
+        # immediately rather than only updating the template, and a full pass
+        # over the six libraries takes ~2h20m. With concurrencyPolicy Forbid, a
+        # change to kometa-configmap or kometa-secret landing within ~2h of
+        # midnight leaves that run in flight when @daily fires, and the
+        # scheduled run is skipped with no error. Each pod reads the ConfigMap
+        # at creation, so the next run picks up config changes regardless.
+        # To apply one immediately, ask for it explicitly:
+        #   kubectl -n entertainment create job --from=cronjob/kometa \
+        #     kometa-manual-$(date +%s)
         cronjob:
           schedule: "@daily"
           timeZone: &timeZone ${TIMEZONE}
