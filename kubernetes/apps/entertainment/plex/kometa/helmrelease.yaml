@@ -87,7 +87,6 @@ spec:
           - path: /config/config.yml
             subPath: config.yml
             readOnly: true
-      logs:
-        type: emptyDir
-        globalMounts:
-          - path: /config/logs
+      # No logs volume on purpose: /config/logs falls through to the config
+      # PVC above, so each run's per-library log survives the pod exiting.
+      # An emptyDir here destroys them, hiding what the nightly run changed.
