@@ -52,6 +52,30 @@ spec:
             envFrom:
               - secretRef:
                   name: sabnzbd-secret
+            # SABnzbd serves its web interface from a single CherryPy thread,
+            # and that thread stalls while post-processing: unrar shells out
+            # against the NFS media mount, and /api stops answering for well
+            # over a second at a time.
+            #
+            # On the *arr probe profile (timeoutSeconds: 1, failureThreshold: 3)
+            # that is fatal. A 44-part password-protected RAR set was enough to
+            # time out three probes in 30s, so kubelet killed the container
+            # mid-unpack (exit 137, reason Error -- not OOM; memory peaked at
+            # 73Mi of a 4Gi limit). On restart SABnzbd resumed the same job,
+            # relaunched unrar, stalled again and was killed again, leaving two
+            # unpack directories for one release:
+            #   _UNPACK_<release>  and  _UNPACK_<release>.1
+            # Older orphans dated 2026-05-10 show this had happened before.
+            #
+            # Because readiness is the same anchor, the pod simultaneously left
+            # the Service (notReadyAddresses), so the Gateway had no upstream
+            # and the sab host answered "upstream connect error ... reset
+            # reason: remote connection failure" for the duration.
+            #
+            # These are qbittorrent's numbers -- the other heavy-I/O download
+            # client here, which blocks the same way under load and has run
+            # clean on this profile. The *arrs keep the tight defaults; they
+            # never shell out to unrar.
             probes:
               liveness: &probes
                 enabled: true
@@ -60,11 +84,16 @@ spec:
                   httpGet:
                     path: /api?mode=version
                     port: *port
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
               readiness: *probes
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
