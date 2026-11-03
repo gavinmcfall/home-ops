@@ -72,6 +72,47 @@ Two controls, both worth having:
    web file manager (over 8443) covers almost all day-to-day file work, so remote SFTP
    is rarely needed.
 
+#### Applying `key_only`
+
+Wings reads its config at boot, so the flag is inert until Wings restarts. **A Wings
+restart does not interrupt running game servers** — the game containers are siblings of
+the `wings` container, not children, and Wings' boot path calls `IsRunning()` then
+reattaches via `Attach()` rather than cycling them. The source comment is explicit:
+*"We never want to stop an instance that is currently running external from Wings."*
+Verified in practice: a running Minecraft server kept its uptime straight through a
+`docker restart wings-wings-1`. One caveat — if a server is *tracked* as running but its
+container has actually died, Wings will start it on boot.
+
+#### Verifying `key_only` — three traps
+
+Confirming this control is harder than it looks, and all three of these read as
+"it is not working" when it is:
+
+1. **The advertised auth methods do not change.** `ssh -o PreferredAuthentications=none`
+   still reports `Authentications that can continue: password,publickey`.
+   `PasswordCallback` is registered on the `ssh.ServerConfig` unconditionally; the
+   `KeyOnly` gate lives *inside* the callback, so it only fires once an attempt arrives.
+2. **Scanner traffic cannot demonstrate it.** The username-format check runs *before* the
+   `KeyOnly` check, so generic SSH dictionaries (`root`, `admin`) still log
+   `(invalid format)` exactly as they did before. That traffic will never visibly change.
+3. **You need a valid `user.serveridshort` username plus any password** to reach the
+   `KeyOnly` path at all. A scripted probe (e.g. paramiko) works; do **not** call
+   `auth_none()` first on the same Transport, as that desyncs the auth sequence and the
+   password attempt arrives as `ssh: unexpected message type 5` without ever reaching
+   the callback.
+
+The success signal is this log line:
+
+```
+WARN failed to validate user credentials
+  (password authentication is disabled; only SSH keys are allowed)
+  method=password subsystem=sftp
+```
+
+Note the scope this implies: `key_only` protects the path that could actually reach a
+Panel password check. The high-volume malformed attempts were already dying one step
+earlier and still are, so the attempt *rate* in the logs will not drop.
+
 Keep 8443 forwarded — the Panel's file manager, console and websocket connect from the
 browser directly to Wings, and that path is TLS with a signed JWT rather than a password.
 
