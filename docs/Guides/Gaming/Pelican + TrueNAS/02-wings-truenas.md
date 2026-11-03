@@ -40,14 +40,40 @@ dig play.${SECRET_DOMAIN} @1.1.1.1
 
 In your router (UniFi, pfSense, etc.), create port forwards to your TrueNAS server:
 
-| Name | External Port | Internal IP | Internal Port | Protocol |
-|------|---------------|-------------|---------------|----------|
-| Wings API | 8443 | `<truenas-ip>` | 8443 | TCP |
-| Wings SFTP | 2022 | `<truenas-ip>` | 2022 | TCP |
-| Game Servers | 25565-25600 | `<truenas-ip>` | 25565-25600 | TCP/UDP |
+| Name | External Port | Internal IP | Internal Port | Protocol | Expose to internet? |
+|------|---------------|-------------|---------------|----------|---------------------|
+| Wings API | 8443 | `<truenas-ip>` | 8443 | TCP | Yes — the Panel UI talks to Wings from the browser |
+| Wings SFTP | 2022 | `<truenas-ip>` | 2022 | TCP | **No** — LAN only, see "SFTP exposure" below |
+| Game Servers | 25565-25600 | `<truenas-ip>` | 25565-25600 | TCP/UDP | Yes — players connect directly |
 
 > [!TIP]
 > The port range 25565-25600 provides 36 allocations for game servers. Minecraft uses 25565 by default.
+
+### SFTP exposure {#sftp-exposure}
+
+Wings' SFTP subsystem authenticates against **Panel credentials**, so a forwarded
+port 2022 is a password-guessing surface on every Panel account. PocketID/OIDC does
+not protect it — SFTP cannot do an OAuth redirect, so it only ever accepts a local
+password or an SSH key.
+
+`play.${SECRET_DOMAIN}` is deliberately **not** proxied through Cloudflare (game
+traffic needs direct access), so a 2022 forward puts Wings' SSH handshake straight on
+the WAN IP where it gets found and hammered. Measured on this cluster over 46 days
+(2026-09-18 to 2026-11-03): **155,874 failed SFTP auth attempts from 355 distinct
+source IPs**, running at ~2,100/day and peaking at ~50,000 in a single day.
+
+Two controls, both worth having:
+
+1. **`key_only: true`** in `config.yml` (see Step 5). Wings then rejects password
+   attempts *before* it contacts the Panel, so no Panel account can be guessed through
+   SFTP at all. Register an SSH key in the Panel under **Account -> SSH Keys** *before*
+   enabling this, or you lock yourself out of SFTP.
+2. **Do not forward 2022.** Reach SFTP over the LAN or a VPN instead. The Panel's own
+   web file manager (over 8443) covers almost all day-to-day file work, so remote SFTP
+   is rarely needed.
+
+Keep 8443 forwarded — the Panel's file manager, console and websocket connect from the
+browser directly to Wings, and that path is TLS with a signed JWT rather than a password.
 
 ---
 
@@ -134,6 +160,9 @@ system:
   timezone: Pacific/Auckland
   sftp:
     bind_port: 2022
+    # Reject password auth outright; SFTP users must register an SSH key in the
+    # Panel (Account -> SSH Keys). See "SFTP exposure" in Step 2 for why.
+    key_only: true
 allowed_origins:
   - https://pelican.nerdz.cloud
 remote: https://pelican.nerdz.cloud
