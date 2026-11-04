@@ -1,0 +1,177 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app tdarr
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  dependsOn:
+    - name: intel-device-plugin-gpu
+      namespace: kube-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: storage
+  values:
+    controllers:
+      tdarr:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/haveagitgat/tdarr
+              # Server and node images must share a version. tdarr_node also
+              # publishes 2.50.02 - do NOT pair it with a 2.50.01 server.
+              # Upstream stopped cutting GitHub releases in 2020, so version
+              # truth is the registry tag list, not `gh release list`.
+              tag: 2.50.01@sha256:67d6a456d3c7963d2bc50318275843015af76e1f4dced3b1c5a91f8874d230bf
+            env:
+              TZ: ${TIMEZONE}
+              # s6-overlay image: starts as root, drops to PUID/PGID.
+              PUID: "568"
+              PGID: "568"
+              UMASK: "002"
+              serverIP: 0.0.0.0
+              serverPort: &serverPort 8266
+              webUIPort: &webPort 8265
+              # Single pod: the server runs its own node, so there is no apiKey
+              # handoff and no second Deployment. Adding an EXTERNAL node later
+              # does require an apiKey plus an ExternalSecret.
+              internalNode: "true"
+              inContainer: "true"
+              nodeName: stanton-02
+              ffmpegVersion: "7"
+              auth: "true"
+              openBrowser: "false"
+              maxLogSizeMB: "10"
+              # GPU-only. CPU transcodes on a shared Talos node would starve
+              # everything else for a worse result than Gen12 QSV gives.
+              transcodegpuWorkers: "2"
+              transcodecpuWorkers: "0"
+              healthcheckgpuWorkers: "1"
+              healthcheckcpuWorkers: "1"
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *webPort
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
+              readiness: *probes
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              # Deliberate deviation from the usual non-root profile: this is an
+              # s6-overlay (LinuxServer-style) image and cannot start
+              # unprivileged. Same compromise as home/calibre-web-automated.
+              runAsUser: 0
+              runAsNonRoot: false
+              allowPrivilegeEscalation: true
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop: ["ALL"]
+                add: ["CHOWN", "DAC_OVERRIDE", "FOWNER", "SETGID", "SETUID"]
+            resources:
+              requests:
+                cpu: 200m
+                memory: 2Gi
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 8Gi
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        # 44 = video, for the render device the i915 plugin injects.
+        # 10000 = the shared media group used across the media stack.
+        supplementalGroups: [44, 10000]
+        seccompProfile: {type: RuntimeDefault}
+      nodeSelector:
+        # Pinned to stanton-02: sharedDevNum is 3, so each node has ONE physical
+        # iGPU shared three ways. immich holds a slot on stanton-01 and plex on
+        # stanton-03; stanton-02's GPU is idle. Pinning also keeps transcodes off
+        # the node serving Plex playback.
+        kubernetes.io/hostname: stanton-02
+        intel.feature.node.kubernetes.io/gpu: "true"
+    service:
+      app:
+        controller: tdarr
+        ports:
+          http:
+            port: *webPort
+          server:
+            port: *serverPort
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Entertainment
+          gethomepage.dev/name: Tdarr
+          gethomepage.dev/app: *app
+          gethomepage.dev/icon: tdarr.png
+          gethomepage.dev/description: Library Transcoding
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          # Internal only. Tdarr has no OIDC, so it never goes on the external
+          # gateway regardless of its own login.
+          - name: internal
+            namespace: network
+            sectionName: https
+    persistence:
+      config:
+        existingClaim: *app
+        globalMounts:
+          - path: /app/server
+            subPath: server
+          - path: /app/configs
+            subPath: configs
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /app/logs
+      # Transcode scratch MUST stay node-local. Tdarr writes the whole output
+      # file here before moving it into place; on ceph-block that would push
+      # every transcode across the network and thrash the cluster for no gain.
+      # Capped so it cannot consume stanton-02's NVMe.
+      temp:
+        type: emptyDir
+        sizeLimit: 100Gi
+        globalMounts:
+          - path: /temp
+      media:
+        type: nfs
+        server: citadel.internal
+        path: /mnt/storage0/media
+        globalMounts:
+          - path: /media
