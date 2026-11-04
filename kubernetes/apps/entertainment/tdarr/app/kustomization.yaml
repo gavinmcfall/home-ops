@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./helmrelease.yaml
+components:
+  - ../../../../components/volsync-standard
+  # priority-09 (Very low priority), not the namespace's usual priority-06:
+  # this is opportunistic batch transcoding and should be the first thing
+  # evicted under pressure, well below Plex and the rest of the media stack.
+  - ../../../../components/priority/priority-09
