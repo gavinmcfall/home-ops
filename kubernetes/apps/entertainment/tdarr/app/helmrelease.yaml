@@ -52,9 +52,9 @@ spec:
               serverIP: 0.0.0.0
               serverPort: &serverPort 8266
               webUIPort: &webPort 8265
-              # Single pod: the server runs its own node, so there is no apiKey
-              # handoff and no second Deployment. Adding an EXTERNAL node later
-              # does require an apiKey plus an ExternalSecret.
+              # Single pod: the server runs its own node, so there is no second
+              # Deployment. The node still needs `apiKey` though - see envFrom
+              # below. It is NOT optional just because the node is internal.
               internalNode: "true"
               inContainer: "true"
               nodeName: stanton-02
@@ -68,6 +68,13 @@ spec:
               transcodecpuWorkers: "0"
               healthcheckgpuWorkers: "1"
               healthcheckcpuWorkers: "1"
+            # Supplies `apiKey`. With auth: "true" the internal node cannot
+            # register without it - it retries every 2s with an empty key and
+            # the server logs "is trying to register but failed auth", while
+            # the UI still shows a healthy server with "No Tdarr Nodes detected".
+            envFrom:
+              - secretRef:
+                  name: tdarr-secret
             probes:
               liveness: &probes
                 enabled: true
