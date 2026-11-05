@@ -9,7 +9,11 @@ components:
 configMapGenerator:
   - name: autobrr-loki-rules
     files:
-      - ./resources/lokirule.yaml
+      # Keyed per app on purpose: the key becomes the filename the rules
+      # sidecar writes into /rules/fake, and it does not run with
+      # UNIQUE_FILENAMES, so a second app using the generic key
+      # "lokirule.yaml" overwrites this file and this alert disappears.
+      - autobrr.yaml=./resources/lokirule.yaml
     options:
       labels:
         loki_rule: "true"

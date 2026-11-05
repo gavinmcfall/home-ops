@@ -14,7 +14,10 @@ configMapGenerator:
       - maddy.conf=./resources/maddy.conf
   - name: smtp-relay-loki-rules
     files:
-      - ./resources/lokirule.yaml
+      # The key becomes the FILENAME the sidecar writes into /rules/fake, and
+      # UNIQUE_FILENAMES is not set on it, so two apps using the key
+      # "lokirule.yaml" silently overwrite each other's rules. Name it per app.
+      - smtp-relay.yaml=./resources/lokirule.yaml
     options:
       labels:
         loki_rule: "true"
