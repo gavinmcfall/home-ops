@@ -1,0 +1,20 @@
+---
+groups:
+  - name: smtp-relay
+    rules:
+      # maddy publishes only three metrics and none of them counts a delivery
+      # failure, so a permanently-failed message leaves no trace in Prometheus
+      # at all -- it is dropped and the queue returns to zero, which is exactly
+      # what a healthy relay looks like. The log line is the only signal. The
+      # queue-depth alert in ../prometheusrule.yaml catches mail that is STUCK;
+      # this one catches mail that is GONE.
+      - alert: SmtpRelayPermanentFailure
+        expr: |
+          sum by (app) (count_over_time({app="smtp-relay"} |~ "(?i)not delivered, permanent error"[5m])) > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: logs
+        annotations:
+          app: "{{ $labels.app }}"
+          summary: "{{ $labels.app }} permanently failed to deliver a message and dropped it (no DSN reaches the sender: maddy uses the null return-path and the upstream rejects MAIL FROM:<>)"
