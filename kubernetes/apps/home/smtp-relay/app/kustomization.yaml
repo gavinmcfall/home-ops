@@ -12,5 +12,14 @@ configMapGenerator:
   - name: smtp-relay-configmap
     files:
       - maddy.conf=./resources/maddy.conf
+  - name: smtp-relay-loki-rules
+    files:
+      - ./resources/lokirule.yaml
+    options:
+      labels:
+        loki_rule: "true"
+      annotations:
+        # Loki's rules sidecar files this under the single-tenant ("fake") rule directory.
+        k8s-sidecar-target-directory: /rules/fake
 generatorOptions:
   disableNameSuffixHash: true
