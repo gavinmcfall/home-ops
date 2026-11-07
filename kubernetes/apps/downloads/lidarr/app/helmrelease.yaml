@@ -42,7 +42,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/lidarr
-              tag: 3.1.6.5078@sha256:24dacfbfa34ab6d99d6f0f2060fd8e97d1a8c5e82ff3d85f0e5a4c46bd9a3b2b
+              tag: 3.2.0.5144@sha256:d460ea8d1a02673c4d82b911acea01d5496ddf2ef28be57d30c60bf208ae6765
             env:
               LIDARR__APP__INSTANCENAME: Lidarr
               LIDARR__APP__THEME: dark
