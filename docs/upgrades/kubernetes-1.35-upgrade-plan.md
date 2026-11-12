@@ -86,6 +86,8 @@ All three nodes report kubelet and control plane v1.35.x on Talos v1.12.6; both 
 
 ## Stages
 
+**Progress (2026-11-12):** Stages 1 to 3 are done; the cluster runs v1.34.13. Stage 4's soak is in progress. Stages 5 and 6 remain. Delete this plan once Stage 6 is complete.
+
 ### Stage 1: Enable `v1beta1` while still on v1.33.1
 
 - `runtime-config` in 📄 `patches/controller/feature-gates.yaml` shall read `admissionregistration.k8s.io/v1alpha1=true,admissionregistration.k8s.io/v1beta1=true`.
@@ -102,8 +104,10 @@ All three nodes report kubelet and control plane v1.35.x on Talos v1.12.6; both 
 
 ### Stage 3: Complete the hop to v1.34.13
 
-- Only after Stage 2 holds, `task talos:upgrade-k8s controller=10.90.3.101 to=v1.34.13` shall run. It skips the node already done.
+- Only after Stage 2 holds, the two remaining apiservers shall be moved the same way, by hand, one at a time, each holding `readyz` on five consecutive checks before the next.
+- When all three apiservers are on the new version, `task talos:upgrade-k8s controller=10.90.3.101 to=v1.34.13` shall run. It finds the apiservers already done and updates controller-manager, scheduler and kubelets.
 - While it runs, each node's `readyz` shall be watched directly; the tool's own "successfully updated" is not evidence of readiness.
+- When a node's kubelet is updated, every static control-plane container on that node restarts once. On 2026-11-12 two apiservers restarted within a second of each other at this step and both recovered inside a minute. The tool gives no control over that pacing; it is the one moment the "two ready apiservers" constraint may not hold.
 
 ### Stage 4: Verify and soak
 
@@ -117,6 +121,8 @@ All three nodes report kubelet and control plane v1.35.x on Talos v1.12.6; both 
 - This hop is the point of no return to 1.33: once a 1.35 apiserver rewrites a policy, etcd holds `v1beta1`.
 
 ### Stage 6: Reconcile declaration with reality
+
+Done once already for v1.34.13, straight after that hop, so that a stale generated config could not downgrade the control plane during the soak. Repeat after v1.35.10.
 
 - `kubernetesVersion` in 📄 `talconfig.yaml` and its `.j2` template shall state the version the nodes run.
 - `talhelper genconfig` shall be re-run so the generated machine configs carry both the version and the new `runtime-config`. If this is skipped, the next `talosctl apply-config` reverts both.
@@ -146,8 +152,11 @@ All three nodes report kubelet and control plane v1.35.x on Talos v1.12.6; both 
 - **Do not overlap with the Talos or Rook upgrades.**
 - **Do not merge #2990 as it stands.**
 
-## Operational notes from the first attempt
+## Operational notes
 
+- `talosctl` commands to one node are proxied through whichever endpoint the client picks. One patch failed with `connection reset by peer` on that hop and did not apply. Pass `-e <node-ip>` alongside `-n <node-ip>` to talk to the node directly, and re-read the node's `apiserverconfig` after any error before retrying.
+- A server-side dry run proves the policies without creating anything: `kubectl --server=https://<node>:6443 create --dry-run=server -o json` of a Job named `volsync-src-*`, labelled `app.kubernetes.io/created-by: volsync`, with one `volumeMounts` entry and one `volumes` entry already present. The result must contain the `jitter` init container and the `repository` NFS volume.
+- Apiserver restarts reset its client-certificate metrics, so `KubeClientCertificateExpiration` can start firing for a certificate that was already close to expiry. On 2026-11-12 it was the admin kubeconfig.
 - Machine config on these nodes is multi-document, so `talosctl patch mc` rejects JSON6902 patches. Use a strategic merge: `-p '{"cluster":{"apiServer":{"image":"registry.k8s.io/kube-apiserver:<version>"}}}'`, with `--mode=no-reboot`.
 - In Git Bash, set `MSYS_NO_PATHCONV=1` for any `kubectl get --raw=/readyz` or the path is rewritten.
 - When the VIP holder's apiserver is down, address a healthy node directly: `kubectl --server=https://10.90.3.10x:6443`.
