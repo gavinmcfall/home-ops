@@ -13,6 +13,7 @@ Each plan here exists because investigating the PR turned up something the PR it
 
 | Plan | PRs | What the investigation found |
 |---|---|---|
+| [Kubernetes v1.33.1 → v1.35.x](./kubernetes-1.35-upgrade-plan.md) | none; [#2990](https://github.com/gavinmcfall/home-ops/pull/2990) follows it | v1.35 is the ceiling on Talos v1.12 and Rook v1.19, and the apiserver flags that keep the VolSync admission policies alive must not be touched on the way there. |
 | [Rook-Ceph v1.19.7 → v1.21.x](./rook-ceph-1.21-upgrade-plan.md) | [#1955](https://github.com/gavinmcfall/home-ops/pull/1955), [#1956](https://github.com/gavinmcfall/home-ops/pull/1956) | There is no 1.19→1.21 upgrade path, and 1.20 stops deploying CSI drivers altogether — a new chart is required or every Ceph PVC loses its driver. |
 | [Talos v1.12.6 → v1.13.x](./talos-1.13-upgrade-plan.md) | [#1885](https://github.com/gavinmcfall/home-ops/pull/1885) | The upgrade operator that would action it is commented out, so merging the bump changes nothing at runtime — and arms an unprompted three-node roll if the operator is ever enabled. |
 | [Sonarr 4.0.20 → v5](./sonarr-v5-upgrade-plan.md) | [#2819](https://github.com/gavinmcfall/home-ops/pull/2819) | Every upstream v5 release is a prerelease, against a one-way Postgres schema migration across three instances. |
