@@ -2,4 +2,9 @@ cluster:
   apiServer:
     extraArgs:
       feature-gates: ImageVolume=true,MutatingAdmissionPolicy=true
-      runtime-config: admissionregistration.k8s.io/v1alpha1=true
+      # v1alpha1: the version the VolSync MutatingAdmissionPolicy manifests use,
+      #           and what the 1.33 admission plugin reads.
+      # v1beta1:  what the plugin reads from 1.34 on. Without it a 1.34+
+      #           apiserver never becomes ready (informer-sync fails forever).
+      # Keep both until the manifests move to v1 with Kubernetes 1.36.
+      runtime-config: admissionregistration.k8s.io/v1alpha1=true,admissionregistration.k8s.io/v1beta1=true
