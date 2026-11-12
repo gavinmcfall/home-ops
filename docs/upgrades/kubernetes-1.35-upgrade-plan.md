@@ -122,11 +122,14 @@ All three nodes report kubelet and control plane v1.35.x on Talos v1.12.6; both 
 
 ### Stage 6: Reconcile declaration with reality
 
-Done once already for v1.34.13, straight after that hop, so that a stale generated config could not downgrade the control plane during the soak. Repeat after v1.35.10.
+The declarations were brought to v1.34.13 straight after that hop (#3056). Repeat after v1.35.10.
 
 - `kubernetesVersion` in 📄 `talconfig.yaml` and its `.j2` template shall state the version the nodes run.
-- `talhelper genconfig` shall be re-run so the generated machine configs carry both the version and the new `runtime-config`. If this is skipped, the next `talosctl apply-config` reverts both.
 - 📄 `kubernetesupgrade.yaml` shall state the same version.
+- **The generated machine configs shall not be regenerated and applied as part of this plan.** A dry-run apply on 2026-11-12 showed that a fresh `talhelper genconfig` (talhelper 3.1.11) differs from the live nodes in ways unrelated to Kubernetes:
+  - it emits network config as new-style documents (`BondConfig`, `Layer2VIPConfig`, `LinkAliasConfig`, `LinkConfig`, `VLANConfig`), where the nodes hold a legacy `machine.network.interfaces` block, so applying rewrites bond, VIP and Thunderbolt link config on every node;
+  - git carries a `10.90.254.1` nameserver and `terminated-pod-gc-threshold: "50"` that the nodes do not have.
+- Until that is reviewed as its own change, the local `clusterconfig/` files (dated 2026-05-19, still v1.33.1) and any fresh `genconfig` output are both unsafe to `apply-config`. Node changes go through targeted `talosctl patch mc` instead.
 - #2990 shall be retargeted to the 1.35 line of `alpine/k8s` and merged.
 
 ## Done Criteria
