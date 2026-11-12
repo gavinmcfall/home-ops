@@ -44,11 +44,11 @@ spec:
               privileged: true
             resources:
               requests:
-                gpu.intel.com/i915_monitoring: 1
+                gpu.intel.com/monitoring: 1
                 cpu: 100m
                 memory: 100Mi
               limits:
-                gpu.intel.com/i915_monitoring: 1
+                gpu.intel.com/monitoring: 1
                 memory: 500Mi
     service:
       main:
