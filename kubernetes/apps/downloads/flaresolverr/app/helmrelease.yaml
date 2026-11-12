@@ -34,12 +34,22 @@ spec:
             image:
               repository: ghcr.io/flaresolverr/flaresolverr
               tag: v3.5.2@sha256:c80ae007ce2ccdcd217a12426e4f039ef763ff90738c808d38810c3e59323767
+            env:
+              TZ: Pacific/Auckland
+              LOG_LEVEL: info
+              # Every in-flight challenge holds a Chrome instance open; skipping
+              # images, CSS and fonts shrinks each one.
+              DISABLE_MEDIA: true
+              PROMETHEUS_ENABLED: true
+              PROMETHEUS_PORT: &metricsPort 8192
             resources:
               requests:
                 cpu: 15m
                 memory: 512Mi
               limits:
-                memory: 2Gi
+                # 2Gi was breached on 2026-11-12 when concurrent unsolvable
+                # challenges stacked on a baseline that leaks to ~700Mi over weeks.
+                memory: 3Gi
     service:
       app:
         controller: *app
@@ -49,3 +59,14 @@ spec:
         ports:
           http:
             port: 8191
+          metrics:
+            port: *metricsPort
+    serviceMonitor:
+      app:
+        serviceName: *app
+        endpoints:
+          - port: metrics
+            scheme: http
+            path: /metrics
+            interval: 1m
+            scrapeTimeout: 10s
