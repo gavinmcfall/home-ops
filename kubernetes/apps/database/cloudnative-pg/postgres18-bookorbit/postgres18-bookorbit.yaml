@@ -45,6 +45,10 @@ spec:
     initdb:
       database: bookorbit
       owner: bookorbit
+      # One source of truth for the owner's password; see externalsecret.yaml.
+      # Without this CNPG generates its own and re-applies it on every restart.
+      secret:
+        name: bookorbit-pg-role
       postInitApplicationSQL:
         - CREATE EXTENSION IF NOT EXISTS "uuid-ossp" CASCADE
         - CREATE EXTENSION IF NOT EXISTS pg_trgm CASCADE
