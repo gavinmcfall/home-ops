@@ -50,6 +50,12 @@ spec:
       crashCollector:
         disable: false
       csi:
+        # Mons are msgr2-only (requireMsgr2), so kernel CephFS mounts must ask for
+        # msgr2. Set here, not in the operator chart: Rook 1.20 removed the
+        # operator chart's csi.cephFSKernelMountOptions, and without this the
+        # ClientProfile loses the option and new CephFS mounts fail.
+        cephfs:
+          kernelMountOptions: ms_mode=prefer-crc
         readAffinity:
           enabled: false
       dashboard:
