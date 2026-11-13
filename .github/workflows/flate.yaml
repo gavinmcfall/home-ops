@@ -97,7 +97,13 @@ jobs:
         # `diff all`, not a hr/ks matrix: in flate 0.7.3 `diff hr` printed
         # nothing for a change `diff all` reported in full (the HelmRelease
         # manifest AND the Deployment it renders), checked on #3066.
-        run: flate diff all -o diff > diff.patch
+        # The diff is informational; `flate test` is the gate. flate 0.7.3 exits
+        # non-zero when a changed HelmRelease depends on a HelmRelease outside the
+        # change set ("dependency not found" on both sides), while still writing
+        # the diff for everything else.
+        run: |
+          flate diff all -o diff > diff.patch \
+            || echo "::warning::flate diff exited non-zero; the diff below may be incomplete"
 
       - name: Generate Diff
         id: diff
