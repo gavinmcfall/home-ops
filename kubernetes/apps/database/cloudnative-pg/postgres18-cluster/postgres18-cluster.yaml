@@ -18,6 +18,18 @@ spec:
   # Loosen the trigger so short stalls don't cause a failover; genuine outages
   # (sustained past failoverDelay) still promote a replica.
   failoverDelay: 30
+
+  # On shutdown CNPG first tries a "smart" stop: refuse new connections and
+  # wait for existing ones to leave. Apps and poolers hold connections open, so
+  # that never completes and the full timeout (default 180s) is pure outage:
+  # - a deleted primary sat 3 minutes before failover even began (2026-11-13,
+  #   about 5 minutes without writes);
+  # - on a node reboot the kubelet only grants 20s (shutdownGracePeriod 30s
+  #   minus 10s for critical pods), so the primary was SIGKILLed mid-smart-stop
+  #   and came back through crash recovery.
+  # 5s leaves room for a clean "fast" stop (checkpoint, close connections)
+  # inside that 20s.
+  smartShutdownTimeout: 5
   probes:
     liveness:
       isolationCheck:
