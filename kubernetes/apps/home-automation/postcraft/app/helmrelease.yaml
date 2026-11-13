@@ -45,7 +45,7 @@ spec:
           app:
             image:
               repository: ghcr.io/gavinmcfall/postcraft
-              tag: v0.3.6-alpha.1@sha256:31dd57f170dc6dd3c2b944a98875b8d94c908328c41777305d18c42add5aa056
+              tag: v0.3.7-alpha.1@sha256:9a061d671dcc1859cd4de5af5aa93a8fe491506bea81e928510c9f9f149d5c13
             env:
               POSTCRAFT_TRANSPORT: http
               POSTCRAFT_PORT: &port 8080
@@ -53,7 +53,7 @@ spec:
               POSTCRAFT_DATA_DIR: /data
               POSTCRAFT_LOG_LEVEL: info
               POSTCRAFT_AUD_CHECK: client_id
-              POSTCRAFT_VERSION: v0.3.6-alpha.1
+              POSTCRAFT_VERSION: v0.3.7-alpha.1
             envFrom:
               - secretRef:
                   name: postcraft-env
@@ -71,14 +71,10 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  # STOPGAP (2026-11-13): /health, not /ready. In v0.3.6-alpha.1
-                  # /ready turns 503 (`oidc_discovery_stale,jwks_stale`) one hour
-                  # after every start: the OIDC discovery and JWKS caches have a
-                  # 3600s TTL, are warmed once at startup, and nothing refreshes
-                  # them in the background. The app keeps working, but the pod sat
-                  # at 0/1 and fired KubePodNotReady for months. Put this back to
-                  # /ready once the app refreshes its caches itself.
-                  httpGet: { path: /health, port: *port }
+                  # /ready needs v0.3.7-alpha.1 or later: earlier images never
+                  # refreshed the OIDC discovery and JWKS caches (3600s TTL), so
+                  # /ready turned 503 one hour after every start.
+                  httpGet: { path: /ready, port: *port }
                   initialDelaySeconds: 10
                   periodSeconds: 10
                   timeoutSeconds: 5
