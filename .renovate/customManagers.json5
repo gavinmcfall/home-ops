@@ -44,5 +44,19 @@
       ],
       datasourceTemplate: "docker",
     },
+    {
+      customType: "regex",
+      description: "Process the VectorChord CloudNativePG imageName. Tags are <postgres minor>-<vectorchord version>, e.g. 18.6-1.1.1. A VectorChord bump needs ALTER EXTENSION vchord UPDATE and a reindex in the Immich database afterwards, so never auto-merge these.",
+      managerFilePatterns: [
+        "/kubernetes/apps/database/cloudnative-pg/.+\\.yaml$/",
+      ],
+      matchStrings: [
+        // imageName: ghcr.io/tensorchord/cloudnative-vectorchord:18.6-1.1.1@sha256:...
+        "imageName:\\s*(?<depName>ghcr\\.io/tensorchord/cloudnative-vectorchord):(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)",
+      ],
+      datasourceTemplate: "docker",
+      // 18 stays fixed (compatibility); VectorChord version orders first, then the Postgres minor.
+      versioningTemplate: "regex:^(?<compatibility>\\d+)\\.(?<build>\\d+)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
+    },
   ],
 }
