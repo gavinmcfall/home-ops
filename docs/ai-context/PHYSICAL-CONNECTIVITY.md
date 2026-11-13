@@ -8,6 +8,12 @@ categories: ["Networking[100%]", "Architecture[60%]", "Reference[80%]"]
 # Physical Connectivity Profile — V2 (Draft)
 
 **Status**:
+- **Live as of 2026-11-13 (supersedes the V2 draft below where they differ):**
+  - `bond0` = one igc RJ45 port, active-backup, `10.90.3.x/16`: management, NAS and Ceph `public_network`. Unchanged.
+  - `bond1` = both X710 SFP+ ports in LACP (802.3ad) to the USW Aggregation, MTU 9000, with VLAN 100 (`10.99.100.x/24`).
+  - **Ceph `cluster_network` is VLAN 100 on `bond1`, not Thunderbolt** (#3090). Tested first: jumbo frames clean and 9.1–9.8 Gb/s per stream between every pair of nodes. Not tested: losing one DAC, or the Aggregation rebooting.
+  - The Thunderbolt mesh is still cabled and configured but carries no Ceph traffic. A wedged Thunderbolt link after a reboot no longer affects storage.
+  - Replication now depends on the USW Aggregation: keep its firmware auto-update off.
 - **V2 connectivity (bond0 X710 primary + igc backup, Citadel SFP+):** *Draft for review. Cables on hand 2026-05-09 (6× 1m SFP+ DACs); no Talos config or physical cabling changes applied yet.*
 - **Thunderbolt host_reset=0 fix:** *Applied 2026-05-05 at commit `413b3ccea` via custom factory.talos.dev schematic (NOT via modules-list — that path doesn't work on UKI Talos; see "Thunderbolt reliability fix" below for the corrected mechanism).*
 
