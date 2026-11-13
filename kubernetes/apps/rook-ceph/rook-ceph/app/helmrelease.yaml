@@ -22,6 +22,11 @@ spec:
     # their settings live in ./csi-drivers-helmrelease.yaml; the CephFS kernel mount
     # option lives on the CephCluster (../cluster/helmrelease.yaml).
     csi:
+      # Rook keeps the CephConnection and ClientProfile (mon addresses, mount options)
+      # up to date for the drivers. The 1.21.2 chart renders this setting empty when
+      # it is not given, which only means "true" by accident of how the operator loads
+      # an empty value, so say it.
+      createCsiOperatorResources: true
       serviceMonitor:
         enabled: true
     image:
