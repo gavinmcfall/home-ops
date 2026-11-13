@@ -71,7 +71,14 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet: { path: /ready, port: *port }
+                  # STOPGAP (2026-11-13): /health, not /ready. In v0.3.6-alpha.1
+                  # /ready turns 503 (`oidc_discovery_stale,jwks_stale`) one hour
+                  # after every start: the OIDC discovery and JWKS caches have a
+                  # 3600s TTL, are warmed once at startup, and nothing refreshes
+                  # them in the background. The app keeps working, but the pod sat
+                  # at 0/1 and fired KubePodNotReady for months. Put this back to
+                  # /ready once the app refreshes its caches itself.
+                  httpGet: { path: /health, port: *port }
                   initialDelaySeconds: 10
                   periodSeconds: 10
                   timeoutSeconds: 5
