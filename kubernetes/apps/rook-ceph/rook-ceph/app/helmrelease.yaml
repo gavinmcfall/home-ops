@@ -18,9 +18,10 @@ spec:
     remediation:
       retries: 3
   values:
+    # From Rook 1.20 this chart only installs the ceph-csi-operator. The drivers and
+    # their settings live in ./csi-drivers-helmrelease.yaml; the CephFS kernel mount
+    # option lives on the CephCluster (../cluster/helmrelease.yaml).
     csi:
-      cephFSKernelMountOptions: ms_mode=prefer-crc
-      enableLiveness: true
       serviceMonitor:
         enabled: true
     image:

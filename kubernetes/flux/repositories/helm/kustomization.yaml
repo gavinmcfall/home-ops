@@ -6,6 +6,7 @@ resources:
   - ./authentik.yaml
   - ./backube-charts.yaml
   - ./bjw-s.yaml
+  - ./ceph-csi-operator.yaml
   - ./cilium.yaml
   - ./cloudnative-pg.yaml
   - ./coredns.yaml
