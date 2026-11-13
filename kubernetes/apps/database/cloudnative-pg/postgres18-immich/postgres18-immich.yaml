@@ -66,6 +66,10 @@ spec:
     initdb:
       database: immich
       owner: immich
+      # One source of truth for the owner's password; see externalsecret.yaml.
+      # Without this CNPG generates its own and re-applies it on every restart.
+      secret:
+        name: immich-pg-role
       postInitApplicationSQL:
         - CREATE EXTENSION IF NOT EXISTS vchord CASCADE
         - CREATE EXTENSION IF NOT EXISTS vector CASCADE

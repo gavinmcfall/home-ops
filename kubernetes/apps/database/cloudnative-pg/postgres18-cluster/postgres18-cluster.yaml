@@ -83,6 +83,17 @@ spec:
     initdb:
       database: postgres
       owner: postgres
+      # The initdb owner here is the `postgres` superuser. Without a named
+      # secret CNPG generated `postgres18-cluster-app` (username postgres,
+      # random password) and, on every primary start, applied the superuser
+      # password and then THAT one on top of it. Every app's init-db container
+      # then failed to log in as postgres until the 15-minute refresh of
+      # cloudnative-pg-secret re-applied the real password (1,764 failed
+      # logins from 15 pods after the 2026-11-13 stanton-01 reboot; the likely
+      # cause of the 2026-10-18 "superuser drift" too). Naming the superuser
+      # secret here makes both passes use the same password.
+      secret:
+        name: cloudnative-pg-secret
 
   # ============================================================================
   # RESTORE FROM BACKUP (commented out - use instead of initdb above)
