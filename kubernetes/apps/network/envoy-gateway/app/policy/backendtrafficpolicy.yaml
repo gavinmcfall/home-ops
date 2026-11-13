@@ -5,7 +5,10 @@ kind: BackendTrafficPolicy
 metadata:
   name: envoy-gateway-backend
 spec:
-  compression:
+  # `compressor`, not `compression`: the old field is deprecated and removed in
+  # Envoy Gateway v1.11. Same item shape. Order matters: the first entry is
+  # preferred when the client accepts several.
+  compressor:
     - type: Brotli
     - type: Gzip
   connection:
