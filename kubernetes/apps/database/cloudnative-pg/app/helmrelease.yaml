@@ -27,6 +27,19 @@ spec:
     - name: openebs
       namespace: openebs-system
   values:
+    # Two copies on different nodes, one elected leader (`--leader-elect` is
+    # already on). With one copy, rebooting its node left the clusters with no
+    # operator for about 51s (2026-11-13 stanton-01 reboot), and nothing can
+    # fail a database over while the operator is away.
+    replicaCount: 2
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: cloudnative-pg
+            app.kubernetes.io/instance: cloudnative-pg
     crds:
       create: true
     config:

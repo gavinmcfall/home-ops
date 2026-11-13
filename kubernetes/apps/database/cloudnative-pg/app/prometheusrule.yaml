@@ -25,9 +25,12 @@ spec:
           labels:
             severity: critical
 
-        # 30m = three missed 10m cycles, and longer than the 15m ExternalSecret
-        # refresh that auto-repairs drift. A drift that self-heals never pages;
-        # this only fires once auto-repair has also failed.
+        # 30m = three missed 10m cycles. Since 2026-11-13 the ExternalSecret
+        # refresh that re-asserts the password is hourly, not every 15m, so this
+        # can now fire before a refresh has had a chance to repair anything.
+        # That is intended: the known cause of drift is fixed (initdb.secret on
+        # postgres18-cluster), so 30 minutes of failed superuser auth is a new
+        # problem worth a page, not something to wait out.
         - alert: CnpgSuperuserAuthFailing
           annotations:
             summary: >-
