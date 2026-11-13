@@ -109,6 +109,18 @@ spec:
             memory: 128Mi
           limits:
             memory: 256Mi
+      security:
+        cephx:
+          # CVE-2025-30156: mon, mgr, OSD, MDS, RGW and admin keys rotated to the
+          # AES256K type. To rotate again, raise keyGeneration above the value in
+          # the CephCluster's status.cephx.
+          daemon:
+            keyRotationPolicy: KeyGeneration
+            keyGeneration: 2
+          # CSI keys stay aes until every node runs Linux 7.0+; the kernel RBD and
+          # CephFS clients cannot use aes256k before that.
+          csi:
+            keyType: aes
       storage:
         useAllNodes: false
         useAllDevices: false
