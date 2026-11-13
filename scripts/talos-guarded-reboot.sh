@@ -12,6 +12,14 @@
 # What it does:
 #   1. Refuses to start unless the cluster gate passes and the node has both
 #      Thunderbolt links up.
+#   1a. Cordons the node, then gets the databases out of the way:
+#      - moves the CNPG operator and pgBackRest plugin pods off it (nothing can
+#        manage a Postgres failover while either is down);
+#      - switches every Postgres primary on it over to a replica on another
+#        node, so writes pause for seconds instead of the minutes a cold
+#        restart takes (about 2m40s on 2026-11-13). Needs the `kubectl cnpg`
+#        plugin; skip with --no-switchover.
+#      The node is uncordoned once it is back and its OSD has been released.
 #   2. Sets Ceph noout and holds the node's OSD back (noup) so it cannot rejoin
 #      by itself.
 #   3. Reboots the node (plain reboot, or a machine-config patch applied with
@@ -35,24 +43,28 @@
 #   ./talos-guarded-reboot.sh <node>                  # talosctl reboot
 #   ./talos-guarded-reboot.sh <node> --patch <file>   # talosctl patch mc --mode=reboot
 #   ./talos-guarded-reboot.sh <node> --resume         # node already rebooted, guards still set
+#   add --no-switchover to reboot with Postgres primaries left where they are
 #
 # With --patch, talosctl's output is never printed: a rejected patch prints a
 # diff that includes secrets from the machine config.
 #
-# Needs: kubectl, talosctl, and the rook-ceph-tools deployment.
+# Needs: kubectl, talosctl, and the rook-ceph-tools deployment; the
+# `kubectl cnpg` plugin (same version as the operator) for the switchover.
 
 set -uo pipefail
 
 NODE="${1:-}"
 MODE="reboot"
 PATCH=""
+SWITCHOVER=1
 shift || true
 while [ $# -gt 0 ]; do
     case "$1" in
         --check) MODE="check" ;;
         --resume) MODE="resume" ;;
         --patch) MODE="patch"; PATCH="${2:-}"; shift ;;
-        -h | --help) sed -n '2,43p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --no-switchover) SWITCHOVER=0 ;;
+        -h | --help) sed -n '2,53p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "unknown argument: $1" >&2; exit 2 ;;
     esac
     shift
@@ -86,6 +98,74 @@ pgs_clean() {
     echo "$stat" | grep -qE '^[0-9]+ pgs:' && [ "$bad" = 0 ]
 }
 
+have_cnpg() { kubectl cnpg version > /dev/null 2>&1; }
+pod_node() { kubectl -n "$1" get pod "$2" -o jsonpath='{.spec.nodeName}' 2> /dev/null; }
+# "namespace cluster instances primary" for every CNPG cluster whose primary is on $NODE
+primaries_here() {
+    kubectl get clusters.postgresql.cnpg.io -A --no-headers \
+        -o custom-columns=NS:.metadata.namespace,NAME:.metadata.name,INST:.spec.instances,PRIMARY:.status.currentPrimary 2> /dev/null \
+        | while read -r ns name inst primary; do
+            [ "$(pod_node "$ns" "$primary")" = "$NODE" ] && echo "$ns $name $inst $primary"
+        done
+}
+# first healthy instance of a cluster that is neither the primary nor on $NODE
+switchover_target() {
+    local ns="$1" name="$2" primary="$3" inst
+    for inst in $(kubectl -n "$ns" get cluster "$name" -o jsonpath='{.status.instancesStatus.healthy[*]}'); do
+        [ "$inst" = "$primary" ] && continue
+        [ "$(pod_node "$ns" "$inst")" = "$NODE" ] && continue
+        echo "$inst"
+        return 0
+    done
+    return 1
+}
+cluster_settled() {
+    [ "$(kubectl -n "$1" get cluster "$2" -o jsonpath='{.status.currentPrimary}')" = "$3" ] \
+        && [ "$(kubectl -n "$1" get cluster "$2" -o jsonpath='{.status.phase}')" = "Cluster in healthy state" ] \
+        && [ "$(kubectl -n "$1" get cluster "$2" -o jsonpath='{.status.readyInstances}')" = "$(kubectl -n "$1" get cluster "$2" -o jsonpath='{.spec.instances}')" ]
+}
+# Move the CNPG operator and pgBackRest plugin pods off $NODE (it must already be cordoned).
+move_db_controllers() {
+    local moved=0 sel
+    for sel in "app.kubernetes.io/name=cloudnative-pg" "app=pgbackrest-controller"; do
+        if [ -n "$(kubectl -n database get pods -l "$sel" --field-selector "spec.nodeName=$NODE,status.phase=Running" --no-headers 2> /dev/null)" ]; then
+            echo "[$(now)] moving pods ($sel) off $NODE"
+            kubectl -n database delete pod -l "$sel" --field-selector "spec.nodeName=$NODE" --wait=true --timeout=120s > /dev/null 2>&1
+            moved=1
+        fi
+    done
+    if [ "$moved" = 1 ]; then
+        kubectl -n database rollout status deploy/cloudnative-pg --timeout=180s > /dev/null 2>&1 \
+            && kubectl -n database rollout status deploy/pgbackrest-controller --timeout=180s > /dev/null 2>&1 \
+            || { echo "!!! the CNPG operator or pgBackRest plugin did not come back on another node"; return 1; }
+    fi
+    return 0
+}
+# Switch every Postgres primary on $NODE over to a replica elsewhere.
+switch_primaries_away() {
+    local ns name inst primary target
+    while read -r ns name inst primary; do
+        [ -n "$ns" ] || continue
+        if [ "$inst" -lt 2 ]; then
+            echo "[$(now)] $name has a single instance — it will be DOWN for the length of the reboot"
+            continue
+        fi
+        target="$(switchover_target "$ns" "$name" "$primary")" \
+            || { echo "!!! $name: no healthy replica off $NODE to switch to"; return 1; }
+        echo "[$(now)] $name: switching primary $primary -> $target"
+        kubectl cnpg promote "$name" "$target" -n "$ns" > /dev/null 2>&1 \
+            || { echo "!!! $name: kubectl cnpg promote failed"; return 1; }
+        for _ in $(seq 1 60); do
+            sleep 5
+            cluster_settled "$ns" "$name" "$target" && break
+        done
+        cluster_settled "$ns" "$name" "$target" \
+            || { echo "!!! $name: not healthy on $target after the switchover"; return 1; }
+        echo "[$(now)] $name: primary is now $target, cluster healthy"
+    done < <(primaries_here)
+    return 0
+}
+
 echo "node $NODE ($IP)  ceph osd(s): $OSDS  thunderbolt neighbours expected: $PEERS_WANT  mode: $MODE"
 echo "[$(now)] thunderbolt now: links_up=$(tb_up) peer_routes=$(tb_routes) found: $(tb_peers)"
 
@@ -95,9 +175,25 @@ if [ "$MODE" = check ]; then
     kubectl get pods -A --field-selector "spec.nodeName=$NODE" --no-headers \
         -o custom-columns=NS:.metadata.namespace,NAME:.metadata.name | awk '{print "      "$1"/"$2}' \
         | grep -E 'postgres|mon-|mgr-|mds-|osd-[0-9]|bookorbit' || echo "      (none of the tracked ones)"
-    echo "--- CNPG primaries:"
-    kubectl get clusters.postgresql.cnpg.io -A \
-        -o custom-columns=NAME:.metadata.name,PRIMARY:.status.currentPrimary --no-headers | sed 's/^/      /'
+    echo "--- database controllers on $NODE (would be moved off first):"
+    kubectl -n database get pods --field-selector "spec.nodeName=$NODE,status.phase=Running" --no-headers \
+        -o custom-columns=NAME:.metadata.name 2> /dev/null | grep -E '^(cloudnative-pg|pgbackrest-controller)-' | sed 's/^/      /' \
+        || echo "      (none)"
+    echo "--- Postgres primaries on $NODE:"
+    FOUND=0
+    while read -r ns name inst primary; do
+        [ -n "$ns" ] || continue
+        FOUND=1
+        if [ "$inst" -lt 2 ]; then
+            echo "      $name: $primary — single instance, DOWN for the reboot"
+        elif [ "$SWITCHOVER" = 0 ]; then
+            echo "      $name: $primary — left in place (--no-switchover)"
+        else
+            echo "      $name: $primary -> would switch to $(switchover_target "$ns" "$name" "$primary" || echo 'NO HEALTHY REPLICA OFF THIS NODE')"
+        fi
+    done < <(primaries_here)
+    [ "$FOUND" = 1 ] || echo "      (none)"
+    if have_cnpg; then echo "--- kubectl cnpg plugin: present"; else echo "--- kubectl cnpg plugin: MISSING (needed for a switchover)"; fi
     echo "--- backups mid-run: $(kubectl get pods -A --no-headers 2>/dev/null | grep -c ' volsync-src-')"
     echo "--- gate:"
     "$HERE/cluster-gate.sh" | grep -E '^FAIL|VERDICT' | sed 's/^/      /'
@@ -109,6 +205,20 @@ if [ "$MODE" != resume ]; then
     tb_ok || { echo "Thunderbolt is not at $PEERS_WANT links BEFORE the reboot — fix that first. Nothing changed."; exit 1; }
     "$HERE/cluster-gate.sh" > /dev/null 2>&1 || {
         echo "cluster gate does not pass — not starting. Run ./cluster-gate.sh to see why. Nothing changed."; exit 1; }
+    if [ "$SWITCHOVER" = 1 ] && ! have_cnpg \
+        && primaries_here | awk '$3 >= 2 {found=1} END {exit !found}'; then
+        echo "A Postgres primary is on $NODE and the kubectl cnpg plugin is not installed."
+        echo "Install it (same version as the operator) or pass --no-switchover. Nothing changed."
+        exit 1
+    fi
+
+    echo "[$(now)] cordoning $NODE"
+    kubectl cordon "$NODE" > /dev/null || { echo "cordon failed. Nothing else changed."; exit 1; }
+    if ! move_db_controllers || { [ "$SWITCHOVER" = 1 ] && ! switch_primaries_away; }; then
+        echo "Database preparation failed — uncordoning $NODE and stopping. The node was not rebooted."
+        kubectl uncordon "$NODE" > /dev/null
+        exit 1
+    fi
 
     echo "[$(now)] ceph: set noout, hold $(for o in $OSDS; do printf 'osd.%s ' "$o"; done)back (noup)"
     ceph osd set noout > /dev/null
@@ -126,6 +236,7 @@ if [ "$MODE" != resume ]; then
         echo "talosctl failed (rc=$RC) — removing guards, node was not rebooted"
         for o in $OSDS; do ceph osd rm-noup "osd.$o" > /dev/null; done
         ceph osd unset noout > /dev/null
+        kubectl uncordon "$NODE" > /dev/null
         exit 1
     fi
 
@@ -167,6 +278,8 @@ for _ in 1 2 3; do
 done
 echo "[$(now)] thunderbolt stable — releasing $(for o in $OSDS; do printf 'osd.%s ' "$o"; done)"
 for o in $OSDS; do ceph osd rm-noup "osd.$o" > /dev/null; done
+# safe to schedule on again; a no-op if the node was never cordoned
+kubectl uncordon "$NODE" > /dev/null 2>&1
 
 OK=0
 for i in $(seq 1 90); do
