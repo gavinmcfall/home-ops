@@ -63,6 +63,17 @@ spec:
         urlPrefix: /
         ssl: false
         prometheusEndpoint: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
+      healthCheck:
+        # These three stay raised until the CSI keys can move to aes256k, which
+        # needs Linux 7.0+ on every node (see security.cephx.csi below). Set each
+        # to unmute once the CSI keys are aes256k so a stray aes key shows again.
+        muteHealthWarning:
+          AUTH_INSECURE_CLIENT_KEY_TYPE:
+            policy: mute
+          AUTH_INSECURE_KEYS_ALLOWED:
+            policy: mute
+          AUTH_INSECURE_KEYS_CREATABLE:
+            policy: mute
       mgr:
         modules:
           - name: pg_autoscaler
