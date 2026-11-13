@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/scheduledbackup_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: postgres18-bookorbit-daily-b2
+  namespace: database
+spec:
+  schedule: "0 30 3 * * *"       # 6-field (sec min hour dom mon dow): 03:30 UTC daily
+  # Not immediate: the weekly full fires on first apply and this would race it.
+  backupOwnerReference: self
+  method: plugin
+  target: primary
+  cluster:
+    name: postgres18-bookorbit
+  pluginConfiguration:
+    name: pgbackrest.dalibo.com
+    parameters:
+      selectedRepository: "1"
+      backupType: incr        # the weekly full re-bases the chain

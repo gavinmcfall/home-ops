@@ -6,11 +6,11 @@ metadata:
   name: postgres18-bookorbit
   namespace: database
 spec:
-  # TRIAL POSTURE: single instance, no pgBackRest. BookOrbit is being evaluated
-  # as the reading hub; its DB holds re-derivable scan metadata plus early user
-  # state. Before promoting to production: bump instances to 3 and wire the
-  # pgbackrest plugin + stanza/pluginconfig/scheduledbackups (mirror
-  # postgres18-immich).
+  # TRIAL POSTURE: single instance. BookOrbit is being evaluated as the reading
+  # hub; its DB holds re-derivable scan metadata plus early user state. Backups
+  # are wired (pgbackrest plugin, see stanza.yaml). Before promoting to
+  # production: bump instances to 3 and set primaryUpdateMethod: switchover
+  # (mirror postgres18-immich).
   instances: 1
 
   # Skip the long "smart" stop that never completes while clients hold
@@ -45,6 +45,15 @@ spec:
 
   monitoring:
     enablePodMonitor: true
+
+  # pgBackRest plugin: WAL archiving + backups to Backblaze B2
+  plugins:
+    - name: pgbackrest.dalibo.com
+      enabled: true
+      isWALArchiver: true
+      parameters:
+        stanzaRef: postgres18-bookorbit-stanza
+        pluginConfigRef: postgres18-bookorbit-pluginconfig
 
   bootstrap:
     initdb:
