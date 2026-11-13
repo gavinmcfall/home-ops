@@ -1,0 +1,122 @@
+---
+# Ceph-CSI drivers. From Rook 1.20 the operator no longer deploys the CSI drivers:
+# this chart owns the Driver and OperatorConfig resources and the drivers' service
+# accounts. The chart version must match the ceph-csi-operator subchart that the
+# rook-ceph chart pins (rook-ceph v1.20.10 -> 1.0.4, rook-ceph 1.21.2 -> 1.1.0).
+#
+# The release MUST be named ceph-csi-drivers in rook-ceph: Rook 1.19.5+ stamped the
+# existing Driver/OperatorConfig resources with that Helm ownership so this release
+# can adopt them.
+#
+# Not set here on purpose: the CephFS kernel mount option (ms_mode=prefer-crc). Rook
+# writes it into the ClientProfile from cephClusterSpec.csi.cephfs.kernelMountOptions
+# in ../cluster/helmrelease.yaml.
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ceph-csi-drivers
+spec:
+  interval: 1h
+  timeout: 15m
+  releaseName: ceph-csi-drivers
+  chart:
+    spec:
+      chart: ceph-csi-drivers
+      version: 1.0.4
+      sourceRef:
+        kind: HelmRepository
+        name: ceph-csi-operator
+        namespace: flux-system
+  dependsOn:
+    - name: rook-ceph
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    operatorConfig:
+      namespace: rook-ceph
+      driverSpecDefaults:
+        clusterName: rook-ceph
+        imageSet:
+          name: rook-csi-operator-image-set-configmap
+        nodePlugin:
+          priorityClassName: system-node-critical
+        controllerPlugin:
+          priorityClassName: system-cluster-critical
+    drivers:
+      rbd:
+        enabled: true
+        # The rook-ceph. prefix is the provisioner name in every StorageClass,
+        # VolumeSnapshotClass and PersistentVolume. Never change it.
+        name: rook-ceph.rbd.csi.ceph.com
+        clusterName: rook-ceph
+        # Chart default is none, which drops the csi-snapshotter sidecar and with
+        # it every VolSync backup of an RBD volume.
+        snapshotPolicy: volumeSnapshot
+        nodePlugin: &nodePlugin
+          updateStrategy:
+            type: RollingUpdate
+          resources:
+            plugin:
+              requests:
+                cpu: 250m
+                memory: 512Mi
+              limits:
+                memory: 1Gi
+            registrar:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+        controllerPlugin:
+          replicas: 2
+          deploymentStrategy:
+            type: Recreate
+          resources:
+            plugin:
+              requests:
+                memory: 512Mi
+              limits:
+                memory: 1Gi
+            provisioner: &sidecar
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+            attacher: *sidecar
+            resizer: *sidecar
+            snapshotter: *sidecar
+      cephfs:
+        enabled: true
+        name: rook-ceph.cephfs.csi.ceph.com
+        clusterName: rook-ceph
+        snapshotPolicy: volumeSnapshot
+        nodePlugin: *nodePlugin
+        controllerPlugin:
+          replicas: 2
+          deploymentStrategy:
+            type: Recreate
+          resources:
+            plugin:
+              requests:
+                cpu: 250m
+                memory: 512Mi
+              limits:
+                memory: 1Gi
+            provisioner: *sidecar
+            attacher: *sidecar
+            resizer: *sidecar
+            snapshotter: *sidecar
+      nfs:
+        enabled: false
+        name: rook-ceph.nfs.csi.ceph.com
+      nvmeof:
+        enabled: false
+        name: rook-ceph.nvmeof.csi.ceph.com
