@@ -226,9 +226,6 @@ spec:
                 # objects (e.g. a 3.6GB container-image blob → zot S3 backend).
                 memory: 2Gi
             instances: 2
-          healthCheck:
-            bucket:
-              interval: 60s
         storageClass:
           enabled: true
           name: ${CLUSTER_STORAGE_BUCKET}

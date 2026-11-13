@@ -37,15 +37,11 @@ tasks:
   validate:
     desc: Validate the Flux tree before committing (renders everything with flate)
     summary: |
-      The pre-commit check. Runs `kubernetes:flate`.
-
-      `kubernetes:schemas` is a separate, advisory check for now: on
-      2026-11-13 it reported two rendered objects carrying a field their CRD
-      does not have (CephObjectStore spec.healthCheck.bucket and
-      AutoscalingRunnerSet spec.listenerConfig). Add it here once those are
-      resolved, so this task never fails on an untouched main.
+      The pre-commit check. Renders everything (`kubernetes:flate`), then
+      schema-checks the result (`kubernetes:schemas`).
     cmds:
       - task: flate
+      - task: schemas
 
   flate:
     desc: Render the whole Flux tree offline with flate (the same check CI runs)
@@ -66,13 +62,26 @@ tasks:
     desc: Schema-check the rendered manifests with kubeconform
     summary: |
       flate proves the tree renders; it does not check the result against
-      schemas. This pipes the rendered output through kubeconform, using the
-      CRD schemas published from this cluster first (they know this cluster's
-      VolSync fork) and the home-operations catalogue second.
+      schemas. This pipes the rendered output through kubeconform.
+
+      Neither CRD catalogue below is generated from THIS cluster. This repo's
+      own publisher (.github/workflows/schemas.yaml, meant for
+      kubernetes-schemas.nerdz.cloud) has failed on every run for months: the
+      Cloudflare Pages project it deploys to does not exist. Until that is
+      restored the check leans on two community catalogues:
+        - kubernetes-schemas.pages.dev first, because it knows the VolSync
+          kopia fork this cluster runs;
+        - k8s-schemas.home-operations.com second.
+
+      AutoscalingRunnerSet is skipped: both catalogues predate
+      spec.listenerConfig, which the CRD installed here does have (checked
+      against the live CRD on 2026-11-13). Drop the skip once the schemas come
+      from this cluster.
     dir: "{{.ROOT_DIR}}"
     cmd: >-
       flate build all {{.FLATE_ARGS}} -o yaml
       | kubeconform -strict -ignore-missing-schemas -summary
+      -skip AutoscalingRunnerSet
       -kubernetes-version {{.FLATE_KUBE_VERSION}}
       -schema-location default
       -schema-location 'https://kubernetes-schemas.pages.dev/{{`{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}`}}.json'

@@ -76,10 +76,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    strategy:
-      matrix:
-        resources: ["hr", "ks"]
-      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -98,7 +94,10 @@ jobs:
           cache: true
 
       - name: Run flate diff
-        run: flate diff ${{ matrix.resources }} -o diff > diff.patch
+        # `diff all`, not a hr/ks matrix: in flate 0.7.3 `diff hr` printed
+        # nothing for a change `diff all` reported in full (the HelmRelease
+        # manifest AND the Deployment it renders), checked on #3066.
+        run: flate diff all -o diff > diff.patch
 
       - name: Generate Diff
         id: diff
@@ -124,14 +123,14 @@ jobs:
         name: Upload large diff artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: flate-diff-${{ matrix.resources }}
+          name: flate-diff
           path: ${{ github.workspace }}/diff.patch
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Add comment
         uses: mshick/add-pr-comment@ec328af66588ab8f77cdeb2c264f14aba45bbf59 # v3
         with:
-          message-id: "${{ github.event.pull_request.number }}/flate/${{ matrix.resources }}"
+          message-id: "${{ github.event.pull_request.number }}/flate"
           message-failure: Diff was not successful
           message: |
             ```diff
@@ -142,9 +141,9 @@ jobs:
         name: Add artifact notice
         uses: mshick/add-pr-comment@ec328af66588ab8f77cdeb2c264f14aba45bbf59 # v3
         with:
-          message-id: "${{ github.event.pull_request.number }}/flate/${{ matrix.resources }}/artifact"
+          message-id: "${{ github.event.pull_request.number }}/flate/artifact"
           message: |
-            flate diff output was >60kB and was uploaded as the `flate-diff-${{ matrix.resources }}` artifact instead of an inline comment.
+            flate diff output was >60kB and was uploaded as the `flate-diff` artifact instead of an inline comment.
 
   success:
     name: Flate - Success
