@@ -29,5 +29,26 @@
       matchPackageNames: ["registry.k8s.io/git-sync/git-sync"],
       allowedVersions: "<4.8.0",
     },
+    {
+      // The ceph-csi-drivers chart version must equal the ceph-csi-operator
+      // subchart that the deployed rook-ceph chart pins (rook-ceph v1.20.10 ->
+      // 1.0.4, 1.21.2 -> 1.1.0). Renovate cannot see that mapping, so a bump on
+      // its own would put the drivers ahead of the operator that reconciles
+      // them. Held behind Dependency Dashboard approval: it stays visible there
+      // but no PR is raised. Bump it by hand in the same change as rook-ceph;
+      // the version to use is in the rook-ceph chart's Chart.yaml dependencies.
+      description: "Hold ceph-csi-drivers for a manual bump with rook-ceph (must match its ceph-csi-operator subchart)",
+      matchDatasources: ["helm"],
+      matchPackageNames: ["ceph-csi-drivers"],
+      dependencyDashboardApproval: true,
+    },
+    {
+      description: "Rook: one minor version at a time",
+      matchPackageNames: ["/rook-ceph/"],
+      matchUpdateTypes: ["minor", "major"],
+      prBodyNotes: [
+        ":warning: Rook supports upgrading one minor version at a time only. If this PR skips a minor, do it in hops. Bump `ceph-csi-drivers` in the same change to the ceph-csi-operator version the new rook-ceph chart pins.",
+      ],
+    },
   ],
 }

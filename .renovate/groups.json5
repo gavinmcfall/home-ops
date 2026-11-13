@@ -60,7 +60,10 @@
     {
       description: "Rook-Ceph Group",
       groupName: "rook-ceph",
-      matchDatasources: ["docker"],
+      // helm as well as docker: the operator chart comes from an OCIRepository
+      // (docker) and the cluster chart from a HelmRepository (helm). With only
+      // docker here they were raised as two PRs (#1955, #1956).
+      matchDatasources: ["docker", "helm"],
       matchPackageNames: ["/rook-ceph/", "/rook-ceph-cluster/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
