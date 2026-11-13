@@ -197,7 +197,7 @@ mkdir -p kubernetes/apps/<namespace>/<app>/app
 
 # 3. Render and validate
 task configure
-task kubernetes:kubeconform
+task kubernetes:validate
 flux diff kustomization <namespace>
 
 # 4. Create PR, merge, monitor
@@ -209,7 +209,7 @@ flux get helmrelease <name>
 # 1. Edit templates or manifests
 # 2. Render and validate
 task configure
-task kubernetes:kubeconform
+task kubernetes:validate
 
 # 3. Review and commit
 git diff
@@ -224,7 +224,7 @@ git commit -m "chore(app): description"
 task configure
 
 # Validate manifests
-task kubernetes:kubeconform
+task kubernetes:validate
 
 # Check Flux status
 flux get kustomizations
@@ -241,7 +241,7 @@ rg -n "\${SECRET_DOMAIN}" -g"*.yaml" kubernetes/apps
 - **Secrets:** Use placeholders (`${SECRET_DOMAIN}`), never commit secrets
 - **Storage:** Define explicitly in HelmRelease `persistence` sections
 - **Images:** Pin with digest: `<tag>@sha256:<digest>` (see below)
-- **Validation:** Always run `task configure` → `task kubernetes:kubeconform` → `flux diff`
+- **Validation:** Always run `task configure` → `task kubernetes:validate` → `flux diff`
 - **PRs:** Include `flux diff` output, never push directly to `main`
 - **Makejinja delimiters:** `#{var}#` not `{{var}}` (avoids Helm conflicts)
 - **Gateway API routing:** Use `route` not `ingress` for main traffic

@@ -1,0 +1,494 @@
+---
+# Placeholder Secrets supplied to flate for offline rendering. NOT real values.
+#
+# Every Flux Kustomization substitutes variables from a `cluster-secrets`
+# Secret in its own namespace (kubernetes/components/common/cluster-vars).
+# Those are SOPS-encrypted, and flate cannot decrypt them, so without stand-ins
+# `${SECRET_DOMAIN}` and friends render as empty and some charts fail their
+# schema. This file gives flate a value for each key.
+#
+# Generated from the key NAMES in the two cluster-secrets.sops.yaml files and
+# the namespace folders under kubernetes/apps. Regenerate when a key or a
+# namespace is added:  task kubernetes:flate-supply
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: actions-runner-system
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: cert-manager
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: cortex
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: database
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: downloads
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: entertainment
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: external-secrets
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: flux-system
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: games
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: home
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: home-automation
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: kube-system
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: network
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: observability
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: openebs-system
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: plane
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: rook-ceph
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: security
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: storage
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: system-upgrade
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: vitals
+stringData:
+  CLOUDFLARE_ACCOUNT_ID: placeholder
+  LATITUDE: '0'
+  LONGITUDE: '0'
+  MINECRAFT_ADMIN: placeholder
+  MINECRAFT_WHITELIST: placeholder
+  SEARXNG_OPEN_METRICS_SECRET: placeholder
+  SECRET_ACME_EMAIL: nobody@example.com
+  SECRET_CLOUDFLARE_TUNNEL_ID: placeholder
+  SECRET_DOMAIN: example.com
+  SECRET_PROXMOX_IP: 192.0.2.1
+  SECRET_TRUENAS_IP: 192.0.2.1
+  SECRET_UNIFI_IP: 192.0.2.1
+  SECRET_VORON_IP: 192.0.2.1
+  TAILSCALE_EMAIL: nobody@example.com
+  UPS_CITADEL_PASSWORD: placeholder
+  UPS_CITADEL_USERNAME: placeholder

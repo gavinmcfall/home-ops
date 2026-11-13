@@ -3,8 +3,18 @@
 version: "3"
 
 vars:
-  KUBECONFORM_SCRIPT: "{{.SCRIPTS_DIR}}/kubeconform.sh"
   KUBERNETES_RESOURCES_DIR: "{{.ROOT_DIR}}/.taskfiles/Kubernetes/resources"
+  # Placeholder cluster-secrets so flate can substitute ${VARS} offline.
+  FLATE_SUPPLY: "{{.ROOT_DIR}}/.github/flate/supply.yaml"
+  # Render against the Kubernetes version the cluster runs.
+  FLATE_KUBE_VERSION:
+    sh: yq '.kubernetesVersion' {{.KUBERNETES_DIR}}/bootstrap/talos/talconfig.yaml | sed 's/^v//'
+  # Shared by every flate invocation. Keep in step with .github/workflows/flate.yaml.
+  FLATE_ARGS: >-
+    --kube-version {{.FLATE_KUBE_VERSION}}
+    --allow-missing-kinds Secret
+    --supply {{.FLATE_SUPPLY}}
+    --no-progress
 
 tasks:
   resources:
@@ -24,12 +34,60 @@ tasks:
         ingresses
         pods
 
-  kubeconform:
-    desc: Validate Kubernetes manifests with kubeconform
-    cmd: bash {{.KUBECONFORM_SCRIPT}} {{.KUBERNETES_DIR}}
+  validate:
+    desc: Validate the Flux tree before committing (renders everything with flate)
+    summary: |
+      The pre-commit check. Runs `kubernetes:flate`.
+
+      `kubernetes:schemas` is a separate, advisory check for now: on
+      2026-11-13 it reported two rendered objects carrying a field their CRD
+      does not have (CephObjectStore spec.healthCheck.bucket and
+      AutoscalingRunnerSet spec.listenerConfig). Add it here once those are
+      resolved, so this task never fails on an untouched main.
+    cmds:
+      - task: flate
+
+  flate:
+    desc: Render the whole Flux tree offline with flate (the same check CI runs)
+    summary: |
+      Renders every Kustomization and HelmRelease from the repository root and
+      fails if any of them does not render. No cluster access, no containers.
+
+      Extra flate arguments can be passed after `--`.
+    dir: "{{.ROOT_DIR}}"
+    cmd: flate test all {{.FLATE_ARGS}} {{.CLI_ARGS}}
     preconditions:
-      - msg: Missing kubeconform script
-        sh: test -f {{.KUBECONFORM_SCRIPT}}
+      - msg: flate is not installed - https://github.com/home-operations/flate/releases
+        sh: command -v flate
+      - msg: Missing {{.FLATE_SUPPLY}} - run `task kubernetes:flate-supply`
+        sh: test -f {{.FLATE_SUPPLY}}
+
+  schemas:
+    desc: Schema-check the rendered manifests with kubeconform
+    summary: |
+      flate proves the tree renders; it does not check the result against
+      schemas. This pipes the rendered output through kubeconform, using the
+      CRD schemas published from this cluster first (they know this cluster's
+      VolSync fork) and the home-operations catalogue second.
+    dir: "{{.ROOT_DIR}}"
+    cmd: >-
+      flate build all {{.FLATE_ARGS}} -o yaml
+      | kubeconform -strict -ignore-missing-schemas -summary
+      -kubernetes-version {{.FLATE_KUBE_VERSION}}
+      -schema-location default
+      -schema-location 'https://kubernetes-schemas.pages.dev/{{`{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}`}}.json'
+      -schema-location 'https://k8s-schemas.home-operations.com/{{`{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}`}}.json'
+      -
+    preconditions:
+      - msg: flate is not installed - https://github.com/home-operations/flate/releases
+        sh: command -v flate
+      - msg: kubeconform is not installed
+        sh: command -v kubeconform
+
+  flate-supply:
+    desc: Regenerate the placeholder secrets flate renders with (after adding a namespace or a cluster-secrets key)
+    dir: "{{.ROOT_DIR}}"
+    cmd: python {{.SCRIPTS_DIR}}/flate-supply.py {{.ROOT_DIR}}
 
   .reset:
     internal: true
