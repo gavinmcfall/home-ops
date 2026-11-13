@@ -10,3 +10,9 @@ machine:
       # drain attempt (stanton-03 was at 115/110). 250 future-proofs against
       # the same scheduling failure mode.
       maxPods: 250
+      # The kubelet only removes unused images when the disk passes 85%, so
+      # they pile up for good (about 165 GB of containerd data on stanton-01
+      # by 2026-11-13). This removes any image unused for 14 days. The clock
+      # starts when the kubelet starts, so the first sweep is 14 days after a
+      # kubelet restart.
+      imageMaximumGCAge: 336h
