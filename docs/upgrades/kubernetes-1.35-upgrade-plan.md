@@ -86,7 +86,15 @@ All three nodes report kubelet and control plane v1.35.x on Talos v1.12.6; both 
 
 ## Stages
 
-**Progress (2026-11-12):** Stages 1 to 3 are done; the cluster runs v1.34.13. Stage 4's soak is in progress. Stages 5 and 6 remain. Delete this plan once Stage 6 is complete.
+**Progress (2026-11-13):** Stages 1 to 5 are done; the cluster runs v1.35.10 on every node. Stage 6's declarations are updated and the restore drill uses `alpine/k8s:1.35.10`. Still open: [#2990](https://github.com/gavinmcfall/home-ops/pull/2990) proposes 1.37.2 and must stay unmerged until the cluster is on 1.37. Delete this plan once that is settled.
+
+**What the v1.35.10 hop showed (2026-11-13):**
+
+- The soak gate was met with a 108 of 108 backup batch on v1.34.13 and a manual restore-drill run (`kubectl -n storage create job --from=cronjob/volsync-restore-drill <name>`), 3 of 3 restored.
+- Checked against the 1.35 changelog before starting: nodes are on cgroup v2, the kubelet is not passed `--pod-infra-container-image`, no `StorageVersionMigration` v1alpha1 objects exist, the apiserver's `--requestheader-allowed-names` is set, and both feature gates (`ImageVolume`, `MutatingAdmissionPolicy`) still exist in v1.35.10.
+- The canary and the two hand-moved apiservers each came up in about a minute with no restarts.
+- `upgrade-k8s` restarts each node's apiserver during its scheduler step as well as at the kubelet step. Twice, for a few seconds, only one apiserver answered `readyz`. All three recovered without help.
+- A mover Job created after the hop carried the `jitter` init container and the `repository` volume.
 
 ### Stage 1: Enable `v1beta1` while still on v1.33.1
 
