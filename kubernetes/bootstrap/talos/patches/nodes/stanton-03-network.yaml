@@ -1,0 +1,83 @@
+# Network config for stanton-03, in the legacy `machine.network.interfaces` form.
+#
+# This lives in a patch instead of `networkInterfaces` in talconfig.yaml on
+# purpose. For Talos >= 1.12, talhelper turns `networkInterfaces` into the
+# new-style documents (LinkAliasConfig, BondConfig, Layer2VIPConfig, LinkConfig,
+# VLANConfig). The nodes still hold the legacy block, so a generated config
+# would rewrite bond0, the VIP, bond1 and both Thunderbolt links on apply.
+# Passing the same data through a patch makes the generated config match the
+# node exactly. Moving to the new-style documents is a separate, planned
+# change that needs console access to each node.
+machine:
+  network:
+    interfaces:
+      - interface: bond0
+        bond:
+          mode: active-backup
+          deviceSelectors:
+            - hardwareAddr: "58:47:ca:76:0e:de"
+              driver: igc
+        dhcp: false
+        addresses:
+          - "10.90.3.103/16"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: "10.90.254.1"
+        mtu: 1500
+        vip:
+          ip: "10.90.3.100"
+        # vlans:
+        #   - &vlan107
+        #     vlanId: 107
+        #     mtu: 1500
+        #     dhcp: false
+        #     addresses:
+        #       - "10.99.107.103/24"
+        #     routes:
+        #       - network: 0.0.0.0/0
+        #         gateway: "10.99.107.1"
+        #     dhcpOptions:
+        #       routeMetric: 4096
+      #############################################
+      #          Ceph LACP bond (V2 fabric)       #
+      #############################################
+      - interface: bond1
+        bond:
+          mode: 802.3ad
+          xmitHashPolicy: layer3+4
+          lacpRate: fast
+          miimon: 100
+          deviceSelectors:
+            - hardwareAddr: "58:47:ca:76:0e:db"
+              driver: i40e
+            - hardwareAddr: "58:47:ca:76:0e:dc"
+              driver: i40e
+        dhcp: false
+        mtu: 9000
+        vlans:
+          - vlanId: 100
+            mtu: 9000
+            dhcp: false
+            addresses:
+              - "10.99.100.103/24"
+      #############################################
+      #         Thunerbolt Configuration          #
+      #############################################
+      - deviceSelector:
+          busPath: 0-1.0 # stanton-01
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.103/32
+        routes:
+          - network: 169.254.255.101/32
+            metric: 2048
+      - deviceSelector:
+          busPath: 1-1.0 # stanton-02
+        dhcp: false
+        mtu: 65520
+        addresses:
+          - 169.254.255.103/32
+        routes:
+          - network: 169.254.255.102/32
+            metric: 2048

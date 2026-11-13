@@ -134,11 +134,12 @@ The declarations were brought to v1.34.13 straight after that hop (#3056). Repea
 
 - `kubernetesVersion` in 📄 `talconfig.yaml` and its `.j2` template shall state the version the nodes run.
 - 📄 `kubernetesupgrade.yaml` shall state the same version.
-- **The generated machine configs shall not be regenerated and applied as part of this plan.** A dry-run apply on 2026-11-12 showed that a fresh `talhelper genconfig` (talhelper 3.1.11) differs from the live nodes in ways unrelated to Kubernetes:
-  - it emits network config as new-style documents (`BondConfig`, `Layer2VIPConfig`, `LinkAliasConfig`, `LinkConfig`, `VLANConfig`), where the nodes hold a legacy `machine.network.interfaces` block, so applying rewrites bond, VIP and Thunderbolt link config on every node;
-  - git carries a `10.90.254.1` nameserver and `terminated-pod-gc-threshold: "50"` that the nodes do not have.
-- Until that is reviewed as its own change, the local `clusterconfig/` files (dated 2026-05-19, still v1.33.1) and any fresh `genconfig` output are both unsafe to `apply-config`. Node changes go through targeted `talosctl patch mc` instead.
-- #2990 shall be retargeted to the 1.35 line of `alpine/k8s` and merged.
+- **Resolved 2026-11-13: the generated machine configs match the nodes again.** A dry-run `apply-config` of a fresh `talhelper genconfig` reports "No changes" on all three nodes. What it took:
+  - Each node's network block moved from `networkInterfaces` in `talconfig.yaml` to a legacy-form patch (📄 `patches/nodes/<host>-network.yaml`). For Talos 1.12 and later, talhelper 3.1.11 turns `networkInterfaces` into new-style documents (`BondConfig`, `Layer2VIPConfig`, `LinkAliasConfig`, `LinkConfig`, `VLANConfig`), which would have rewritten bond, VIP and Thunderbolt config on every node.
+  - `terminated-pod-gc-threshold: "50"` had been in git since May but never applied; it was patched onto each node's controller-manager.
+  - The `10.90.254.1` nameserver difference recorded on 2026-11-12 was a misreading of the diff; the nodes already had it.
+- Before any future `apply-config`, repeat the dry run and expect "No changes" apart from the change being made. Moving to the new-style network documents is a separate, planned change that needs console access to each node.
+- #2990 is held: Renovate limits `alpine/k8s` to below 1.36 (#3061) and the restore drill runs 1.35.10 (#3060).
 
 ## Done Criteria
 
