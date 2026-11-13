@@ -9,7 +9,7 @@ metadata:
     cnpg.io/skipEmptyWalArchiveCheck: "enabled"
 spec:
   instances: 3
-  imageName: ghcr.io/cloudnative-pg/postgresql:18@sha256:7f374e054e46fdefd64b52904e32362949703a75c05302dca8ffa1eb78d41891
+  imageName: ghcr.io/cloudnative-pg/postgresql:18@sha256:899d3ed526b659d77935dde0e6bf2d69dbbf17d3d8c6486ca8cfd04bd3c18533
   primaryUpdateStrategy: unsupervised
 
   # Tolerate brief pod-network blips before failing over. On 2026-06-16 a ~45s
