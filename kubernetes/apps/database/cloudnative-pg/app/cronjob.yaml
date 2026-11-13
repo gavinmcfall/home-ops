@@ -43,7 +43,7 @@ spec:
             - name: probe
               # Same digest the clusters themselves run, so this pulls nothing
               # new and Renovate tracks one image reference for both.
-              image: ghcr.io/cloudnative-pg/postgresql:18@sha256:7f374e054e46fdefd64b52904e32362949703a75c05302dca8ffa1eb78d41891
+              image: ghcr.io/cloudnative-pg/postgresql:18@sha256:899d3ed526b659d77935dde0e6bf2d69dbbf17d3d8c6486ca8cfd04bd3c18533
               command: ["/bin/bash", "-c"]
               # NOTE: shell vars escaped as $${VAR} so Flux postBuild.substitute
               # leaves them alone — the parent flux-system Kustomization patches

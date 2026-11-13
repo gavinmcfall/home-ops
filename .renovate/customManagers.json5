@@ -32,5 +32,17 @@
       ],
       datasourceTemplate: "docker",
     },
+    {
+      customType: "regex",
+      description: "Process the CloudNativePG Cluster imageName (not a container image field Renovate's kubernetes manager reads)",
+      managerFilePatterns: [
+        "/kubernetes/apps/database/cloudnative-pg/.+\\.yaml$/",
+      ],
+      matchStrings: [
+        // imageName: ghcr.io/cloudnative-pg/postgresql:18@sha256:...
+        "imageName:\\s*(?<depName>ghcr\\.io/cloudnative-pg/postgresql):(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)",
+      ],
+      datasourceTemplate: "docker",
+    },
   ],
 }
