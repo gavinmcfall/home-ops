@@ -74,5 +74,16 @@
       matchPackageNames: ["spegel", "ghcr.io/spegel-org/helm-charts/spegel"],
       allowedVersions: "<0.8.0",
     },
+    {
+      // alpine/k8s supplies kubectl to the VolSync restore drill
+      // (kubernetes/apps/storage/volsync/app/restore-drill.yaml). kubectl is
+      // only supported within one minor of the apiserver, and the cluster is
+      // capped at Kubernetes 1.35 until Talos v1.13 and Rook v1.20+ land.
+      // #2990 proposed 1.33.1 -> 1.37.2. To override, raise the bound here in
+      // the same change that moves the cluster to the next minor.
+      description: ["Hold alpine/k8s on the cluster's Kubernetes minor (1.35) — raise with the cluster, not before (2026-11-13). See #2990."],
+      matchPackageNames: ["docker.io/alpine/k8s", "alpine/k8s"],
+      allowedVersions: "<1.36.0",
+    },
   ],
 }
