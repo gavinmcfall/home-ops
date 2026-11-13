@@ -12,6 +12,11 @@ spec:
   # pgbackrest plugin + stanza/pluginconfig/scheduledbackups (mirror
   # postgres18-immich).
   instances: 1
+
+  # Skip the long "smart" stop that never completes while clients hold
+  # connections, so the instance reaches a clean fast stop inside the kubelet's
+  # 20s node-shutdown budget (see postgres18-cluster for the 2026-11-13 detail).
+  smartShutdownTimeout: 5
   # BookOrbit requires the uuid-ossp, pg_trgm, and vector (pgvector) extensions.
   # The vectorchord image ships vector 0.8.1 + contrib (verified against the
   # running postgres18-immich cluster); same pinned image as postgres18-immich.

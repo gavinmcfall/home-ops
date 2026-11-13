@@ -18,6 +18,11 @@ spec:
   # for the 2026-06-16 incident). Loosen the default 1s isolation check so short
   # stalls don't fence the primary; genuine outages still promote a replica.
   failoverDelay: 30
+
+  # Skip the long "smart" stop that never completes while clients hold
+  # connections, so the instance reaches a clean fast stop inside the kubelet's
+  # 20s node-shutdown budget (see postgres18-cluster for the 2026-11-13 detail).
+  smartShutdownTimeout: 5
   probes:
     liveness:
       isolationCheck:
