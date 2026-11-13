@@ -80,6 +80,11 @@ spec:
             enabled: true
       network:
         provider: host
+        # cluster = VLAN 100 on bond1 (2x 10G SFP+ LACP, MTU 9000), not the
+        # Thunderbolt mesh: a Thunderbolt link wedges on most reboots and, as the
+        # cluster network, that stalled every placement group until a cable was
+        # reseated. Rook only writes this to the mon config store; OSDs read it at
+        # start, so a change here needs each OSD restarted, one at a time.
         addressRanges:
           public: ["${CEPH_PUBLIC_CIDR}"]
           cluster: ["${CEPH_CLUSTER_CIDR}"]
