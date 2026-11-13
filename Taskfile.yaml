@@ -77,7 +77,7 @@ tasks:
   .validate:
     internal: true
     cmds:
-      - task: kubernetes:kubeconform
+      - task: kubernetes:validate
       - cmd: echo === Done rendering and validating YAML ===
       - cmd: |
           if [[ $KUBECONFIG != "{{.KUBECONFIG_FILE}}" ]]; then

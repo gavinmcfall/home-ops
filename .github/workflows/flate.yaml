@@ -1,0 +1,163 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Flate"
+
+# Renders the Flux tree offline with flate (https://github.com/home-operations/flate),
+# the Go successor to flux-local. `task kubernetes:flate` runs the same test locally.
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths: ["kubernetes/**", ".github/flate/**", ".github/workflows/flate.yaml"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Keep in step with FLATE_ARGS in .taskfiles/Kubernetes/Taskfile.yaml.
+  # --allow-missing-kinds Secret: Secrets that only exist in the live cluster
+  #   (ExternalSecret targets, Helm valuesFrom) are skipped, not failed.
+  # --supply: placeholder cluster-secrets so ${VARS} substitute offline.
+  FLATE_ALLOW_MISSING_KINDS: Secret
+  FLATE_SUPPLY: .github/flate/supply.yaml
+  FLATE_NO_PROGRESS: "true"
+
+jobs:
+  filter:
+    name: Flate - Filter
+    runs-on: ubuntu-latest
+    outputs:
+      changed-files: ${{ steps.changed-files.outputs.changed_files }}
+    steps:
+      - name: Get Changed Files
+        id: changed-files
+        uses: bjw-s-labs/action-changed-files@147be9638332cf68fd60714a610509d7a9360d60 # v0.7.0
+        with:
+          patterns: |-
+            kubernetes/**/*
+            .github/flate/**/*
+            .github/workflows/flate.yaml
+
+  test:
+    name: Flate - Test
+    needs: filter
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Read the cluster's Kubernetes version
+        run: echo "FLATE_KUBE_VERSION=$(yq '.kubernetesVersion' kubernetes/bootstrap/talos/talconfig.yaml | sed 's/^v//')" >> "$GITHUB_ENV"
+
+      # base: "" leaves FLATE_BASE unset so `test` renders the whole tree
+      # instead of the action's changed-only default.
+      - name: Setup flate
+        uses: home-operations/flate/action@bbb6ebc344da051752dbdb1b413860ceffcfb63d # v0.7.3
+        with:
+          base: ""
+          version: "0.7.3"
+          cache: true
+
+      - name: Run flate test
+        run: flate test all
+
+  diff:
+    name: Flate - Diff
+    needs: filter
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      matrix:
+        resources: ["hr", "ks"]
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Read the cluster's Kubernetes version
+        run: echo "FLATE_KUBE_VERSION=$(yq '.kubernetesVersion' kubernetes/bootstrap/talos/talconfig.yaml | sed 's/^v//')" >> "$GITHUB_ENV"
+
+      - name: Setup flate
+        uses: home-operations/flate/action@bbb6ebc344da051752dbdb1b413860ceffcfb63d # v0.7.3
+        with:
+          base: "origin/${{ github.event.repository.default_branch }}"
+          version: "0.7.3"
+          cache: true
+
+      - name: Run flate diff
+        run: flate diff ${{ matrix.resources }} -o diff > diff.patch
+
+      - name: Generate Diff
+        id: diff
+        run: |
+          DIFF_FILE="${GITHUB_WORKSPACE}/diff.patch"
+          if [ ! -s "$DIFF_FILE" ]; then
+            echo "No differences rendered"
+            echo "bytes=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          cat "$DIFF_FILE"
+          bytes=$(wc -c < "$DIFF_FILE")
+          echo "bytes=$bytes" >> "$GITHUB_OUTPUT"
+          if [ "$bytes" -lt 60000 ]; then
+            {
+              echo "diff<<EOF_FLATE_DIFF"
+              cat "$DIFF_FILE"
+              echo "EOF_FLATE_DIFF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: ${{ steps.diff.outputs.bytes != '' && fromJSON(steps.diff.outputs.bytes) >= 60000 }}
+        name: Upload large diff artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: flate-diff-${{ matrix.resources }}
+          path: ${{ github.workspace }}/diff.patch
+
+      - if: ${{ steps.diff.outputs.diff != '' }}
+        name: Add comment
+        uses: mshick/add-pr-comment@ec328af66588ab8f77cdeb2c264f14aba45bbf59 # v3
+        with:
+          message-id: "${{ github.event.pull_request.number }}/flate/${{ matrix.resources }}"
+          message-failure: Diff was not successful
+          message: |
+            ```diff
+            ${{ steps.diff.outputs.diff }}
+            ```
+
+      - if: ${{ steps.diff.outputs.diff == '' && steps.diff.outputs.bytes != '' && fromJSON(steps.diff.outputs.bytes) >= 60000 }}
+        name: Add artifact notice
+        uses: mshick/add-pr-comment@ec328af66588ab8f77cdeb2c264f14aba45bbf59 # v3
+        with:
+          message-id: "${{ github.event.pull_request.number }}/flate/${{ matrix.resources }}/artifact"
+          message: |
+            flate diff output was >60kB and was uploaded as the `flate-diff-${{ matrix.resources }}` artifact instead of an inline comment.
+
+  success:
+    name: Flate - Success
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    needs:
+      - test
+      - diff
+    steps:
+      - name: Any jobs failed?
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
+      - name: All jobs passed or skipped?
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: echo "All jobs passed or skipped" && echo "${{ toJSON(needs.*.result) }}"
