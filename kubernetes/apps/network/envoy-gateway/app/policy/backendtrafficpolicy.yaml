@@ -9,8 +9,12 @@ spec:
   # Envoy Gateway v1.11. Same item shape. Order matters: the first entry is
   # preferred when the client accepts several.
   compressor:
+    # Each entry needs its settings block, even empty: with `compressor`, Envoy Gateway
+    # silently drops an entry whose matching block is absent, which turns compression off.
     - type: Brotli
+      brotli: {}
     - type: Gzip
+      gzip: {}
   connection:
     bufferLimit: 8Mi
   targetSelectors:
