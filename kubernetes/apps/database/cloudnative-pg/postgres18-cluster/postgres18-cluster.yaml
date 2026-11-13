@@ -11,6 +11,10 @@ spec:
   instances: 3
   imageName: ghcr.io/cloudnative-pg/postgresql:18@sha256:899d3ed526b659d77935dde0e6bf2d69dbbf17d3d8c6486ca8cfd04bd3c18533
   primaryUpdateStrategy: unsupervised
+  # Promote an updated replica instead of restarting the primary in place: the 18.6
+  # roll on 2026-11-13 took the shared primary down for ~2 min with the default (restart).
+  # With switchover, an image change and a postgresql.parameters change must be separate commits.
+  primaryUpdateMethod: switchover
 
   # Tolerate brief pod-network blips before failing over. On 2026-06-16 a ~45s
   # stanton-02 network disruption tripped the default 1s isolation check and
