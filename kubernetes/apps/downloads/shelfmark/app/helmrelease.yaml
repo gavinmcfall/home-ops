@@ -77,6 +77,10 @@ spec:
               # Multi-file audiobook torrents otherwise land as loose PartNN.mp3 files in the
               # inbox; organize mode files them as {Author}/{Title}/ (template set in the UI).
               FILE_ORGANIZATION_AUDIOBOOK: organize
+              # Shelfmark v1.7.0 adds a sweep that removes its own stalled
+              # torrents (and their partial data) from qBittorrent after 6h.
+              # 0 turns it off: nothing here removes a torrent from qBittorrent.
+              STALE_TORRENT_HOURS: "0"
             envFrom:
               # AA_DONATOR_KEY + OIDC_CLIENT_ID/SECRET + SHELFMARK_API_KEY from the ExternalSecret.
               # SHELFMARK_API_KEY (Bearer or X-Api-Key) acts as the first admin user, not an OIDC user.
