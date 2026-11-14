@@ -27,6 +27,10 @@
     "**/*.sops.*",
     "**/resources/**",
     ".codex/**",
+    // Cluster-template leftovers. They repeat the live HelmRepositories, so
+    // every helm lookup saw each registry URL twice ("Excess registryUrls").
+    // Not kept in step with the live versions any more.
+    "bootstrap/templates/**",
   ],
   flux: {
     managerFilePatterns: ["/\\.yaml(?:\\.j2)?$/"],
