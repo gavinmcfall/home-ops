@@ -18,7 +18,7 @@
     ":semanticCommits",
     ":timezone(America/New_York)",
   ],
-  dependencyDashboardTitle: "Renovate Dashboard 🤖",
+  dependencyDashboard: { title: "Renovate Dashboard 🤖" },
   suppressNotifications: [
     "prEditedNotification",
     "prIgnoreNotification",
