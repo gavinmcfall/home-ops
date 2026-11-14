@@ -53,7 +53,7 @@ spec:
           app:
             image:
               repository: ghcr.io/calibrain/shelfmark
-              tag: v1.5.1@sha256:acfa46b8be80f1e2f084a7703ff027ab274397feb24006114e92c05c140b62c3
+              tag: v1.7.0@sha256:6544e02595271b0267b9acda58fa7f3db6f14942bece51b7aadfe4000cf34f1c
             env:
               TZ: ${TIMEZONE}
               FLASK_PORT: "8084"
