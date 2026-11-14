@@ -83,10 +83,10 @@ spec:
               # directory`. The dotfiles-sync CronJob uses it fine because it
               # passes args straight to the kubectl entrypoint; this one loops,
               # so it needs a shell. alpine/k8s has both, its kubectl matches
-              # the cluster's 1.35, and unlike `apk add kubectl` on plain alpine
+              # the cluster's 1.36, and unlike `apk add kubectl` on plain alpine
               # (the wings-cert-sync pattern) it needs neither root nor a
               # writable root, so the hardening below stays intact.
-              image: docker.io/alpine/k8s:1.35.10
+              image: docker.io/alpine/k8s:1.36.6
               command: ["/bin/sh", "-c"]
               # NOTE: no braced shell expansions below. The parent flux-system
               # Kustomization patches postBuild.substituteFrom onto every app
