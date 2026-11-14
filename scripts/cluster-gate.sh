@@ -71,9 +71,11 @@ done
 
 # --- ceph --------------------------------------------------------------------
 HEALTH="$(ceph health detail | head -8)"
-HEALTH1="$(echo "$HEALTH" | head -1)"
-ONLY_NOOUT="$(echo "$HEALTH" | grep -vE '^HEALTH_WARN noout flag\(s\) set$|OSDMAP_FLAGS' | grep -c .)"
-if [ "$HEALTH1" = HEALTH_OK ] || { [ "$ALLOW_NOOUT" = 1 ] && [ "$ONLY_NOOUT" = 0 ]; }; then H_OK=ok; else H_OK=no; fi
+# Warnings muted on purpose (healthCheck.muteHealthWarning in the cluster
+# HelmRelease) show as a "(muted: ...)" suffix on the summary line. They do not
+# count; anything unmuted still fails the gate.
+HEALTH1="$(ceph health | head -1 | sed -E 's/[; ]*\(muted: [A-Z_ ]+\)$//')"
+if [ "$HEALTH1" = HEALTH_OK ] || { [ "$ALLOW_NOOUT" = 1 ] && [ "$HEALTH1" = 'HEALTH_WARN noout flag(s) set' ]; }; then H_OK=ok; else H_OK=no; fi
 chk "ceph health$([ "$ALLOW_NOOUT" = 1 ] && echo ' (noout tolerated)')" "$H_OK" "$(echo "$HEALTH" | tr '\n' '|')"
 
 OSD_STAT="$(ceph osd stat)"

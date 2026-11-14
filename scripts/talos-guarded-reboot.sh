@@ -175,7 +175,10 @@ switch_primaries_away() {
         echo "[$(now)] $name: switching primary $primary -> $target"
         kubectl cnpg promote "$name" "$target" -n "$ns" > /dev/null 2>&1 \
             || { echo "!!! $name: kubectl cnpg promote failed"; return 1; }
-        for _ in $(seq 1 60); do
+        # The old primary archives its remaining WAL before it stops, and each
+        # pgBackRest push can take over a minute; five minutes was too short
+        # (2026-11-14, six segments queued). Allow twenty.
+        for _ in $(seq 1 240); do
             sleep 5
             cluster_settled "$ns" "$name" "$target" && break
         done
