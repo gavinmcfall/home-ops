@@ -42,12 +42,12 @@
   packageRules: [
     {
       description: ["Skip major updates for stateful databases"],
-      matchPackagePatterns: [
-        "bitnamicharts/mariadb",
-        "bitnamicharts/postgresql",
-        "valkey/valkey",
-        "rabbitmq",
-        "postgres-init",
+      matchPackageNames: [
+        "/bitnamicharts/mariadb/",
+        "/bitnamicharts/postgresql/",
+        "/valkey/valkey/",
+        "/rabbitmq/",
+        "/postgres-init/",
       ],
       matchDatasources: ["helm", "docker"],
       matchUpdateTypes: ["major"],

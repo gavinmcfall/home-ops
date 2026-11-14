@@ -2,6 +2,11 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   packageRules: [
     {
+      description: "Postcraft's image is a private package the bot cannot read, and releases are pinned by hand (tag, build, push, pin). Remove this rule if the package is made public or the bot is given access.",
+      matchPackageNames: ["ghcr.io/gavinmcfall/postcraft"],
+      enabled: false,
+    },
+    {
       description: "Override Helmfile Dependency Name",
       matchDatasources: ["docker"],
       matchManagers: ["helmfile"],
