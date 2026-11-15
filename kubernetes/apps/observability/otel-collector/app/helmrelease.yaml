@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: opentelemetry-collector
-      version: 0.177.0
+      version: 0.178.3
       sourceRef:
         kind: HelmRepository
         name: opentelemetry
@@ -27,8 +27,10 @@ spec:
     fullnameOverride: otel-collector
     image:
       repository: otel/opentelemetry-collector-contrib
-      tag: 0.163.2
-      digest: sha256:93aad750175cbf1a973ae1c5886c3371f4d800f61be25cdd26870b8441ffe9fa
+      # Tag and digest in ONE field. With a separate `digest:` key the chart
+      # deploys by digest and ignores the tag, and Renovate only rewrites the
+      # tag -- so the tag climbed to 0.163.2 while the pod stayed on 0.153.0.
+      tag: 0.165.0@sha256:e40d61f10c9a617cca1ffd1be4d7e2b3a4b0f0001798ff07e58cabe82e618cea
     command:
       name: otelcol-contrib
     extraEnvs:

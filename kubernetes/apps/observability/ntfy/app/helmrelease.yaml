@@ -27,7 +27,7 @@ spec:
           app:
             image:
               repository: binwiederhier/ntfy
-              tag: v2.33.1@sha256:29bc952294d58957f6ca6638eca9a653a33555989224edbdf4bb9433ee606497
+              tag: v2.38.0@sha256:771309aecfce18d8fe2bfb8069994ddd6be6ca6ccdd7badace3d791a0045ff0d
             args:
               - serve
             env:
@@ -35,9 +35,10 @@ spec:
               NTFY_BASE_URL: https://ntfy.${SECRET_DOMAIN}
               NTFY_UPSTREAM_BASE_URL: https://ntfy.sh
               NTFY_BEHIND_PROXY: "true"
-              NTFY_ENABLE_LOGIN: "true"
-              NTFY_ENABLE_SIGNUP: "false"
-              NTFY_ENABLE_RESERVATIONS: "true"
+              # No NTFY_ENABLE_LOGIN / _SIGNUP / _RESERVATIONS here: they need an
+              # auth file (NTFY_AUTH_FILE), and there is none, so they never did
+              # anything. ntfy v2.36+ refuses to start when they are set without
+              # one. Add them back together with an auth file on a PVC.
             probes:
               liveness: &probes
                 enabled: true

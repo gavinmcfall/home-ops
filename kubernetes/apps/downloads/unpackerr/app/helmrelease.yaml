@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 4.4.0
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -37,6 +37,9 @@ spec:
               UN_WEBSERVER_METRICS: true
               UN_WEBSERVER_LOG_FILE: /logs/webserver.log
               UN_ACTIVITY: true
+              # v1: a role that can only read metrics, for the Prometheus API key
+              # in the secret. Role names in env are case-sensitive.
+              UN_WEBSERVER_ROLES_metrics_PERMISSIONS_0: system:metrics:read
               # Webhook - Notifiarr
               UN_WEBHOOK_0_NAME: Notifiarr
               UN_WEBHOOK_0_EVENTS_0: "0"
@@ -98,6 +101,12 @@ spec:
             path: /metrics
             interval: 1m
             scrapeTimeout: 10s
+            # Ignored by v0.16; required by v1.
+            authorization:
+              type: Bearer
+              credentials:
+                name: unpackerr-secret
+                key: UN_WEBSERVER_API_KEYS_0_KEY
     persistence:
       logs:
         type: emptyDir
@@ -106,5 +115,8 @@ spec:
         server: citadel.internal
         path: /mnt/storage0/media
         globalMounts:
-          - path: /downloads/
+          # Must be the path Sonarr and Radarr report (their own /media mount).
+          # It was /downloads/, so every queue item failed with "no such file
+          # or directory" and nothing was ever extracted.
+          - path: /media/Downloads/qbittorrent
             subPath: Downloads/qbittorrent

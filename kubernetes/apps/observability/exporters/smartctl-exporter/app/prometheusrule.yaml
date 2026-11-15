@@ -12,7 +12,10 @@ spec:
           annotations:
             summary: Mounted drive {{ $labels.device }} on device {{ $labels.instance }}
               has a temperature higher than 65°C.
-          expr: smartctl_device_temperature > 65
+          # Only the live reading. smartctl_exporter v0.15 adds the drive's
+          # own limits as extra series on this metric (op_limit_max,
+          # critical_limit_max, around 80-84), which would always be > 65.
+          expr: smartctl_device_temperature{temperature_type="current"} > 65
           for: 15m
           labels:
             severity: critical

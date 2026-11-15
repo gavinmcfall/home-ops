@@ -5,7 +5,7 @@ kind: Dragonfly
 metadata:
   name: dragonfly
 spec:
-  image: ghcr.io/dragonflydb/dragonfly:v2.0.2
+  image: ghcr.io/dragonflydb/dragonfly:v2.1.0
   # 4 replicas (was 6) — 6 across 3 viable stantons (pyro tainted) ran 2 per
   # node, which couldn't lose any stanton without violating maxSkew=1 spread.
   # 4 across 3 nodes (typically 2/1/1) survives losing one node cleanly.
@@ -25,6 +25,10 @@ spec:
     - --cluster_mode=emulated
     - --default_lua_flags=allow-undeclared-keys
     - --shard_repl_backlog_len=8192
+    # Off: by default Dragonfly checks version.dragonflydb.io once a day and
+    # sends uptime, hardware and environment details with the request.
+    # Renovate tracks new releases already.
+    - --version_check=false
   resources:
     requests:
       cpu: 100m

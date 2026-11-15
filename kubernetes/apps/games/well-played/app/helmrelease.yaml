@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.4.0/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: well-played
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 4.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    defaultPodOptions:
+      imagePullSecrets:
+        - name: well-played-ghcr-pull-secret
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    controllers:
+      well-played:
+        # One image: API + web client. Migrates and (first run only) seeds the database on boot.
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          # Creates the `well_played` role + database in the shared cluster.
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 18.7.0@sha256:6d4cfa4b8d343eb6fa0de8dd9ec416a2007f346bb631fc8e246e1f39eee6c4aa
+            envFrom: &envFrom
+              - secretRef:
+                  name: well-played-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gavinmcfall/well-played
+              # Commit SHA tag from the well-played repo's release workflow, pinned by digest.
+              tag: 3addf50a0c6868573076c4298186bf70d14ab97e@sha256:5be37684502c9884ce422573cc1df1ce3e3f2edd446d432910b44c10cd8291af
+            env:
+              PORT: "4900"
+            envFrom: *envFrom
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /healthz, port: 4900 }
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /readyz, port: 4900 }
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  # First boot seeds the database from the bundled specs.
+                  httpGet: { path: /healthz, port: 4900 }
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 60
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+    service:
+      app:
+        controller: well-played
+        ports:
+          http:
+            port: 4900
+    route:
+      app:
+        # Internal only: the internal-dns annotation alone (an external-dns key here would
+        # publish a public record).
+        annotations:
+          internal-dns.alpha.kubernetes.io/target: internal.${SECRET_DOMAIN}
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: network
+            sectionName: https
+    persistence:
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

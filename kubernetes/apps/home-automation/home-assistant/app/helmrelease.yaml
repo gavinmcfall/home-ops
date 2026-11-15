@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 4.4.0
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -39,7 +39,7 @@ spec:
           init-contact-energy:
             image:
               repository: docker.io/alpine/git
-              tag: v2.54.0@sha256:4fac439ee3b9204bec99c712b8a15942999632458f716ae8149fbb97cb760cd4
+              tag: v2.54.0@sha256:6a1fdb962814ca11508ca8d1bab94375b5b7ac4e4a9a40981c29fc32c02f095d
             command:
               - /bin/sh
               - -c
@@ -93,7 +93,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/home-assistant
-              tag: 2026.10.3@sha256:3a5bf87bb8192cbef21a2e44383477a48a227c2dd19c2383ada2cb229981c127
+              tag: 2026.11.1@sha256:c129b1e4190273254d93d413fe2a083233c9202d84cb08f84dddb01861df432e
             env:
               TZ: ${TIMEZONE}
               HASS_HTTP_TRUSTED_PROXY_1: ${LOCAL_CIDR}
@@ -114,7 +114,7 @@ spec:
           code-server:
             image:
               repository: ghcr.io/coder/code-server
-              tag: 4.143.1@sha256:377b66bec5645510ed52549bb00e648c273edc604d230a3f90fd2b2433afcb97
+              tag: 4.145.2@sha256:09565f9e07f5624554e295e8bab0e2fec4a7c533eb3cff459ed6596a4d3d7c1c
             args:
               [
                 "--auth",
