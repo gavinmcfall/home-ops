@@ -79,6 +79,18 @@
       allowedVersions: "<0.8.0",
     },
     {
+      // n8n publishes every release to Docker Hub straight away, but marks new
+      // minors as pre-releases on GitHub for about a week before the `stable`
+      // tag moves. Docker tags carry no pre-release flag, so Renovate proposed
+      // 2.48.4 (and 3.x, all of it early access) while stable was 2.47.7.
+      // followTag does not work with the docker datasource, so this bound is
+      // raised by hand: when Docker Hub's `stable` tag reaches a new minor,
+      // move the bound to the minor after it.
+      description: ["Hold n8n on its stable line (2.47.x on 2026-11-16) — raise when Docker Hub's `stable` tag moves to the next minor."],
+      matchPackageNames: ["docker.io/n8nio/n8n", "n8nio/n8n"],
+      allowedVersions: "<2.48.0",
+    },
+    {
       // alpine/k8s supplies kubectl to the VolSync restore drill
       // (kubernetes/apps/storage/volsync/app/restore-drill.yaml). kubectl is
       // only supported within one minor of the apiserver, and the cluster runs
