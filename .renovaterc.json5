@@ -96,6 +96,10 @@
       description: ["Hold n8n at 2.48.x — do not move further into pre-releases. Raise when Docker Hub's `stable` tag reaches the next minor (2026-11-16)."],
       matchPackageNames: ["docker.io/n8nio/n8n", "n8nio/n8n"],
       allowedVersions: "<2.49.0",
+      // n8n is switched off (commented out in home-automation/kustomization.yaml,
+      // 2026-11-16); its manifests and data are kept. No PRs while it is off.
+      // Remove this line when it is turned back on.
+      enabled: false,
     },
     {
       // alpine/k8s supplies kubectl to the VolSync restore drill
