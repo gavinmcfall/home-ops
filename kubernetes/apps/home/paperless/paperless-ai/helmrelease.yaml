@@ -23,7 +23,9 @@ spec:
           app:
             image:
               repository: docker.io/clusterzx/paperless-ai
-              tag: latest@sha256:2b65888163fd59716f1c8285b31c5bd0b30c9c3c192c42b516688e3887d4ba60
+              # A version tag, not `latest`: on `latest` a major release shows up as
+              # a digest bump with no changelog (4.0.0 did, as #3044).
+              tag: 3.0.9@sha256:2b65888163fd59716f1c8285b31c5bd0b30c9c3c192c42b516688e3887d4ba60
             env:
               TZ: ${TIMEZONE}
             envFrom:

@@ -100,7 +100,9 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: *port
+                # A number, not the *port string: app-template 4.6.1+ treats a
+                # string here as a port NAME and fails to find one called "8787".
+                port: 8787
     persistence:
       config:
         accessMode: ReadWriteOnce
