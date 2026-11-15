@@ -6,18 +6,30 @@ metadata:
   name: postgres18-bookorbit
   namespace: database
 spec:
-  # TRIAL POSTURE: single instance. BookOrbit is being evaluated as the reading
-  # hub; its DB holds re-derivable scan metadata plus early user state. Backups
-  # are wired (pgbackrest plugin, see stanza.yaml). Before promoting to
-  # production: bump instances to 3 and set primaryUpdateMethod: switchover
-  # (mirror postgres18-immich).
-  instances: 1
-  # No PodDisruptionBudget while there is one instance. CNPG's primary PDB
-  # allows zero disruptions, and with no replica to switch to a node drain
-  # could never finish -- which would stall tuppr (and any `talosctl upgrade`)
-  # on whichever node holds this pod. Without it the pod is evicted and comes
-  # back on another node. Set back to true when instances goes to 3.
-  enablePDB: false
+  # One primary and two replicas, one per node (2026-11-16; a single instance
+  # before that, as a trial). Mirrors postgres18-immich. With replicas the
+  # default PodDisruptionBudget is back: a node drain now switches the primary
+  # to a replica instead of having nowhere to go.
+  instances: 3
+  # Promote an updated replica instead of restarting the primary in place.
+  # With switchover, an image change and a postgresql.parameters change must
+  # be separate commits.
+  primaryUpdateMethod: switchover
+
+  # Tolerate brief pod-network blips before failing over (see postgres18-cluster
+  # for the 2026-06-16 incident).
+  failoverDelay: 30
+  probes:
+    liveness:
+      isolationCheck:
+        enabled: true
+        connectionTimeout: 3000
+        requestTimeout: 3000
+
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname
+    podAntiAffinityType: preferred
 
   # Skip the long "smart" stop that never completes while clients hold
   # connections, so the instance reaches a clean fast stop inside the kubelet's
