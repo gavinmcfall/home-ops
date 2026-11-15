@@ -18,6 +18,9 @@
         // # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
         // - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/experimental-install.yaml
         "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n\\s*- https://github\\.com/[^/]+/[^/]+/releases/download/(?<currentValue>[^/]+)/",
+        // # renovate: datasource=github-releases depName=dragonflydb/dragonfly-operator
+        // - https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/v1.8.0/manifests/crd.yaml
+        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n\\s*- https://raw\\.githubusercontent\\.com/[^/]+/[^/]+/(?<currentValue>[^/]+)/",
       ],
       datasourceTemplate: "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
     },
