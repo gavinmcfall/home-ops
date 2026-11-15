@@ -25,6 +25,10 @@ spec:
     - --cluster_mode=emulated
     - --default_lua_flags=allow-undeclared-keys
     - --shard_repl_backlog_len=8192
+    # Off: by default Dragonfly checks version.dragonflydb.io once a day and
+    # sends uptime, hardware and environment details with the request.
+    # Renovate tracks new releases already.
+    - --version_check=false
   resources:
     requests:
       cpu: 100m
