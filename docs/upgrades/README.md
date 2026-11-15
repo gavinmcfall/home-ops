@@ -17,6 +17,7 @@ Each plan here exists because investigating the PR turned up something the PR it
 | [Rook-Ceph v1.19.7 → v1.21.x](./rook-ceph-1.21-upgrade-plan.md) | [#1955](https://github.com/gavinmcfall/home-ops/pull/1955), [#1956](https://github.com/gavinmcfall/home-ops/pull/1956) | There is no 1.19→1.21 upgrade path, and 1.20 stops deploying CSI drivers altogether — a new chart is required or every Ceph PVC loses its driver. |
 | [Talos v1.12.6 → v1.13.x](./talos-1.13-upgrade-plan.md) | [#1885](https://github.com/gavinmcfall/home-ops/pull/1885) | The upgrade operator that would action it is commented out, so merging the bump changes nothing at runtime — and arms an unprompted three-node roll if the operator is ever enabled. |
 | [Sonarr 4.0.20 → v5](./sonarr-v5-upgrade-plan.md) | [#2819](https://github.com/gavinmcfall/home-ops/pull/2819) | Every upstream v5 release is a prerelease, against a one-way Postgres schema migration across three instances. |
+| [app-template 4.6.2 → 5.3.0 + postgres-init 18](./app-template-5-rollout-plan.md) | [#3096](https://github.com/gavinmcfall/home-ops/pull/3096) | 5.0 turns off the ServiceAccount token mount and gives each release its own ServiceAccount, so every pod restarts and four apps lose the Kubernetes API unless they opt back in. Rolled out in sections by dependency tier. |
 
 ## Two constraints that span these plans
 
