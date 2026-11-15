@@ -74,6 +74,9 @@ spec:
         retention_period: 14d
     singleBinary:
       replicas: 1
+      # Set here, not through components/priority: that component patches
+      # app-template's defaultPodOptions, which this chart rejects.
+      priorityClassName: priority-08
       persistence:
         enabled: true
         storageClass: openebs-hostpath
