@@ -12,6 +12,12 @@ spec:
   # production: bump instances to 3 and set primaryUpdateMethod: switchover
   # (mirror postgres18-immich).
   instances: 1
+  # No PodDisruptionBudget while there is one instance. CNPG's primary PDB
+  # allows zero disruptions, and with no replica to switch to a node drain
+  # could never finish -- which would stall tuppr (and any `talosctl upgrade`)
+  # on whichever node holds this pod. Without it the pod is evicted and comes
+  # back on another node. Set back to true when instances goes to 3.
+  enablePDB: false
 
   # Skip the long "smart" stop that never completes while clients hold
   # connections, so the instance reaches a clean fast stop inside the kubelet's

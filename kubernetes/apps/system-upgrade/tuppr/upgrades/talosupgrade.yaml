@@ -6,10 +6,22 @@ metadata:
   name: talos
 spec:
   talos:
+    # Merging a change to this version IS the trigger: tuppr upgrades every
+    # node whose Talos version differs, one control-plane node at a time. It
+    # keeps each node's own installer image (factory schematic and extensions)
+    # and only swaps the version. Renovate raises patch bumps on their own;
+    # minor and major need Dependency Dashboard approval (.renovaterc.json5).
+    # To hold a run: annotate this object tuppr.home-operations.com/suspend=true.
     # renovate: datasource=docker depName=ghcr.io/siderolabs/installer
     version: v1.13.12
   policy:
     rebootMode: powercycle
+    # talosctl drains the node first. A Postgres primary switching away can
+    # take over ten minutes here (slow WAL archiving, dalibo/cnpg-plugin-
+    # pgbackrest#163), well past the 5m default.
+    drainTimeout: 20m
+    timeout: 45m
+  # Checked before EACH node; a failing check waits, it does not fail the run.
   healthChecks:
     - apiVersion: volsync.backube/v1alpha1
       kind: ReplicationSource
@@ -19,3 +31,9 @@ spec:
       kind: CephCluster
       expr: |-
         status.ceph.health in ['HEALTH_OK']
+    # Every CloudNativePG cluster healthy with all instances ready, so the
+    # next node is not taken while a failover from the last one is settling.
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      expr: |-
+        has(status.phase) && status.phase == "Cluster in healthy state" && has(status.readyInstances) && status.readyInstances == status.instances
