@@ -11,6 +11,6 @@ resources:
   # Applications
   # - ./discord-exporter/ks.yaml
   - ./home-assistant/ks.yaml
-  - ./n8n/ks.yaml
+  # - ./n8n/ks.yaml
   - ./postcraft/ks.yaml
   - ./teslamate/ks.yaml
