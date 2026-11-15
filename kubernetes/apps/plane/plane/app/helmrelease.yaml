@@ -23,7 +23,9 @@ spec:
       retries: 3
       strategy: rollback
   values:
-    planeVersion: v1.0.0
+    # No planeVersion pin: the app follows the chart's own default (v1.4.3 on
+    # chart 1.9.0). A hand pin sat at v1.0.0 for a year while the chart moved
+    # on, leaving the app behind several security releases.
     ingress:
       enabled: false
       appHost: plane.${SECRET_DOMAIN}
