@@ -3,5 +3,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./kubernetesupgrade.yaml
+  # Talos only. kubernetesupgrade.yaml is deliberately NOT listed: Kubernetes
+  # minor upgrades are done by hand with a one-node apiserver canary (see
+  # docs/upgrades/). tuppr's Kubernetes path is `talosctl upgrade-k8s`, which
+  # walked a bad apiserver flag across two control-plane nodes on 2026-11-13.
   - ./talosupgrade.yaml

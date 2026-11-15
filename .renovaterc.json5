@@ -102,6 +102,24 @@
       enabled: false,
     },
     {
+      // tuppr (kubernetes/apps/system-upgrade/tuppr) upgrades Talos as soon as
+      // a version bump merges. Patch releases get their own PR; without
+      // separateMinorPatch Renovate folds a patch into a pending minor and
+      // 1.13.x patches would stop appearing once 1.14 exists.
+      description: ["Talos: patch bumps raised on their own (merging one starts a tuppr rollout). Never automerged."],
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/siderolabs/installer"],
+      separateMinorPatch: true,
+      automerge: false,
+    },
+    {
+      description: ["Talos minor and major upgrades are done by hand — approve on the Dependency Dashboard to get a PR."],
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/siderolabs/installer"],
+      matchUpdateTypes: ["minor", "major"],
+      dependencyDashboardApproval: true,
+    },
+    {
       // alpine/k8s supplies kubectl to the VolSync restore drill
       // (kubernetes/apps/storage/volsync/app/restore-drill.yaml). kubectl is
       // only supported within one minor of the apiserver, and the cluster runs
