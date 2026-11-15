@@ -86,9 +86,16 @@
       // followTag does not work with the docker datasource, so this bound is
       // raised by hand: when Docker Hub's `stable` tag reaches a new minor,
       // move the bound to the minor after it.
-      description: ["Hold n8n on its stable line (2.47.x on 2026-11-16) — raise when Docker Hub's `stable` tag moves to the next minor."],
+      //
+      // The cluster is on 2.48.4 (a pre-release when it was merged). Going
+      // back to 2.47.7 was tried on 2026-11-15 and failed: after reverting the
+      // three extra migrations, 2.47.7 crash-looped parsing a trusted-source
+      // record 2.48 had already rewritten in a newer format ("Invalid
+      // discriminator value. Expected 1"). n8n downgrades are not safe once
+      // the newer version has started. So: stay, and go no further.
+      description: ["Hold n8n at 2.48.x — do not move further into pre-releases. Raise when Docker Hub's `stable` tag reaches the next minor (2026-11-16)."],
       matchPackageNames: ["docker.io/n8nio/n8n", "n8nio/n8n"],
-      allowedVersions: "<2.48.0",
+      allowedVersions: "<2.49.0",
     },
     {
       // alpine/k8s supplies kubectl to the VolSync restore drill
