@@ -49,8 +49,10 @@ spec:
               LOG_LEVEL: "debug"
               #LLM Config
               LLM_PROVIDER: openai
-              LLM_MODEL: "OpenAI: gpt-4o" # could use many different options https://github.com/icereed/paperless-gpt?tab=readme-ov-file#environment-variables
-              OPENAI_BASE_URL: http://litellm.cortex.svc.cluster.local:4000
+              # Straight to OpenAI: no OPENAI_BASE_URL means api.openai.com.
+              # It went through LiteLLM before, which is no longer deployed;
+              # "OpenAI: gpt-4o" was LiteLLM's alias for this model.
+              LLM_MODEL: "gpt-4o"
               #OCR Config
               OCR_PROVIDER: 'google_docai'
               CREATE_LOCAL_HOCR: "true" # Optional, for hOCR generation
