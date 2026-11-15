@@ -302,7 +302,7 @@ Kopia mover pods need access to the NFS share where backups are stored. A Mutati
 ### The Policy Definition
 
 ```yaml
-apiVersion: admissionregistration.k8s.io/v1alpha1
+apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingAdmissionPolicy
 metadata:
   name: volsync-nfs-inject
@@ -352,7 +352,7 @@ spec:
 ### Binding the Policy
 
 ```yaml
-apiVersion: admissionregistration.k8s.io/v1alpha1
+apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingAdmissionPolicyBinding
 metadata:
   name: volsync-nfs-inject
