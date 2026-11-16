@@ -60,7 +60,10 @@ spec:
                 set -e
                 # apk runs THROUGH gluetun's tunnel, which flaps for the first few
                 # seconds of boot — retry until the tunnel is up instead of dying.
-                until apk add --no-cache git openssh openssh-client tmux ca-certificates curl; do
+                # apk has no network timeout: a connection opened while the tunnel
+                # is switching hangs forever and the loop never retries (dev-box
+                # sat at 1/2 for 10+ min on 2026-11-16), so cap each attempt.
+                until timeout 90 apk add --no-cache git openssh openssh-client tmux ca-certificates curl; do
                   echo "apk failed (tunnel not up yet?); retrying in 5s..."; sleep 5
                 done
                 # Privilege-separation dir for sshd.
