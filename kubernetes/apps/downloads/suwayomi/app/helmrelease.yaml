@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 4.6.2
+      version: 5.3.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -60,7 +60,7 @@ spec:
           02-init-db:
             image:
               repository: ghcr.io/home-operations/postgres-init
-              tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
+              tag: 18.7.0@sha256:6d4cfa4b8d343eb6fa0de8dd9ec416a2007f346bb631fc8e246e1f39eee6c4aa
             envFrom: &envFrom
               - secretRef:
                   name: suwayomi-secret
