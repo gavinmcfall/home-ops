@@ -106,7 +106,9 @@ spec:
           - memory-snapshot-on-shutdown
           - new-service-discovery-manager
         retention: 90d
-        retentionSize: 200GB
+        # openebs-hostpath does not enforce the 75Gi claim, so retentionSize is
+        # the real cap. Kept under the claim, with headroom for WAL + head chunks.
+        retentionSize: 70GB
         resources:
           requests:
             cpu: 300m
