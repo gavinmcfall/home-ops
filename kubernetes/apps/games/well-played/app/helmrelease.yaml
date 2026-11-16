@@ -53,7 +53,7 @@ spec:
             image:
               repository: ghcr.io/gavinmcfall/well-played
               # Commit SHA tag from the well-played repo's release workflow, pinned by digest.
-              tag: c6537579c027adb42a81ffac27947655f8cd3240@sha256:99222c4bbd28cb5dc1d9f908c0063098e43354d623231d5c74e5a86bbfc68233
+              tag: 167f538a88be8161b17cfab70b48f23dc14bb8ae@sha256:60466848e79855e5900bda7f9f5d433fccf348eda91d431e20afdac2fa5e8dcb
             env:
               PORT: "4900"
             envFrom: *envFrom
