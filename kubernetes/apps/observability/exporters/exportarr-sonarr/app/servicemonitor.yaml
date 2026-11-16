@@ -12,9 +12,13 @@ spec:
     matchLabels:
       app.kubernetes.io/name: exportarr-sonarr
   endpoints:
+    # ENABLE_ADDITIONAL_METRICS makes ~3 API calls per series (451 series):
+    # a scrape takes 40-55s and overran the old 1m timeout under load.
+    # sonarr_episode_quality_total (Grafana 12530 quality panel) needs it.
+    # Keep interval under Prometheus' 5m lookback so instant queries never gap.
     - port: sonarr
-      interval: 2m
-      scrapeTimeout: 1m
+      interval: 4m
+      scrapeTimeout: 3m
       path: /metrics
     - port: sonarr-uhd
       interval: 1m
