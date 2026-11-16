@@ -48,6 +48,7 @@ spec:
               RADARR__APP__THEME: dark
               RADARR__AUTH__METHOD: External
               RADARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              RADARR__SERVER__ALLOWEDHOSTS: radarr.${SECRET_DOMAIN},radarr,radarr.downloads,radarr.downloads.svc,radarr.downloads.svc.cluster.local
               RADARR__LOG__DBENABLED: "False"
               RADARR__LOG__LEVEL: info
               RADARR__SERVER__PORT: &port 80
