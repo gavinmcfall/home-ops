@@ -10,11 +10,15 @@ spec:
       rules:
         - alert: SpeedtestExporterAbsent
           annotations:
-            description: Speedtest Exporter has disappeared from Prometheus target discovery.
+            description: Speedtest Exporter has had no successful scrape for over two hours.
             summary: Speedtest Exporter is down.
+          # The exporter is scraped once an hour (each scrape runs a real test), so
+          # look back over two scrapes. A plain up == 1 is empty between scrapes,
+          # and a pod restart just after a scrape left a gap longer than the old
+          # 75m hold (fired 2026-11-16 after the app-template 5 canary).
           expr: |
-            absent(up{job=~".*speedtest-exporter.*"} == 1)
-          for: 75m
+            absent(last_over_time(up{job=~".*speedtest-exporter.*"}[2h]) == 1)
+          for: 15m
           labels:
             severity: critical
         - alert: SpeedtestSlowInternetDownload
