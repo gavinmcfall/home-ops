@@ -51,7 +51,6 @@
         "/bitnamicharts/postgresql/",
         "/valkey/valkey/",
         "/rabbitmq/",
-        "/postgres-init/",
       ],
       matchDatasources: ["helm", "docker"],
       matchUpdateTypes: ["major"],
