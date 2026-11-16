@@ -25,9 +25,12 @@ spec:
               repository: docker.io/clusterzx/paperless-ai
               # A version tag, not `latest`: on `latest` a major release shows up as
               # a digest bump with no changelog (4.0.0 did, as #3044).
-              tag: 3.0.9@sha256:2b65888163fd59716f1c8285b31c5bd0b30c9c3c192c42b516688e3887d4ba60
+              tag: 4.0.0@sha256:bea1e218755ba7940da9748ce64e3d7020f15059eab8eb5c6e5470d3d60436a6
             env:
               TZ: ${TIMEZONE}
+              # Behind the Envoy gateway: one proxy hop, so the login rate limit
+              # sees real client IPs and cookies are marked secure.
+              TRUST_PROXY: "1"
             envFrom:
               - secretRef:
                   name: paperless-ai-secret
@@ -35,6 +38,19 @@ spec:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 3000
+                  initialDelaySeconds: 0
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+              readiness: *probes
             resources:
               requests:
                 cpu: 10m
@@ -65,30 +81,15 @@ spec:
             namespace: network
             sectionName: https
     persistence:
+      # 4.0 is a single Node process that writes only to /app/data (settings,
+      # SQLite, search index, embedding model in data/models) and /tmp. The 3.x
+      # Python/pm2 paths (/.pm2, /nltk_data, /app/logs, /app/OPENAPI) are gone.
       config:
         enabled: true
         existingClaim: paperless-ai
         globalMounts:
           - path: /app/data
-          - path: /app/OPENAPI
-      cache:
-        type: emptyDir
-        globalMounts:
-          - path: /app/public/images
-          - path: /.cache
-      home:
-        type: emptyDir
-        globalMounts:
-          - path: /.pm2
-      logs:
-        type: emptyDir
-        globalMounts:
-          - path: /app/logs
       tmp:
         type: emptyDir
         globalMounts:
           - path: /tmp
-      ntlk:
-        type: emptyDir
-        globalMounts:
-          - path: /nltk_data
