@@ -45,6 +45,7 @@ spec:
               PROWLARR__APP__THEME: dark
               PROWLARR__AUTH__METHOD: External
               PROWLARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              PROWLARR__SERVER__ALLOWEDHOSTS: prowlarr.${SECRET_DOMAIN},prowlarr,prowlarr.downloads,prowlarr.downloads.svc,prowlarr.downloads.svc.cluster.local
               PROWLARR__LOG__DBENABLED: "False"
               PROWLARR__LOG__LEVEL: info
               PROWLARR__UPDATE__BRANCH: develop
@@ -59,6 +60,9 @@ spec:
                   httpGet:
                     path: /ping
                     port: *port
+                    httpHeaders:
+                      - name: Host
+                        value: localhost
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
