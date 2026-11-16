@@ -53,6 +53,20 @@ spec:
               UNIQUE_FILENAMES: true
               METHOD: WATCH
             restartPolicy: Always
+            # /healthz answers 200 only after the first sync has written every
+            # endpoint ConfigMap. As a startup probe on a native sidecar it holds
+            # gatus back until then; without it gatus can read /config first and
+            # come up with only config.yaml's endpoints (2026-11-16: 2 of 35).
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: 8080
+                  periodSeconds: 2
+                  failureThreshold: 60
             resources: &resources
               requests:
                 cpu: 10m
