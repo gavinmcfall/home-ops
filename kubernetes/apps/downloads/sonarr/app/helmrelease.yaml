@@ -48,6 +48,7 @@ spec:
               SONARR__APP__THEME: dark
               SONARR__AUTH__METHOD: External
               SONARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              SONARR__SERVER__ALLOWEDHOSTS: sonarr.${SECRET_DOMAIN},sonarr,sonarr.downloads,sonarr.downloads.svc,sonarr.downloads.svc.cluster.local
               SONARR__LOG__DBENABLED: "False"
               SONARR__LOG__LEVEL: info
               SONARR__SERVER__PORT: &port 80
@@ -62,6 +63,9 @@ spec:
                   httpGet:
                     path: /ping
                     port: *port
+                    httpHeaders:
+                      - name: Host
+                        value: localhost
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
