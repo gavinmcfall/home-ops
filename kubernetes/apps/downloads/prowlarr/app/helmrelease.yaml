@@ -41,7 +41,7 @@ spec:
               repository: ghcr.io/home-operations/prowlarr
               tag: 3.0.2@sha256:ff3e486e1e4c4a696daf3e69ce5ebec19539dd6aa4420a2a17ab3ddaf0cfd2d8
             env:
-              PROWLARR__APP_INSTANCENAME: Prowlarr
+              PROWLARR__APP__INSTANCENAME: Prowlarr
               PROWLARR__APP__THEME: dark
               PROWLARR__AUTH__METHOD: External
               PROWLARR__AUTH__REQUIRED: DisabledForLocalAddresses

@@ -50,8 +50,7 @@ spec:
           app:
             image:
               repository: ghcr.io/autobrr/dashbrr
-              tag: pr-67
-              # tag: v0.2.0@sha256:b3b898d4bf9b463bf802e7af188de45e6ca08eb96e828b4e9cbfde6e418441ad
+              tag: v0.8.0@sha256:ce36626f51e4f7b2d7017c025c99faf2c41540209f21bb665a601d60c11ffffd
             env:
               DASHBRR__CONFIG_PATH: /config/config.toml
               DASHBRR__DB_PATH: /cache/._ # cache path is derived from DASHBRR__DB_PATH

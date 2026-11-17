@@ -74,7 +74,7 @@ spec:
           abs-tract:
             image:
               repository: arranhs/abs-tract
-              tag: latest
+              tag: v0.2.0@sha256:227a17ace1461e263f0f151c4abd635ddd96c8a6276acca9a6921da0d4ec0cba
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
