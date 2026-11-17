@@ -32,7 +32,7 @@ spec:
           app:
             image:
               repository: ghcr.io/timothystewart6/prometheus-plex-exporter
-              tag: latest
+              tag: latest@sha256:90dc0799601c334f2945a3d5b4b552a06352b208a8ce88a428cf90d6c9aa51cd
             env:
               TZ: ${TIMEZONE}
               PLEX_SERVER: http://plex.entertainment.svc.cluster.local:32400

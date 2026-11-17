@@ -62,6 +62,9 @@ spec:
       # fallback; pin the legacy prefix every route in this repo still uses.
       - --annotation-prefix=external-dns.alpha.kubernetes.io/
       - --annotation-filter=internal-dns.alpha.kubernetes.io/target
+      # The webhook client timeout is read + write (default 5s + 10s). The UDM API
+      # sometimes stalls past 15s and external-dns exits on its first sync.
+      - --webhook-provider-read-timeout=30s
     policy: sync
     sources:
       - gateway-httproute
