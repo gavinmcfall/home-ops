@@ -52,9 +52,6 @@ spec:
             command: ["/bin/sh", "/scripts/remind.sh"]
             env:
               TZ: ${TIMEZONE}
-              SMTP_HOST: smtp-relay.home.svc.cluster.local
-              SMTP_PORT: "25"
-              MAIL_FROM: unifi-reminder@${SECRET_DOMAIN}
               PROMETHEUS_URL: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
             envFrom:
               - secretRef:

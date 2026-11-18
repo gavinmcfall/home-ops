@@ -10,8 +10,8 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: smtp-relay
-      namespace: home
+    - name: external-secrets-stores
+      namespace: external-secrets
   path: ./kubernetes/apps/home/unifi-update-reminder/app
   prune: true
   sourceRef:
