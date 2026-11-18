@@ -27,6 +27,37 @@ sonarr:
       - trash_id: 72dae194fc92bf828f32cde7744e51a1
         reset_unmatched_scores:
           enabled: false
+      # HD-1080p — hand-made profile (142 shows), managed here for the x265
+      # preference. 1080p sources share one group so x265 wins whenever one is
+      # available. Upgrades were off; on now so existing x264 files move to x265.
+      # No blocks exist in this profile and none are added.
+      - name: HD-1080p
+        reset_unmatched_scores:
+          enabled: false
+        upgrade:
+          allowed: true
+          until_quality: 1080p
+          until_score: 10000
+        qualities:
+          - name: Bluray-2160p Remux
+            enabled: false
+          - name: Bluray-2160p
+            enabled: false
+          - name: WEB 2160p
+            enabled: false
+            qualities:
+              - WEBRip-2160p
+              - WEBDL-2160p
+          - name: HDTV-2160p
+            enabled: false
+          - name: Bluray-1080p Remux
+            enabled: false
+          - name: 1080p
+            qualities:
+              - Bluray-1080p
+              - WEBDL-1080p
+              - WEBRip-1080p
+          - name: HDTV-1080p
 
     custom_formats:
       # Unwanted (based on onedr0p's config)
@@ -44,11 +75,15 @@ sonarr:
         assign_scores_to:
           - name: WEB-1080p
             score: 20
+          - name: HD-1080p
+            score: 10000
       - trash_ids:
           - 9b64dff695c2115facf1b6ea59c9bd07 # x265 (no HDR/DV)
         assign_scores_to:
           - name: WEB-1080p
             score: 20
+          - name: HD-1080p
+            score: 0
       - trash_ids:
           - b2550eb333d27b75833e25b8c2557b38 # 10bit
         assign_scores_to:
