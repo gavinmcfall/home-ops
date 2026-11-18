@@ -29,7 +29,7 @@ spec:
           app:
             image:
               repository: redis/redisinsight
-              tag: 3.8.0@sha256:b5e19ee240abef6edb435871b90ff8a210995422e8e018ab61c0339d318a1f84
+              tag: 3.10.1@sha256:7aea9c96ee8e34518d7d692c02a081f6e46ff9230e7779212aa10a65c423c18a
             env:
               TZ: ${TIMEZONE}
               RI_FILES_LOGGER: false
