@@ -33,29 +33,99 @@ sonarr:
         name: Remux-1080p - Anime
         reset_unmatched_scores:
           enabled: false
+      # Web 1080p — hand-made profile (307 shows), managed here for the x265 preference.
+      # All 1080p sources share one group so the x265 score, not the source, decides.
+      # 2160p stays listed (disabled) above 1080p so no 4K file is ever "upgraded" down.
+      - name: Web 1080p
+        reset_unmatched_scores:
+          enabled: false
+        upgrade:
+          allowed: true
+          until_quality: 1080p
+          until_score: 10000
+        qualities:
+          - name: Bluray-2160p Remux
+            enabled: false
+          - name: Bluray-2160p
+            enabled: false
+          - name: WEB 2160p
+            enabled: false
+            qualities:
+              - WEBRip-2160p
+              - WEBDL-2160p
+          - name: HDTV-2160p
+            enabled: false
+          - name: 1080p
+            qualities:
+              - Bluray-1080p Remux
+              - Bluray-1080p
+              - WEBDL-1080p
+              - WEBRip-1080p
+          - name: HDTV-1080p
+          - name: Web-720p
+            qualities:
+              - WEBRip-720p
+              - WEBDL-720p
+          - name: HDTV-720p
+          - name: Web-480p
+            qualities:
+              - WEBRip-480p
+              - WEBDL-480p
+          - name: DVD
+          - name: SDTV
 
     # Custom Formats: https://recyclarr.dev/reference/configuration/custom-formats/
     custom_formats:
-      # Unwanted (based on onedr0p's config)
+      # x265 preference: x265 wins over x264 whenever one is available, x264 only
+      # when there is no x265. +10000 beats the largest stack of other positive
+      # scores (~7.5k: tier + DV + HDR layers). Blocks are -100000 so a blocked
+      # x265 (+10000 - 100000) can never outrank a clean x264. until_score 10000
+      # means an x265 file stops upgrading and an x264 file keeps upgrading.
+      - trash_ids:
+          - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
+        assign_scores_to:
+          - name: WEB-1080p
+            score: 10000
+          - name: Web 1080p
+            score: 10000
+      - trash_ids:
+          - 9b64dff695c2115facf1b6ea59c9bd07 # x265 (no HDR/DV) — zeroed so 1080p x265 is not counted twice
+        assign_scores_to:
+          - name: WEB-1080p
+            score: 0
+          - name: Web 1080p
+            score: 0
+
+      # Blocks (both 1080p profiles)
       - trash_ids:
           - 32b367365729d530ca1c124a0b180c64 # Bad Dual Groups
           - 82d40da2bc6923f41e14394075dd4b03 # No-RlsGroup
           - e1a997ddb54e3ecbfe06341ad323c458 # Obfuscated
           - 06d66ab109d4d2eddb2794d21526d140 # Retags
+          - 85c61753df5da1fb2aab6f2a47426b09 # BR-DISK
+          - 9c11cd3f07101cdba90a2d81cf0e56b4 # LQ
         assign_scores_to:
           - name: WEB-1080p
-
+            score: -100000
+          - name: Web 1080p
+            score: -100000
+      # Blocks already in WEB-1080p only
       - trash_ids:
-          # Uncomment the next six lines to allow x265 HD releases with HDR/DV
-          - 47435ece6b99a0b477caf360e79ba0bb # x265 (HD)
+          - 15a05bc7c1a36e2b57fd628f8977e2fc # AV1
+          - fbcb31d8dabd2a319072b84fc0b7249c # Extras
+          - e2315f990da2e2cbfc9fa5b7a6fcfe48 # LQ (Release Title)
+          - 23297a736ca77c0fc8e70f8edd7ee56c # Upscaled
+          - ae575f95ab639ba5d15f663bf019e3e8 # Language: Not Original
         assign_scores_to:
           - name: WEB-1080p
-            score: 20
+            score: -100000
+      # Blocks already in Web 1080p only
       - trash_ids:
-          - 9b64dff695c2115facf1b6ea59c9bd07 # x265 (no HDR/DV)
+          - 69aa1e159f97d860440b04cd6d590c4f # Language: Not English
+          - 9c14d194486c4014d422adc64092d794 # Dubs Only
         assign_scores_to:
-          - name: WEB-1080p
-            score: 20
+          - name: Web 1080p
+            score: -100000
       - trash_ids:
           - b2550eb333d27b75833e25b8c2557b38 # 10bit
         assign_scores_to:

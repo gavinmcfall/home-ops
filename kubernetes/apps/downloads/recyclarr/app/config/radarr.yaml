@@ -30,6 +30,87 @@ radarr:
         name: Remux-1080p - Anime
         reset_unmatched_scores:
           enabled: false
+      # Hand-made profiles that hold the library (748 / 148 / 28 movies), managed
+      # here for the x265 preference. All 1080p sources share one group so the
+      # x265 score, not the source, decides. 2160p stays listed (disabled) above
+      # 1080p so no 4K file is ever "upgraded" down to 1080p.
+      - name: Remux/Web 1080p
+        reset_unmatched_scores:
+          enabled: false
+        upgrade:
+          allowed: true
+          until_quality: 1080p
+          until_score: 10000
+        qualities:
+          - name: Remux-2160p
+            enabled: false
+          - name: Bluray-2160p
+            enabled: false
+          - name: WEB 2160p
+            enabled: false
+            qualities:
+              - WEBDL-2160p
+              - WEBRip-2160p
+          - name: HDTV-2160p
+            enabled: false
+          - name: 1080p
+            qualities:
+              - Remux-1080p
+              - Bluray-1080p
+              - WEBDL-1080p
+              - WEBRip-1080p
+          - name: HDTV-1080p
+      - name: HD-1080p
+        reset_unmatched_scores:
+          enabled: false
+        upgrade:
+          allowed: true
+          until_quality: 1080p
+          until_score: 10000
+        qualities:
+          - name: Remux-2160p
+            enabled: false
+          - name: Bluray-2160p
+            enabled: false
+          - name: WEB 2160p
+            enabled: false
+            qualities:
+              - WEBDL-2160p
+              - WEBRip-2160p
+          - name: HDTV-2160p
+            enabled: false
+          - name: 1080p
+            qualities:
+              - Remux-1080p
+              - Bluray-1080p
+              - WEBDL-1080p
+              - WEBRip-1080p
+          - name: HDTV-1080p
+      - name: HD Bluray + WEB
+        reset_unmatched_scores:
+          enabled: false
+        upgrade:
+          allowed: true
+          until_quality: 1080p
+          until_score: 10000
+        qualities:
+          - name: Remux-2160p
+            enabled: false
+          - name: Bluray-2160p
+            enabled: false
+          - name: WEB 2160p
+            enabled: false
+            qualities:
+              - WEBDL-2160p
+              - WEBRip-2160p
+          - name: HDTV-2160p
+            enabled: false
+          - name: 1080p
+            qualities:
+              - Bluray-1080p
+              - WEBDL-1080p
+              - WEBRip-1080p
+          - name: Bluray-720p
 
     custom_formats:
       # Movie Custom Formats
@@ -53,16 +134,65 @@ radarr:
           - name: SQP-1 (1080p)
 
       # x265 preference (space saving)
+      # In the three library profiles x265 wins over x264 whenever one is
+      # available, x264 only when there is no x265. +10000 beats the largest
+      # stack of other positive scores (~7.9k: lossless audio + Remux tier +
+      # IMAX). Blocks are -100000 so a blocked x265 (+10000 - 100000) can never
+      # outrank a clean x264. until_score 10000 means an x265 file stops
+      # upgrading and an x264 file keeps upgrading.
       - trash_ids:
           - dc98083864ea246d05a42df0d05f81cc # x265 (HD)
         assign_scores_to:
           - name: SQP-1 (1080p)
             score: 20
+          - name: Remux/Web 1080p
+            score: 10000
+          - name: HD-1080p
+            score: 10000
+          - name: HD Bluray + WEB
+            score: 10000
       - trash_ids:
-          - 839bea857ed2c0a8e084f3cbdbd65ecb # x265 (no HDR/DV)
+          - 839bea857ed2c0a8e084f3cbdbd65ecb # x265 (no HDR/DV) — zeroed so 1080p x265 is not counted twice
         assign_scores_to:
           - name: SQP-1 (1080p)
             score: 20
+          - name: Remux/Web 1080p
+            score: 0
+          - name: HD-1080p
+            score: 0
+          - name: HD Bluray + WEB
+            score: 0
+
+      # Blocks for the three library profiles, raised to -100000 where they
+      # already exist (no new blocks added)
+      - trash_ids:
+          - ed38b889b31be83fda192888e2286d83 # BR-DISK
+          - 90a6f9a284dff5103f6346090e6280c8 # LQ
+          - b8cd450cbfa689c0259a01d9e29ba3d6 # 3D
+        assign_scores_to:
+          - name: Remux/Web 1080p
+            score: -100000
+          - name: HD-1080p
+            score: -100000
+          - name: HD Bluray + WEB
+            score: -100000
+      - trash_ids:
+          - 9c38ebb7384dada637be8899efa68e6f # SDR
+          - 7357cf5161efbf8c4d5d0c30b4815ee2 # Obfuscated
+          - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup
+        assign_scores_to:
+          - name: HD-1080p
+            score: -100000
+      - trash_ids:
+          - e6886871085226c3da1830830146846c # Generated Dynamic HDR
+          - e204b80c87be9497a8a6eaff48f72905 # LQ (Release Title)
+          - bfd8eb01832d646a0a89c4deb46f8564 # Upscaled
+          - 0a3f082873eb454bde444150b70253cc # Extras
+          - 712d74cd88bceb883ee32f773656b1f5 # Sing-Along Versions
+          - cae4ca30163749b891686f95532519bd # AV1
+        assign_scores_to:
+          - name: HD Bluray + WEB
+            score: -100000
 
       # Anime Custom Formats
       - trash_ids:
