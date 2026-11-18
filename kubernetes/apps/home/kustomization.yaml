@@ -30,3 +30,4 @@ resources:
   - ./smtp-relay/ks.yaml
   - ./spyglass/ks.yaml
   - ./thelounge/ks.yaml
+  - ./unifi-update-reminder/ks.yaml

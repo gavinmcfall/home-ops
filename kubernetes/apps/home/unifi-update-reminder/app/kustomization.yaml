@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./externalsecret.yaml
+  - ./helmrelease.yaml
+configMapGenerator:
+  - name: unifi-update-reminder-scripts
+    files:
+      - remind.sh=./resources/remind.sh
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    # Shell ${VARS} inside the script are NOT Flux postBuild variables —
+    # exempt the generated ConfigMap from substitution.
+    kustomize.toolkit.fluxcd.io/substitute: disabled
