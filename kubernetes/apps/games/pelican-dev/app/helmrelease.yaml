@@ -49,7 +49,7 @@ spec:
           install-plugin-deps:
             image:
               repository: ghcr.io/pelican/panel
-              tag: v1.0.0-rc.1@sha256:6cdbd674c14221b760da980cbeecab1982cdd1d38746ae204306fe156b19239d
+              tag: v1.0.0-rc.4@sha256:1d38b9781b072729f5f9d78440a38a0513b879e61c2d4f2a9812200dee21a539
             env:
               COMPOSER_VENDOR_DIR: /mnt/vendor
             command:
@@ -81,10 +81,12 @@ spec:
           app:
             image:
               repository: ghcr.io/pelican/panel
-              tag: v1.0.0-rc.1@sha256:6cdbd674c14221b760da980cbeecab1982cdd1d38746ae204306fe156b19239d
+              tag: v1.0.0-rc.4@sha256:1d38b9781b072729f5f9d78440a38a0513b879e61c2d4f2a9812200dee21a539
             env:
               XDG_DATA_HOME: /pelican-data
               FILAMENT_UPLOADABLE_AVATARS: "true"
+              # One-click updates would rewrite the container, not the pinned image; Flux owns upgrades
+              PANEL_DASHBOARD_UPDATE_ENABLED: "false"
               PATH: /opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
             envFrom:
               - secretRef:
