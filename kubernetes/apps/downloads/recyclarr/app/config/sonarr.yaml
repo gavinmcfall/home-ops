@@ -131,6 +131,18 @@ sonarr:
         assign_scores_to:
           - name: WEB-1080p
             score: 10
+      # Anime on Web 1080p (126 Anime-folder series use this profile). Sonarr
+      # parses "Dual-Audio" release titles as Japanese only, so the Not English
+      # block above (-100000) rejected every dual-audio release and left those
+      # shows on Japanese-only or foreign-dub copies. Anime Dual Audio needs a
+      # dual-audio title marker AND Japanese/Chinese/Korean audio, so it never
+      # matches live-action TV: +100000 cancels the block for anime dual audio
+      # only. A Bad Dual Group release still nets -100000 and stays blocked.
+      - trash_ids:
+          - 418f50b10f1907201b6cfdf881f467b7 # Anime Dual Audio
+        assign_scores_to:
+          - name: Web 1080p
+            score: 100000
 
       # Anime Custom Formats
       - trash_ids:
@@ -145,20 +157,28 @@ sonarr:
           - name: Remux-1080p - Anime
             score: 0 # Adjust scoring as desired
 
+      # English audio gate for Remux-1080p - Anime (profile min score is 100).
+      # Dubs Only matches any "Dubbed" title, German and French dubs included,
+      # so +3000 alone let German.Dubbed copies win. Not English now costs 3000,
+      # which nets the outcomes to:
+      #   dual audio (parsed Japanese)  6000 - 3000 = 3000  pass
+      #   English dub (parsed English)  3000 -    0 = 3000  pass
+      #   German/French dub             3000 - 3000 =    0  rejected
+      #   Japanese-only raw                0 - 3000 = -3000 rejected
       - trash_ids:
           - 418f50b10f1907201b6cfdf881f467b7 # Anime Dual Audio
         assign_scores_to:
           - name: Remux-1080p - Anime
-            score: 3000 # Gatekeeper: required for min_format_score threshold
+            score: 6000
 
       - trash_ids:
           - 9c14d194486c4014d422adc64092d794 # Dubs Only
         assign_scores_to:
           - name: Remux-1080p - Anime
-            score: 3000 # Gatekeeper: required for min_format_score threshold
+            score: 3000
 
       - trash_ids:
           - 69aa1e159f97d860440b04cd6d590c4f # Language: Not English
         assign_scores_to:
           - name: Remux-1080p - Anime
-            score: 0 # Neutralize - anime is expected to be non-English
+            score: -3000
