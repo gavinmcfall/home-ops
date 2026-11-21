@@ -36,7 +36,7 @@ spec:
           init-db:
             image:
               repository: ghcr.io/home-operations/postgres-init
-              tag: 17.6.0@sha256:86a1992d46273c58fd4ad95b626081dfaabfe16bd56944675169e406d1a660dd
+              tag: 19.0.0@sha256:b49e2f1f373d932ab41614633ac89fa506e5d21bb13cc18d9c96ca026e51f502
             envFrom: &envFrom
               - secretRef:
                   name: peertube-secret
