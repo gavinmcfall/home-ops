@@ -25,7 +25,7 @@ spec:
               repository: docker.io/clusterzx/paperless-ai
               # A version tag, not `latest`: on `latest` a major release shows up as
               # a digest bump with no changelog (4.0.0 did, as #3044).
-              tag: 4.0.0@sha256:bea1e218755ba7940da9748ce64e3d7020f15059eab8eb5c6e5470d3d60436a6
+              tag: v4.7.0@sha256:eff2134eab69ddfb8ead0c768687a4df22d964ab4b51b3fa5c1b1bac8cb10e5d
             env:
               TZ: ${TIMEZONE}
               # Behind the Envoy gateway: one proxy hop, so the login rate limit
