@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: docker.io/library/telegraf
-              tag: 1.40.3@sha256:2958e3cbdc22d702ebd4a1e2db004c564f52a866551a65817eea26011407ea66
+              tag: 1.40.4@sha256:ed12bf60e0d634c48d403ed02ae8b67fb3f885cbd939c4d4ba7ea05c05a4741a
             envFrom:
               - secretRef:
                   name: telegraf-secret
