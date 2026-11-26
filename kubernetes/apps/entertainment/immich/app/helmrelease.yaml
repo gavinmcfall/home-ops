@@ -69,6 +69,10 @@ spec:
               # Explicit ML service URL for resilience
               IMMICH_MACHINE_LEARNING_URL: "http://immich-machine-learning.entertainment.svc.cluster.local:3003"
               IMMICH_TELEMETRY_INCLUDE: "all"
+              # Workaround for immich-app/immich#33466: with the default host "::" the
+              # v3.4.2 Prometheus exporter answers every /metrics request with 400.
+              # Remove once a release containing the upstream fix is deployed.
+              IMMICH_HOST: "0.0.0.0"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
