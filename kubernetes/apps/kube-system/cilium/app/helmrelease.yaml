@@ -27,6 +27,15 @@ spec:
   values:
     hubble:
       enabled: true
+      tls:
+        auto:
+          # The chart default (method: helm) generates the Hubble certs once and
+          # reuses the existing secrets on every upgrade, so they expired a year
+          # after install (2026-11-18) and broke hubble-relay. cronJob runs
+          # certgen on each upgrade and on the schedule below, renewing them
+          # well inside their 365-day validity.
+          method: cronJob
+          schedule: "0 0 1 */4 *"
       export:
         # Persist dropped/errored flows so the next network blip is diagnosable at
         # the datapath level (file is node-local: /var/run/cilium/hubble/ on each
