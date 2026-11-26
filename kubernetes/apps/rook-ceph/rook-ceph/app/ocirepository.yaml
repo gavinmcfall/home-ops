@@ -11,5 +11,5 @@ spec:
     operation: copy
   ref:
     # No leading v: Rook dropped it from OCI chart tags in 1.21.0.
-    tag: 1.21.2
+    tag: 1.21.3
   url: oci://ghcr.io/rook/rook-ceph
