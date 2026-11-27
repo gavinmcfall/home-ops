@@ -33,6 +33,54 @@ sonarr:
         name: Remux-1080p - Anime
         reset_unmatched_scores:
           enabled: false
+        # No Remux: anime Remuxes averaged 5.8 GiB/episode (266 files, 1.5 TiB)
+        # against 1.1 GiB for Bluray encodes. This is the guide's quality list
+        # with Bluray-1080p Remux taken out of the "Bluray 1080p" group and
+        # disabled. It stays above Bluray-1080p so existing Remux files are
+        # never "upgraded" down to an encode.
+        upgrade:
+          allowed: true
+          until_quality: Bluray-1080p
+          until_score: 10000
+        qualities:
+          - name: Bluray-1080p Remux
+            enabled: false
+          - name: Bluray-1080p
+          - name: WEB 1080p
+            qualities:
+              - HDTV-1080p
+              - WEBRip-1080p
+              - WEBDL-1080p
+          - name: Bluray-720p
+          - name: WEB 720p
+            qualities:
+              - HDTV-720p
+              - WEBRip-720p
+              - WEBDL-720p
+          - name: Bluray-480p
+          - name: WEB 480p
+            qualities:
+              - WEBRip-480p
+              - WEBDL-480p
+          - name: DVD
+          - name: SDTV
+          - name: Bluray-2160p Remux
+            enabled: false
+          - name: Bluray-2160p
+            enabled: false
+          - name: WEB 2160p
+            enabled: false
+            qualities:
+              - WEBRip-2160p
+              - WEBDL-2160p
+          - name: HDTV-2160p
+            enabled: false
+          - name: Raw-HD
+            enabled: false
+          - name: Bluray-576p
+            enabled: false
+          - name: Unknown
+            enabled: false
       # Web 1080p — hand-made profile (307 shows), managed here for the x265 preference.
       # All 1080p sources share one group so the x265 score, not the source, decides.
       # 2160p stays listed (disabled) above 1080p so no 4K file is ever "upgraded" down.
