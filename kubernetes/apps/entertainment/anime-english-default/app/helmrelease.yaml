@@ -43,7 +43,7 @@ spec:
             # python3, and is cached on the nodes. Bump together with tdarr.
             image:
               repository: ghcr.io/haveagitgat/tdarr
-              tag: 2.50.01@sha256:67d6a456d3c7963d2bc50318275843015af76e1f4dced3b1c5a91f8874d230bf
+              tag: 3.10.00@sha256:98137b694eed678f14ebc5f1d594d87ff8086df5cbc04203a15a53d95fe518b7
             command: ["python3", "/scripts/english_default.py"]
             env:
               ROOT: /media/Library/Anime
