@@ -9,6 +9,7 @@ components:
 
 resources:
   # Applications
+  - ./anime-english-default/ks.yaml
   - ./audiobookshelf/ks.yaml
   - ./bookorbit/ks.yaml
   - ./immich/ks.yaml

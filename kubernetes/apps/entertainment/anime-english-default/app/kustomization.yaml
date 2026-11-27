@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./helmrelease.yaml
+components:
+  # Nightly batch job: first to go under pressure, same as tdarr.
+  - ../../../../components/priority/priority-09
+configMapGenerator:
+  - name: anime-english-default-configmap
+    files:
+      - ./resources/english_default.py
+generatorOptions:
+  disableNameSuffixHash: true
