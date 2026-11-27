@@ -2,15 +2,17 @@
 """Make English audio the default track in anime MKVs, in place.
 
 Walks ROOT for .mkv files. Where an English audio track exists but is not the
-only default audio track, it sets the first English audio track as default and
-clears the default flag on every other audio track. Header edit only
+only default audio track, it sets an English audio track as default (the one
+already flagged, else the first) and clears the default flag on every other
+audio track. Header edit only
 (mkvpropedit): no remux, no re-encode.
 
 Subtitles (SUBS):
   report - log subtitle defaults that would change, but never edit them
   apply  - when the default audio is English, make an English signs & songs
-           track the default subtitle if one exists, otherwise no default
-           subtitle; full English or foreign subtitle tracks lose default
+           track (forced, or named signs/songs) the only default subtitle if
+           one exists, otherwise no default subtitle; full English and
+           foreign subtitle tracks lose default
   off    - ignore subtitles entirely
 
 Skipped, never edited:
@@ -25,6 +27,7 @@ Environment:
   MIN_AGE_MINUTES  default 60
   LIMIT            stop after this many changed files, 0 = no limit
   ONLY             only consider paths containing this text
+  CHILD_MEMORY_MIB address-space cap for each mkvmerge call (default 2560)
   TDARR_URL        Tdarr server API base, e.g. http://tdarr:8266
   apiKey           Tdarr API key (same env name the Tdarr secret uses)
 
@@ -32,6 +35,7 @@ Output is one TSV line per file worth mentioning, then a SUMMARY line.
 """
 import json
 import os
+import resource
 import subprocess
 import sys
 import time
@@ -40,6 +44,7 @@ import urllib.request
 
 ENGLISH = {"eng", "en"}
 SIGNS_WORDS = ("sign", "song")
+CHILD_MEMORY_MIB = int(os.environ.get("CHILD_MEMORY_MIB", "2560"))
 
 
 def env(name, default=""):
@@ -76,6 +81,13 @@ def is_signs(track):
     return bool(p.get("forced_track")) or any(w in name for w in SIGNS_WORDS)
 
 
+def is_english_sub(track):
+    # Some releases (Anime Time, Judas) name the track "English [Signs/Songs]"
+    # but tag its language jpn, so the name counts as well as the tag.
+    name = (track.get("properties", {}).get("track_name") or "").lower()
+    return lang(track) in ENGLISH or "english" in name
+
+
 def describe(tracks):
     return ",".join(f"{lang(t)}{'*' if is_default(t) else ''}" for t in tracks)
 
@@ -102,12 +114,21 @@ def tdarr_busy_files():
     return busy
 
 
+def pick(candidates):
+    """The candidate that is already default, else the first one.
+
+    Keeps a release's own choice (say its second English dub or second signs
+    track) instead of moving the flag to a different but equivalent track.
+    """
+    return next((t for t in candidates if is_default(t)), candidates[0])
+
+
 def plan_audio(audio):
     """Return {track_number: wanted_default} for audio, or None if no change."""
     eng = [t for t in audio if lang(t) in ENGLISH]
     if not eng or len(audio) < 2:
         return None
-    target = eng[0]
+    target = pick(eng)
     if all(is_default(t) == (t is target) for t in audio):
         return None
     return {t["properties"]["number"]: t is target for t in audio}
@@ -117,16 +138,25 @@ def plan_subs(subs):
     """Return {track_number: wanted_default} for subtitles, or None."""
     if not subs:
         return None
-    signs = [t for t in subs if lang(t) in ENGLISH and is_signs(t)]
-    target = signs[0] if signs else None
+    signs = [t for t in subs if is_english_sub(t) and is_signs(t)]
+    target = pick(signs) if signs else None
     if all(is_default(t) == (t is target) for t in subs):
         return None
     return {t["properties"]["number"]: t is target for t in subs}
 
 
+def cap_child_memory():
+    # mkvmerge -J needs ~80 MB on most files but 1.2 GB on some remuxes. Capping
+    # each child turns a pathological file into one ERROR line instead of an
+    # OOM kill that would stop every nightly run at the same file.
+    limit = CHILD_MEMORY_MIB << 20
+    resource.setrlimit(resource.RLIMIT_AS, (limit, limit))
+
+
 def read_tracks(path):
     out = subprocess.run(["mkvmerge", "-J", path], capture_output=True,
-                         text=True, check=True).stdout
+                         text=True, check=True,
+                         preexec_fn=cap_child_memory).stdout
     tracks = json.loads(out).get("tracks", [])
     return ([t for t in tracks if t.get("type") == "audio"],
             [t for t in tracks if t.get("type") == "subtitles"])
@@ -230,7 +260,9 @@ def main():
         if sub_plan:
             names = ",".join(
                 f"{lang(t)}{'*' if is_default(t) else ''}"
-                f"{'(signs)' if is_signs(t) else ''}" for t in subs)
+                f"{'(signs)' if is_signs(t) else ''}"
+                f"{'>on' if sub_plan[t['properties']['number']] else ''}"
+                for t in subs)
             if subs_mode == "apply":
                 counts["subs_fix"] += 1
                 changes.update(sub_plan)
@@ -267,6 +299,9 @@ def main():
             print(f"STOP\t-\treached LIMIT={limit}", flush=True)
             break
 
+    # Largest mkvmerge/mkvpropedit resident size seen, to size the memory limit.
+    counts["peak_child_mib"] = (
+        resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss // 1024)
     print("SUMMARY\t-\t" + json.dumps(counts), flush=True)
     if counts["error"] or counts["verify_failed"]:
         sys.exit(1)

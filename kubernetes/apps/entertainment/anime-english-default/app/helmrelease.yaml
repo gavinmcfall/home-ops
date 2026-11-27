@@ -49,8 +49,10 @@ spec:
               ROOT: /media/Library/Anime
               # "true" edits files; anything else only logs what would change.
               APPLY: "false"
-              # report = log subtitle defaults that would change, never edit.
-              SUBS: report
+              # apply = with English audio default, an English signs & songs
+              # track is the only default sub (or none); full subs go off.
+              # Gavin's call, 2026-11-28. report = log only, off = ignore.
+              SUBS: apply
               MIN_AGE_MINUTES: "60"
               LIMIT: "0"
               TDARR_URL: http://tdarr.entertainment.svc.cluster.local:8266
@@ -66,9 +68,12 @@ spec:
             resources:
               requests:
                 cpu: 50m
-                memory: 64Mi
+                memory: 128Mi
+              # mkvmerge -J needs ~80 MB on most files but 1.2 GB on some
+              # remuxes (Shangri-La Frontier S02E09). The script caps each
+              # mkvmerge at 2.5 GiB, so this limit sits just above that.
               limits:
-                memory: 256Mi
+                memory: 3Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
