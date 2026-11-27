@@ -48,7 +48,9 @@ spec:
             env:
               ROOT: /media/Library/Anime
               # "true" edits files; anything else only logs what would change.
-              APPLY: "false"
+              # Live since 2026-11-28 (Gavin), after a full dry run and a
+              # verified 5-file sample.
+              APPLY: "true"
               # apply = with English audio default, an English signs & songs
               # track is the only default sub (or none); full subs go off.
               # Gavin's call, 2026-11-28. report = log only, off = ignore.
