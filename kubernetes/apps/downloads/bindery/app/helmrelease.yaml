@@ -36,7 +36,7 @@ spec:
             # existing files (reorganize is an explicit, opt-in action only).
             image:
               repository: ghcr.io/vavallee/bindery
-              tag: v1.53.2@sha256:5089b373d97cd74846ee5b3022844cba0d0139e57234676a57202a92bf5cec12
+              tag: v1.53.3@sha256:ef2f2c70c55fec187ac2a4834fa2820161dd7831503fc91e6b04f1e2e8f0d126
             env:
               TZ: ${TIMEZONE}
               BINDERY_PORT: &port "8787"
